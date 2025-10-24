@@ -1,6 +1,6 @@
 # WoWAudit Spreadsheet Intake Notes
 
-This section documents the structure of `wowaudit/War Within Spreadsheet.xlsx` so we can migrate any useful automation into EdgeRush LootMan. The file is provided only as an analytical reference—production systems must pull data directly from WoWAudit APIs and persist it in our own database (no reliance on manual exports).
+This section documents the structure of the sample workbook `wowaudit/War Within Spreadsheet.xlsx` so we can migrate any useful automation into EdgeRush LootMan. The file is provided only as an analytical reference from a previous expansion—production systems must pull data directly from WoWAudit APIs and persist it in our own database (no reliance on manual exports).
 
 ## Workbook Overview
 - **Summary** – guild health indicators (refresh status, tracked members, Patreon gating), hyperlinks to roster/raid pages, and column labels reused across other sheets.

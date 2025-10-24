@@ -1,6 +1,6 @@
 # WoWAudit Data Coverage Map
 
-The sample spreadsheet `wowaudit/War Within Spreadsheet.xlsx` (analysis only) mirrors WoWAudit’s `raw_data` export. EdgeRush LootMan’s data-sync service must ingest every metric available there—and more—directly via WoWAudit’s API plus supplemental sources (Warcraft Logs, Raidbots, etc.). No production workflow should depend on manual exports; fetch data programmatically and persist it in our database.
+The sample spreadsheet `wowaudit/War Within Spreadsheet.xlsx` (analysis only) mirrors a WoWAudit `raw_data` export from a prior expansion. EdgeRush LootMan’s data-sync service must ingest every metric available there—and more—directly via WoWAudit’s API plus supplemental sources (Warcraft Logs, Raidbots, etc.). No production workflow should depend on manual exports; fetch data programmatically and persist it in our database.
 
 This document catalogues the column groups observed in `raw_data`, the inferred WoWAudit API sources, and follow-up actions to guarantee parity.
 

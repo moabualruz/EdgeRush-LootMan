@@ -2,17 +2,47 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:18
     container_name: edgerush-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-edgerush}
       POSTGRES_USER: ${POSTGRES_USER:-edgerush}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edgerush}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
+
+  data-sync:
+    image: gradle:8.10.1-jdk21
+    container_name: edgerush-data-sync
+    working_dir: /home/gradle/project
+    volumes:
+      - ./:/home/gradle/project
+    depends_on:
+      - postgres
+    command: ["sh", "-lc", "gradle :data-sync-service:bootRun"]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-edgerush}
+      POSTGRES_USER: ${POSTGRES_USER:-edgerush}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edgerush}
+      WOWAUDIT_API_KEY: ${WOWAUDIT_API_KEY}
+      WOWAUDIT_GUILD_URI: ${WOWAUDIT_GUILD_URI}
+      SYNC_RUN_ON_STARTUP: ${SYNC_RUN_ON_STARTUP:-false}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+    ports:
+      - "8080:8080"
+
+  nginx:
+    image: nginx:1.27
+    container_name: edgerush-nginx
+    depends_on:
+      - data-sync
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
 
 volumes:
   postgres_data:

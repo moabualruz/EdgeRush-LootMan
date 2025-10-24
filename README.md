@@ -1,18 +1,18 @@
 # EdgeRush LootMan
 
-EdgeRush LootMan (ELM) is a progression-first loot governance blueprint for **World of Warcraft: The War Within** mythic raid teams. It replaces ad‑hoc loot distribution with a transparent, data-backed system tuned to push Cutting Edge kills faster and with fewer roster conflicts. The long-term goal is to deliver an automated scoring platform (see `docs/system-overview.md`) that interfaces with WoWAudit, Warcraft Logs, Wipefest, and Raidbots to calculate Final Loot Priority Scores (FLPS) in real time.
+EdgeRush LootMan (ELM) is a progression-first guild operations platform for World of Warcraft raid teams. It replaces ad‑hoc roster, loot, and recruitment workflows with transparent, data-backed automation so guild leaders can push Cutting Edge kills faster and with fewer roster conflicts. The immediate goal is to mirror WoWAudit data, store it locally, and calculate the Progression-Optimized Loot Council Policy (POLCP); the long-term vision is a full guild portal (web/app/addon) with rank-based permissions and end-to-end operations support (recruitment, raid teams, loot assignments, attendance auditing, and analytics).
 
 All live data must be collected directly from provider APIs and stored in our own database (PostgreSQL by default, SQLite allowed only for quick local smoke tests); the `wowaudit/` directory contains analysis references only and should never be used as a production data source.
 
 ## Why EdgeRush LootMan Exists
-- Focus every raid drop on the fastest path to collective progression instead of personal upgrades.
-- Flatten loot council drama by tying every decision to public, verifiable metrics.
-- Automate the high-friction parts of loot management so officers spend raid nights pulling bosses, not wrangling spreadsheets.
+- Give guild leadership a single source of truth for roster management, recruitment intake, raid scheduling, and loot policy.
+- Flatten loot council drama by tying every decision to public, verifiable metrics (POLCP + FLPS).
+- Automate high-friction operations so officers spend raid nights pulling bosses, not wrangling spreadsheets or copy/pasting data across tools.
 
 ## Core Pillars
-- **Accelerated Progression** – Treat each Mythic drop as a raid resource whose job is to remove the next progression wall.
-- **Radical Transparency** – Publish the data, the formulas, and the outcomes so raiders can audit every decision.
-- **Operational Efficiency** – Lean on automation (WoWAudit, Raidbots Droptimizer, RC Loot Council) to keep the system easy to run week after week.
+- **Accelerated Progression** – Treat every raid resource (roster slots, loot, recruitment) as a guild-wide investment whose job is to remove the next progression wall.
+- **Radical Transparency** – Publish the data, formulas, and outcomes so raiders can audit every decision, from loot awards to attendance.
+- **Operational Efficiency** – Lean on automation (WoWAudit, Warcraft Logs, Raidbots, RC Loot Council) to keep roster, raid teams, recruitment, and loot distribution easy to run week after week.
 
 ## Final Loot Priority Score (FLPS)
 All contested loot decisions flow through the FLPS. A raider’s score is the product of three components:
@@ -41,13 +41,20 @@ FLPS = (RMS × IPI) × RDF
 
 ## Tool Stack
 - **RC Loot Council** – Rapid in-game voting with context on current gear and notes.
-- **WoWAudit** – Central hub for attendance, sims, wishlists, loot history, and RDF tracking.
+- **WoWAudit** – Central hub for attendance, sims, wishlists, loot history, recruitment, and RDF tracking.
 - **Raidbots Droptimizer** – Required source for upgrade sims per raider and encounter.
 - **Warcraft Logs & Wipefest** – Mechanical execution analytics (deaths, avoidable damage).
 - **Raid-Helper / Method Raid Tools / Raid Attendance Tracker** – Attendance automation.
 - **Discord (Ticket / Thread System)** – Handles appeals, feedback, and long-form discussions outside raid hours.
-- **Automation Targets** – Scheduled scripts hitting the WoWAudit API (`/guild/attendance`, `/guild/loot`, `/guild/sims`, `/guild/characters`) plus Warcraft Logs and Raidbots integrations to feed the future scoring service.
+- **Automation Targets** – Scheduled scripts hitting the WoWAudit API (`/v1/characters`, `/v1/team`, `/v1/period`, `/v1/wishlists`, `/v1/loot_history/{season}`, `/v1/attendance`, `/v1/raids`, `/v1/historical_data`, `/v1/guests`, `/v1/applications`) along with Warcraft Logs and Raidbots to feed the scoring and operations layers.
 - **Persistence** – PostgreSQL (Docker) as the primary data store; SQLite allowed for local smoke tests. Future ingress consolidation via nginx is planned.
+
+## Data Coverage Today
+- **Roster & Attendance** – Characters, guests, attendance summaries, and historical activity snapshots are ingested for auditing and roster health dashboards.
+- **Raid Scheduling** – Upcoming/past raids, sign-ups, and encounter toggles are persisted for team management and planning.
+- **Loot & Wishlists** – Season loot history, wishlists (summary + character-level detail), and POLCP-ready metrics are stored for loot council transparency.
+- **Recruitment** – Applications, alts, and question responses are imported to streamline guild intake workflows.
+- **Raw Snapshots** – Every WoWAudit payload is archived for auditing/version drift so the dataset can be replayed or reprocessed when logic changes.
 
 ## Operating Workflow
 1. **Collect Data Automatically** – Attendance, logs, sims, wishlists feed into WoWAudit.
@@ -87,4 +94,9 @@ FLPS = (RMS × IPI) × RDF
 - `docs/wowaudit-spreadsheet.md`, `docs/wowaudit-data-map.md`, `docs/wowaudit-raw-schema.json` – WoWAudit export schema analysis, categorized column inventory, and API mapping for full data parity.
 - `assets/onboarding/README.md` – Export instructions for the onboarding slide deck.
 - `assets/dashboard/README.md`, `assets/dashboard/mock_flps.csv` – Seed dataset and checklist for the interim FLPS dashboard.
-- `wowaudit/War Within Spreadsheet.xlsx` – Analysis-only reference; production data must be fetched via APIs and stored in database (see docs/wowaudit-spreadsheet.md).
+- `wowaudit/War Within Spreadsheet.xlsx` – Legacy sample workbook used for reverse-engineering; production data must be fetched via APIs and stored in database (see docs/wowaudit-spreadsheet.md).
+
+## Local Development
+- Configure `.env.local` with the required variables (see `docs/local-setup.md`).
+- Run `docker compose --env-file .env.local up --build` (uses PostgreSQL 18 with `/var/lib/postgresql` volume, Gradle JDK 21, nginx) to start Postgres, the Gradle-based Spring Boot service, and nginx.
+- Default access: `http://localhost/api/` proxied through nginx; set `SYNC_RUN_ON_STARTUP=true` to trigger an immediate WoWAudit sync, or rely on the scheduled cron job.

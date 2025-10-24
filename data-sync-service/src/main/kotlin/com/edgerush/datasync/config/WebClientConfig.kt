@@ -17,6 +17,7 @@ class WebClientConfig {
                 headers.setBearerAuth(apiKey)
             }
             headers.addIfAbsent(HttpHeaders.USER_AGENT, "EdgeRushLootMan/0.1 (+https://wowaudit.com)")
+            headers.addIfAbsent(HttpHeaders.ACCEPT, "application/json")
         }
 
         return builder

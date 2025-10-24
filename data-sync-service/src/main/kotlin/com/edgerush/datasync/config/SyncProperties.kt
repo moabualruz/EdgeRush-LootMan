@@ -7,10 +7,12 @@ import org.springframework.boot.context.properties.bind.DefaultValue
 data class SyncProperties(
     @DefaultValue("0 0 4 * * *")
     val cron: String,
+    @DefaultValue("false")
+    val runOnStartup: Boolean,
     val wowaudit: WoWAudit
 ) {
     data class WoWAudit(
-        @DefaultValue("https://api.wowaudit.com/v1")
+        @DefaultValue("https://wowaudit.com")
         val baseUrl: String,
         val guildProfileUri: String?,
         val apiKey: String?

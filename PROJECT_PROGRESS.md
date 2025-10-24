@@ -27,6 +27,10 @@
 - [x] Replaced guild-specific URLs with placeholders; emphasized API-first data flow and database persistence strategy.
 - [x] Drafted persistence plan, Docker PostgreSQL setup, and Flyway migration (`docs/persistence-plan.md`, `docker-compose.yml`, `application*.yaml`).
 - [x] Documented WoWAudit API DTO plan (`docs/api/wowaudit-schema.md`) and nginx ingress strategy (`docs/nginx-plan.md`).
-- [ ] Implement error handling and add unit tests for Kotlin data sync clients (WebClient, retry logic).
+- [x] Hooked WoWAudit sync into scheduled + optional startup triggers (`WoWAuditScheduler`, `WoWAuditStartupRunner`).
+- [x] Added Docker-based runtime (Postgres 18, Gradle runner, nginx) and documented local setup (`docs/local-setup.md`).
+- [x] Updated sync workflow to use WoWAudit `/v1` roster/team/period endpoints and guild/team loot history with JSON safeguards.
+- [x] Persisted full WoWAudit datasets locally (attendance, raids, historical activity, guests, applications, wishlists) with auditing snapshots and normalized tables.
+- [ ] Harden error handling and add unit tests for Kotlin data sync clients (WebClient, retry logic).
 - [ ] Integrate mock datasets into interim dashboard template and share link with council.
-- [ ] Build WoWAudit API deserializers covering full `raw_data` column set.
+- [ ] Compute and persist POLCP (FLPS) results using the synchronized data.

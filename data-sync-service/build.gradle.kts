@@ -14,7 +14,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
-    implementation("org.flywaydb:flyway-core")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
+    implementation("org.flywaydb:flyway-core:10.18.2")
+    implementation("org.flywaydb:flyway-database-postgresql:10.18.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")

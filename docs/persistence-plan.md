@@ -3,7 +3,7 @@
 EdgeRush LootMan stores all synchronized data in a first-party database so that dashboards, APIs, and historical queries are independent of external spreadsheets. This plan outlines the initial persistence strategy.
 
 ## 1. Datastore Overview
-- **Primary database**: PostgreSQL 16 (containerized via Docker Compose).
+- **Primary database**: PostgreSQL 18 (containerized via Docker Compose).
 - **Developer fallback**: SQLite file-based store for quick smoke tests (`spring.profiles.active=sqlite`). Not recommended for shared environments.
 - **Future ingress**: nginx reverse proxy will front all internal services to simplify port management and TLS termination.
 
@@ -24,6 +24,13 @@ Goal: capture enough structure for FLPS scoring snapshots and loot history while
 Tables proposed in `V0001__init.sql`:
 - `raiders` – canonical roster with role, class, last sync metadata, and unique character key.
 - `loot_awards` – awarded items with item id, tier classification, RDF cooldown data, and foreign key to `raiders`.
+- `wishlist_snapshots` – stores raw wishlist payloads per character for audit/comparison.
+- `attendance_stats` – tracks raid attendance metrics per character and sync.
+- `raids`, `raid_signups`, `raid_encounters` – detailed raid schedule with sign-up rosters and encounter toggles.
+- `historical_activity` – keystone/vault progress by character and period.
+- `guests` – recurring guest roster tracked by WoWAudit.
+- `applications`, `application_alts`, `application_questions` – recruitment intake data with answers and attachments.
+- `wowaudit_snapshots` – raw JSON payload archive for auditing and reprocessing.
 - `sync_runs` – audit of synchronization attempts (source, status, duration, error payloads).
 
 Indexes will target frequent lookup paths (`raiders(character_name)`, `loot_awards(item_id)` etc.).

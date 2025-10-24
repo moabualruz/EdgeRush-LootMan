@@ -3,7 +3,7 @@
 ## WoWAudit API
 - Navigate to `Settings → API Access` in WoWAudit and generate a guild API key.
 - Store the key in environment variables when running scripts (`export WOWAUDIT_API_KEY=...`).
-- Base URL: `https://api.wowaudit.com/v1`
+- Base URL: `https://wowaudit.com/v1`
 - Core endpoints (GET unless noted):
   - `/guild/attendance`
   - `/guild/loot`
@@ -62,4 +62,4 @@ Load environment variables in Spring Boot using `@ConfigurationProperties` or en
 ## Local Testing Tips
 - Run `./gradlew :data-sync-service:test` to execute unit tests (once Gradle wrapper is added).
 - Use the mock fixtures in `docs/data/` to simulate WoWAudit, Logs, and Droptimizer responses without hitting live APIs.
-- Database: run PostgreSQL via Docker Compose for real sync tests (`docker compose up db`). Provide an optional SQLite profile for quick local experiments, but default to PostgreSQL.
+- Database: run PostgreSQL via Docker Compose for real sync tests (`docker compose --env-file .env.local up db`). Provide an optional SQLite profile for quick local experiments, but default to PostgreSQL 18 (volume mounted at `/var/lib/postgresql`). Set `SYNC_RUN_ON_STARTUP=true` when you want a one-time sync on boot; otherwise scheduled execution is driven by `sync.cron`.

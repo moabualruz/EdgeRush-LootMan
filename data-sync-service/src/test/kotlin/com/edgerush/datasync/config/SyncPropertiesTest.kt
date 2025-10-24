@@ -10,7 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest
         "sync.wowaudit.base-url=https://api.test",
         "sync.wowaudit.guild-profile-uri=https://wowaudit.com/REGION/REALM/GUILD/profile",
         "sync.wowaudit.api-key=test-key-123",
-        "sync.cron=0 15 5 * * *"
+        "sync.cron=0 15 5 * * *",
+        "sync.run-on-startup=true"
     ]
 )
 class SyncPropertiesTest @Autowired constructor(
@@ -20,6 +21,7 @@ class SyncPropertiesTest @Autowired constructor(
     @Test
     fun `binds properties from configuration`() {
         assertThat(properties.cron).isEqualTo("0 15 5 * * *")
+        assertThat(properties.runOnStartup).isTrue()
         assertThat(properties.wowaudit.baseUrl).isEqualTo("https://api.test")
         assertThat(properties.wowaudit.guildProfileUri)
             .isEqualTo("https://wowaudit.com/REGION/REALM/GUILD/profile")

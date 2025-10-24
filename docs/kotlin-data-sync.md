@@ -15,12 +15,12 @@ This document sketches the architecture for the MVP automation layer, implemente
 - Packaging: Runnable jar / Docker image triggered via CLI args or scheduled tasks.
 
 ## 2. Responsibilities
-1. Fetch roster, attendance, loot, and simulation data from WoWAudit `/guild` endpoints.
+1. Fetch roster, attendance, loot, wishlist, and simulation data from WoWAudit `/v1` endpoints.
 2. Augment mechanical metrics with Warcraft Logs GraphQL queries and Wipefest summaries.
 3. Normalize External Preparation metrics (vault slots, crest usage, heroic clears).
 4. Compute RMS, IPI, and RDF values for each raider.
 5. Mirror the full WoWAudit `raw_data` schema (every gear/performance/prep column) in EdgeRush domain models.
-6. Provide resilient API clients (`WoWAuditClient`) with retry-aware error handling for 429/5xx responses.
+6. Provide resilient API clients (`WoWAuditClient`) with retry-aware error handling for 429/5xx responses, plus scheduled (`WoWAuditScheduler`) and on-demand (`WoWAuditStartupRunner`) orchestration.
 7. Persist synchronized data locally (default: PostgreSQL via Docker Compose; SQLite permitted for quick developer tests) with migration support.
 8. Publish optional Discord webhooks summarizing updates.
 
@@ -41,7 +41,7 @@ This document sketches the architecture for the MVP automation layer, implemente
   sync:
     cron: "0 0 4 * * *"
     wowaudit:
-      base-url: https://api.wowaudit.com/v1
+      base-url: https://wowaudit.com
     raidbots:
       enabled: true
   ```
