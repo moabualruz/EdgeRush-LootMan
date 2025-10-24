@@ -1,0 +1,58 @@
+[
+  {
+    "name": "RogueB",
+    "acs": 0.9,
+    "mas": 1.0,
+    "eps": 1.0,
+    "rms": 0.96,
+    "uv": 0.05,
+    "tierBonus": 1.1,
+    "roleMultiplier": 1.0,
+    "ipi": 0.608,
+    "rdf": 1.0,
+    "flps": 0.583,
+    "eligible": true
+  },
+  {
+    "name": "MageA",
+    "acs": 0.9,
+    "mas": 0.888,
+    "eps": 1.0,
+    "rms": 0.915,
+    "uv": 0.05,
+    "tierBonus": 1.1,
+    "roleMultiplier": 1.0,
+    "ipi": 0.608,
+    "rdf": 1.0,
+    "flps": 0.556,
+    "eligible": true
+  },
+  {
+    "name": "PriestD",
+    "acs": 0.9,
+    "mas": 0.861,
+    "eps": 1.0,
+    "rms": 0.904,
+    "uv": 0.076,
+    "tierBonus": 1.1,
+    "roleMultiplier": 0.7,
+    "ipi": 0.559,
+    "rdf": 1.0,
+    "flps": 0.505,
+    "eligible": true
+  },
+  {
+    "name": "HunterC",
+    "acs": 1.0,
+    "mas": 0.0,
+    "eps": 0.77,
+    "rms": 0.554,
+    "uv": 0.04,
+    "tierBonus": 1.2,
+    "roleMultiplier": 1.0,
+    "ipi": 0.638,
+    "rdf": 1.0,
+    "flps": 0.354,
+    "eligible": false
+  }
+]

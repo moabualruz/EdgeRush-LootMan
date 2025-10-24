@@ -1,0 +1,36 @@
+{
+  "encounter": "Queen Ansurek Mythic",
+  "spec_averages": {
+    "Mage": { "dpa": 0.25, "adt_pct": 0.08 },
+    "Rogue": { "dpa": 0.20, "adt_pct": 0.07 },
+    "Hunter": { "dpa": 0.22, "adt_pct": 0.09 },
+    "Priest": { "dpa": 0.18, "adt_pct": 0.06 }
+  },
+  "players": [
+    {
+      "character": "MageA",
+      "spec": "Mage",
+      "deaths_per_attempt": 0.30,
+      "avoidable_damage_pct": 0.10
+    },
+    {
+      "character": "RogueB",
+      "spec": "Rogue",
+      "deaths_per_attempt": 0.18,
+      "avoidable_damage_pct": 0.06
+    },
+    {
+      "character": "HunterC",
+      "spec": "Hunter",
+      "deaths_per_attempt": 0.35,
+      "avoidable_damage_pct": 0.14
+    },
+    {
+      "character": "PriestD",
+      "spec": "Priest",
+      "deaths_per_attempt": 0.22,
+      "avoidable_damage_pct": 0.08
+    }
+  ]
+}
+

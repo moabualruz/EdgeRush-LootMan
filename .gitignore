@@ -1,3 +1,20 @@
-# IntelliJ / JetBrains IDE config
-.idea/
+# Kotlin build
+/build/
+/.gradle/
 
+# IntelliJ / JetBrains
+.idea/
+*.iml
+
+# Runtime artifacts
+/tmp/
+*.log
+*.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Guild-provided exports (keep local only)
+wowaudit/

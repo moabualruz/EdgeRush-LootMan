@@ -1,0 +1,32 @@
+# Project Progress
+
+## 2025-10-24
+- [x] Initialized git repository and configured local user identity.
+- [x] Authored README detailing EdgeRush LootMan pillars, scoring model, and workflow.
+- [x] Added supporting documentation (`docs/score-model.md`, `docs/onboarding-guide.md`) and completed initial commit.
+- [x] Captured system purpose, pseudocode, and automation roadmap in `docs/system-overview.md`.
+- [x] Published high-level project plan with phased goals in `docs/project-plan.md`.
+- [x] Broke scope into MVP vs extended features and logged results in `docs/project-plan.md`.
+- [x] Produced mock data fixtures (`docs/data/`) for WoWAudit, Warcraft Logs, and Raidbots inputs.
+- [x] Documented API setup and updated plan for Kotlin-based data sync service.
+- [x] Drafted interim dashboard prototype instructions and documented mock data usage.
+- [x] Authored FLPS walkthrough using mock datasets (`docs/flps-walkthrough.md`).
+- [x] Produced onboarding deck outline (`docs/onboarding-deck.md`).
+- [x] Outlined Kotlin Spring Boot data-sync architecture and testing plan (`docs/kotlin-data-sync.md`).
+- [x] Scaffolded Kotlin Spring Boot data-sync module with placeholder acceptance test.
+- [x] Drafted Discord announcement templates (`docs/discord-templates.md`).
+- [x] Added `.env.example` and bound configurable WoWAudit guild URI in `SyncProperties`.
+- [x] Implemented Kotlin `ScoreCalculator` with unit tests using mock datasets.
+- [x] Generated mock FLPS output (`docs/data/mock_flps_output.json`) and wired dashboard instructions to use it.
+- [x] Published onboarding slide deck file (`docs/onboarding-slides.reveal.md`).
+- [x] Documented Discord webhook rollout plan (`docs/discord-webhook-plan.md`).
+- [x] Catalogued WoWAudit spreadsheet schema and endpoint mapping (`docs/wowaudit-spreadsheet.md`, `docs/wowaudit-data-map.md`).
+- [x] Generated categorized column schema (`docs/wowaudit-raw-schema.json`) and documented onboarding export workflow (`assets/onboarding/README.md`).
+- [x] Converted onboarding deck into shareable formats (see assets/onboarding/README.md) and prepped distribution instructions.
+- [x] Seeded interim dashboard dataset (`assets/dashboard/mock_flps.csv`) and publishing checklist (`assets/dashboard/README.md`).
+- [x] Replaced guild-specific URLs with placeholders; emphasized API-first data flow and database persistence strategy.
+- [x] Drafted persistence plan, Docker PostgreSQL setup, and Flyway migration (`docs/persistence-plan.md`, `docker-compose.yml`, `application*.yaml`).
+- [x] Documented WoWAudit API DTO plan (`docs/api/wowaudit-schema.md`) and nginx ingress strategy (`docs/nginx-plan.md`).
+- [ ] Implement error handling and add unit tests for Kotlin data sync clients (WebClient, retry logic).
+- [ ] Integrate mock datasets into interim dashboard template and share link with council.
+- [ ] Build WoWAudit API deserializers covering full `raw_data` column set.

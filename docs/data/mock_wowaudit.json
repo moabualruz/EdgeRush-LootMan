@@ -1,0 +1,53 @@
+{
+  "roster": [
+    {
+      "character": "MageA",
+      "role": "DPS",
+      "attendance_percent": 98,
+      "vault_slots_unlocked": 3,
+      "crest_usage_ratio": 1.0,
+      "heroic_bosses_cleared": 8,
+      "last_awards": [
+        { "item": "Stormwatcher's Sigil", "tier": "A", "date": "2025-10-10" }
+      ]
+    },
+    {
+      "character": "RogueB",
+      "role": "DPS",
+      "attendance_percent": 92,
+      "vault_slots_unlocked": 3,
+      "crest_usage_ratio": 0.9,
+      "heroic_bosses_cleared": 7,
+      "last_awards": [
+        { "item": "Raidfang Dirk", "tier": "B", "date": "2025-10-17" }
+      ]
+    },
+    {
+      "character": "HunterC",
+      "role": "DPS",
+      "attendance_percent": 100,
+      "vault_slots_unlocked": 2,
+      "crest_usage_ratio": 0.8,
+      "heroic_bosses_cleared": 6,
+      "last_awards": []
+    },
+    {
+      "character": "PriestD",
+      "role": "Healer",
+      "attendance_percent": 95,
+      "vault_slots_unlocked": 3,
+      "crest_usage_ratio": 1.0,
+      "heroic_bosses_cleared": 8,
+      "last_awards": [
+        { "item": "Renewal Balm", "tier": "C", "date": "2025-10-03" }
+      ]
+    }
+  ],
+  "tier_progress": [
+    { "character": "MageA", "tier_pieces_owned": 2 },
+    { "character": "RogueB", "tier_pieces_owned": 3 },
+    { "character": "HunterC", "tier_pieces_owned": 1 },
+    { "character": "PriestD", "tier_pieces_owned": 3 }
+  ]
+}
+

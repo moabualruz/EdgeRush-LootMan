@@ -1,6 +1,8 @@
 # EdgeRush LootMan
 
-EdgeRush LootMan (ELM) is a progression-first loot governance blueprint for **World of Warcraft: The War Within** mythic raid teams. It replaces ad‑hoc loot distribution with a transparent, data-backed system tuned to push Cutting Edge kills faster and with fewer roster conflicts.
+EdgeRush LootMan (ELM) is a progression-first loot governance blueprint for **World of Warcraft: The War Within** mythic raid teams. It replaces ad‑hoc loot distribution with a transparent, data-backed system tuned to push Cutting Edge kills faster and with fewer roster conflicts. The long-term goal is to deliver an automated scoring platform (see `docs/system-overview.md`) that interfaces with WoWAudit, Warcraft Logs, Wipefest, and Raidbots to calculate Final Loot Priority Scores (FLPS) in real time.
+
+All live data must be collected directly from provider APIs and stored in our own database (PostgreSQL by default, SQLite allowed only for quick local smoke tests); the `wowaudit/` directory contains analysis references only and should never be used as a production data source.
 
 ## Why EdgeRush LootMan Exists
 - Focus every raid drop on the fastest path to collective progression instead of personal upgrades.
@@ -16,7 +18,7 @@ EdgeRush LootMan (ELM) is a progression-first loot governance blueprint for **Wo
 All contested loot decisions flow through the FLPS. A raider’s score is the product of three components:
 
 ```
-FLPS = (RMS) × (IPI) × (RDF)
+FLPS = (RMS × IPI) × RDF
 ```
 
 - **Raider Merit Score (RMS, 40%)** – Attendance commitment, mechanical adherence, and external preparation.
@@ -44,6 +46,8 @@ FLPS = (RMS) × (IPI) × (RDF)
 - **Warcraft Logs & Wipefest** – Mechanical execution analytics (deaths, avoidable damage).
 - **Raid-Helper / Method Raid Tools / Raid Attendance Tracker** – Attendance automation.
 - **Discord (Ticket / Thread System)** – Handles appeals, feedback, and long-form discussions outside raid hours.
+- **Automation Targets** – Scheduled scripts hitting the WoWAudit API (`/guild/attendance`, `/guild/loot`, `/guild/sims`, `/guild/characters`) plus Warcraft Logs and Raidbots integrations to feed the future scoring service.
+- **Persistence** – PostgreSQL (Docker) as the primary data store; SQLite allowed for local smoke tests. Future ingress consolidation via nginx is planned.
 
 ## Operating Workflow
 1. **Collect Data Automatically** – Attendance, logs, sims, wishlists feed into WoWAudit.
@@ -63,9 +67,24 @@ FLPS = (RMS) × (IPI) × (RDF)
 - Automate RDF decay notifications in Discord to remind raiders when they re-enter contention.
 - Add testing scripts to validate data imports from WoWAudit or Raidbots after patches.
 - Draft onboarding materials (videos or slides) to train new recruits on EdgeRush LootMan expectations.
+- Stand up the automated scoring service described in `docs/system-overview.md`, starting with API data ingestion and FLPS calculation scripts.
+- Prototype UI flows (e.g., in Canva) for the eventual Flutter + Kotlin + PostgreSQL stack before committing to implementation.
 
 ## Contributing
-- File issues or proposals in `/docs` (to be created) with data-backed suggestions.
+- File issues or proposals in `/docs` with data-backed suggestions.
 - Bring encounter-specific exceptions (e.g., healer PM adjustments) with logs ready for review.
 - Remember: the system rewards the raid’s fastest path to Cutting Edge. Help us iterate without losing that north star.
 
+## Documentation Map
+- `docs/system-overview.md` – End-to-end scoring and automation blueprint.
+- `docs/score-model.md` – Detailed formulas and sample values.
+- `docs/flps-walkthrough.md` – Worked example using mock data fixtures.
+- `docs/onboarding-guide.md`, `docs/onboarding-deck.md`, `docs/onboarding-slides.reveal.md` – Training materials for raiders.
+- `docs/project-plan.md` – Phased roadmap with MVP vs extended features.
+- `docs/kotlin-data-sync.md`, `docs/automation-notes.md` – Kotlin/Spring Boot data sync design and operational guidance.
+- `docs/dashboard-prototype.md` – Interim visualization instructions.
+- `docs/discord-templates.md`, `docs/discord-webhook-plan.md` – Messaging templates and rollout plan for automated Discord notifications.
+- `docs/wowaudit-spreadsheet.md`, `docs/wowaudit-data-map.md`, `docs/wowaudit-raw-schema.json` – WoWAudit export schema analysis, categorized column inventory, and API mapping for full data parity.
+- `assets/onboarding/README.md` – Export instructions for the onboarding slide deck.
+- `assets/dashboard/README.md`, `assets/dashboard/mock_flps.csv` – Seed dataset and checklist for the interim FLPS dashboard.
+- `wowaudit/War Within Spreadsheet.xlsx` – Analysis-only reference; production data must be fetched via APIs and stored in database (see docs/wowaudit-spreadsheet.md).

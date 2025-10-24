@@ -1,0 +1,1720 @@
+{
+  "metadata_row_values": [
+    {
+      "index": 0,
+      "column": "45954.6",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 1,
+      "column": "DoD",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 2,
+      "column": "Twisting Nether",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 3,
+      "column": "EU",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 4,
+      "column": "1034|Your spreadsheet is out of date, for more features click the update arrow below.",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 5,
+      "column": "good|All added members are being tracked, there are no problems!",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 6,
+      "column": "no patreon",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 7,
+      "column": "Main",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 8,
+      "column": "https://wowaudit.com/REGION/REALM/GUILD/raids",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    },
+    {
+      "index": 9,
+      "column": "2025-10-24 14:24:54 +0200",
+      "note": "Spreadsheet metadata value (header unavailable)"
+    }
+  ],
+  "external_links": [
+    {
+      "index": 10,
+      "column": "https://wowaudit.com/REGION/REALM/GUILD/roster"
+    }
+  ],
+  "gear_equipped": [
+    {
+      "index": 11,
+      "column": "neck_id"
+    },
+    {
+      "index": 12,
+      "column": "neck_name"
+    },
+    {
+      "index": 13,
+      "column": "neck_quality"
+    },
+    {
+      "index": 14,
+      "column": "shoulder_ilvl"
+    },
+    {
+      "index": 15,
+      "column": "shoulder_id"
+    },
+    {
+      "index": 16,
+      "column": "shoulder_name"
+    },
+    {
+      "index": 17,
+      "column": "shoulder_quality"
+    },
+    {
+      "index": 18,
+      "column": "back_ilvl"
+    },
+    {
+      "index": 19,
+      "column": "back_id"
+    },
+    {
+      "index": 20,
+      "column": "back_name"
+    },
+    {
+      "index": 21,
+      "column": "back_quality"
+    },
+    {
+      "index": 22,
+      "column": "chest_ilvl"
+    },
+    {
+      "index": 23,
+      "column": "chest_id"
+    },
+    {
+      "index": 24,
+      "column": "chest_name"
+    },
+    {
+      "index": 25,
+      "column": "chest_quality"
+    },
+    {
+      "index": 26,
+      "column": "wrist_ilvl"
+    },
+    {
+      "index": 27,
+      "column": "wrist_id"
+    },
+    {
+      "index": 28,
+      "column": "wrist_name"
+    },
+    {
+      "index": 29,
+      "column": "wrist_quality"
+    },
+    {
+      "index": 30,
+      "column": "hands_ilvl"
+    },
+    {
+      "index": 31,
+      "column": "hands_id"
+    },
+    {
+      "index": 32,
+      "column": "hands_name"
+    },
+    {
+      "index": 33,
+      "column": "hands_quality"
+    },
+    {
+      "index": 34,
+      "column": "waist_ilvl"
+    },
+    {
+      "index": 35,
+      "column": "waist_id"
+    },
+    {
+      "index": 36,
+      "column": "waist_name"
+    },
+    {
+      "index": 37,
+      "column": "waist_quality"
+    },
+    {
+      "index": 38,
+      "column": "legs_ilvl"
+    },
+    {
+      "index": 39,
+      "column": "legs_id"
+    },
+    {
+      "index": 40,
+      "column": "legs_name"
+    },
+    {
+      "index": 41,
+      "column": "legs_quality"
+    },
+    {
+      "index": 42,
+      "column": "feet_ilvl"
+    },
+    {
+      "index": 43,
+      "column": "feet_id"
+    },
+    {
+      "index": 44,
+      "column": "feet_name"
+    },
+    {
+      "index": 45,
+      "column": "feet_quality"
+    },
+    {
+      "index": 46,
+      "column": "finger_1_ilvl"
+    },
+    {
+      "index": 47,
+      "column": "finger_1_id"
+    },
+    {
+      "index": 48,
+      "column": "finger_1_name"
+    },
+    {
+      "index": 49,
+      "column": "finger_1_quality"
+    },
+    {
+      "index": 50,
+      "column": "finger_2_ilvl"
+    },
+    {
+      "index": 51,
+      "column": "finger_2_id"
+    },
+    {
+      "index": 52,
+      "column": "finger_2_name"
+    },
+    {
+      "index": 53,
+      "column": "finger_2_quality"
+    },
+    {
+      "index": 54,
+      "column": "trinket_1_ilvl"
+    },
+    {
+      "index": 55,
+      "column": "trinket_1_id"
+    },
+    {
+      "index": 56,
+      "column": "trinket_1_name"
+    },
+    {
+      "index": 57,
+      "column": "trinket_1_quality"
+    },
+    {
+      "index": 58,
+      "column": "trinket_2_ilvl"
+    },
+    {
+      "index": 59,
+      "column": "trinket_2_id"
+    },
+    {
+      "index": 60,
+      "column": "trinket_2_name"
+    },
+    {
+      "index": 61,
+      "column": "trinket_2_quality"
+    },
+    {
+      "index": 62,
+      "column": "main_hand_ilvl"
+    },
+    {
+      "index": 63,
+      "column": "main_hand_id"
+    },
+    {
+      "index": 64,
+      "column": "main_hand_name"
+    },
+    {
+      "index": 65,
+      "column": "main_hand_quality"
+    },
+    {
+      "index": 66,
+      "column": "off_hand_ilvl"
+    },
+    {
+      "index": 67,
+      "column": "off_hand_id"
+    },
+    {
+      "index": 68,
+      "column": "off_hand_name"
+    },
+    {
+      "index": 69,
+      "column": "off_hand_quality"
+    },
+    {
+      "index": 116,
+      "column": "main_hand_enchant"
+    },
+    {
+      "index": 117,
+      "column": "off_hand_enchant"
+    },
+    {
+      "index": 118,
+      "column": "finger_1_enchant"
+    },
+    {
+      "index": 119,
+      "column": "finger_2_enchant"
+    },
+    {
+      "index": 124,
+      "column": "back_enchant"
+    },
+    {
+      "index": 125,
+      "column": "chest_enchant"
+    },
+    {
+      "index": 126,
+      "column": "feet_enchant"
+    },
+    {
+      "index": 130,
+      "column": "wrist_enchant"
+    },
+    {
+      "index": 131,
+      "column": "legs_enchant"
+    },
+    {
+      "index": 357,
+      "column": "head_enchant_level"
+    },
+    {
+      "index": 359,
+      "column": "head_enchant"
+    },
+    {
+      "index": 402,
+      "column": "waist_spell"
+    }
+  ],
+  "warcraft_logs_scores": [
+    {
+      "index": 70,
+      "column": "WCL_raid_finder"
+    },
+    {
+      "index": 71,
+      "column": "WCL_normal"
+    },
+    {
+      "index": 72,
+      "column": "WCL_heroic"
+    },
+    {
+      "index": 73,
+      "column": "WCL_mythic"
+    }
+  ],
+  "weekly_seasonal_counters": [
+    {
+      "index": 74,
+      "column": "week_heroic_dungeons"
+    },
+    {
+      "index": 75,
+      "column": "season_heroic_dungeons"
+    },
+    {
+      "index": 76,
+      "column": "week_delves"
+    },
+    {
+      "index": 77,
+      "column": "season_delves"
+    },
+    {
+      "index": 93,
+      "column": "season_mythic_dungeons"
+    },
+    {
+      "index": 105,
+      "column": "week_mythic_dungeons"
+    },
+    {
+      "index": 160,
+      "column": "season_highest_m+"
+    }
+  ],
+  "renown_campaign": [
+    {
+      "index": 78,
+      "column": "worldsoul_memories"
+    },
+    {
+      "index": 163,
+      "column": "worldsoul_weekly"
+    },
+    {
+      "index": 183,
+      "column": "assembly_of_the_deeps_renown"
+    },
+    {
+      "index": 184,
+      "column": "council_of_dornogal_renown"
+    },
+    {
+      "index": 185,
+      "column": "hallowfall_arathi_renown"
+    },
+    {
+      "index": 186,
+      "column": "severed_threads_renown"
+    },
+    {
+      "index": 187,
+      "column": "total_renown_score"
+    },
+    {
+      "index": 400,
+      "column": "cartels_of_undermine_renown"
+    },
+    {
+      "index": 401,
+      "column": "gallagio_loyalty_rewards_club_renown"
+    },
+    {
+      "index": 404,
+      "column": "the_karesh_trust_renown"
+    }
+  ],
+  "weekly_events": [
+    {
+      "index": 79,
+      "column": "awakening_the_machine"
+    },
+    {
+      "index": 164,
+      "column": "weekly_event_completed"
+    }
+  ],
+  "raid_currency": [
+    {
+      "index": 80,
+      "column": "coffer_keys"
+    },
+    {
+      "index": 81,
+      "column": "weathered_crests"
+    },
+    {
+      "index": 83,
+      "column": "carved_crests"
+    },
+    {
+      "index": 94,
+      "column": "runed_crests"
+    },
+    {
+      "index": 191,
+      "column": "ingenuity_sparks_equipped"
+    },
+    {
+      "index": 362,
+      "column": "gilded_crests"
+    },
+    {
+      "index": 380,
+      "column": "valorstones"
+    }
+  ],
+  "collectibles_general": [
+    {
+      "index": 82,
+      "column": "toys_owned"
+    },
+    {
+      "index": 111,
+      "column": "exalted_amount"
+    },
+    {
+      "index": 112,
+      "column": "unique_pets"
+    },
+    {
+      "index": 113,
+      "column": "lvl_25_pets"
+    }
+  ],
+  "enchant_quality": [
+    {
+      "index": 84,
+      "column": "enchant_quality_wrist"
+    },
+    {
+      "index": 85,
+      "column": "enchant_quality_legs"
+    },
+    {
+      "index": 86,
+      "column": "enchant_quality_main_hand"
+    },
+    {
+      "index": 87,
+      "column": "enchant_quality_off_hand"
+    },
+    {
+      "index": 88,
+      "column": "enchant_quality_finger_1"
+    },
+    {
+      "index": 89,
+      "column": "enchant_quality_finger_2"
+    },
+    {
+      "index": 121,
+      "column": "enchant_quality_back"
+    },
+    {
+      "index": 122,
+      "column": "enchant_quality_chest"
+    },
+    {
+      "index": 123,
+      "column": "enchant_quality_feet"
+    }
+  ],
+  "sockets_gems": [
+    {
+      "index": 90,
+      "column": "empty_sockets"
+    },
+    {
+      "index": 120,
+      "column": "gem_list"
+    },
+    {
+      "index": 190,
+      "column": "jewelry_sockets"
+    },
+    {
+      "index": 351,
+      "column": "epic_gem"
+    }
+  ],
+  "identity_metadata": [
+    {
+      "index": 91,
+      "column": "race"
+    },
+    {
+      "index": 92,
+      "column": "role"
+    },
+    {
+      "index": 114,
+      "column": "realm"
+    },
+    {
+      "index": 115,
+      "column": "join_date"
+    },
+    {
+      "index": 128,
+      "column": "blizzard_last_modified"
+    },
+    {
+      "index": 129,
+      "column": "rank"
+    },
+    {
+      "index": 132,
+      "column": "highest_ilvl_ever_equipped"
+    },
+    {
+      "index": 133,
+      "column": "character_id"
+    }
+  ],
+  "dungeon_specific": [
+    {
+      "index": 95,
+      "column": "operation_floodgate_total"
+    },
+    {
+      "index": 96,
+      "column": "operation_floodgate_score"
+    },
+    {
+      "index": 97,
+      "column": "arakara_city_of_echoes_total"
+    },
+    {
+      "index": 98,
+      "column": "arakara_city_of_echoes_score"
+    },
+    {
+      "index": 99,
+      "column": "ecodome_aldani_total"
+    },
+    {
+      "index": 100,
+      "column": "ecodome_aldani_score"
+    },
+    {
+      "index": 101,
+      "column": "the_dawnbreaker_total"
+    },
+    {
+      "index": 102,
+      "column": "the_dawnbreaker_score"
+    },
+    {
+      "index": 103,
+      "column": "priory_of_the_sacred_flame_total"
+    },
+    {
+      "index": 104,
+      "column": "priory_of_the_sacred_flame_score"
+    },
+    {
+      "index": 353,
+      "column": "circlet_ilvl"
+    },
+    {
+      "index": 354,
+      "column": "circlet_singing_thunder_name"
+    },
+    {
+      "index": 355,
+      "column": "circlet_singing_sea_name"
+    },
+    {
+      "index": 356,
+      "column": "circlet_singing_wind_name"
+    },
+    {
+      "index": 405,
+      "column": "manaforge_vandals_renown"
+    },
+    {
+      "index": 406,
+      "column": "reshii_wraps_rank"
+    },
+    {
+      "index": 407,
+      "column": "reshii_wraps_epic_fiber"
+    },
+    {
+      "index": 408,
+      "column": "reshii_wraps_boots_track"
+    }
+  ],
+  "world_quest_activity": [
+    {
+      "index": 106,
+      "column": "wqs_done_total"
+    },
+    {
+      "index": 107,
+      "column": "wqs_this_week"
+    },
+    {
+      "index": 168,
+      "column": "quests_done_total"
+    },
+    {
+      "index": 169,
+      "column": "dailies_done_total"
+    }
+  ],
+  "notes": [
+    {
+      "index": 108,
+      "column": "note"
+    }
+  ],
+  "achievements_titles": [
+    {
+      "index": 109,
+      "column": "achievement_points"
+    },
+    {
+      "index": 165,
+      "column": "titles"
+    },
+    {
+      "index": 166,
+      "column": "cutting_edge"
+    },
+    {
+      "index": 167,
+      "column": "ahead_of_the_curve"
+    }
+  ],
+  "collectibles_mounts": [
+    {
+      "index": 110,
+      "column": "mounts"
+    },
+    {
+      "index": 360,
+      "column": "gallywix_mount"
+    },
+    {
+      "index": 361,
+      "column": "ansurek_mount"
+    },
+    {
+      "index": 403,
+      "column": "dimensius_mount"
+    }
+  ],
+  "community_perks": [
+    {
+      "index": 127,
+      "column": "theater_troupe"
+    }
+  ],
+  "historical_metrics": [
+    {
+      "index": 134,
+      "column": "historical_wqs_done"
+    },
+    {
+      "index": 135,
+      "column": "historical_mplus_done"
+    },
+    {
+      "index": 136,
+      "column": "historical_dungeons_done"
+    },
+    {
+      "index": 256,
+      "column": "historical_great_vault_slot_1"
+    },
+    {
+      "index": 257,
+      "column": "historical_great_vault_slot_2"
+    },
+    {
+      "index": 258,
+      "column": "historical_great_vault_slot_3"
+    },
+    {
+      "index": 259,
+      "column": "historical_great_vault_slot_4"
+    },
+    {
+      "index": 260,
+      "column": "historical_great_vault_slot_5"
+    },
+    {
+      "index": 261,
+      "column": "historical_great_vault_slot_6"
+    },
+    {
+      "index": 262,
+      "column": "historical_great_vault_slot_7"
+    },
+    {
+      "index": 263,
+      "column": "historical_great_vault_slot_8"
+    },
+    {
+      "index": 264,
+      "column": "historical_great_vault_slot_9"
+    }
+  ],
+  "raid_progression": [
+    {
+      "index": 137,
+      "column": "raids_raid_finder"
+    },
+    {
+      "index": 138,
+      "column": "raids_raid_finder_weekly"
+    },
+    {
+      "index": 139,
+      "column": "raids_normal"
+    },
+    {
+      "index": 140,
+      "column": "raids_normal_weekly"
+    },
+    {
+      "index": 141,
+      "column": "raids_heroic"
+    },
+    {
+      "index": 142,
+      "column": "Ulgrax_The Bloodbound Horror_Sikran_Rasha'nan_Broodtwister Ovi'nax_Nexus-Princess Ky'veza_The Silken Court_Queen Ansurek@Nerub-ar Palace@Vexie and the Geargrinders_Cauldron of Carnage_Rik Reverb_Stix Bunkjunker_Sprocketmonger Lockenstock_The One-Armed Bandit_Mug'Zee, Heads of Security_Chrome King Gallywix@Liberation of Undermine@Plexus Sentinel_Loom'ithar_Soulbinder Naazindhri_Forgeweaver Araz_The Soul Hunters_Fractillus_Nexus-King Salhadaar_Dimensius, the All-Devouring@Manaforge Omega@"
+    },
+    {
+      "index": 143,
+      "column": "raids_mythic"
+    },
+    {
+      "index": 144,
+      "column": "raids_mythic_weekly"
+    },
+    {
+      "index": 385,
+      "column": "raids_visible"
+    }
+  ],
+  "pvp": [
+    {
+      "index": 145,
+      "column": "honor_level"
+    },
+    {
+      "index": 146,
+      "column": "2v2_rating"
+    },
+    {
+      "index": 147,
+      "column": "2v2_season_played"
+    },
+    {
+      "index": 148,
+      "column": "2v2_week_played"
+    },
+    {
+      "index": 149,
+      "column": "honorable_kills"
+    },
+    {
+      "index": 150,
+      "column": "3v3_rating"
+    },
+    {
+      "index": 151,
+      "column": "3v3_season_played"
+    },
+    {
+      "index": 152,
+      "column": "3v3_week_played"
+    },
+    {
+      "index": 153,
+      "column": "rbg_rating"
+    },
+    {
+      "index": 154,
+      "column": "rbg_season_played"
+    },
+    {
+      "index": 155,
+      "column": "rbg_week_played"
+    },
+    {
+      "index": 156,
+      "column": "max_2v2_rating"
+    },
+    {
+      "index": 157,
+      "column": "max_3v3_rating"
+    },
+    {
+      "index": 348,
+      "column": "shuffle_rating"
+    },
+    {
+      "index": 349,
+      "column": "shuffle_season_played"
+    },
+    {
+      "index": 350,
+      "column": "shuffle_week_played"
+    }
+  ],
+  "mythic_plus": [
+    {
+      "index": 158,
+      "column": "m+_score"
+    },
+    {
+      "index": 159,
+      "column": "weekly_highest_m+"
+    }
+  ],
+  "professions": [
+    {
+      "index": 161,
+      "column": "profession_1"
+    },
+    {
+      "index": 162,
+      "column": "profession_2"
+    },
+    {
+      "index": 352,
+      "column": "professions_visible"
+    }
+  ],
+  "legacy_dungeon_stats": [
+    {
+      "index": 170,
+      "column": "tazavesh_streets_of_wonder_total"
+    },
+    {
+      "index": 171,
+      "column": "tazavesh_streets_of_wonder_score"
+    },
+    {
+      "index": 172,
+      "column": "tazavesh_soleahs_gambit_total"
+    },
+    {
+      "index": 173,
+      "column": "tazavesh_soleahs_gambit_score"
+    },
+    {
+      "index": 188,
+      "column": "halls_of_atonement_total"
+    },
+    {
+      "index": 189,
+      "column": "halls_of_atonement_score"
+    }
+  ],
+  "great_vault_current": [
+    {
+      "index": 174,
+      "column": "great_vault_slot_1"
+    },
+    {
+      "index": 175,
+      "column": "great_vault_slot_2"
+    },
+    {
+      "index": 176,
+      "column": "great_vault_slot_3"
+    },
+    {
+      "index": 177,
+      "column": "great_vault_slot_4"
+    },
+    {
+      "index": 178,
+      "column": "great_vault_slot_5"
+    },
+    {
+      "index": 179,
+      "column": "great_vault_slot_6"
+    },
+    {
+      "index": 180,
+      "column": "great_vault_slot_7"
+    },
+    {
+      "index": 181,
+      "column": "great_vault_slot_8"
+    },
+    {
+      "index": 182,
+      "column": "great_vault_slot_9"
+    }
+  ],
+  "gear_best": [
+    {
+      "index": 192,
+      "column": "best_head_ilvl"
+    },
+    {
+      "index": 193,
+      "column": "best_head_id"
+    },
+    {
+      "index": 194,
+      "column": "best_head_name"
+    },
+    {
+      "index": 195,
+      "column": "best_head_quality"
+    },
+    {
+      "index": 196,
+      "column": "best_neck_ilvl"
+    },
+    {
+      "index": 197,
+      "column": "best_neck_id"
+    },
+    {
+      "index": 198,
+      "column": "best_neck_name"
+    },
+    {
+      "index": 199,
+      "column": "best_neck_quality"
+    },
+    {
+      "index": 200,
+      "column": "best_shoulder_ilvl"
+    },
+    {
+      "index": 201,
+      "column": "best_shoulder_id"
+    },
+    {
+      "index": 202,
+      "column": "best_shoulder_name"
+    },
+    {
+      "index": 203,
+      "column": "best_shoulder_quality"
+    },
+    {
+      "index": 204,
+      "column": "best_back_ilvl"
+    },
+    {
+      "index": 205,
+      "column": "best_back_id"
+    },
+    {
+      "index": 206,
+      "column": "best_back_name"
+    },
+    {
+      "index": 207,
+      "column": "best_back_quality"
+    },
+    {
+      "index": 208,
+      "column": "best_chest_ilvl"
+    },
+    {
+      "index": 209,
+      "column": "best_chest_id"
+    },
+    {
+      "index": 210,
+      "column": "best_chest_name"
+    },
+    {
+      "index": 211,
+      "column": "best_chest_quality"
+    },
+    {
+      "index": 212,
+      "column": "best_wrist_ilvl"
+    },
+    {
+      "index": 213,
+      "column": "best_wrist_id"
+    },
+    {
+      "index": 214,
+      "column": "best_wrist_name"
+    },
+    {
+      "index": 215,
+      "column": "best_wrist_quality"
+    },
+    {
+      "index": 216,
+      "column": "best_hands_ilvl"
+    },
+    {
+      "index": 217,
+      "column": "best_hands_id"
+    },
+    {
+      "index": 218,
+      "column": "best_hands_name"
+    },
+    {
+      "index": 219,
+      "column": "best_hands_quality"
+    },
+    {
+      "index": 220,
+      "column": "best_waist_ilvl"
+    },
+    {
+      "index": 221,
+      "column": "best_waist_id"
+    },
+    {
+      "index": 222,
+      "column": "best_waist_name"
+    },
+    {
+      "index": 223,
+      "column": "best_waist_quality"
+    },
+    {
+      "index": 224,
+      "column": "best_legs_ilvl"
+    },
+    {
+      "index": 225,
+      "column": "best_legs_id"
+    },
+    {
+      "index": 226,
+      "column": "best_legs_name"
+    },
+    {
+      "index": 227,
+      "column": "best_legs_quality"
+    },
+    {
+      "index": 228,
+      "column": "best_feet_ilvl"
+    },
+    {
+      "index": 229,
+      "column": "best_feet_id"
+    },
+    {
+      "index": 230,
+      "column": "best_feet_name"
+    },
+    {
+      "index": 231,
+      "column": "best_feet_quality"
+    },
+    {
+      "index": 232,
+      "column": "best_finger_1_ilvl"
+    },
+    {
+      "index": 233,
+      "column": "best_finger_1_id"
+    },
+    {
+      "index": 234,
+      "column": "best_finger_1_name"
+    },
+    {
+      "index": 235,
+      "column": "best_finger_1_quality"
+    },
+    {
+      "index": 236,
+      "column": "best_finger_2_ilvl"
+    },
+    {
+      "index": 237,
+      "column": "best_finger_2_id"
+    },
+    {
+      "index": 238,
+      "column": "best_finger_2_name"
+    },
+    {
+      "index": 239,
+      "column": "best_finger_2_quality"
+    },
+    {
+      "index": 240,
+      "column": "best_trinket_1_ilvl"
+    },
+    {
+      "index": 241,
+      "column": "best_trinket_1_id"
+    },
+    {
+      "index": 242,
+      "column": "best_trinket_1_name"
+    },
+    {
+      "index": 243,
+      "column": "best_trinket_1_quality"
+    },
+    {
+      "index": 244,
+      "column": "best_trinket_2_ilvl"
+    },
+    {
+      "index": 245,
+      "column": "best_trinket_2_id"
+    },
+    {
+      "index": 246,
+      "column": "best_trinket_2_name"
+    },
+    {
+      "index": 247,
+      "column": "best_trinket_2_quality"
+    },
+    {
+      "index": 248,
+      "column": "best_main_hand_ilvl"
+    },
+    {
+      "index": 249,
+      "column": "best_main_hand_id"
+    },
+    {
+      "index": 250,
+      "column": "best_main_hand_name"
+    },
+    {
+      "index": 251,
+      "column": "best_main_hand_quality"
+    },
+    {
+      "index": 252,
+      "column": "best_off_hand_ilvl"
+    },
+    {
+      "index": 253,
+      "column": "best_off_hand_id"
+    },
+    {
+      "index": 254,
+      "column": "best_off_hand_name"
+    },
+    {
+      "index": 255,
+      "column": "best_off_hand_quality"
+    }
+  ],
+  "tier_summary": [
+    {
+      "index": 265,
+      "column": "tier_head_ilvl"
+    },
+    {
+      "index": 266,
+      "column": "tier_shoulder_ilvl"
+    },
+    {
+      "index": 267,
+      "column": "tier_chest_ilvl"
+    },
+    {
+      "index": 268,
+      "column": "tier_hands_ilvl"
+    },
+    {
+      "index": 269,
+      "column": "tier_legs_ilvl"
+    },
+    {
+      "index": 270,
+      "column": "tier_head_difficulty"
+    },
+    {
+      "index": 271,
+      "column": "tier_shoulder_difficulty"
+    },
+    {
+      "index": 272,
+      "column": "tier_chest_difficulty"
+    },
+    {
+      "index": 273,
+      "column": "tier_hands_difficulty"
+    },
+    {
+      "index": 274,
+      "column": "tier_legs_difficulty"
+    }
+  ],
+  "embellishments": [
+    {
+      "index": 275,
+      "column": "embellished_item_id_1"
+    },
+    {
+      "index": 276,
+      "column": "embellished_item_level_1"
+    },
+    {
+      "index": 277,
+      "column": "embellished_spell_id_1"
+    },
+    {
+      "index": 278,
+      "column": "embellished_spell_name_1"
+    },
+    {
+      "index": 279,
+      "column": "embellished_item_id_2"
+    },
+    {
+      "index": 280,
+      "column": "embellished_item_level_2"
+    },
+    {
+      "index": 281,
+      "column": "embellished_spell_id_2"
+    },
+    {
+      "index": 282,
+      "column": "embellished_spell_name_2"
+    }
+  ],
+  "profession_recipes": [
+    {
+      "index": 283,
+      "column": "Alchemy_210816_Algari Alchemist Stone|Alchemy_212719_Algari Flask Cauldron|Alchemy_212751_Algari Potion Cauldron|Blacksmithing_222441_Everforged Warglaive|Blacksmithing_222443_Everforged Greataxe|Blacksmithing_222440_Everforged Longsword|Blacksmithing_222439_Everforged Dagger|Blacksmithing_222435_Everforged Vambraces|Blacksmithing_222436_Everforged Pauldrons|Blacksmithing_222430_Everforged Breastplate|Blacksmithing_222442_Everforged Mace|Blacksmithing_222432_Everforged Defender|Blacksmithing_222429_Everforged Sabatons|Blacksmithing_222431_Everforged Greatbelt|Blacksmithing_222438_Everforged Stabber|Blacksmithing_222433_Everforged Helm|Blacksmithing_222434_Everforged Legplates|Blacksmithing_222437_Everforged Gauntlets|Blacksmithing_222451_Charged Slicer|Blacksmithing_222447_Charged Claymore|Blacksmithing_222448_Charged Halberd|Blacksmithing_222446_Charged Facesmasher|Blacksmithing_222444_Charged Hexsword|Blacksmithing_222445_Charged Runeaxe|Blacksmithing_222449_Charged Crusher|Blacksmithing_222450_Charged Invoker|Blacksmithing_222459_Beledar's Bulwark|Blacksmithing_222458_Sanctified Steps|Blacksmithing_222463_Siphoning Stiletto|Blacksmithing_222493_Artisan Leatherworker's Toolset|Blacksmithing_222491_Artisan Needle Set|Blacksmithing_222492_Artisan Leatherworker's Knife|Blacksmithing_222488_Artisan Sickle|Blacksmithing_222489_Artisan Pickaxe|Blacksmithing_222490_Artisan Skinning Knife|Jewelcrafting_213777_Magnificent Jeweler's Setting|Jewelcrafting_213741_Culminating Blasphemite|Jewelcrafting_213744_Elusive Blasphemite|Jewelcrafting_213738_Insightful Blasphemite|Jewelcrafting_215133_Binding of Binding|Jewelcrafting_215134_Fractured Gemstone Locket|Jewelcrafting_215135_Ring of Earthen Craftsmanship|Jewelcrafting_215136_Amulet of Earthen Craftsmanship|Jewelcrafting_215125_Enchanter's Crystal|Jewelcrafting_215124_Extravagant Loupes|Jewelcrafting_215123_Forger's Font Inspector|Jewelcrafting_215122_Novelist's Specs|Inscription_222625_Transcribe to Radiance|Inscription_222624_Transcribe to Symbiosis|Inscription_222623_Transcribe to Vivacity|Inscription_222622_Transcribe to Ascension|Inscription_226025_Darkmoon Sigil: Radiance|Inscription_226031_Darkmoon Sigil: Vivacity|Inscription_226028_Darkmoon Sigil: Symbiosis|Inscription_226022_Darkmoon Sigil: Ascension|Inscription_222568_Vagabond's Bounding Baton|Inscription_222567_Vagabond's Careful Crutch|Inscription_222566_Vagabond's Torch|Inscription_222600_Contract: Assembly of the Deeps|Inscription_222603_Contract: Hallowfall Arathi|Inscription_222606_Contract: The Severed Threads|Inscription_222597_Contract: Council of Dornogal|Inscription_219660_Algari Missive of Crafting Speed|Inscription_222644_Algari Missive of Deftness|Inscription_222638_Algari Missive of Finesse|Inscription_222626_Algari Missive of Ingenuity|Inscription_222632_Algari Missive of Multicraft|Inscription_222641_Algari Missive of Perception|Inscription_222629_Algari Missive of Resourcefulness|Inscription_222578_Inscribed Rolling Pin|Inscription_222574_Silver Tongue's Quill|Inscription_222576_Patient Alchemist's Mixing Rod|Inscription_222548_Algari Treatise on Inscription|Inscription_222554_Algari Treatise on Blacksmithing|Inscription_222550_Algari Treatise on Enchanting|Inscription_222621_Algari Treatise on Engineering|Inscription_222552_Algari Treatise on Herbalism|Inscription_222546_Algari Treatise on Alchemy|Inscription_222551_Algari Treatise on Jewelcrafting|Inscription_222549_Algari Treatise on Leatherworking|Inscription_222553_Algari Treatise on Mining|Inscription_222649_Algari Treatise on Skinning|Inscription_222547_Algari Treatise on Tailoring|Inscription_219933_Algari Competitor's Emblem|Inscription_225368_Algari Competitor's Pillar|Inscription_225369_Algari Competitor's Staff|Inscription_225372_Algari Competitor's Lamp|Inscription_219932_Algari Competitor's Insignia of Alacrity|Inscription_219931_Algari Competitor's Medallion|Tailoring_222817_Consecrated Cloak|Tailoring_222816_Consecrated Cord|Tailoring_222815_Consecrated Cuffs|Tailoring_222822_Consecrated Gloves|Tailoring_222818_Consecrated Hood|Tailoring_222820_Consecrated Leggings|Tailoring_222821_Consecrated Mantle|Tailoring_222819_Consecrated Robe|Tailoring_222814_Consecrated Slippers|Tailoring_222850_Artisan Alchemist's Robe|Tailoring_222849_Artisan Enchanter's Hat|Tailoring_222851_Artisan Chef's Hat|Tailoring_222848_Artisan Fishing Cap|Tailoring_222847_Artisan Gardening Hat|Tailoring_222859_Concoctor's Clutch|Tailoring_222864_Darkmoon Duffle|Tailoring_222866_Excavator's Haversack|Tailoring_222860_Ignition Satchel|Tailoring_222867_Jeweler's Purse|Tailoring_222862_Magically \"Infinite\" Messenger|Tailoring_222863_Prodigy's Toolbox|Tailoring_224852_The Severed Satchel|Tailoring_222856_Duskweave Bag|Tailoring_222854_Dawnweave Reagent Bag|Tailoring_222865_Gardener's Seed Satchel|Tailoring_225936_Hideseeker's Tote|Tailoring_222861_Hideshaper's Workbag|Tailoring_222807_Grips of the Woven Dawn|Tailoring_222808_Treads of the Woven Dawn|Tailoring_222811_Warm Sunrise Bracers|Tailoring_222812_Cool Sunset Bracers|Tailoring_222809_Gloves of the Woven Dusk|Tailoring_222810_Slippers of the Woven Dusk|Tailoring_222868_Dawnthread Lining|Tailoring_222872_Duskthread Lining|Tailoring_222894_Daybreak Spellthread|Tailoring_222891_Sunset Spellthread|Tailoring_217120_Algari Competitor's Cloth Bands|Tailoring_217125_Algari Competitor's Cloth Cloak|Tailoring_217122_Algari Competitor's Cloth Gloves|Tailoring_217121_Algari Competitor's Cloth Hood|Tailoring_217117_Algari Competitor's Cloth Leggings|Tailoring_217124_Algari Competitor's Cloth Sash|Tailoring_217118_Algari Competitor's Cloth Shoulderpads|Tailoring_217119_Algari Competitor's Cloth Treads|Tailoring_217123_Algari Competitor's Cloth Tunic|Leatherworking_219906_Defender's Armor Kit|Leatherworking_219909_Stormbound Armor Kit|Leatherworking_219334_Rune-Branded Armbands|Leatherworking_219333_Rune-Branded Grasps|Leatherworking_219329_Rune-Branded Hood|Leatherworking_219327_Rune-Branded Kickers|Leatherworking_219332_Rune-Branded Legwraps|Leatherworking_219330_Rune-Branded Mantle|Leatherworking_219328_Rune-Branded Tunic|Leatherworking_219331_Rune-Branded Waistband|Leatherworking_219339_Glyph-Etched Binding|Leatherworking_219336_Glyph-Etched Breastplate|Leatherworking_219340_Glyph-Etched Cuisses|Leatherworking_219338_Glyph-Etched Epaulets|Leatherworking_219341_Glyph-Etched Gauntlets|Leatherworking_219337_Glyph-Etched Guise|Leatherworking_219335_Glyph-Etched Stompers|Leatherworking_219342_Glyph-Etched Vambraces|Leatherworking_219492_Sanctified Torchbearer's Grips|Leatherworking_219489_Waders of the Unifying Flame|Leatherworking_219495_Blessed Weapon Grip|Leatherworking_219502_Adrenal Surge Clasp|Leatherworking_219501_Vambraces of Deepening Darkness|Leatherworking_219504_Writhing Armor Banding|Leatherworking_219509_Busy Bee's Buckle|Leatherworking_219513_Roiling Thunderstrike Talons|Leatherworking_219511_Rook Feather Wristwraps|Leatherworking_219508_Reinforced Setae Flyers|Leatherworking_219507_Smoldering Pollen Hauberk|Leatherworking_219512_Weathered Stormfront Vest|Leatherworking_217130_Algari Competitor's Leather Belt|Leatherworking_217126_Algari Competitor's Leather Boots|Leatherworking_217127_Algari Competitor's Leather Chestpiece|Leatherworking_217132_Algari Competitor's Leather Gloves|Leatherworking_217128_Algari Competitor's Leather Mask|Leatherworking_217129_Algari Competitor's Leather Shoulderpads|Leatherworking_217131_Algari Competitor's Leather Trousers|Leatherworking_217133_Algari Competitor's Leather Wristwraps|Leatherworking_217135_Algari Competitor's Chain Chainmail|Leatherworking_217136_Algari Competitor's Chain Cowl|Leatherworking_217141_Algari Competitor's Chain Cuffs|Leatherworking_217137_Algari Competitor's Chain Epaulets|Leatherworking_217140_Algari Competitor's Chain Gauntlets|Leatherworking_217138_Algari Competitor's Chain Girdle|Leatherworking_217139_Algari Competitor's Chain Leggings|Leatherworking_217134_Algari Competitor's Chain Treads|Leatherworking_219871_Arathi Leatherworker's Smock|Leatherworking_219870_Charged Scrapmaster's Gauntlets|Leatherworking_219874_Earthen Forgemaster's Apron|Leatherworking_219876_Earthen Jeweler's Cover|Leatherworking_219867_Stonebound Herbalist's Pack|Leatherworking_219869_Deep Tracker's Cap|Leatherworking_219868_Deep Tracker's Pack|Leatherworking_219872_Nerubian Alchemist's Hat|Enchanting_224073_Enchanted Gilded Harbinger Crest|Enchanting_224072_Enchanted Runed Harbinger Crest|Enchanting_224069_Enchanted Weathered Harbinger Crest|Enchanting_224173_Concentration Concentrate|Enchanting_224108_Oil of Beledar's Grace|Enchanting_224111_Oil of Deep Toxins|Enchanting_224405_Scepter of Radiant Magics|Enchanting_224116_Runed Null Stone Rod|Enchanting_224115_Runed Ironclaw Rod|Enchanting_50475_Cavalry's March|Enchanting_50477_Defender's March|Enchanting_50476_Scout's March|Enchanting_50521_Chant of Armored Avoidance|Enchanting_50523_Chant of Armored Leech|Enchanting_50525_Chant of Armored Speed|Enchanting_50503_Council's Intellect|Enchanting_50504_Crystalline Radiance|Enchanting_50505_Oathsworn's Strength|Enchanting_50501_Stormrider's Agility|Enchanting_50531_Chant of Burrowing Rapidity|Enchanting_50529_Chant of Leeching Fangs|Enchanting_50527_Chant of Winged Grace|Enchanting_50506_Algari Deftness|Enchanting_50507_Algari Finesse|Enchanting_50508_Algari Ingenuity|Enchanting_50509_Algari Perception|Enchanting_50510_Algari Resourcefulness|Enchanting_50479_Radiant Critical Strike|Enchanting_50481_Radiant Haste|Enchanting_50483_Radiant Mastery|Enchanting_50485_Radiant Versatility|Enchanting_50532_Cursed Critical Strike|Enchanting_50533_Cursed Haste|Enchanting_50534_Cursed Mastery|Enchanting_50535_Cursed Versatility|Enchanting_50486_Authority of Air|Enchanting_50487_Authority of Fiery Resolve|Enchanting_50488_Authority of Radiant Power|Enchanting_50511_Authority of Storms|Enchanting_50536_Authority of the Depths|Engineering_221868_Entropy Enhancer|Engineering_221865_Chaos Circuit|Engineering_225987_Bottled Brilliance|Engineering_221862_Safety Switch|Engineering_221859_Gyrating Gear|Engineering_221856_Whimsical Wiring|Engineering_221853_Handful of Bismuth Bolts|Engineering_221926_Blame Redirection Device|Engineering_221932_Complicated Fuse Box|Engineering_221923_Recalibrated Safety Switch|Engineering_221938_Concealed Chaos Module|Engineering_221941_Energy Redistribution Beacon|Engineering_221935_Pouch of Pocket Grenades|Engineering_221920_Adjustable Cogwheel|Engineering_221917_Impeccable Cogwheel|Engineering_221914_Overclocked Cogwheel|Engineering_221911_Serrated Cogwheel|Engineering_221805_Blasting Bracers|Engineering_221808_Clanking Cuffs|Engineering_221804_Dangerous Distraction Inhibitor|Engineering_221802_Overclocked Idea Generator|Engineering_221969_P.0.W. x2|Engineering_221801_Studious Brilliance Expeditor|Engineering_221803_Supercharged Thought Enhancer|Engineering_221806_Venting Vambraces|Engineering_221807_Whirring Wristwraps|Engineering_221789_Aqirite Brainwave Projector|Engineering_221791_Aqirite Fisherfriend|Engineering_221798_Aqirite Fueled Samophlange|Engineering_221796_Aqirite Miner's Headgear|Engineering_221793_Lapidary's Aqirite Clamps|Engineering_221800_Miner's Aqirite Hoard|Engineering_221787_Spring-Loaded Aqirite Fabric Cutters|Engineering_221788_Bismuth Brainwave Projector|Engineering_221790_Bismuth Fisherfriend|Engineering_221795_Bismuth Miner's Headgear|Engineering_221792_Lapidary's Bismuth Clamps|Engineering_221799_Miner's Bismuth Hoard|Engineering_221786_Spring-Loaded Bismuth Fabric Cutters|Engineering_224586_Box o' Booms|Engineering_221880_Potion Bomb of Power|Engineering_221876_Potion Bomb of Recovery|Engineering_221872_Potion Bomb of Speed|Engineering_221967_Crowd Pummeler 2-30|Engineering_221953_Convincingly Realistic Jumper Cables|Engineering_221945_Irresistible Red Button|Engineering_221949_Pausing Pylon|Engineering_221957_Algari Repair Bot 11O|Engineering_221959_Portable Profession Possibility Projector|Engineering_219387_Barrel of Fireworks|Engineering_221962_Defective Escape Pod|Engineering_221964_Filmless Camera|Engineering_221966_Wormhole Generator: Khaz Algar|Engineering_219403_Stonebound Lantern|Engineering_221904_Tinker: Earthen Delivery Drill|Engineering_221908_Tinker: Heartseeking Health Injector|Engineering_217155_Algari Competitor's Cloth Bracers|Engineering_217151_Algari Competitor's Cloth Goggles|Engineering_217156_Algari Competitor's Leather Bracers|Engineering_217152_Algari Competitor's Leather Goggles|Engineering_217157_Algari Competitor's Mail Bracers|Engineering_217153_Algari Competitor's Mail Goggles|Engineering_217158_Algari Competitor's Plate Bracers|Engineering_217154_Algari Competitor's Plate Goggles|Engineering_225370_Algari Competitor's Rifle"
+    }
+  ],
+  "reference_values": [
+    {
+      "index": 284,
+      "column": "707.0"
+    },
+    {
+      "index": 285,
+      "column": "694.0"
+    },
+    {
+      "index": 286,
+      "column": "681.0"
+    },
+    {
+      "index": 287,
+      "column": "668.0"
+    },
+    {
+      "index": 288,
+      "column": "655.0"
+    },
+    {
+      "index": 289,
+      "column": "642.0"
+    }
+  ],
+  "spark_items": [
+    {
+      "index": 290,
+      "column": "spark_neck_name"
+    },
+    {
+      "index": 291,
+      "column": "spark_neck_quality"
+    },
+    {
+      "index": 292,
+      "column": "spark_shoulder_ilvl"
+    },
+    {
+      "index": 293,
+      "column": "spark_shoulder_id"
+    },
+    {
+      "index": 294,
+      "column": "spark_shoulder_name"
+    },
+    {
+      "index": 295,
+      "column": "spark_shoulder_quality"
+    },
+    {
+      "index": 296,
+      "column": "spark_back_ilvl"
+    },
+    {
+      "index": 297,
+      "column": "spark_back_id"
+    },
+    {
+      "index": 298,
+      "column": "spark_back_name"
+    },
+    {
+      "index": 299,
+      "column": "spark_back_quality"
+    },
+    {
+      "index": 300,
+      "column": "spark_chest_ilvl"
+    },
+    {
+      "index": 301,
+      "column": "spark_chest_id"
+    },
+    {
+      "index": 302,
+      "column": "spark_chest_name"
+    },
+    {
+      "index": 303,
+      "column": "spark_chest_quality"
+    },
+    {
+      "index": 304,
+      "column": "spark_wrist_ilvl"
+    },
+    {
+      "index": 305,
+      "column": "spark_wrist_id"
+    },
+    {
+      "index": 306,
+      "column": "spark_wrist_name"
+    },
+    {
+      "index": 307,
+      "column": "spark_wrist_quality"
+    },
+    {
+      "index": 308,
+      "column": "spark_hands_ilvl"
+    },
+    {
+      "index": 309,
+      "column": "spark_hands_id"
+    },
+    {
+      "index": 310,
+      "column": "spark_hands_name"
+    },
+    {
+      "index": 311,
+      "column": "spark_hands_quality"
+    },
+    {
+      "index": 312,
+      "column": "spark_waist_ilvl"
+    },
+    {
+      "index": 313,
+      "column": "spark_waist_id"
+    },
+    {
+      "index": 314,
+      "column": "spark_waist_name"
+    },
+    {
+      "index": 315,
+      "column": "spark_waist_quality"
+    },
+    {
+      "index": 316,
+      "column": "spark_legs_ilvl"
+    },
+    {
+      "index": 317,
+      "column": "spark_legs_id"
+    },
+    {
+      "index": 318,
+      "column": "spark_legs_name"
+    },
+    {
+      "index": 319,
+      "column": "spark_legs_quality"
+    },
+    {
+      "index": 320,
+      "column": "spark_feet_ilvl"
+    },
+    {
+      "index": 321,
+      "column": "spark_feet_id"
+    },
+    {
+      "index": 322,
+      "column": "spark_feet_name"
+    },
+    {
+      "index": 323,
+      "column": "spark_feet_quality"
+    },
+    {
+      "index": 324,
+      "column": "spark_finger_1_ilvl"
+    },
+    {
+      "index": 325,
+      "column": "spark_finger_1_id"
+    },
+    {
+      "index": 326,
+      "column": "spark_finger_1_name"
+    },
+    {
+      "index": 327,
+      "column": "spark_finger_1_quality"
+    },
+    {
+      "index": 328,
+      "column": "spark_finger_2_ilvl"
+    },
+    {
+      "index": 329,
+      "column": "spark_finger_2_id"
+    },
+    {
+      "index": 330,
+      "column": "spark_finger_2_name"
+    },
+    {
+      "index": 331,
+      "column": "spark_finger_2_quality"
+    },
+    {
+      "index": 332,
+      "column": "spark_trinket_1_ilvl"
+    },
+    {
+      "index": 333,
+      "column": "spark_trinket_1_id"
+    },
+    {
+      "index": 334,
+      "column": "spark_trinket_1_name"
+    },
+    {
+      "index": 335,
+      "column": "spark_trinket_1_quality"
+    },
+    {
+      "index": 336,
+      "column": "spark_trinket_2_ilvl"
+    },
+    {
+      "index": 337,
+      "column": "spark_trinket_2_id"
+    },
+    {
+      "index": 338,
+      "column": "spark_trinket_2_name"
+    },
+    {
+      "index": 339,
+      "column": "spark_trinket_2_quality"
+    },
+    {
+      "index": 340,
+      "column": "spark_main_hand_ilvl"
+    },
+    {
+      "index": 341,
+      "column": "spark_main_hand_id"
+    },
+    {
+      "index": 342,
+      "column": "spark_main_hand_name"
+    },
+    {
+      "index": 343,
+      "column": "spark_main_hand_quality"
+    },
+    {
+      "index": 344,
+      "column": "spark_off_hand_ilvl"
+    },
+    {
+      "index": 345,
+      "column": "spark_off_hand_id"
+    },
+    {
+      "index": 346,
+      "column": "spark_off_hand_name"
+    },
+    {
+      "index": 347,
+      "column": "spark_off_hand_quality"
+    }
+  ],
+  "stat_distribution": [
+    {
+      "index": 358,
+      "column": "raid_buff_percentage"
+    },
+    {
+      "index": 386,
+      "column": "crit_gear_percentage"
+    },
+    {
+      "index": 387,
+      "column": "haste_gear_percentage"
+    },
+    {
+      "index": 388,
+      "column": "mastery_gear_percentage"
+    },
+    {
+      "index": 389,
+      "column": "vers_gear_percentage"
+    },
+    {
+      "index": 390,
+      "column": "crit_enchant_percentage"
+    },
+    {
+      "index": 391,
+      "column": "haste_enchant_percentage"
+    },
+    {
+      "index": 392,
+      "column": "mastery_enchant_percentage"
+    },
+    {
+      "index": 393,
+      "column": "vers_enchant_percentage"
+    }
+  ],
+  "upgrade_levels": [
+    {
+      "index": 363,
+      "column": "upgrade_level_head"
+    },
+    {
+      "index": 364,
+      "column": "upgrade_level_neck"
+    },
+    {
+      "index": 365,
+      "column": "upgrade_level_shoulder"
+    },
+    {
+      "index": 366,
+      "column": "upgrade_level_back"
+    },
+    {
+      "index": 367,
+      "column": "upgrade_level_chest"
+    },
+    {
+      "index": 368,
+      "column": "upgrade_level_wrist"
+    },
+    {
+      "index": 369,
+      "column": "upgrade_level_hands"
+    },
+    {
+      "index": 370,
+      "column": "upgrade_level_waist"
+    },
+    {
+      "index": 371,
+      "column": "upgrade_level_legs"
+    },
+    {
+      "index": 372,
+      "column": "upgrade_level_feet"
+    },
+    {
+      "index": 373,
+      "column": "upgrade_level_finger_1"
+    },
+    {
+      "index": 374,
+      "column": "upgrade_level_finger_2"
+    },
+    {
+      "index": 375,
+      "column": "upgrade_level_trinket_1"
+    },
+    {
+      "index": 376,
+      "column": "upgrade_level_trinket_2"
+    },
+    {
+      "index": 377,
+      "column": "upgrade_level_main_hand"
+    },
+    {
+      "index": 378,
+      "column": "upgrade_level_off_hand"
+    }
+  ],
+  "upgrade_summary": [
+    {
+      "index": 379,
+      "column": "total_upgrades_missing"
+    }
+  ],
+  "visibility_flags": [
+    {
+      "index": 381,
+      "column": "summary_visible"
+    },
+    {
+      "index": 382,
+      "column": "roster_visible"
+    },
+    {
+      "index": 383,
+      "column": "overview_visible"
+    },
+    {
+      "index": 384,
+      "column": "vault_visible"
+    }
+  ],
+  "upgrade_track_items": [
+    {
+      "index": 394,
+      "column": "mythic_track_items"
+    },
+    {
+      "index": 395,
+      "column": "heroic_track_items"
+    },
+    {
+      "index": 396,
+      "column": "normal_track_items"
+    },
+    {
+      "index": 397,
+      "column": "raid_finder_track_items"
+    },
+    {
+      "index": 398,
+      "column": "world_advanced_track_items"
+    },
+    {
+      "index": 399,
+      "column": "world_basic_track_items"
+    }
+  ]
+}

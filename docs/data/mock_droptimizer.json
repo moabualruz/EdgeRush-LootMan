@@ -1,0 +1,32 @@
+{
+  "item": "Fyr'alath, the Dream Render",
+  "baseline_dps": {
+    "Mage": 155000,
+    "Rogue": 148000,
+    "Hunter": 152000,
+    "Priest": 90000
+  },
+  "submissions": [
+    {
+      "character": "MageA",
+      "simulated_gain": 7750,
+      "droptimizer_url": "https://raidbots.com/simbot/report/FAKE-MAGEA"
+    },
+    {
+      "character": "RogueB",
+      "simulated_gain": 7400,
+      "droptimizer_url": "https://raidbots.com/simbot/report/FAKE-ROGUEB"
+    },
+    {
+      "character": "HunterC",
+      "simulated_gain": 6100,
+      "droptimizer_url": "https://raidbots.com/simbot/report/FAKE-HUNTERC"
+    },
+    {
+      "character": "PriestD",
+      "simulated_gain": 6800,
+      "droptimizer_url": "https://raidbots.com/simbot/report/FAKE-PRIESTD"
+    }
+  ]
+}
+
