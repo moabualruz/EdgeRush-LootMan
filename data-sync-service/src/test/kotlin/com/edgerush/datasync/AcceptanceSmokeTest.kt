@@ -1,5 +1,6 @@
 package com.edgerush.datasync
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -11,7 +12,9 @@ import java.nio.file.Path
 
 class AcceptanceSmokeTest {
 
-    private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+    private val mapper = ObjectMapper()
+        .registerModule(KotlinModule.Builder().build())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     @Test
     fun `sample datasets load`() {

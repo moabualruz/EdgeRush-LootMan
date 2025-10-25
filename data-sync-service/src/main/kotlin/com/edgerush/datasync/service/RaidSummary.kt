@@ -14,4 +14,3 @@ data class RaidSummary(
     val notes: String?,
     val selectionsImage: String?
 )
-

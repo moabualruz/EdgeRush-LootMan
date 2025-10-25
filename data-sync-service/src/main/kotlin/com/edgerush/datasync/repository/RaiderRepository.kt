@@ -8,4 +8,5 @@ import java.util.Optional
 @Repository
 interface RaiderRepository : CrudRepository<RaiderEntity, Long> {
     fun findByCharacterNameAndRealm(name: String, realm: String): Optional<RaiderEntity>
+    fun findByWowauditId(wowauditId: Long): Optional<RaiderEntity>
 }

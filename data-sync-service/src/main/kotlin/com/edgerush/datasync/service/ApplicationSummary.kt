@@ -15,7 +15,11 @@ data class ApplicationSummary(
     val mainCharacterName: String?,
     val mainCharacterRealm: String?,
     val mainCharacterClass: String?,
-    val mainCharacterRole: String?
+    val mainCharacterRole: String?,
+    val mainCharacterRace: String?,
+    val mainCharacterFaction: String?,
+    val mainCharacterLevel: Int?,
+    val mainCharacterRegion: String?
 ) {
     fun toEntity(): ApplicationEntity = ApplicationEntity(
         applicationId = id,
@@ -30,7 +34,10 @@ data class ApplicationSummary(
         mainCharacterRealm = mainCharacterRealm,
         mainCharacterClass = mainCharacterClass,
         mainCharacterRole = mainCharacterRole,
+        mainCharacterRace = mainCharacterRace,
+        mainCharacterFaction = mainCharacterFaction,
+        mainCharacterLevel = mainCharacterLevel,
+        mainCharacterRegion = mainCharacterRegion,
         syncedAt = OffsetDateTime.now()
     )
 }
-

@@ -21,6 +21,9 @@ data class ApplicationEntity(
     val mainCharacterRealm: String?,
     val mainCharacterClass: String?,
     val mainCharacterRole: String?,
+    val mainCharacterRace: String?,
+    val mainCharacterFaction: String?,
+    val mainCharacterLevel: Int?,
+    val mainCharacterRegion: String?,
     val syncedAt: OffsetDateTime
 )
-

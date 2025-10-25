@@ -11,6 +11,7 @@ data class AttendanceRecord(
     val characterId: Long?,
     val characterName: String,
     val characterRealm: String?,
+    val characterRegion: String?,
     val characterClass: String?,
     val characterRole: String?,
     val attendedAmountOfRaids: Int?,
@@ -18,7 +19,10 @@ data class AttendanceRecord(
     val attendedPercentage: Double?,
     val selectedAmountOfEncounters: Int?,
     val totalAmountOfEncounters: Int?,
-    val selectedPercentage: Double?
+    val selectedPercentage: Double?,
+    val teamId: Long?,
+    val seasonId: Long?,
+    val periodId: Long?
 ) {
     fun toEntity(): AttendanceStatEntity = AttendanceStatEntity(
         instance = instance,
@@ -28,6 +32,7 @@ data class AttendanceRecord(
         characterId = characterId,
         characterName = characterName,
         characterRealm = characterRealm,
+        characterRegion = characterRegion,
         characterClass = characterClass,
         characterRole = characterRole,
         attendedAmountOfRaids = attendedAmountOfRaids,
@@ -36,7 +41,9 @@ data class AttendanceRecord(
         selectedAmountOfEncounters = selectedAmountOfEncounters,
         totalAmountOfEncounters = totalAmountOfEncounters,
         selectedPercentage = selectedPercentage,
+        teamId = teamId,
+        seasonId = seasonId,
+        periodId = periodId,
         syncedAt = OffsetDateTime.now()
     )
 }
-

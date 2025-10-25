@@ -23,6 +23,10 @@ data class RaidEntity(
     val totalSize: Int?,
     val notes: String?,
     val selectionsImage: String?,
+    val teamId: Long?,
+    val seasonId: Long?,
+    val periodId: Long?,
+    val createdAt: OffsetDateTime?,
+    val updatedAt: OffsetDateTime?,
     val syncedAt: OffsetDateTime
 )
-

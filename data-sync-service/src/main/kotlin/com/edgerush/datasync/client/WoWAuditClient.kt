@@ -44,13 +44,10 @@ class WoWAuditClient(
 
     fun fetchApplicationDetail(id: Long): Mono<String> = get("/v1/applications/$id")
 
-    private val baseUrlRequiresApiPrefix: Boolean = false
-
-    private fun get(path: String): Mono<String> {
-        val resolvedPath = resolvePath(path)
-        return webClient
+    private fun get(path: String): Mono<String> =
+        webClient
             .get()
-            .uri(resolvedPath)
+            .uri(path)
             .retrieve()
             .onStatus({ it == HttpStatus.TOO_MANY_REQUESTS }) { response ->
                 response.bodyToMono(String::class.java)
@@ -68,39 +65,17 @@ class WoWAuditClient(
                     .flatMap { body -> Mono.error(WoWAuditClientErrorException(body)) }
             }
             .bodyToMono(String::class.java)
-            .flatMap { body ->
+            .map { body ->
                 val snippet = body.trim()
-                if (looksLikeHtml(snippet)) {
-                    val redirectTarget = extractRedirectTarget(snippet)
-                    val message = buildString {
-                        append("WoWAudit request to '$resolvedPath' returned HTML instead of JSON.")
-                        redirectTarget?.let { append(" Response redirected to '$it'.") }
-                        append(" Check that sync.wowaudit.base-url points to the API (e.g. https://wowaudit.com)")
-                        append(" and that a valid API key is configured if required. Sample response: ${snippet.take(200)}")
-                    }
-                    log.warn(message)
-                    return@flatMap Mono.error(WoWAuditUnexpectedResponse(message))
+                if (snippet.startsWith("<")) {
+                    log.warn("WoWAudit response for '{}' was not JSON. First bytes: {}", path, snippet.take(120))
+                    throw WoWAuditUnexpectedResponse("Expected JSON but received HTML. Snippet: ${snippet.take(200)}")
                 }
-                Mono.just(body)
+                body
             }
             .doOnSubscribe {
                 require(!properties.wowaudit.guildProfileUri.isNullOrBlank()) {
                     "sync.wowaudit.guild-profile-uri must be configured"
                 }
             }
-    }
-
-    private fun resolvePath(path: String): String {
-        if (baseUrlRequiresApiPrefix && path.startsWith("/v1/")) {
-            return "$path"
-        }
-        return path
-    }
-
-    private fun looksLikeHtml(payload: String): Boolean =
-        payload.startsWith("<!DOCTYPE", ignoreCase = true) ||
-            payload.startsWith("<html", ignoreCase = true)
-
-    private fun extractRedirectTarget(payload: String): String? =
-        Regex("href=\"([^\"]+)\"").find(payload)?.groupValues?.getOrNull(1)
 }
