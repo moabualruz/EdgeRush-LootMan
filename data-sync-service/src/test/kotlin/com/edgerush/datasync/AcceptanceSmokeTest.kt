@@ -13,12 +13,6 @@ class AcceptanceSmokeTest {
 
     private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
-    data class RaiderSample(
-        val character: String,
-        val role: String,
-        val attendance_percent: Int
-    )
-
     @Test
     fun `sample datasets load`() {
         val projectRoot = Path.of("").toAbsolutePath().normalize()

@@ -15,6 +15,6 @@ sync:
   cron: "0 0 4 * * *"
   run-on-startup: ${SYNC_RUN_ON_STARTUP:false}
   wowaudit:
-    base-url: ${WOWAUDIT_BASE_URL:https://wowaudit.com/v1}
+    base-url: ${WOWAUDIT_BASE_URL:https://wowaudit.com}
     guild-profile-uri: ${WOWAUDIT_GUILD_URI:}
     api-key: ${WOWAUDIT_API_KEY:}

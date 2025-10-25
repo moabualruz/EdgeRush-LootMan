@@ -1,6 +1,7 @@
 package com.edgerush.datasync.client
 
 import com.edgerush.datasync.config.SyncProperties
+import com.edgerush.datasync.config.WoWAuditProperties
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -22,7 +23,8 @@ class WoWAuditClientTest {
         val baseUrl = server.url("/").toString().removeSuffix("/")
         val props = SyncProperties(
             cron = "0 0 4 * * *",
-            wowaudit = SyncProperties.WoWAudit(
+            runOnStartup = false,
+            wowaudit = WoWAuditProperties(
                 baseUrl = baseUrl,
                 guildProfileUri = "https://wowaudit.com/REGION/REALM/GUILD/profile",
                 apiKey = "test-key"
@@ -81,7 +83,8 @@ class WoWAuditClientTest {
     fun `requires guild profile uri`() {
         val props = SyncProperties(
             cron = "0 0 4 * * *",
-            wowaudit = SyncProperties.WoWAudit(
+            runOnStartup = false,
+            wowaudit = WoWAuditProperties(
                 baseUrl = server.url("/").toString().removeSuffix("/"),
                 guildProfileUri = null,
                 apiKey = "test-key"

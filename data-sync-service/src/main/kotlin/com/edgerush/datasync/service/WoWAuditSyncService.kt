@@ -33,6 +33,16 @@ class WoWAuditSyncService(
     private val applicationAltRepository: ApplicationAltRepository,
     private val applicationQuestionRepository: ApplicationQuestionRepository,
     private val snapshotRepository: WoWAuditSnapshotRepository,
+    private val rosterRawRepository: WoWAuditRosterMemberRawRepository,
+    private val applicationRawRepository: WoWAuditApplicationRawRepository,
+    private val raidRawRepository: WoWAuditRaidRawRepository,
+    private val wishlistRawRepository: WoWAuditWishlistRawRepository,
+    private val lootHistoryRawRepository: WoWAuditLootHistoryRawRepository,
+    private val attendanceRawRepository: WoWAuditAttendanceRawRepository,
+    private val historicalDataRawRepository: WoWAuditHistoricalDataRawRepository,
+    private val guestRawRepository: WoWAuditGuestRawRepository,
+    private val teamRawRepository: WoWAuditTeamRawRepository,
+    private val periodRawRepository: WoWAuditPeriodRawRepository,
     private val syncRunService: SyncRunService
 ) {
 
@@ -46,13 +56,41 @@ class WoWAuditSyncService(
             .flatMap { tuple ->
                 val team = tuple.t1
                 val body = tuple.t2
-                Mono.fromCallable {
-                    val records = parseRoster(body, team)
-                    records.forEach { raiderService.upsertCharacter(it) }
-                    saveSnapshot("v1/characters", body)
-                    records.size
+        Mono.fromCallable {
+            val records = parseRoster(body, team)
+            records.forEach { raiderService.upsertCharacter(it) }
+            saveSnapshot("v1/characters", body)
+            try {
+                val rosterRoot = objectMapper.readTree(body)
+                val nodes = when {
+                    rosterRoot.isArray -> rosterRoot
+                    rosterRoot.has("characters") -> rosterRoot["characters"]
+                    else -> null
                 }
+                rosterRawRepository.deleteAll()
+                if (nodes != null && nodes.isArray) {
+                    val now = OffsetDateTime.now()
+                    val rawEntities = mutableListOf<WoWAuditRosterMemberRawEntity>()
+                    nodes.forEach { element ->
+                        val id = element.path("id").asLong(-1)
+                        if (id > 0) {
+                            rawEntities += WoWAuditRosterMemberRawEntity(
+                                characterId = id,
+                                payload = element.toString(),
+                                syncedAt = now
+                            )
+                        }
+                    }
+                    if (rawEntities.isNotEmpty()) {
+                        rosterRawRepository.saveAll(rawEntities)
+                    }
+                }
+            } catch (ex: Exception) {
+                logger.warn("Failed to persist raw roster payload: {}", ex.message)
             }
+            records.size
+        }
+    }
             .doOnSuccess { count ->
                 logger.info("Synced {} raiders from WoWAudit", count)
                 syncRunService.complete(run, status = "SUCCESS", message = "Synced $count raiders")
@@ -76,11 +114,22 @@ class WoWAuditSyncService(
                     logger.warn("Season ID missing from period payload; skipping loot history sync")
                     return@flatMap Mono.just(0)
                 }
-                client.fetchLootHistory(team.guildId, team.id, seasonId)
+                client.fetchLootHistory(seasonId)
                     .flatMap { body ->
                         Mono.fromCallable {
                             val processed = processLootHistory(body, team, period)
                             saveSnapshot("loot_history/season/$seasonId", body)
+                            try {
+                                lootHistoryRawRepository.save(
+                                    WoWAuditLootHistoryRawEntity(
+                                        seasonId = seasonId,
+                                        payload = body,
+                                        syncedAt = OffsetDateTime.now()
+                                    )
+                                )
+                            } catch (ex: Exception) {
+                                logger.warn("Failed to persist loot history for season {}: {}", seasonId, ex.message)
+                            }
                             processed
                         }
                     }
@@ -103,12 +152,61 @@ class WoWAuditSyncService(
             .flatMapMany { tuple ->
                 val team = tuple.t1
                 val body = tuple.t2
-                saveSnapshot("v1/wishlists", body)
-                parseWishlistSummary(body, team).toFlux()
+                Mono.fromCallable {
+                    saveSnapshot("v1/wishlists", body)
+                    try {
+                        val root = objectMapper.readTree(body)
+                        val nodes = when {
+                            root.isArray -> root
+                            root.has("characters") -> root["characters"]
+                            else -> null
+                        }
+                        wishlistRawRepository.deleteAll()
+                        if (nodes != null && nodes.isArray) {
+                            val now = OffsetDateTime.now()
+                            val rawEntities = mutableListOf<WoWAuditWishlistRawEntity>()
+                            nodes.forEach { node ->
+                                val id = node.path("id").asLong(-1)
+                                if (id > 0) {
+                                    rawEntities += WoWAuditWishlistRawEntity(
+                                        characterId = id,
+                                        summaryJson = node.toString(),
+                                        detailJson = null,
+                                        syncedAt = now
+                                    )
+                                }
+                            }
+                            if (rawEntities.isNotEmpty()) {
+                                wishlistRawRepository.saveAll(rawEntities)
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist wishlist summaries: {}", ex.message)
+                    }
+                    parseWishlistSummary(body, team)
+                }.flatMapMany { it.toFlux() }
             }
             .flatMap({ summary ->
                 client.fetchWishlistDetail(summary.id)
-                    .map { payload -> summary to payload }
+                    .flatMap { payload ->
+                        Mono.fromCallable {
+                            try {
+                                val now = OffsetDateTime.now()
+                                val existing = wishlistRawRepository.findById(summary.id).orElse(null)
+                                val entity = existing?.copy(detailJson = payload, syncedAt = now)
+                                    ?: WoWAuditWishlistRawEntity(
+                                        characterId = summary.id,
+                                        summaryJson = null,
+                                        detailJson = payload,
+                                        syncedAt = now
+                                    )
+                                wishlistRawRepository.save(entity)
+                            } catch (ex: Exception) {
+                                logger.warn("Failed to persist wishlist detail {}: {}", summary.id, ex.message)
+                            }
+                            summary to payload
+                        }
+                    }
             }, 4)
             .flatMap { (summary, payload) ->
                 Mono.fromCallable {
@@ -155,14 +253,27 @@ class WoWAuditSyncService(
     private fun fetchTeamInfoOptional(): Mono<TeamResponse?> =
         fetchTeamInfo().onErrorResume { ex ->
             logger.warn("Unable to fetch WoWAudit team info: {}", ex.message)
-            Mono.just(null)
+            Mono.fromCallable<TeamResponse?> { null }
         }
 
     private fun fetchTeamInfo(): Mono<TeamResponse> =
         client.fetchTeam().flatMap { body ->
             try {
                 saveSnapshot("v1/team", body)
-                Mono.just(objectMapper.readValue(body, TeamResponse::class.java))
+                val response = objectMapper.readValue(body, TeamResponse::class.java)
+                try {
+                    val teamId = response.id.takeIf { it > 0 } ?: 0L
+                    teamRawRepository.save(
+                        WoWAuditTeamRawEntity(
+                            teamId = teamId,
+                            payload = body,
+                            syncedAt = OffsetDateTime.now()
+                        )
+                    )
+                } catch (ex: Exception) {
+                    logger.warn("Failed to persist team payload: {}", ex.message)
+                }
+                Mono.just(response)
             } catch (ex: Exception) {
                 Mono.error(ex)
             }
@@ -171,14 +282,33 @@ class WoWAuditSyncService(
     private fun fetchCurrentPeriodOptional(): Mono<PeriodResponse?> =
         fetchCurrentPeriod().map { it }.onErrorResume { ex ->
             logger.warn("Unable to fetch WoWAudit period info: {}", ex.message)
-            Mono.just(null)
+            Mono.fromCallable<PeriodResponse?> { null }
         }
 
     private fun fetchCurrentPeriod(): Mono<PeriodResponse> =
         client.fetchPeriod().flatMap { body ->
             saveSnapshot("v1/period", body)
-            parsePeriod(body)?.let { Mono.just(it) }
-                ?: Mono.error(IllegalStateException("Missing season information"))
+            val period = parsePeriod(body)
+            if (period != null) {
+                try {
+                    val periodKey = period.periodId
+                        ?: period.currentPeriod
+                        ?: period.seasonId
+                        ?: 0L
+                    periodRawRepository.save(
+                        WoWAuditPeriodRawEntity(
+                            periodId = periodKey,
+                            payload = body,
+                            syncedAt = OffsetDateTime.now()
+                        )
+                    )
+                } catch (ex: Exception) {
+                    logger.warn("Failed to persist period payload: {}", ex.message)
+                }
+                Mono.just(period)
+            } else {
+                Mono.error(IllegalStateException("Missing season information"))
+            }
         }
 
     private fun parseRoster(body: String, team: TeamResponse?): List<RaiderRecord> {
@@ -241,15 +371,16 @@ class WoWAuditSyncService(
             null
         }
 
-    private fun processLootHistory(body: String, team: TeamResponse, period: PeriodResponse): Int =
-        try {
+    @Suppress("UNUSED_PARAMETER")
+    private fun processLootHistory(body: String, team: TeamResponse, period: PeriodResponse): Int {
+        return try {
             val root = objectMapper.readTree(body)
             val entriesNode: Iterable<JsonNode> = when {
                 root.isArray -> root
                 root.has("history_items") -> root["history_items"]
                 root.has("loot") -> root["loot"]
                 else -> {
-                    logger.warn("Unexpected loot history payload format: {}", root.nodeType())
+                    logger.warn("Unexpected loot history payload format: {}", root.nodeType)
                     return 0
                 }
             }
@@ -300,6 +431,7 @@ class WoWAuditSyncService(
             logger.error("Failed to process loot history", ex)
             0
         }
+    }
 
     private fun parseWishlistSummary(body: String, team: TeamResponse?): List<WishlistSummary> {
         val defaultRealm = team?.realm.orEmpty()
@@ -373,6 +505,17 @@ class WoWAuditSyncService(
             .flatMap { body ->
                 Mono.fromCallable {
                     saveSnapshot("v1/attendance", body)
+                    try {
+                        attendanceRawRepository.save(
+                            WoWAuditAttendanceRawEntity(
+                                id = 1,
+                                payload = body,
+                                syncedAt = OffsetDateTime.now()
+                            )
+                        )
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist attendance payload: {}", ex.message)
+                    }
                     val records = parseAttendance(body, team)
                     attendanceStatRepository.deleteAll()
                     attendanceStatRepository.saveAll(records.map { it.toEntity() }).forEach { }
@@ -388,16 +531,65 @@ class WoWAuditSyncService(
         }
         return client.fetchRaids()
             .flatMapMany { body ->
-                saveSnapshot("v1/raids?include_past=true", body)
-                val summaries = parseRaidList(body)
-                raidEncounterRepository.deleteAll()
-                raidSignupRepository.deleteAll()
-                raidRepository.deleteAll()
-                summaries.toFlux()
+                Mono.fromCallable {
+                    saveSnapshot("v1/raids?include_past=true", body)
+                    val summaries = parseRaidList(body)
+                    raidEncounterRepository.deleteAll()
+                    raidSignupRepository.deleteAll()
+                    raidRepository.deleteAll()
+                    try {
+                        val root = objectMapper.readTree(body)
+                        val raidsNode = when {
+                            root.isArray -> root
+                            root.has("raids") -> root["raids"]
+                            else -> null
+                        }
+                        raidRawRepository.deleteAll()
+                        if (raidsNode != null && raidsNode.isArray) {
+                            val now = OffsetDateTime.now()
+                            val rawEntities = mutableListOf<WoWAuditRaidRawEntity>()
+                            raidsNode.forEach { node ->
+                                val id = node.path("id").asLong(-1)
+                                if (id > 0) {
+                                    rawEntities += WoWAuditRaidRawEntity(
+                                        raidId = id,
+                                        summaryJson = node.toString(),
+                                        detailJson = null,
+                                        syncedAt = now
+                                    )
+                                }
+                            }
+                            if (rawEntities.isNotEmpty()) {
+                                raidRawRepository.saveAll(rawEntities)
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist raid summaries: {}", ex.message)
+                    }
+                    summaries
+                }.flatMapMany { it.toFlux() }
             }
             .flatMap({ summary ->
                 client.fetchRaidDetail(summary.id)
-                    .map { detail -> summary to detail }
+                    .flatMap { detail ->
+                        Mono.fromCallable {
+                            try {
+                                val now = OffsetDateTime.now()
+                                val existing = raidRawRepository.findById(summary.id).orElse(null)
+                                val entity = existing?.copy(detailJson = detail, syncedAt = now)
+                                    ?: WoWAuditRaidRawEntity(
+                                        raidId = summary.id,
+                                        summaryJson = null,
+                                        detailJson = detail,
+                                        syncedAt = now
+                                    )
+                                raidRawRepository.save(entity)
+                            } catch (ex: Exception) {
+                                logger.warn("Failed to persist raid detail {}: {}", summary.id, ex.message)
+                            }
+                            summary to detail
+                        }
+                    }
             }, 2)
             .flatMap { (summary, detail) ->
                 Mono.fromCallable { saveRaid(summary, detail) }
@@ -417,6 +609,17 @@ class WoWAuditSyncService(
             .flatMap { body ->
                 Mono.fromCallable {
                     saveSnapshot("v1/historical_data?period=$periodId", body)
+                    try {
+                        historicalDataRawRepository.save(
+                            WoWAuditHistoricalDataRawEntity(
+                                periodId = periodId,
+                                payload = body,
+                                syncedAt = OffsetDateTime.now()
+                            )
+                        )
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist historical data payload for period {}: {}", periodId, ex.message)
+                    }
                     val records = parseHistoricalData(body, periodId)
                     historicalActivityRepository.deleteAll()
                     historicalActivityRepository.saveAll(records).forEach { }
@@ -431,6 +634,29 @@ class WoWAuditSyncService(
             .flatMap { body ->
                 Mono.fromCallable {
                     saveSnapshot("v1/guests", body)
+                    try {
+                        val root = objectMapper.readTree(body)
+                        if (root.isArray) {
+                            val now = OffsetDateTime.now()
+                            val rawEntities = mutableListOf<WoWAuditGuestRawEntity>()
+                            guestRawRepository.deleteAll()
+                            root.forEach { node ->
+                                val id = node.path("id").asLong(-1)
+                                if (id > 0) {
+                                    rawEntities += WoWAuditGuestRawEntity(
+                                        guestId = id,
+                                        payload = node.toString(),
+                                        syncedAt = now
+                                    )
+                                }
+                            }
+                            if (rawEntities.isNotEmpty()) {
+                                guestRawRepository.saveAll(rawEntities)
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist guest payload: {}", ex.message)
+                    }
                     val guests = parseGuests(body)
                     guestRepository.deleteAll()
                     guestRepository.saveAll(guests).forEach { }
@@ -444,6 +670,35 @@ class WoWAuditSyncService(
             .flatMap { body ->
                 Mono.fromCallable {
                     saveSnapshot("v1/applications", body)
+                    try {
+                        val root = objectMapper.readTree(body)
+                        val nodes = when {
+                            root.isArray -> root
+                            root.has("applications") -> root["applications"]
+                            else -> null
+                        }
+                        applicationRawRepository.deleteAll()
+                        if (nodes != null && nodes.isArray) {
+                            val now = OffsetDateTime.now()
+                            val rawEntities = mutableListOf<WoWAuditApplicationRawEntity>()
+                            nodes.forEach { node ->
+                                val id = node.path("id").asLong(-1)
+                                if (id > 0) {
+                                    rawEntities += WoWAuditApplicationRawEntity(
+                                        applicationId = id,
+                                        summaryJson = node.toString(),
+                                        detailJson = null,
+                                        syncedAt = now
+                                    )
+                                }
+                            }
+                            if (rawEntities.isNotEmpty()) {
+                                applicationRawRepository.saveAll(rawEntities)
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to persist application summaries: {}", ex.message)
+                    }
                     parseApplicationSummaries(body)
                 }
             }
@@ -455,7 +710,25 @@ class WoWAuditSyncService(
             }
             .flatMap({ summary ->
                 client.fetchApplicationDetail(summary.id)
-                    .map { detail -> summary to detail }
+                    .flatMap { detail ->
+                        Mono.fromCallable {
+                            try {
+                                val now = OffsetDateTime.now()
+                                val existing = applicationRawRepository.findById(summary.id).orElse(null)
+                                val entity = existing?.copy(detailJson = detail, syncedAt = now)
+                                    ?: WoWAuditApplicationRawEntity(
+                                        applicationId = summary.id,
+                                        summaryJson = null,
+                                        detailJson = detail,
+                                        syncedAt = now
+                                    )
+                                applicationRawRepository.save(entity)
+                            } catch (ex: Exception) {
+                                logger.warn("Failed to persist application detail {}: {}", summary.id, ex.message)
+                            }
+                            summary to detail
+                        }
+                    }
             }, 2)
             .flatMap { (summary, detail) ->
                 Mono.fromCallable { saveApplication(summary, detail) }
@@ -466,7 +739,6 @@ class WoWAuditSyncService(
 
     private fun parseAttendance(body: String, team: TeamResponse?): List<AttendanceRecord> {
         val defaultRealm = team?.realm.orEmpty()
-        val defaultRegion = team?.region.orEmpty()
         val records = mutableListOf<AttendanceRecord>()
         return try {
             val node = objectMapper.readTree(body)
@@ -476,7 +748,7 @@ class WoWAuditSyncService(
             val endDate = node.path("end_date").asText(null)
             val characters = node.path("characters")
             if (!characters.isArray) {
-                logger.warn("Unexpected attendance payload format: {}", characters.nodeType())
+                logger.warn("Unexpected attendance payload format: {}", characters.nodeType)
                 emptyList()
             } else {
                 characters.forEach { element ->
@@ -777,144 +1049,4 @@ class WoWAuditSyncService(
         )
     }
 
-    private fun saveSnapshotMono(endpoint: String, payload: String): Mono<Unit> =
-        Mono.fromCallable { saveSnapshot(endpoint, payload) }
-            .thenReturn(Unit)
-
-    private fun extractApplicationIds(body: String): List<Long> =
-        try {
-            val node = objectMapper.readTree(body)
-            val applications = when {
-                node.isArray -> node
-                node.has("applications") -> node["applications"]
-                else -> return emptyList()
-            }
-            applications.mapNotNull { it.path("id").asLong(-1).takeIf { id -> id > 0 } }
-        } catch (ex: Exception) {
-            logger.error("Failed to parse applications payload", ex)
-            emptyList()
-        }
 }
-
-data class RaiderRecord(
-    val name: String,
-    val realm: String,
-    val region: String = "",
-    val clazz: String = "",
-    val spec: String = "",
-    val role: String = ""
-)
-
-data class WishlistSummary(
-    val id: Long,
-    val name: String,
-    val realm: String,
-    val region: String
-)
-
-data class AttendanceRecord(
-    val instance: String?,
-    val encounter: String?,
-    val startDate: String?,
-    val endDate: String?,
-    val characterId: Long?,
-    val characterName: String,
-    val characterRealm: String?,
-    val characterClass: String?,
-    val characterRole: String?,
-    val attendedAmountOfRaids: Int?,
-    val totalAmountOfRaids: Int?,
-    val attendedPercentage: Double?,
-    val selectedAmountOfEncounters: Int?,
-    val totalAmountOfEncounters: Int?,
-    val selectedPercentage: Double?
-) {
-    fun toEntity(): AttendanceStatEntity = AttendanceStatEntity(
-        instance = instance,
-        encounter = encounter,
-        startDate = parseLocalDate(startDate),
-        endDate = parseLocalDate(endDate),
-        characterId = characterId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterClass = characterClass,
-        characterRole = characterRole,
-        attendedAmountOfRaids = attendedAmountOfRaids,
-        totalAmountOfRaids = totalAmountOfRaids,
-        attendedPercentage = attendedPercentage,
-        selectedAmountOfEncounters = selectedAmountOfEncounters,
-        totalAmountOfEncounters = totalAmountOfEncounters,
-        selectedPercentage = selectedPercentage,
-        syncedAt = OffsetDateTime.now()
-    )
-}
-
-data class RaidSummary(
-    val id: Long,
-    val date: String?,
-    val startTime: String?,
-    val endTime: String?,
-    val instance: String?,
-    val difficulty: String?,
-    val optional: Boolean?,
-    val status: String?,
-    val presentSize: Int?,
-    val totalSize: Int?,
-    val notes: String?,
-    val selectionsImage: String?
-)
-
-data class ApplicationSummary(
-    val id: Long,
-    val appliedAt: OffsetDateTime?,
-    val status: String?,
-    val role: String?,
-    val age: Int?,
-    val country: String?,
-    val battletag: String?,
-    val discordId: String?,
-    val mainCharacterName: String?,
-    val mainCharacterRealm: String?,
-    val mainCharacterClass: String?,
-    val mainCharacterRole: String?
-) {
-    fun toEntity(): ApplicationEntity = ApplicationEntity(
-        applicationId = id,
-        appliedAt = appliedAt,
-        status = status,
-        role = role,
-        age = age,
-        country = country,
-        battletag = battletag,
-        discordId = discordId,
-        mainCharacterName = mainCharacterName,
-        mainCharacterRealm = mainCharacterRealm,
-        mainCharacterClass = mainCharacterClass,
-        mainCharacterRole = mainCharacterRole,
-        syncedAt = OffsetDateTime.now()
-    )
-}
-
-private fun JsonNode.asIntOrNull(): Int? =
-    if (this.isMissingNode || this.isNull) null else this.asInt()
-
-private fun JsonNode.asDoubleOrNull(): Double? =
-    if (this.isMissingNode || this.isNull) null else this.asDouble()
-
-private fun JsonNode.asBooleanOrNull(): Boolean? =
-    if (this.isMissingNode || this.isNull) null else this.asBoolean()
-
-private fun parseLocalDate(value: String?): LocalDate? =
-    value?.takeIf { it.isNotBlank() }?.let {
-        runCatching { LocalDate.parse(it) }.getOrNull()
-    }
-
-private fun parseLocalTime(value: String?): LocalTime? =
-    value?.takeIf { it.isNotBlank() }?.let {
-        runCatching { LocalTime.parse(it) }.getOrNull()
-    }
-
-private fun parseOffsetDateTime(value: String?): OffsetDateTime? =
-    value?.takeIf { it.isNotBlank() }?.let {
-        runCatching { OffsetDateTime.parse(it) }.getOrNull()
-    }

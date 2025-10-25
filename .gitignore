@@ -1,5 +1,4 @@
 # Kotlin build
-/build/
 /.gradle/
 
 # IntelliJ / JetBrains
@@ -18,3 +17,5 @@
 
 # Guild-provided exports (keep local only)
 wowaudit/
+build/
+*/build/

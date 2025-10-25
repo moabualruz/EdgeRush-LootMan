@@ -3,7 +3,7 @@
 ## WoWAudit API
 - Navigate to `Settings → API Access` in WoWAudit and generate a guild API key.
 - Store the key in environment variables when running scripts (`export WOWAUDIT_API_KEY=...`).
-- Base URL: `https://wowaudit.com/v1`
+- Base URL: `https://wowaudit.com`
 - Core endpoints (GET unless noted):
   - `/guild/attendance`
   - `/guild/loot`

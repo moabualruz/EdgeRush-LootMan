@@ -26,29 +26,3 @@ data class RaidEntity(
     val syncedAt: OffsetDateTime
 )
 
-@Table("raid_signups")
-data class RaidSignupEntity(
-    @Id
-    val id: Long? = null,
-    val raidId: Long,
-    val characterId: Long?,
-    val characterName: String?,
-    val characterRealm: String?,
-    val characterClass: String?,
-    val characterRole: String?,
-    val status: String?,
-    val comment: String?,
-    val selected: Boolean?
-)
-
-@Table("raid_encounters")
-data class RaidEncounterEntity(
-    @Id
-    val id: Long? = null,
-    val raidId: Long,
-    val encounterId: Long?,
-    val name: String?,
-    val enabled: Boolean?,
-    val extra: Boolean?,
-    val notes: String?
-)

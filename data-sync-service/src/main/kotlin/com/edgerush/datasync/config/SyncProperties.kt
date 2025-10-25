@@ -9,12 +9,5 @@ data class SyncProperties(
     val cron: String,
     @DefaultValue("false")
     val runOnStartup: Boolean,
-    val wowaudit: WoWAudit
-) {
-    data class WoWAudit(
-        @DefaultValue("https://wowaudit.com")
-        val baseUrl: String,
-        val guildProfileUri: String?,
-        val apiKey: String?
-    )
-}
+    val wowaudit: WoWAuditProperties
+)

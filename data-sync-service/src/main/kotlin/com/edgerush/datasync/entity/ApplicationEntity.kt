@@ -24,24 +24,3 @@ data class ApplicationEntity(
     val syncedAt: OffsetDateTime
 )
 
-@Table("application_alts")
-data class ApplicationAltEntity(
-    @Id
-    val id: Long? = null,
-    val applicationId: Long,
-    val name: String?,
-    val realm: String?,
-    val `class`: String?,
-    val role: String?,
-    val level: Int?
-)
-
-@Table("application_questions")
-data class ApplicationQuestionEntity(
-    @Id
-    val id: Long? = null,
-    val applicationId: Long,
-    val question: String?,
-    val answer: String?,
-    val filesJson: String?
-)

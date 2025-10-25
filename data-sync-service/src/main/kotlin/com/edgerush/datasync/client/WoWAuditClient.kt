@@ -1,17 +1,11 @@
 package com.edgerush.datasync.client
 
 import com.edgerush.datasync.config.SyncProperties
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import org.slf4j.LoggerFactory
-
-sealed class WoWAuditClientException(message: String) : RuntimeException(message)
-class WoWAuditRateLimitException(message: String) : WoWAuditClientException(message)
-class WoWAuditServerException(message: String) : WoWAuditClientException(message)
-class WoWAuditClientErrorException(message: String) : WoWAuditClientException(message)
-class WoWAuditUnexpectedResponse(message: String) : WoWAuditClientException(message)
 
 @Component
 class WoWAuditClient(
@@ -23,8 +17,8 @@ class WoWAuditClient(
 
     fun fetchRoster(): Mono<String> = get("/v1/characters")
 
-    fun fetchLootHistory(guildId: Long, teamId: Long, seasonId: Long): Mono<String> =
-        get("/api/guilds/$guildId/teams/$teamId/loot_history.json?season_id=$seasonId")
+    fun fetchLootHistory(seasonId: Long): Mono<String> =
+        get("/v1/loot_history/$seasonId")
 
     fun fetchWishlists(): Mono<String> = get("/v1/wishlists")
 
@@ -50,10 +44,13 @@ class WoWAuditClient(
 
     fun fetchApplicationDetail(id: Long): Mono<String> = get("/v1/applications/$id")
 
-    private fun get(path: String): Mono<String> =
-        webClient
+    private val baseUrlRequiresApiPrefix: Boolean = false
+
+    private fun get(path: String): Mono<String> {
+        val resolvedPath = resolvePath(path)
+        return webClient
             .get()
-            .uri(path)
+            .uri(resolvedPath)
             .retrieve()
             .onStatus({ it == HttpStatus.TOO_MANY_REQUESTS }) { response ->
                 response.bodyToMono(String::class.java)
@@ -71,17 +68,39 @@ class WoWAuditClient(
                     .flatMap { body -> Mono.error(WoWAuditClientErrorException(body)) }
             }
             .bodyToMono(String::class.java)
-            .map { body ->
+            .flatMap { body ->
                 val snippet = body.trim()
-                if (snippet.startsWith("<")) {
-                    log.warn("WoWAudit response for '{}' was not JSON. First bytes: {}", path, snippet.take(120))
-                    throw WoWAuditUnexpectedResponse("Expected JSON but received HTML. Snippet: ${snippet.take(200)}")
+                if (looksLikeHtml(snippet)) {
+                    val redirectTarget = extractRedirectTarget(snippet)
+                    val message = buildString {
+                        append("WoWAudit request to '$resolvedPath' returned HTML instead of JSON.")
+                        redirectTarget?.let { append(" Response redirected to '$it'.") }
+                        append(" Check that sync.wowaudit.base-url points to the API (e.g. https://wowaudit.com)")
+                        append(" and that a valid API key is configured if required. Sample response: ${snippet.take(200)}")
+                    }
+                    log.warn(message)
+                    return@flatMap Mono.error(WoWAuditUnexpectedResponse(message))
                 }
-                body
+                Mono.just(body)
             }
             .doOnSubscribe {
                 require(!properties.wowaudit.guildProfileUri.isNullOrBlank()) {
                     "sync.wowaudit.guild-profile-uri must be configured"
                 }
             }
+    }
+
+    private fun resolvePath(path: String): String {
+        if (baseUrlRequiresApiPrefix && path.startsWith("/v1/")) {
+            return "$path"
+        }
+        return path
+    }
+
+    private fun looksLikeHtml(payload: String): Boolean =
+        payload.startsWith("<!DOCTYPE", ignoreCase = true) ||
+            payload.startsWith("<html", ignoreCase = true)
+
+    private fun extractRedirectTarget(payload: String): String? =
+        Regex("href=\"([^\"]+)\"").find(payload)?.groupValues?.getOrNull(1)
 }
