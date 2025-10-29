@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edgerush}
     volumes:
       - postgres_data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
 
   data-sync:
     build:
