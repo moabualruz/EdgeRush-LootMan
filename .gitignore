@@ -1,9 +1,13 @@
 # Kotlin build
 /.gradle/
+.kotlin/
 
 # IntelliJ / JetBrains
 .idea/
 *.iml
+
+# VS Code
+.vscode/
 
 # Runtime artifacts
 /tmp/

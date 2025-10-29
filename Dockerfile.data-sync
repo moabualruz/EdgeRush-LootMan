@@ -1,0 +1,25 @@
+# Use Eclipse Temurin JDK 24 as base
+FROM eclipse-temurin:24-jdk
+
+# Install necessary tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Gradle
+ENV GRADLE_VERSION=8.10.1
+RUN curl -L https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle.zip \
+    && unzip -q gradle.zip \
+    && mv gradle-${GRADLE_VERSION} /opt/gradle \
+    && rm gradle.zip
+
+# Set Gradle in PATH
+ENV PATH="/opt/gradle/bin:${PATH}"
+
+# Create gradle user and set up working directory
+RUN useradd -m gradle
+WORKDIR /home/gradle/project
+
+# Default command - run as root to avoid permission issues with mounted volume
+CMD ["gradle", ":data-sync-service:bootRun"]

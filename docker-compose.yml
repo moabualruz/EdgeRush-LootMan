@@ -13,14 +13,15 @@ services:
       - postgres_data:/var/lib/postgresql
 
   data-sync:
-    image: gradle:8.10.1-jdk21
+    build:
+      context: .
+      dockerfile: Dockerfile.data-sync
     container_name: edgerush-data-sync
     working_dir: /home/gradle/project
     volumes:
       - ./:/home/gradle/project
     depends_on:
       - postgres
-    command: ["sh", "-lc", "gradle :data-sync-service:bootRun"]
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
