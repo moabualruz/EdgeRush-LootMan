@@ -347,7 +347,12 @@
   - Write comprehensive tests for integration workflows
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 28. Refactor Shared context
+- [x] 28. Refactor Shared context
+
+
+
+
+
   - Create domain layer for Raider and Guild entities
   - Create application layer for common use cases (raider management, guild config)
   - Create infrastructure layer for shared repositories
