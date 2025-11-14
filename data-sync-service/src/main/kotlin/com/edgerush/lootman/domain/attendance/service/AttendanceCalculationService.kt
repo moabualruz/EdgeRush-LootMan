@@ -12,7 +12,6 @@ import java.time.LocalDate
  *
  * Provides methods to aggregate and calculate attendance metrics from attendance records.
  */
-@Service
 class AttendanceCalculationService(
     private val attendanceRepository: AttendanceRepository
 ) {

@@ -1,8 +1,7 @@
 package com.edgerush.lootman.api.attendance
 
 import com.edgerush.lootman.application.attendance.AttendanceReport
-import com.edgerush.lootman.application.attendance.AttendanceTrackingResult
-import com.edgerush.lootman.application.attendance.GuildAttendanceReport
+import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.model.AttendanceStats
 import java.time.Instant
 import java.time.LocalDate
@@ -38,19 +37,19 @@ data class TrackAttendanceResponse(
     val recordedAt: Instant
 ) {
     companion object {
-        fun from(result: AttendanceTrackingResult): TrackAttendanceResponse {
+        fun from(record: AttendanceRecord): TrackAttendanceResponse {
             return TrackAttendanceResponse(
-                recordId = result.recordId.value,
-                raiderId = result.raiderId.value,
-                guildId = result.guildId.value,
-                instance = result.instance,
-                encounter = result.encounter,
-                startDate = result.startDate,
-                endDate = result.endDate,
-                attendedRaids = result.attendedRaids,
-                totalRaids = result.totalRaids,
-                attendancePercentage = result.attendancePercentage,
-                recordedAt = result.recordedAt
+                recordId = record.id.value,
+                raiderId = record.raiderId.value,
+                guildId = record.guildId.value,
+                instance = record.instance,
+                encounter = record.encounter,
+                startDate = record.startDate,
+                endDate = record.endDate,
+                attendedRaids = record.attendedRaids,
+                totalRaids = record.totalRaids,
+                attendancePercentage = record.attendancePercentage,
+                recordedAt = record.recordedAt
             )
         }
     }
@@ -83,26 +82,7 @@ data class AttendanceReportResponse(
     }
 }
 
-/**
- * Response DTO for guild attendance report.
- */
-data class GuildAttendanceReportResponse(
-    val guildId: String,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
-    val stats: AttendanceStatsDto
-) {
-    companion object {
-        fun from(report: GuildAttendanceReport): GuildAttendanceReportResponse {
-            return GuildAttendanceReportResponse(
-                guildId = report.guildId.value,
-                startDate = report.startDate,
-                endDate = report.endDate,
-                stats = AttendanceStatsDto.from(report.stats)
-            )
-        }
-    }
-}
+
 
 /**
  * DTO for attendance statistics.

@@ -10,94 +10,90 @@ import java.time.LocalDate
 /**
  * Use case for getting attendance reports.
  *
- * This use case orchestrates attendance reporting by:
- * 1. Determining the scope (overall, instance, or encounter)
- * 2. Calculating attendance statistics
- * 3. Returning formatted report
+ * This use case orchestrates the process of:
+ * 1. Validating the query parameters
+ * 2. Calculating attendance statistics based on the query scope
+ * 3. Returning an aggregated attendance report
  */
-@Service
 class GetAttendanceReportUseCase(
     private val attendanceCalculationService: AttendanceCalculationService
 ) {
+
     /**
-     * Executes the attendance report generation for a raider.
+     * Execute the get attendance report use case.
      *
-     * @param query The report query with scope and filters
-     * @return Result containing AttendanceReport or error
+     * @param query The query containing report parameters
+     * @return Result containing the AttendanceReport or an exception
      */
     fun execute(query: GetAttendanceReportQuery): Result<AttendanceReport> = runCatching {
+        // Validate that encounter is not specified without instance
+        if (query.encounter != null && query.instance == null) {
+            throw IllegalArgumentException("Cannot query encounter attendance without specifying an instance")
+        }
+
+        val raiderId = RaiderId(query.raiderId)
+        val guildId = GuildId(query.guildId)
+
+        // Calculate stats based on query scope
         val stats = when {
-            // Specific encounter
-            query.instance != null && query.encounter != null -> {
+            query.encounter != null && query.instance != null -> {
+                // Encounter-specific stats
                 attendanceCalculationService.calculateAttendanceStatsForEncounter(
-                    raiderId = query.raiderId,
-                    guildId = query.guildId,
+                    raiderId = raiderId,
+                    guildId = guildId,
                     instance = query.instance,
                     encounter = query.encounter,
                     startDate = query.startDate,
                     endDate = query.endDate
                 )
             }
-            // Specific instance
             query.instance != null -> {
+                // Instance-specific stats
                 attendanceCalculationService.calculateAttendanceStatsForInstance(
-                    raiderId = query.raiderId,
-                    guildId = query.guildId,
+                    raiderId = raiderId,
+                    guildId = guildId,
                     instance = query.instance,
                     startDate = query.startDate,
                     endDate = query.endDate
                 )
             }
-            // Overall attendance
             else -> {
+                // Overall stats
                 attendanceCalculationService.calculateAttendanceStats(
-                    raiderId = query.raiderId,
-                    guildId = query.guildId,
+                    raiderId = raiderId,
+                    guildId = guildId,
                     startDate = query.startDate,
                     endDate = query.endDate
                 )
             }
         }
 
+        // Create the report
         AttendanceReport(
-            raiderId = query.raiderId,
-            guildId = query.guildId,
+            raiderId = raiderId,
+            guildId = guildId,
+            startDate = query.startDate,
+            endDate = query.endDate,
             instance = query.instance,
             encounter = query.encounter,
-            startDate = query.startDate,
-            endDate = query.endDate,
-            stats = stats
-        )
-    }
-
-    /**
-     * Executes the attendance report generation for an entire guild.
-     *
-     * @param query The guild report query
-     * @return Result containing GuildAttendanceReport or error
-     */
-    fun executeGuildReport(query: GetGuildAttendanceReportQuery): Result<GuildAttendanceReport> = runCatching {
-        val stats = attendanceCalculationService.calculateGuildAttendanceStats(
-            guildId = query.guildId,
-            startDate = query.startDate,
-            endDate = query.endDate
-        )
-
-        GuildAttendanceReport(
-            guildId = query.guildId,
-            startDate = query.startDate,
-            endDate = query.endDate,
             stats = stats
         )
     }
 }
 
 /**
- * Query for getting attendance report for a raider.
+ * Query for getting an attendance report.
+ *
+ * @property raiderId The raider's unique identifier
+ * @property guildId The guild's unique identifier
+ * @property startDate The start date of the report period
+ * @property endDate The end date of the report period
+ * @property instance Optional raid instance name for instance-specific report
+ * @property encounter Optional encounter name for encounter-specific report
  */
 data class GetAttendanceReportQuery(
-    val raiderId: RaiderId,
-    val guildId: GuildId,
+    val raiderId: Long,
+    val guildId: String,
     val startDate: LocalDate,
     val endDate: LocalDate,
     val instance: String? = null,
@@ -105,33 +101,22 @@ data class GetAttendanceReportQuery(
 )
 
 /**
- * Query for getting guild-wide attendance report.
- */
-data class GetGuildAttendanceReportQuery(
-    val guildId: GuildId,
-    val startDate: LocalDate,
-    val endDate: LocalDate
-)
-
-/**
- * Attendance report for a raider.
+ * Attendance report containing aggregated statistics.
+ *
+ * @property raiderId The raider's unique identifier
+ * @property guildId The guild's unique identifier
+ * @property startDate The start date of the report period
+ * @property endDate The end date of the report period
+ * @property instance The raid instance name (null for overall report)
+ * @property encounter The encounter name (null for instance or overall report)
+ * @property stats The aggregated attendance statistics
  */
 data class AttendanceReport(
     val raiderId: RaiderId,
     val guildId: GuildId,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
     val instance: String?,
     val encounter: String?,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
-    val stats: AttendanceStats
-)
-
-/**
- * Guild-wide attendance report.
- */
-data class GuildAttendanceReport(
-    val guildId: GuildId,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
     val stats: AttendanceStats
 )

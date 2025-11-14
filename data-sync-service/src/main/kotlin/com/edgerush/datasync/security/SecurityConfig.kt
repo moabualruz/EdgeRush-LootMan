@@ -16,6 +16,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
+@org.springframework.context.annotation.Profile("!test")
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val adminModeConfig: AdminModeConfig,

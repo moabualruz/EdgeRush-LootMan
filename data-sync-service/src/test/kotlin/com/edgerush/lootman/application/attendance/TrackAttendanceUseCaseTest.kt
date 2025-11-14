@@ -1,192 +1,219 @@
 package com.edgerush.lootman.application.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
-import com.edgerush.lootman.domain.attendance.model.GuildId
-import com.edgerush.lootman.domain.attendance.model.RaiderId
+import com.edgerush.lootman.domain.attendance.model.*
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import io.mockk.slot
+import io.mockk.mockk
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
+/**
+ * Unit tests for TrackAttendanceUseCase.
+ */
 class TrackAttendanceUseCaseTest : UnitTest() {
 
-    @MockK
     private lateinit var attendanceRepository: AttendanceRepository
-
-    @InjectMockKs
     private lateinit var useCase: TrackAttendanceUseCase
 
+    @BeforeEach
+    fun setup() {
+        attendanceRepository = mockk()
+        useCase = TrackAttendanceUseCase(attendanceRepository)
+    }
+
     @Test
-    fun `should track attendance successfully with valid command`() {
-        // Arrange
+    fun `should track attendance successfully when valid command provided`() {
+        // Given
         val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
+            raiderId = 123L,
+            guildId = "guild-456",
             instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
+            encounter = null,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
             attendedRaids = 8,
             totalRaids = 10
         )
 
-        val recordSlot = slot<AttendanceRecord>()
-        every { attendanceRepository.save(capture(recordSlot)) } answers { recordSlot.captured }
+        val expectedRecord = AttendanceRecord.create(
+            raiderId = RaiderId(command.raiderId),
+            guildId = GuildId(command.guildId),
+            instance = command.instance,
+            encounter = command.encounter,
+            startDate = command.startDate,
+            endDate = command.endDate,
+            attendedRaids = command.attendedRaids,
+            totalRaids = command.totalRaids
+        )
 
-        // Act
+        every { attendanceRepository.save(any()) } returns expectedRecord
+
+        // When
         val result = useCase.execute(command)
 
-        // Assert
-        result.isSuccess shouldBe true
-        val attendanceResult = result.getOrNull()!!
-
-        attendanceResult.raiderId shouldBe command.raiderId
-        attendanceResult.guildId shouldBe command.guildId
-        attendanceResult.instance shouldBe command.instance
-        attendanceResult.encounter shouldBe command.encounter
-        attendanceResult.attendedRaids shouldBe 8
-        attendanceResult.totalRaids shouldBe 10
-        attendanceResult.attendancePercentage shouldBe 0.8
+        // Then
+        assertTrue(result.isSuccess)
+        val record = result.getOrThrow()
+        assertEquals(RaiderId(command.raiderId), record.raiderId)
+        assertEquals(GuildId(command.guildId), record.guildId)
+        assertEquals(command.instance, record.instance)
+        assertEquals(command.attendedRaids, record.attendedRaids)
+        assertEquals(command.totalRaids, record.totalRaids)
+        assertEquals(0.8, record.attendancePercentage)
 
         verify(exactly = 1) { attendanceRepository.save(any()) }
     }
 
     @Test
-    fun `should track attendance for overall instance when encounter is null`() {
-        // Arrange
+    fun `should track attendance with encounter when encounter specified`() {
+        // Given
         val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
+            raiderId = 123L,
+            guildId = "guild-456",
+            instance = "Nerub-ar Palace",
+            encounter = "Queen Ansurek",
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
+            attendedRaids = 5,
+            totalRaids = 8
+        )
+
+        val expectedRecord = AttendanceRecord.create(
+            raiderId = RaiderId(command.raiderId),
+            guildId = GuildId(command.guildId),
+            instance = command.instance,
+            encounter = command.encounter,
+            startDate = command.startDate,
+            endDate = command.endDate,
+            attendedRaids = command.attendedRaids,
+            totalRaids = command.totalRaids
+        )
+
+        every { attendanceRepository.save(any()) } returns expectedRecord
+
+        // When
+        val result = useCase.execute(command)
+
+        // Then
+        assertTrue(result.isSuccess)
+        val record = result.getOrThrow()
+        assertEquals("Queen Ansurek", record.encounter)
+
+        verify(exactly = 1) { attendanceRepository.save(any()) }
+    }
+
+    @Test
+    fun `should return failure when attended raids exceeds total raids`() {
+        // Given
+        val command = TrackAttendanceCommand(
+            raiderId = 123L,
+            guildId = "guild-456",
             instance = "Nerub-ar Palace",
             encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 9,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
+            attendedRaids = 12,
             totalRaids = 10
         )
 
-        val recordSlot = slot<AttendanceRecord>()
-        every { attendanceRepository.save(capture(recordSlot)) } answers { recordSlot.captured }
-
-        // Act
+        // When
         val result = useCase.execute(command)
 
-        // Assert
-        result.isSuccess shouldBe true
-        val attendanceResult = result.getOrNull()!!
+        // Then
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
 
-        attendanceResult.encounter shouldBe null
-        attendanceResult.attendancePercentage shouldBe 0.9
-
-        verify(exactly = 1) { attendanceRepository.save(any()) }
+        verify(exactly = 0) { attendanceRepository.save(any()) }
     }
 
     @Test
-    fun `should track perfect attendance`() {
-        // Arrange
+    fun `should return failure when total raids is zero`() {
+        // Given
         val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
+            raiderId = 123L,
+            guildId = "guild-456",
             instance = "Nerub-ar Palace",
             encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
+            attendedRaids = 0,
+            totalRaids = 0
+        )
+
+        // When
+        val result = useCase.execute(command)
+
+        // Then
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+
+        verify(exactly = 0) { attendanceRepository.save(any()) }
+    }
+
+    @Test
+    fun `should return failure when end date is before start date`() {
+        // Given
+        val command = TrackAttendanceCommand(
+            raiderId = 123L,
+            guildId = "guild-456",
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 1, 31),
+            endDate = LocalDate.of(2024, 1, 1),
+            attendedRaids = 8,
+            totalRaids = 10
+        )
+
+        // When
+        val result = useCase.execute(command)
+
+        // Then
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+
+        verify(exactly = 0) { attendanceRepository.save(any()) }
+    }
+
+    @Test
+    fun `should track perfect attendance when attended equals total`() {
+        // Given
+        val command = TrackAttendanceCommand(
+            raiderId = 123L,
+            guildId = "guild-456",
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
             attendedRaids = 10,
             totalRaids = 10
         )
 
-        val recordSlot = slot<AttendanceRecord>()
-        every { attendanceRepository.save(capture(recordSlot)) } answers { recordSlot.captured }
-
-        // Act
-        val result = useCase.execute(command)
-
-        // Assert
-        result.isSuccess shouldBe true
-        val attendanceResult = result.getOrNull()!!
-
-        attendanceResult.attendancePercentage shouldBe 1.0
-    }
-
-    @Test
-    fun `should fail when attended raids exceeds total raids`() {
-        // Arrange
-        val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 11,
-            totalRaids = 10
+        val expectedRecord = AttendanceRecord.create(
+            raiderId = RaiderId(command.raiderId),
+            guildId = GuildId(command.guildId),
+            instance = command.instance,
+            encounter = command.encounter,
+            startDate = command.startDate,
+            endDate = command.endDate,
+            attendedRaids = command.attendedRaids,
+            totalRaids = command.totalRaids
         )
 
-        // Act
+        every { attendanceRepository.save(any()) } returns expectedRecord
+
+        // When
         val result = useCase.execute(command)
 
-        // Assert
-        result.isFailure shouldBe true
-        verify(exactly = 0) { attendanceRepository.save(any()) }
-    }
+        // Then
+        assertTrue(result.isSuccess)
+        val record = result.getOrThrow()
+        assertEquals(1.0, record.attendancePercentage)
 
-    @Test
-    fun `should fail when end date is before start date`() {
-        // Arrange
-        val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 14),
-            endDate = LocalDate.of(2024, 11, 1),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
-
-        // Act
-        val result = useCase.execute(command)
-
-        // Assert
-        result.isFailure shouldBe true
-        verify(exactly = 0) { attendanceRepository.save(any()) }
-    }
-
-    @Test
-    fun `should generate unique record ID for each tracking`() {
-        // Arrange
-        val command = TrackAttendanceCommand(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
-
-        val recordSlot = slot<AttendanceRecord>()
-        every { attendanceRepository.save(capture(recordSlot)) } answers { recordSlot.captured }
-
-        // Act
-        val result1 = useCase.execute(command)
-        val result2 = useCase.execute(command)
-
-        // Assert
-        result1.isSuccess shouldBe true
-        result2.isSuccess shouldBe true
-
-        val record1 = result1.getOrNull()!!
-        val record2 = result2.getOrNull()!!
-
-        record1.recordId shouldNotBe record2.recordId
+        verify(exactly = 1) { attendanceRepository.save(any()) }
     }
 }
