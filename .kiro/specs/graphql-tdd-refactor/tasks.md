@@ -363,7 +363,11 @@
 
 ## Phase 7: Cleanup and Optimization
 
-- [ ] 29. Remove deprecated code
+- [x] 29. Remove deprecated code
+
+
+
+
   - Identify and mark old service layer as deprecated
   - Remove unused entity classes from old entity/ package
   - Clean up old mapper implementations in service/mapper/
