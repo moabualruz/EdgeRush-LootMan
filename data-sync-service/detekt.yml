@@ -31,7 +31,7 @@ complexity:
     functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: true
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: true
     threshold: 15
   TooManyFunctions:
@@ -306,8 +306,10 @@ style:
     ignoreEnums: true
     ignoreRanges: true
     ignoreExtensionFunctions: true
-  MandatoryBracesIfStatements:
+  BracesOnIfStatements:
     active: false
+    singleLine: never
+    multiLine: always
   MandatoryBracesLoops:
     active: false
   MaxLineLength:
