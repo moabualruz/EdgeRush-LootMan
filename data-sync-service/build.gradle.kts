@@ -3,6 +3,9 @@ plugins {
     id("io.spring.dependency-management")
     kotlin("jvm")
     kotlin("plugin.spring")
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    jacoco
 }
 
 dependencies {
@@ -31,12 +34,27 @@ dependencies {
     // Rate Limiting
     implementation("com.google.guava:guava:33.0.0-jre")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Testing
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.mockito", module = "mockito-core")
+    }
     testImplementation("org.springframework.boot:spring-boot-starter-web") // For MockMvc
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("com.h2database:h2") // For in-memory testing
+    
+    // MockK for Kotlin-friendly mocking
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    
+    // Testcontainers for database integration tests
+    testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.testcontainers:postgresql:1.19.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    
+    // Kotest for better assertions
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    testImplementation("io.kotest:kotest-property:5.8.0")
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.xerial:sqlite-jdbc:3.46.0.0")
@@ -44,6 +62,80 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+// JaCoCo configuration for code coverage
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.85".toBigDecimal() // 85% coverage requirement for TDD standards
+            }
+        }
+        rule {
+            element = "CLASS"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+            excludes = listOf(
+                "*.config.*",
+                "*.entity.*",
+                "*.dto.*",
+                "*Application*"
+            )
+        }
+    }
+}
+
+// Make build fail if coverage is below threshold
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+// ktlint configuration
+ktlint {
+    version.set("1.0.1")
+    android.set(false)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    ignoreFailures.set(false)
+    
+    filter {
+        exclude("**/generated/**")
+        exclude("**/build/**")
+        include("**/kotlin/**")
+    }
+}
+
+// detekt configuration
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$projectDir/detekt.yml")
+    baseline = file("$projectDir/detekt-baseline.xml")
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
+    }
 }
 
 java {

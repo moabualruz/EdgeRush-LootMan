@@ -4,29 +4,23 @@ import com.edgerush.datasync.entity.BehavioralActionEntity
 import com.edgerush.datasync.entity.LootBanEntity
 import com.edgerush.datasync.repository.BehavioralActionRepository
 import com.edgerush.datasync.repository.LootBanRepository
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import java.time.LocalDateTime
 
 class BehavioralScoreServiceTest {
 
-    @Mock
     private lateinit var behavioralActionRepository: BehavioralActionRepository
-
-    @Mock
     private lateinit var lootBanRepository: LootBanRepository
-
     private lateinit var behavioralScoreService: BehavioralScoreService
 
     @BeforeEach
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        behavioralActionRepository = mockk()
+        lootBanRepository = mockk()
         behavioralScoreService = BehavioralScoreService(behavioralActionRepository, lootBanRepository)
     }
 
@@ -35,11 +29,13 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(
-            eq(guildId), 
-            eq(characterName), 
-            any()
-        )).thenReturn(emptyList())
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(
+                guildId, 
+                characterName, 
+                any()
+            )
+        } returns emptyList()
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -65,8 +61,9 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(deduction))
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(deduction)
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -103,8 +100,9 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(deduction1, deduction2))
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(deduction1, deduction2)
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -141,8 +139,9 @@ class BehavioralScoreServiceTest {
             expiresAt = null
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(deduction, restoration))
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(deduction, restoration)
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -168,8 +167,9 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(largeDeduction))
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(largeDeduction)
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -195,8 +195,9 @@ class BehavioralScoreServiceTest {
             expiresAt = null
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(largeRestoration))
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(largeRestoration)
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -210,8 +211,9 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(null)
+        every { 
+            lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
+        } returns null
 
         // When
         val result = behavioralScoreService.isCharacterBannedFromLoot(guildId, characterName)
@@ -236,8 +238,9 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(ban)
+        every { 
+            lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
+        } returns ban
 
         // When
         val result = behavioralScoreService.isCharacterBannedFromLoot(guildId, characterName)
@@ -267,10 +270,12 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(listOf(deduction))
-        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
-            .thenReturn(null)
+        every { 
+            behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
+        } returns listOf(deduction)
+        every { 
+            lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
+        } returns null
 
         // When
         val result = behavioralScoreService.getBehavioralBreakdown(guildId, characterName)

@@ -9,7 +9,7 @@ import com.edgerush.datasync.service.raidbots.RaidbotsUpgradeService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
+import io.mockk.mockk
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
@@ -19,10 +19,10 @@ import java.time.ZoneOffset
 class ScoreCalculatorTest {
 
     private val fixedClock = Clock.fixed(LocalDate.of(2025, 10, 24).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC)
-    private val mockDataTransformer = mock<WoWAuditDataTransformerService>()
-    private val mockModifierService = mock<FlpsModifierService>()
-    private val mockPerformanceService = mock<WarcraftLogsPerformanceService>()
-    private val mockRaidbotsService = mock<RaidbotsUpgradeService>()
+    private val mockDataTransformer = mockk<WoWAuditDataTransformerService>()
+    private val mockModifierService = mockk<FlpsModifierService>()
+    private val mockPerformanceService = mockk<WarcraftLogsPerformanceService>()
+    private val mockRaidbotsService = mockk<RaidbotsUpgradeService>()
     private val calculator = ScoreCalculator(mockDataTransformer, mockModifierService, mockPerformanceService, mockRaidbotsService, fixedClock)
 
     @Test
