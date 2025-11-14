@@ -192,11 +192,24 @@ External APIs → Clients → Sync Services → Database Entities → Repositori
 4. **Performance**: Calculations should complete in < 1 second for 30 raiders
 5. **Error Handling**: Graceful degradation when external APIs fail
 
-## Priority Features for Specs
+## Current Priorities
 
-1. **Warcraft Logs Integration** (Critical) - Enables accurate MAS scoring
-2. **Raidbots Integration** (Critical) - Enables accurate upgrade value calculation
-3. **Web Dashboard** (High) - Transparency requirement
-4. **Discord Bot** (High) - Operational efficiency
-5. **RC Loot Council Integration** (Medium) - In-game convenience
-6. **Advanced Analytics** (Low) - Enhancement feature
+**⚠️ IMPORTANT:** For the most up-to-date project priorities, see `PROJECT_PRIORITIES.md` in the root directory.
+
+### Active Priority (Priority 0)
+**TDD Standards & Project Refactoring** - 13 weeks, spec complete
+- Establish testing infrastructure and standards (85% coverage)
+- Refactor to domain-driven design architecture
+- Organize into bounded contexts (FLPS, Loot, Attendance, Raids, etc.)
+- Spec: `.kiro/specs/graphql-tdd-refactor/`
+
+### Upcoming Priorities
+1. **GraphQL API Implementation** (After refactoring) - Spec complete
+2. **Complete REST API Layer** (40% complete) - Spec complete
+3. **Raidbots Integration** (40% complete, blocked by API key) - Spec complete
+4. **Web Dashboard** (Planned) - Spec complete
+5. **Discord Bot** (Planned) - Spec complete
+
+### Completed
+- ✅ **Warcraft Logs Integration** (100% complete) - MAS scoring enabled
+- ✅ **Core FLPS System** (100% complete) - Full calculation engine
