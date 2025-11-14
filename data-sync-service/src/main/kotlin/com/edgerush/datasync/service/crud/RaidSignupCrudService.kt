@@ -8,7 +8,7 @@ import com.edgerush.datasync.entity.RaidSignupEntity
 import com.edgerush.datasync.repository.RaidSignupRepository
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.service.AuditLogger
-import com.edgerush.datasync.service.mapper.RaidSignupMapper
+import com.edgerush.datasync.service.mapper.LegacyRaidSignupMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class RaidSignupCrudService(
     private val repository: RaidSignupRepository,
-    private val mapper: RaidSignupMapper,
+    private val mapper: LegacyRaidSignupMapper,
     private val auditLogger: AuditLogger,
 ) : CrudService<RaidSignupEntity, Long, CreateRaidSignupRequest, UpdateRaidSignupRequest, RaidSignupResponse> {
     override fun findAll(pageable: Pageable): Page<RaidSignupResponse> {

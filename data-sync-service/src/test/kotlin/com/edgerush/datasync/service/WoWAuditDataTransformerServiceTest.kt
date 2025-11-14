@@ -28,7 +28,7 @@ class WoWAuditDataTransformerServiceTest {
     private lateinit var lootAwardRepository: LootAwardRepository
 
     @Autowired
-    private lateinit var raidRepository: RaidRepository
+    private lateinit var raidRepository: LegacyRaidRepository
 
     @Autowired
     private lateinit var raidSignupRepository: RaidSignupRepository

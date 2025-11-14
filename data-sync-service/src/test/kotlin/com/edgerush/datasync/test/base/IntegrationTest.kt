@@ -45,7 +45,10 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * }
  * ```
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = [com.edgerush.datasync.DataSyncApplication::class]
+)
 @Testcontainers
 @ActiveProfiles("test")
 abstract class IntegrationTest {

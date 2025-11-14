@@ -28,7 +28,7 @@ class WoWAuditSyncService(
     private val lootAwardWishDataRepository: LootAwardWishDataRepository,
     private val wishlistSnapshotRepository: WishlistSnapshotRepository,
     private val attendanceStatRepository: AttendanceStatRepository,
-    private val raidRepository: RaidRepository,
+    private val raidRepository: LegacyRaidRepository,
     private val raidSignupRepository: RaidSignupRepository,
     private val raidEncounterRepository: RaidEncounterRepository,
     private val historicalActivityRepository: HistoricalActivityRepository,

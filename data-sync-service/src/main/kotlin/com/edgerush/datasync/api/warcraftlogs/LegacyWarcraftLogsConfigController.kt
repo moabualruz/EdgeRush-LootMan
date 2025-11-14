@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/warcraft-logs/config")
-class WarcraftLogsConfigController(
+class LegacyWarcraftLogsConfigController(
     private val configService: WarcraftLogsConfigService,
     private val characterMappingService: com.edgerush.datasync.service.warcraftlogs.CharacterMappingService,
 ) {

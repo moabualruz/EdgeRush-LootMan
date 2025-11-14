@@ -6,10 +6,10 @@ import com.edgerush.datasync.api.dto.response.RaidResponse
 import com.edgerush.datasync.api.exception.AccessDeniedException
 import com.edgerush.datasync.api.exception.ResourceNotFoundException
 import com.edgerush.datasync.entity.RaidEntity
-import com.edgerush.datasync.repository.RaidRepository
+import com.edgerush.datasync.repository.LegacyRaidRepository
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.service.AuditLogger
-import com.edgerush.datasync.service.mapper.RaidMapper
+import com.edgerush.datasync.service.mapper.LegacyRaidMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class RaidCrudService(
-    private val repository: RaidRepository,
-    private val mapper: RaidMapper,
+    private val repository: LegacyRaidRepository,
+    private val mapper: LegacyRaidMapper,
     private val auditLogger: AuditLogger,
 ) : CrudService<RaidEntity, Long, CreateRaidRequest, UpdateRaidRequest, RaidResponse> {
     private val logger = LoggerFactory.getLogger(javaClass)

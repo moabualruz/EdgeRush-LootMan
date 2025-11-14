@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 
 @Component
-class RaidMapper {
+class LegacyRaidMapper {
     fun toEntity(request: CreateRaidRequest): RaidEntity {
         return RaidEntity(
             raidId = 0, // Will be generated

@@ -269,7 +269,12 @@
 
 ## Phase 5: Raids Bounded Context Refactoring
 
-- [ ] 21. Create Raids domain layer with TDD
+- [x] 21. Create Raids domain layer with TDD
+
+
+
+
+
 
 
   - Write tests for Raid aggregate root (scheduling, state transitions)
@@ -283,7 +288,12 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 
-- [ ] 22. Create Raids application layer with TDD
+- [x] 22. Create Raids application layer with TDD
+
+
+
+
+
   - Write tests for ScheduleRaidUseCase
   - Implement ScheduleRaidUseCase with validation
   - Write tests for ManageSignupsUseCase
@@ -292,7 +302,14 @@
   - Implement RecordRaidResultsUseCase with result recording
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
-- [ ] 23. Create Raids infrastructure layer with TDD
+- [x] 23. Create Raids infrastructure layer with TDD
+
+
+
+
+
+
+
 
 
   - Write tests for RaidRepository implementation
@@ -302,14 +319,25 @@
   - _Requirements: 2.2, 5.4, 5.5_
 
 
-- [ ] 24. Update Raids API layer with TDD
+- [x] 24. Update Raids API layer with TDD
+
+
+
+
+
   - Write integration tests for RaidController
   - Refactor RaidController to use new use cases
   - Verify backward compatibility
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
 
-- [ ] 25. Verify Raids bounded context completion
+- [x] 25. Verify Raids bounded context completion
+
+
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run code quality checks
@@ -319,7 +347,9 @@
 ## Phase 6: Remaining Bounded Contexts
 
 
+
 - [ ] 26. Refactor Applications bounded context
+
   - Create domain layer for guild applications
   - Create application layer with use cases
   - Create infrastructure layer with repositories

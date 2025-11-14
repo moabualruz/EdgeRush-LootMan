@@ -8,7 +8,7 @@ import com.edgerush.datasync.entity.RaidEncounterEntity
 import com.edgerush.datasync.repository.RaidEncounterRepository
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.service.AuditLogger
-import com.edgerush.datasync.service.mapper.RaidEncounterMapper
+import com.edgerush.datasync.service.mapper.LegacyRaidEncounterMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class RaidEncounterCrudService(
     private val repository: RaidEncounterRepository,
-    private val mapper: RaidEncounterMapper,
+    private val mapper: LegacyRaidEncounterMapper,
     private val auditLogger: AuditLogger,
 ) : CrudService<RaidEncounterEntity, Long, CreateRaidEncounterRequest, UpdateRaidEncounterRequest, RaidEncounterResponse> {
     override fun findAll(pageable: Pageable): Page<RaidEncounterResponse> {

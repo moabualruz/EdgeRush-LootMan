@@ -14,7 +14,7 @@ class WoWAuditDataTransformerService(
     private val characterHistoryRepository: CharacterHistoryRepository,
     private val wishlistSnapshotRepository: WishlistSnapshotRepository,
     private val lootAwardRepository: LootAwardRepository,
-    private val raidRepository: RaidRepository,
+    private val raidRepository: LegacyRaidRepository,
     private val raidSignupRepository: RaidSignupRepository,
     private val raiderService: RaiderService,
 ) {
