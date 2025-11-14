@@ -15,11 +15,11 @@ import java.time.Instant
 class RaidbotsConfigService(
     private val configRepository: RaidbotsConfigRepository,
     private val encryptionService: CredentialEncryptionService,
-    private val properties: RaidbotsProperties
+    private val properties: RaidbotsProperties,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val objectMapper = jacksonObjectMapper()
-    
+
     fun getConfig(guildId: String): RaidbotsGuildConfig {
         val entity = configRepository.findById(guildId).orElse(null)
         return if (entity != null) {
@@ -28,39 +28,44 @@ class RaidbotsConfigService(
             createDefaultConfig(guildId)
         }
     }
-    
-    fun updateConfig(guildId: String, config: RaidbotsGuildConfig) {
+
+    fun updateConfig(
+        guildId: String,
+        config: RaidbotsGuildConfig,
+    ) {
         val encryptedApiKey = config.apiKey?.let { encryptionService.encrypt(it) }
-        
-        val entity = RaidbotsConfigEntity(
-            guildId = guildId,
-            enabled = config.enabled,
-            encryptedApiKey = encryptedApiKey,
-            configJson = objectMapper.writeValueAsString(config),
-            updatedAt = Instant.now()
-        )
-        
+
+        val entity =
+            RaidbotsConfigEntity(
+                guildId = guildId,
+                enabled = config.enabled,
+                encryptedApiKey = encryptedApiKey,
+                configJson = objectMapper.writeValueAsString(config),
+                updatedAt = Instant.now(),
+            )
+
         configRepository.save(entity)
         logger.info("Updated Raidbots config for guild: $guildId")
     }
-    
+
     fun getEffectiveApiKey(guildId: String): String {
         val config = getConfig(guildId)
         return config.apiKey ?: properties.apiKey
     }
-    
+
     fun getAllEnabledGuilds(): List<RaidbotsGuildConfig> {
         return configRepository.findAllEnabled().map { parseConfig(it) }
     }
-    
+
     private fun parseConfig(entity: RaidbotsConfigEntity): RaidbotsGuildConfig {
         val config = objectMapper.readValue<RaidbotsGuildConfig>(entity.configJson)
-        val decryptedApiKey = entity.encryptedApiKey?.let { 
-            runCatching { encryptionService.decrypt(it) }.getOrNull()
-        }
+        val decryptedApiKey =
+            entity.encryptedApiKey?.let {
+                runCatching { encryptionService.decrypt(it) }.getOrNull()
+            }
         return config.copy(apiKey = decryptedApiKey)
     }
-    
+
     private fun createDefaultConfig(guildId: String): RaidbotsGuildConfig {
         return RaidbotsGuildConfig(guildId = guildId, enabled = false)
     }

@@ -7,26 +7,30 @@ import java.time.OffsetDateTime
 
 @Service
 class SyncRunService(
-    private val repository: SyncRunRepository
+    private val repository: SyncRunRepository,
 ) {
-
-    fun startRun(source: String): SyncRunEntity = repository.save(
-        SyncRunEntity(
-            source = source,
-            status = "RUNNING",
-            startedAt = OffsetDateTime.now(),
-            completedAt = null,
-            message = null
+    fun startRun(source: String): SyncRunEntity =
+        repository.save(
+            SyncRunEntity(
+                source = source,
+                status = "RUNNING",
+                startedAt = OffsetDateTime.now(),
+                completedAt = null,
+                message = null,
+            ),
         )
-    )
 
-    fun complete(run: SyncRunEntity, status: String, message: String? = null) {
+    fun complete(
+        run: SyncRunEntity,
+        status: String,
+        message: String? = null,
+    ) {
         repository.save(
             run.copy(
                 status = status,
                 completedAt = OffsetDateTime.now(),
-                message = message
-            )
+                message = message,
+            ),
         )
     }
 }

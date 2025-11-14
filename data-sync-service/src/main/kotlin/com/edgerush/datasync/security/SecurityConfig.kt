@@ -18,9 +18,8 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 @EnableReactiveMethodSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val adminModeConfig: AdminModeConfig
+    private val adminModeConfig: AdminModeConfig,
 ) {
-    
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http
@@ -32,7 +31,6 @@ class SecurityConfig(
                     // Public endpoints
                     .pathMatchers("/actuator/health", "/actuator/metrics", "/actuator/info").permitAll()
                     .pathMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll()
-                    
                     // Admin mode bypasses all auth
                     .apply {
                         if (adminModeConfig.isEnabled()) {
@@ -40,16 +38,16 @@ class SecurityConfig(
                         } else {
                             // FLPS endpoints - public read access
                             pathMatchers(HttpMethod.GET, "/api/v1/flps/**").permitAll()
-                            
+
                             // All GET requests - authenticated users
                             pathMatchers(HttpMethod.GET, "/api/v1/**").authenticated()
-                            
+
                             // Write operations - require admin roles
                             pathMatchers(HttpMethod.POST, "/api/v1/**").hasAnyAuthority("GUILD_ADMIN", "SYSTEM_ADMIN")
                             pathMatchers(HttpMethod.PUT, "/api/v1/**").hasAnyAuthority("GUILD_ADMIN", "SYSTEM_ADMIN")
                             pathMatchers(HttpMethod.DELETE, "/api/v1/**").hasAnyAuthority("GUILD_ADMIN", "SYSTEM_ADMIN")
                             pathMatchers(HttpMethod.PATCH, "/api/v1/**").hasAnyAuthority("GUILD_ADMIN", "SYSTEM_ADMIN")
-                            
+
                             // Default - require authentication
                             anyExchange().authenticated()
                         }
@@ -58,22 +56,22 @@ class SecurityConfig(
             .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .build()
     }
-    
+
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        
+
         if (adminModeConfig.isEnabled()) {
             configuration.allowedOrigins = listOf("*")
         } else {
             configuration.allowedOrigins = listOf("http://localhost:3000", "http://localhost:8080")
         }
-        
+
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = !adminModeConfig.isEnabled()
         configuration.maxAge = 3600L
-        
+
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source

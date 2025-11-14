@@ -8,27 +8,28 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/warcraft-logs/config")
 class WarcraftLogsConfigController(
     private val configService: WarcraftLogsConfigService,
-    private val characterMappingService: com.edgerush.datasync.service.warcraftlogs.CharacterMappingService
+    private val characterMappingService: com.edgerush.datasync.service.warcraftlogs.CharacterMappingService,
 ) {
-    
     @GetMapping("/{guildId}")
-    fun getConfig(@PathVariable guildId: String): WarcraftLogsGuildConfig {
+    fun getConfig(
+        @PathVariable guildId: String,
+    ): WarcraftLogsGuildConfig {
         return configService.getConfig(guildId)
     }
-    
+
     @PutMapping("/{guildId}")
     fun updateConfig(
         @PathVariable guildId: String,
-        @RequestBody config: WarcraftLogsGuildConfig
+        @RequestBody config: WarcraftLogsGuildConfig,
     ): WarcraftLogsGuildConfig {
         configService.updateConfig(guildId, config)
         return configService.getConfig(guildId)
     }
-    
+
     @PostMapping("/{guildId}/character-mapping")
     fun createCharacterMapping(
         @PathVariable guildId: String,
-        @RequestBody request: CharacterMappingRequest
+        @RequestBody request: CharacterMappingRequest,
     ): Map<String, String> {
         characterMappingService.createMapping(
             guildId = guildId,
@@ -36,13 +37,15 @@ class WarcraftLogsConfigController(
             wowauditRealm = request.wowauditRealm,
             warcraftLogsName = request.warcraftLogsName,
             warcraftLogsRealm = request.warcraftLogsRealm,
-            createdBy = request.createdBy
+            createdBy = request.createdBy,
         )
         return mapOf("status" to "success", "message" to "Character mapping created")
     }
-    
+
     @GetMapping("/{guildId}/character-mappings")
-    fun getCharacterMappings(@PathVariable guildId: String): List<CharacterMappingResponse> {
+    fun getCharacterMappings(
+        @PathVariable guildId: String,
+    ): List<CharacterMappingResponse> {
         return characterMappingService.getMappingsForGuild(guildId).map {
             CharacterMappingResponse(
                 id = it.id!!,
@@ -50,15 +53,15 @@ class WarcraftLogsConfigController(
                 wowauditRealm = it.wowauditRealm,
                 warcraftLogsName = it.warcraftLogsName,
                 warcraftLogsRealm = it.warcraftLogsRealm,
-                createdAt = it.createdAt.toString()
+                createdAt = it.createdAt.toString(),
             )
         }
     }
-    
+
     @DeleteMapping("/{guildId}/character-mapping/{mappingId}")
     fun deleteCharacterMapping(
         @PathVariable guildId: String,
-        @PathVariable mappingId: Long
+        @PathVariable mappingId: Long,
     ): Map<String, String> {
         characterMappingService.deleteMapping(mappingId)
         return mapOf("status" to "success", "message" to "Character mapping deleted")
@@ -70,7 +73,7 @@ data class CharacterMappingRequest(
     val wowauditRealm: String,
     val warcraftLogsName: String,
     val warcraftLogsRealm: String,
-    val createdBy: String? = null
+    val createdBy: String? = null,
 )
 
 data class CharacterMappingResponse(
@@ -79,5 +82,5 @@ data class CharacterMappingResponse(
     val wowauditRealm: String,
     val warcraftLogsName: String,
     val warcraftLogsRealm: String,
-    val createdAt: String
+    val createdAt: String,
 )

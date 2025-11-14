@@ -1,9 +1,6 @@
 package com.edgerush.datasync.config.warcraftlogs
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.validation.annotation.Validated
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
 
 @ConfigurationProperties(prefix = "warcraft-logs")
 data class WarcraftLogsProperties(
@@ -15,7 +12,7 @@ data class WarcraftLogsProperties(
     val maxRetries: Int = 3,
     val retryDelayMs: Long = 1000,
     val maxConcurrentRequests: Int = 5,
-    val requestTimeoutSeconds: Long = 30
+    val requestTimeoutSeconds: Long = 30,
 ) {
     init {
         // Only validate credentials if Warcraft Logs integration is enabled

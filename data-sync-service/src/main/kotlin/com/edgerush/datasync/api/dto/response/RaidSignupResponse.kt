@@ -1,6 +1,5 @@
 package com.edgerush.datasync.api.dto.response
 
-
 data class RaidSignupResponse(
     val id: Long?,
     val raidId: Long,
@@ -13,5 +12,5 @@ data class RaidSignupResponse(
     val characterGuest: Boolean?,
     val status: String?,
     val comment: String?,
-    val selected: Boolean?
+    val selected: Boolean?,
 )

@@ -3,13 +3,13 @@ package com.edgerush.datasync.client.warcraftlogs
 /**
  * Base exception for all Warcraft Logs client errors
  */
-sealed class WarcraftLogsException(message: String, cause: Throwable? = null) : 
+sealed class WarcraftLogsException(message: String, cause: Throwable? = null) :
     RuntimeException(message, cause)
 
 /**
  * Authentication failed with Warcraft Logs API
  */
-class WarcraftLogsAuthenticationException(message: String, cause: Throwable? = null) : 
+class WarcraftLogsAuthenticationException(message: String, cause: Throwable? = null) :
     WarcraftLogsException(message, cause)
 
 /**
@@ -17,7 +17,7 @@ class WarcraftLogsAuthenticationException(message: String, cause: Throwable? = n
  */
 class WarcraftLogsRateLimitException(
     message: String,
-    val retryAfterSeconds: Long? = null
+    val retryAfterSeconds: Long? = null,
 ) : WarcraftLogsException(message)
 
 /**
@@ -26,11 +26,11 @@ class WarcraftLogsRateLimitException(
 class WarcraftLogsApiException(
     message: String,
     val statusCode: Int,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : WarcraftLogsException(message, cause)
 
 /**
  * Data parsing or validation error
  */
-class WarcraftLogsDataException(message: String, cause: Throwable? = null) : 
+class WarcraftLogsDataException(message: String, cause: Throwable? = null) :
     WarcraftLogsException(message, cause)

@@ -14,5 +14,5 @@ data class LootBanEntity(
     val bannedBy: String, // Guild leader who applied the ban
     val bannedAt: LocalDateTime,
     val expiresAt: LocalDateTime?, // When the ban expires (null = permanent)
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
 )

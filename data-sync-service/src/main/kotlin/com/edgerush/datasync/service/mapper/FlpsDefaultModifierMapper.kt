@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class FlpsDefaultModifierMapper {
-
     fun toEntity(request: CreateFlpsDefaultModifierRequest): FlpsDefaultModifierEntity {
         return FlpsDefaultModifierEntity(
             id = null,
@@ -21,7 +20,10 @@ class FlpsDefaultModifierMapper {
         )
     }
 
-    fun updateEntity(entity: FlpsDefaultModifierEntity, request: UpdateFlpsDefaultModifierRequest): FlpsDefaultModifierEntity {
+    fun updateEntity(
+        entity: FlpsDefaultModifierEntity,
+        request: UpdateFlpsDefaultModifierRequest,
+    ): FlpsDefaultModifierEntity {
         return entity.copy(
             category = request.category ?: entity.category,
             modifierKey = request.modifierKey ?: entity.modifierKey,

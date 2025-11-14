@@ -28,5 +28,5 @@ data class RaidEntity(
     val periodId: Long?,
     val createdAt: OffsetDateTime?,
     val updatedAt: OffsetDateTime?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

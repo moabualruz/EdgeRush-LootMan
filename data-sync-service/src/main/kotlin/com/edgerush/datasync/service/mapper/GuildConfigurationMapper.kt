@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class GuildConfigurationMapper {
-
     fun toEntity(request: CreateGuildConfigurationRequest): GuildConfigurationEntity {
         return GuildConfigurationEntity(
             id = null,
@@ -30,11 +29,14 @@ class GuildConfigurationMapper {
             createdAt = OffsetDateTime.now(),
             customBenchmarkRms = null, // System populated
             customBenchmarkIpi = null, // System populated
-            benchmarkUpdatedAt = null // System populated
+            benchmarkUpdatedAt = null, // System populated
         )
     }
 
-    fun updateEntity(entity: GuildConfigurationEntity, request: UpdateGuildConfigurationRequest): GuildConfigurationEntity {
+    fun updateEntity(
+        entity: GuildConfigurationEntity,
+        request: UpdateGuildConfigurationRequest,
+    ): GuildConfigurationEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             guildName = request.guildName ?: entity.guildName,

@@ -9,8 +9,10 @@ import java.time.OffsetDateTime
 
 @Component
 class ApplicationMapper {
-    
-    fun toEntity(request: CreateApplicationRequest, applicationId: Long): ApplicationEntity {
+    fun toEntity(
+        request: CreateApplicationRequest,
+        applicationId: Long,
+    ): ApplicationEntity {
         return ApplicationEntity(
             applicationId = applicationId,
             appliedAt = request.appliedAt,
@@ -28,11 +30,14 @@ class ApplicationMapper {
             mainCharacterFaction = request.mainCharacterFaction,
             mainCharacterLevel = request.mainCharacterLevel,
             mainCharacterRegion = request.mainCharacterRegion,
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
-    fun toEntity(existing: ApplicationEntity, request: UpdateApplicationRequest): ApplicationEntity {
+
+    fun toEntity(
+        existing: ApplicationEntity,
+        request: UpdateApplicationRequest,
+    ): ApplicationEntity {
         return existing.copy(
             appliedAt = request.appliedAt ?: existing.appliedAt,
             status = request.status ?: existing.status,
@@ -49,10 +54,10 @@ class ApplicationMapper {
             mainCharacterFaction = request.mainCharacterFaction ?: existing.mainCharacterFaction,
             mainCharacterLevel = request.mainCharacterLevel ?: existing.mainCharacterLevel,
             mainCharacterRegion = request.mainCharacterRegion ?: existing.mainCharacterRegion,
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
+
     fun toResponse(entity: ApplicationEntity): ApplicationResponse {
         return ApplicationResponse(
             applicationId = entity.applicationId,
@@ -71,7 +76,7 @@ class ApplicationMapper {
             mainCharacterFaction = entity.mainCharacterFaction,
             mainCharacterLevel = entity.mainCharacterLevel,
             mainCharacterRegion = entity.mainCharacterRegion,
-            syncedAt = entity.syncedAt
+            syncedAt = entity.syncedAt,
         )
     }
 }

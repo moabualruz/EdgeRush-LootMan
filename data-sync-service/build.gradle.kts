@@ -22,15 +22,15 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
     implementation("org.flywaydb:flyway-core:10.18.2")
     implementation("org.flywaydb:flyway-database-postgresql:10.18.2")
-    
+
     // OpenAPI/Swagger Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
-    
+
     // JWT Support
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
-    
+
     // Rate Limiting
     implementation("com.google.guava:guava:33.0.0-jre")
 
@@ -41,16 +41,16 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-web") // For MockMvc
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("io.projectreactor:reactor-test")
-    
+
     // MockK for Kotlin-friendly mocking
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
-    
+
     // Testcontainers for database integration tests
     testImplementation("org.testcontainers:testcontainers:1.19.3")
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    
+
     // Kotest for better assertions
     testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
@@ -90,12 +90,13 @@ tasks.jacocoTestCoverageVerification {
                 value = "COVEREDRATIO"
                 minimum = "0.80".toBigDecimal()
             }
-            excludes = listOf(
-                "*.config.*",
-                "*.entity.*",
-                "*.dto.*",
-                "*Application*"
-            )
+            excludes =
+                listOf(
+                    "*.config.*",
+                    "*.entity.*",
+                    "*.dto.*",
+                    "*Application*",
+                )
         }
     }
 }
@@ -112,7 +113,7 @@ ktlint {
     outputToConsole.set(true)
     coloredOutput.set(true)
     ignoreFailures.set(false)
-    
+
     filter {
         exclude("**/generated/**")
         exclude("**/build/**")

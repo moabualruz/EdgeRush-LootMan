@@ -3,6 +3,7 @@ package com.edgerush.datasync.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
+
 @Table("raider_statistics")
 data class RaiderStatisticsEntity(
     @Id
@@ -28,5 +29,5 @@ data class RaiderStatisticsEntity(
     @Column("collectibles_level_25_pets")
     val collectiblesLevel25Pets: Int?,
     @Column("honor_level")
-    val honorLevel: Int?
+    val honorLevel: Int?,
 )

@@ -18,5 +18,5 @@ data class WarcraftLogsPerformanceEntity(
     val avoidableDamagePercentage: Double,
     val performancePercentile: Double?,
     val itemLevel: Int,
-    val calculatedAt: Instant
+    val calculatedAt: Instant,
 )

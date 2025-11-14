@@ -8,19 +8,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderTrackItemMapper {
-
     fun toEntity(request: CreateRaiderTrackItemRequest): RaiderTrackItemEntity {
         return RaiderTrackItemEntity(
             id = null,
             raiderId = 0L, // System populated
             tier = "", // System populated
-            itemCount = 0 // System populated
+            itemCount = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderTrackItemEntity, request: UpdateRaiderTrackItemRequest): RaiderTrackItemEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderTrackItemEntity,
+        request: UpdateRaiderTrackItemRequest,
+    ): RaiderTrackItemEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderTrackItemEntity): RaiderTrackItemResponse {

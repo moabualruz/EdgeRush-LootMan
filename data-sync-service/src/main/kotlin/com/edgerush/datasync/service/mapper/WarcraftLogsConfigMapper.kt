@@ -9,7 +9,6 @@ import java.time.Instant
 
 @Component
 class WarcraftLogsConfigMapper {
-
     fun toEntity(request: CreateWarcraftLogsConfigRequest): WarcraftLogsConfigEntity {
         return WarcraftLogsConfigEntity(
             guildId = "", // TODO: Set from request or context
@@ -25,7 +24,10 @@ class WarcraftLogsConfigMapper {
         )
     }
 
-    fun updateEntity(entity: WarcraftLogsConfigEntity, request: UpdateWarcraftLogsConfigRequest): WarcraftLogsConfigEntity {
+    fun updateEntity(
+        entity: WarcraftLogsConfigEntity,
+        request: UpdateWarcraftLogsConfigRequest,
+    ): WarcraftLogsConfigEntity {
         return entity.copy(
             enabled = request.enabled ?: entity.enabled,
             guildName = request.guildName ?: entity.guildName,
@@ -35,7 +37,7 @@ class WarcraftLogsConfigMapper {
             encryptedClientSecret = request.encryptedClientSecret ?: entity.encryptedClientSecret,
             configJson = request.configJson ?: entity.configJson,
             updatedBy = request.updatedBy ?: entity.updatedBy,
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
         )
     }
 

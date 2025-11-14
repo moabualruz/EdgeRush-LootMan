@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RaidbotsConfigRepository : CrudRepository<RaidbotsConfigEntity, String> {
-    
     @Query("SELECT * FROM raidbots_config WHERE enabled = true")
     fun findAllEnabled(): List<RaidbotsConfigEntity>
 }

@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 
 @Component
 class LootBanMapper {
-
     fun toEntity(request: CreateLootBanRequest): LootBanEntity {
         return LootBanEntity(
             id = null,
@@ -22,7 +21,10 @@ class LootBanMapper {
         )
     }
 
-    fun updateEntity(entity: LootBanEntity, request: UpdateLootBanRequest): LootBanEntity {
+    fun updateEntity(
+        entity: LootBanEntity,
+        request: UpdateLootBanRequest,
+    ): LootBanEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             characterName = request.characterName ?: entity.characterName,

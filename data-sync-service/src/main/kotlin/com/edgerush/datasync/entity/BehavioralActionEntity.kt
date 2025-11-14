@@ -16,5 +16,5 @@ data class BehavioralActionEntity(
     val appliedBy: String, // Guild leader who applied the action
     val appliedAt: LocalDateTime,
     val expiresAt: LocalDateTime?, // When the deduction expires (null = permanent)
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
 )

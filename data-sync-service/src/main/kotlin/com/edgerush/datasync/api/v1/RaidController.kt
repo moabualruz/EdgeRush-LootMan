@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/raids")
 @Tag(name = "Raids", description = "Manage raid events and schedules")
 class RaidController(
-    raidService: RaidCrudService
+    raidService: RaidCrudService,
 ) : BaseCrudController<RaidEntity, Long, CreateRaidRequest, UpdateRaidRequest, RaidResponse>(raidService) {
-    
     private val raidService = raidService as RaidCrudService
-    
+
     @GetMapping("/team/{teamId}")
     @Operation(summary = "Get all raids for a specific team")
     fun findByTeamId(
-        @Parameter(description = "Team ID") @PathVariable teamId: Long
+        @Parameter(description = "Team ID") @PathVariable teamId: Long,
     ): ResponseEntity<List<RaidResponse>> {
         val raids = raidService.findByTeamId(teamId)
         return ResponseEntity.ok(raids)

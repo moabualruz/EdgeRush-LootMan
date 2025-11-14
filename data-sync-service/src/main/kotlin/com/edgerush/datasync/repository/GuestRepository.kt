@@ -6,9 +6,11 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface GuestRepository : 
+interface GuestRepository :
     CrudRepository<GuestEntity, Long>,
     PagingAndSortingRepository<GuestEntity, Long> {
-    
-    fun findByNameAndRealm(name: String, realm: String?): GuestEntity?
+    fun findByNameAndRealm(
+        name: String,
+        realm: String?,
+    ): GuestEntity?
 }

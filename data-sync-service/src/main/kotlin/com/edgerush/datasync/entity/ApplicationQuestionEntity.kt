@@ -11,5 +11,5 @@ data class ApplicationQuestionEntity(
     val position: Int?,
     val question: String?,
     val answer: String?,
-    val filesJson: String?
+    val filesJson: String?,
 )

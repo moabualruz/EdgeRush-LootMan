@@ -6,17 +6,17 @@ import com.edgerush.datasync.repository.BehavioralActionRepository
 import com.edgerush.datasync.repository.LootBanRepository
 import com.edgerush.datasync.service.GuildManagementService
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.context.annotation.Import
 import java.time.LocalDateTime
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,7 +25,6 @@ import java.time.LocalDateTime
 @Import(com.edgerush.datasync.config.TestSecurityConfig::class)
 @Transactional
 class ComprehensiveFlpsIntegrationTest {
-
     @Autowired
     private lateinit var guildManagementService: GuildManagementService
 
@@ -53,16 +52,17 @@ class ComprehensiveFlpsIntegrationTest {
     @Test
     fun `comprehensive FLPS report should include all components`() {
         // Given: Some test behavioral data
-        val behavioralDeduction = BehavioralActionEntity(
-            guildId = testGuildId,
-            characterName = "TestCharacter",
-            actionType = "DEDUCTION",
-            deductionAmount = 0.2,
-            reason = "Late to raid",
-            appliedBy = "TestLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
+        val behavioralDeduction =
+            BehavioralActionEntity(
+                guildId = testGuildId,
+                characterName = "TestCharacter",
+                actionType = "DEDUCTION",
+                deductionAmount = 0.2,
+                reason = "Late to raid",
+                appliedBy = "TestLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
         behavioralActionRepository.save(behavioralDeduction)
 
         // When: Calling the comprehensive service method
@@ -70,11 +70,11 @@ class ComprehensiveFlpsIntegrationTest {
 
         // Then: Verify the response structure includes all expected components
         assert(reports.isNotEmpty() || reports.isEmpty()) // Just verify it returns without error
-        
+
         // If we have reports, verify the structure
         if (reports.isNotEmpty()) {
             val firstReport = reports[0]
-            
+
             // Verify core components exist
             assert(firstReport.breakdown.name.isNotEmpty())
             assert(firstReport.attendanceScore >= 0.0)
@@ -91,16 +91,17 @@ class ComprehensiveFlpsIntegrationTest {
     fun `behavioral deduction should affect eligibility`() {
         // Given: A character with behavioral deduction but no loot ban
         val characterName = "TestCharacter"
-        val behavioralDeduction = BehavioralActionEntity(
-            guildId = testGuildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.3,
-            reason = "Behavioral issue",
-            appliedBy = "TestLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
+        val behavioralDeduction =
+            BehavioralActionEntity(
+                guildId = testGuildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.3,
+                reason = "Behavioral issue",
+                appliedBy = "TestLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
         behavioralActionRepository.save(behavioralDeduction)
 
         // When: Getting the FLPS report
@@ -119,14 +120,15 @@ class ComprehensiveFlpsIntegrationTest {
     fun `loot ban should make character ineligible`() {
         // Given: A character with an active loot ban
         val characterName = "BannedCharacter"
-        val lootBan = LootBanEntity(
-            guildId = testGuildId,
-            characterName = characterName,
-            reason = "DKP violation",
-            bannedBy = "TestLeader",
-            bannedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
+        val lootBan =
+            LootBanEntity(
+                guildId = testGuildId,
+                characterName = characterName,
+                reason = "DKP violation",
+                bannedBy = "TestLeader",
+                bannedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
         lootBanRepository.save(lootBan)
 
         // When: Getting the FLPS report
@@ -145,32 +147,38 @@ class ComprehensiveFlpsIntegrationTest {
     @Test
     fun `management endpoints should work correctly`() {
         // Test behavioral deduction endpoint
-        val behavioralRequest = mapOf(
-            "characterName" to "TestCharacter",
-            "deductionAmount" to 0.2,
-            "reason" to "Late to raid",
-            "appliedBy" to "TestLeader",
-            "expiresAt" to LocalDateTime.now().plusDays(7).toString()
-        )
+        val behavioralRequest =
+            mapOf(
+                "characterName" to "TestCharacter",
+                "deductionAmount" to 0.2,
+                "reason" to "Late to raid",
+                "appliedBy" to "TestLeader",
+                "expiresAt" to LocalDateTime.now().plusDays(7).toString(),
+            )
 
-        mockMvc.perform(post("/api/guild/$testGuildId/management/behavioral/deduction")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(behavioralRequest)))
+        mockMvc.perform(
+            post("/api/guild/$testGuildId/management/behavioral/deduction")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(behavioralRequest)),
+        )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.actionType").value("DEDUCTION"))
             .andExpect(jsonPath("$.deductionAmount").value(0.2))
 
         // Test loot ban endpoint
-        val banRequest = mapOf(
-            "characterName" to "TestCharacter",
-            "reason" to "DKP violation",
-            "bannedBy" to "TestLeader",
-            "expiresAt" to LocalDateTime.now().plusDays(3).toString()
-        )
+        val banRequest =
+            mapOf(
+                "characterName" to "TestCharacter",
+                "reason" to "DKP violation",
+                "bannedBy" to "TestLeader",
+                "expiresAt" to LocalDateTime.now().plusDays(3).toString(),
+            )
 
-        mockMvc.perform(post("/api/guild/$testGuildId/management/loot-ban")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(banRequest)))
+        mockMvc.perform(
+            post("/api/guild/$testGuildId/management/loot-ban")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(banRequest)),
+        )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.reason").value("DKP violation"))
 

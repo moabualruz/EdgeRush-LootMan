@@ -12,5 +12,5 @@ data class CharacterPerformanceData(
     val damageTaken: Long,
     val avoidableDamageTaken: Long,
     val itemLevel: Int,
-    val performancePercentile: Double?
+    val performancePercentile: Double?,
 )

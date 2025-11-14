@@ -8,9 +8,11 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class WebClientConfig {
-
     @Bean
-    fun wowauditWebClient(builder: WebClient.Builder, properties: SyncProperties): WebClient {
+    fun wowauditWebClient(
+        builder: WebClient.Builder,
+        properties: SyncProperties,
+    ): WebClient {
         val apiKey = properties.wowaudit.apiKey
         val defaultHeaders: (HttpHeaders) -> Unit = { headers ->
             if (!apiKey.isNullOrBlank()) {
@@ -26,7 +28,7 @@ class WebClientConfig {
             .exchangeStrategies(
                 ExchangeStrategies.builder()
                     .codecs { it.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) }
-                    .build()
+                    .build(),
             )
             .build()
     }

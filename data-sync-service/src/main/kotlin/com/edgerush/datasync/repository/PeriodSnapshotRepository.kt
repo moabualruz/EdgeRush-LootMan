@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PeriodSnapshotRepository : CrudRepository<PeriodSnapshotEntity, Long> {
-    fun findByTeamIdAndPeriodId(teamId: Long, periodId: Long): PeriodSnapshotEntity?
+    fun findByTeamIdAndPeriodId(
+        teamId: Long,
+        periodId: Long,
+    ): PeriodSnapshotEntity?
 }

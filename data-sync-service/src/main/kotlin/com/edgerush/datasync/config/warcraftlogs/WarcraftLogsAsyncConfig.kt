@@ -9,7 +9,6 @@ import java.util.concurrent.Executor
 @Configuration
 @EnableAsync
 class WarcraftLogsAsyncConfig {
-    
     @Bean("warcraftLogsExecutor")
     fun warcraftLogsExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {

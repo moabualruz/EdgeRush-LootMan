@@ -30,5 +30,5 @@ data class LootAwardResponse(
     val discarded: Boolean?,
     val characterId: Long?,
     val awardedByCharacterId: Long?,
-    val awardedByName: String?
+    val awardedByName: String?,
 )

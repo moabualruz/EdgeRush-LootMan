@@ -24,5 +24,5 @@ data class AttendanceStatResponse(
     val teamId: Long?,
     val seasonId: Long?,
     val periodId: Long?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

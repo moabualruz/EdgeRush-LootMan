@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RaidbotsResultRepository : CrudRepository<RaidbotsResultEntity, Long> {
-    
     fun findBySimulationId(simulationId: Long): List<RaidbotsResultEntity>
-    
+
     @Query("SELECT * FROM raidbots_results WHERE item_id = :itemId ORDER BY calculated_at DESC")
-    fun findByItemId(@Param("itemId") itemId: Long): List<RaidbotsResultEntity>
+    fun findByItemId(
+        @Param("itemId") itemId: Long,
+    ): List<RaidbotsResultEntity>
 }

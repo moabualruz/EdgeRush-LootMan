@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderGearItemMapper {
-
     fun toEntity(request: CreateRaiderGearItemRequest): RaiderGearItemEntity {
         return RaiderGearItemEntity(
             id = null,
@@ -22,13 +21,15 @@ class RaiderGearItemMapper {
             enchantQuality = null, // System populated
             upgradeLevel = null, // System populated
             sockets = null, // System populated
-            name = null // System populated
+            name = null, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderGearItemEntity, request: UpdateRaiderGearItemRequest): RaiderGearItemEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderGearItemEntity,
+        request: UpdateRaiderGearItemRequest,
+    ): RaiderGearItemEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderGearItemEntity): RaiderGearItemResponse {

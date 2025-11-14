@@ -3,8 +3,9 @@ package com.edgerush.datasync.model
 enum class Role {
     DPS,
     Tank,
-    Healer;
-    
+    Healer,
+    ;
+
     companion object {
         fun fromWoWAuditRole(wowAuditRole: String?): Role {
             return when (wowAuditRole?.lowercase()) {
@@ -16,4 +17,3 @@ enum class Role {
         }
     }
 }
-

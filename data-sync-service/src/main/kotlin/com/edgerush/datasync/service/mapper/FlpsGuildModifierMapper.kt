@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class FlpsGuildModifierMapper {
-
     fun toEntity(request: CreateFlpsGuildModifierRequest): FlpsGuildModifierEntity {
         return FlpsGuildModifierEntity(
             id = null,
@@ -22,7 +21,10 @@ class FlpsGuildModifierMapper {
         )
     }
 
-    fun updateEntity(entity: FlpsGuildModifierEntity, request: UpdateFlpsGuildModifierRequest): FlpsGuildModifierEntity {
+    fun updateEntity(
+        entity: FlpsGuildModifierEntity,
+        request: UpdateFlpsGuildModifierRequest,
+    ): FlpsGuildModifierEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             category = request.category ?: entity.category,

@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class SyncRunMapper {
-
     fun toEntity(request: CreateSyncRunRequest): SyncRunEntity {
         return SyncRunEntity(
             id = null,
@@ -21,7 +20,10 @@ class SyncRunMapper {
         )
     }
 
-    fun updateEntity(entity: SyncRunEntity, request: UpdateSyncRunRequest): SyncRunEntity {
+    fun updateEntity(
+        entity: SyncRunEntity,
+        request: UpdateSyncRunRequest,
+    ): SyncRunEntity {
         return entity.copy(
             source = request.source ?: entity.source,
             status = request.status ?: entity.status,

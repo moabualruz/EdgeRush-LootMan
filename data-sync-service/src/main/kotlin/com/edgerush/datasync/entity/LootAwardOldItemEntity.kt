@@ -9,5 +9,5 @@ data class LootAwardOldItemEntity(
     val id: Long? = null,
     val lootAwardId: Long,
     val itemId: Long?,
-    val bonusId: String?
+    val bonusId: String?,
 )

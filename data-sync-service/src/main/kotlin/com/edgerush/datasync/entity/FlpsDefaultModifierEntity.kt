@@ -14,5 +14,5 @@ data class FlpsDefaultModifierEntity(
     val modifierValue: BigDecimal,
     val description: String?,
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
-    val updatedAt: OffsetDateTime = OffsetDateTime.now()
+    val updatedAt: OffsetDateTime = OffsetDateTime.now(),
 )

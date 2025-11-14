@@ -7,5 +7,5 @@ data class RaidbotsConfigResponse(
     val enabled: Boolean,
     val encryptedApiKey: String?,
     val configJson: String,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )

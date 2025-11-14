@@ -8,5 +8,5 @@ data class LootAwardBonusIdEntity(
     @Id
     val id: Long? = null,
     val lootAwardId: Long,
-    val bonusId: String?
+    val bonusId: String?,
 )

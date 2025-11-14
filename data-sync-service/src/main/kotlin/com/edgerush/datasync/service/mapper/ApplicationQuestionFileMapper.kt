@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class ApplicationQuestionFileMapper {
-
     fun toEntity(request: CreateApplicationQuestionFileRequest): ApplicationQuestionFileEntity {
         return ApplicationQuestionFileEntity(
             id = null,
@@ -20,7 +19,10 @@ class ApplicationQuestionFileMapper {
         )
     }
 
-    fun updateEntity(entity: ApplicationQuestionFileEntity, request: UpdateApplicationQuestionFileRequest): ApplicationQuestionFileEntity {
+    fun updateEntity(
+        entity: ApplicationQuestionFileEntity,
+        request: UpdateApplicationQuestionFileRequest,
+    ): ApplicationQuestionFileEntity {
         return entity.copy(
             applicationId = request.applicationId ?: entity.applicationId,
             questionPosition = request.questionPosition ?: entity.questionPosition,

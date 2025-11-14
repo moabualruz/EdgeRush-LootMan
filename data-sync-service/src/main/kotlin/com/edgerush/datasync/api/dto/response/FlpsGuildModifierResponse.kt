@@ -10,5 +10,5 @@ data class FlpsGuildModifierResponse(
     val modifierKey: String,
     val modifierValue: BigDecimal,
     val description: String?,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
 )

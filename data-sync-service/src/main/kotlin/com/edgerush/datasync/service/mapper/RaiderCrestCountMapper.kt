@@ -8,19 +8,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderCrestCountMapper {
-
     fun toEntity(request: CreateRaiderCrestCountRequest): RaiderCrestCountEntity {
         return RaiderCrestCountEntity(
             id = null,
             raiderId = 0L, // System populated
             crestType = "", // System populated
-            crestCount = 0 // System populated
+            crestCount = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderCrestCountEntity, request: UpdateRaiderCrestCountRequest): RaiderCrestCountEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderCrestCountEntity,
+        request: UpdateRaiderCrestCountRequest,
+    ): RaiderCrestCountEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderCrestCountEntity): RaiderCrestCountResponse {

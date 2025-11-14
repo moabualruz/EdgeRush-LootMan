@@ -7,7 +7,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class WoWAuditSchemaTest {
-
     private val mapper = jacksonObjectMapper()
 
     @Test
@@ -24,12 +23,13 @@ class WoWAuditSchemaTest {
             "tier_summary",
             "renown_campaign",
             "pvp",
-            "raid_progression"
+            "raid_progression",
         )
 
-        val totalColumns = root.fields().asSequence()
-            .flatMap { (_, value) -> value.elements().asSequence() }
-            .count()
+        val totalColumns =
+            root.fields().asSequence()
+                .flatMap { (_, value) -> value.elements().asSequence() }
+                .count()
         assertThat(totalColumns)
             .`as`("total raw_data columns captured")
             .isGreaterThanOrEqualTo(400)

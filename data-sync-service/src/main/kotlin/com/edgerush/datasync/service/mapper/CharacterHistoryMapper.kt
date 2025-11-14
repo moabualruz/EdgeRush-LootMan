@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class CharacterHistoryMapper {
-
     fun toEntity(request: CreateCharacterHistoryRequest): CharacterHistoryEntity {
         return CharacterHistoryEntity(
             id = null,
@@ -21,13 +20,15 @@ class CharacterHistoryMapper {
             periodId = null, // System populated
             historyJson = "", // System populated
             bestGearJson = null, // System populated
-            syncedAt = java.time.OffsetDateTime.now()
+            syncedAt = java.time.OffsetDateTime.now(),
         )
     }
 
-    fun updateEntity(entity: CharacterHistoryEntity, request: UpdateCharacterHistoryRequest): CharacterHistoryEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: CharacterHistoryEntity,
+        request: UpdateCharacterHistoryRequest,
+    ): CharacterHistoryEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: CharacterHistoryEntity): CharacterHistoryResponse {

@@ -13,5 +13,5 @@ data class TeamRaidDayResponse(
     val currentInstance: String?,
     val difficulty: String?,
     val activeFrom: LocalDate?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

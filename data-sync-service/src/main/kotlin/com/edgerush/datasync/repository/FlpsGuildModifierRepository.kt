@@ -9,7 +9,20 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FlpsGuildModifierRepository : CrudRepository<FlpsGuildModifierEntity, Long>, PagingAndSortingRepository<FlpsGuildModifierEntity, Long> {
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<FlpsGuildModifierEntity>
-    fun findByGuildIdAndCategory(guildId: String, category: String, pageable: Pageable): Page<FlpsGuildModifierEntity>
-    fun findByGuildIdAndCategoryAndModifierKey(guildId: String, category: String, modifierKey: String): FlpsGuildModifierEntity?
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<FlpsGuildModifierEntity>
+
+    fun findByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+        pageable: Pageable,
+    ): Page<FlpsGuildModifierEntity>
+
+    fun findByGuildIdAndCategoryAndModifierKey(
+        guildId: String,
+        category: String,
+        modifierKey: String,
+    ): FlpsGuildModifierEntity?
 }

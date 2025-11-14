@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class TeamMetadataMapper {
-
     fun toEntity(request: CreateTeamMetadataRequest): TeamMetadataEntity {
         return TeamMetadataEntity(
             teamId = 0L, // TODO: Set from request or context
@@ -27,7 +26,10 @@ class TeamMetadataMapper {
         )
     }
 
-    fun updateEntity(entity: TeamMetadataEntity, request: UpdateTeamMetadataRequest): TeamMetadataEntity {
+    fun updateEntity(
+        entity: TeamMetadataEntity,
+        request: UpdateTeamMetadataRequest,
+    ): TeamMetadataEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             guildName = request.guildName ?: entity.guildName,

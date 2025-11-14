@@ -14,6 +14,5 @@ data class RaiderInput(
     val tierPiecesOwned: Int,
     val simulatedGain: Double,
     val specBaselineOutput: Double,
-    val lastAwards: List<LootAward>
+    val lastAwards: List<LootAward>,
 )
-

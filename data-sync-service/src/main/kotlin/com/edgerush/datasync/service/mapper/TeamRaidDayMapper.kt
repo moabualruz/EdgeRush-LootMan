@@ -5,13 +5,10 @@ import com.edgerush.datasync.api.dto.request.UpdateTeamRaidDayRequest
 import com.edgerush.datasync.api.dto.response.TeamRaidDayResponse
 import com.edgerush.datasync.entity.TeamRaidDayEntity
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.time.LocalTime
 import java.time.OffsetDateTime
 
 @Component
 class TeamRaidDayMapper {
-
     fun toEntity(request: CreateTeamRaidDayRequest): TeamRaidDayEntity {
         return TeamRaidDayEntity(
             id = null,
@@ -26,7 +23,10 @@ class TeamRaidDayMapper {
         )
     }
 
-    fun updateEntity(entity: TeamRaidDayEntity, request: UpdateTeamRaidDayRequest): TeamRaidDayEntity {
+    fun updateEntity(
+        entity: TeamRaidDayEntity,
+        request: UpdateTeamRaidDayRequest,
+    ): TeamRaidDayEntity {
         return entity.copy(
             teamId = request.teamId ?: entity.teamId,
             weekDay = request.weekDay ?: entity.weekDay,

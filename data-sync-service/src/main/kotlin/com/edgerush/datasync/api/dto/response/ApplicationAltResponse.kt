@@ -1,6 +1,5 @@
 package com.edgerush.datasync.api.dto.response
 
-
 data class ApplicationAltResponse(
     val id: Long?,
     val applicationId: Long,
@@ -11,5 +10,5 @@ data class ApplicationAltResponse(
     val role: String?,
     val level: Int?,
     val faction: String?,
-    val race: String?
+    val race: String?,
 )

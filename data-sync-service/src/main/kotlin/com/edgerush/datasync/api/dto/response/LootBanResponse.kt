@@ -9,5 +9,5 @@ data class LootBanResponse(
     val reason: String,
     val bannedBy: String,
     val bannedAt: LocalDateTime,
-    val expiresAt: LocalDateTime?
+    val expiresAt: LocalDateTime?,
 )

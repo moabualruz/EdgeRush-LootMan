@@ -7,9 +7,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface WarcraftLogsConfigRepository : CrudRepository<WarcraftLogsConfigEntity, String> {
-    
     @Query("SELECT * FROM warcraft_logs_config WHERE enabled = true")
     fun findAllEnabled(): List<WarcraftLogsConfigEntity>
-    
+
     fun findByGuildId(guildId: String): WarcraftLogsConfigEntity?
 }

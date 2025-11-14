@@ -6,13 +6,12 @@ import com.edgerush.datasync.repository.BehavioralActionRepository
 import com.edgerush.datasync.repository.LootBanRepository
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class BehavioralScoreServiceTest {
-
     private lateinit var behavioralActionRepository: BehavioralActionRepository
     private lateinit var lootBanRepository: LootBanRepository
     private lateinit var behavioralScoreService: BehavioralScoreService
@@ -29,11 +28,11 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        every { 
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(
-                guildId, 
-                characterName, 
-                any()
+                guildId,
+                characterName,
+                any(),
             )
         } returns emptyList()
 
@@ -49,19 +48,20 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val deduction = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.2,
-            reason = "Late to raid",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
-        
-        every { 
+        val deduction =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.2,
+                reason = "Late to raid",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(deduction)
 
@@ -77,30 +77,32 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val deduction1 = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.2,
-            reason = "Late to raid",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(2),
-            expiresAt = LocalDateTime.now().plusDays(6)
-        )
-        val deduction2 = BehavioralActionEntity(
-            id = 2,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.1,
-            reason = "Unprepared for raid",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
-        
-        every { 
+        val deduction1 =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.2,
+                reason = "Late to raid",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(2),
+                expiresAt = LocalDateTime.now().plusDays(6),
+            )
+        val deduction2 =
+            BehavioralActionEntity(
+                id = 2,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.1,
+                reason = "Unprepared for raid",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(deduction1, deduction2)
 
@@ -116,30 +118,32 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val deduction = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.3,
-            reason = "Late to raid",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(2),
-            expiresAt = LocalDateTime.now().plusDays(6)
-        )
-        val restoration = BehavioralActionEntity(
-            id = 2,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "RESTORATION",
-            deductionAmount = 0.1,
-            reason = "Good behavior improvement",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = null
-        )
-        
-        every { 
+        val deduction =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.3,
+                reason = "Late to raid",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(2),
+                expiresAt = LocalDateTime.now().plusDays(6),
+            )
+        val restoration =
+            BehavioralActionEntity(
+                id = 2,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "RESTORATION",
+                deductionAmount = 0.1,
+                reason = "Good behavior improvement",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = null,
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(deduction, restoration)
 
@@ -155,19 +159,20 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val largeDeduction = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 1.5, // More than possible
-            reason = "Major violation",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
-        
-        every { 
+        val largeDeduction =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 1.5, // More than possible
+                reason = "Major violation",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(largeDeduction)
 
@@ -183,19 +188,20 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val largeRestoration = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "RESTORATION",
-            deductionAmount = 0.5, // Would put us above 1.0
-            reason = "Exceptional behavior",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = null
-        )
-        
-        every { 
+        val largeRestoration =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "RESTORATION",
+                deductionAmount = 0.5, // Would put us above 1.0
+                reason = "Exceptional behavior",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = null,
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(largeRestoration)
 
@@ -211,7 +217,7 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        every { 
+        every {
             lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
         } returns null
 
@@ -228,17 +234,18 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val ban = LootBanEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            reason = "DKP violation",
-            bannedBy = "GuildLeader",
-            bannedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
-        
-        every { 
+        val ban =
+            LootBanEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                reason = "DKP violation",
+                bannedBy = "GuildLeader",
+                bannedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
+
+        every {
             lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
         } returns ban
 
@@ -258,22 +265,23 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        val deduction = BehavioralActionEntity(
-            id = 1,
-            guildId = guildId,
-            characterName = characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = 0.2,
-            reason = "Late to raid",
-            appliedBy = "GuildLeader",
-            appliedAt = LocalDateTime.now().minusDays(1),
-            expiresAt = LocalDateTime.now().plusDays(7)
-        )
-        
-        every { 
+        val deduction =
+            BehavioralActionEntity(
+                id = 1,
+                guildId = guildId,
+                characterName = characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = 0.2,
+                reason = "Late to raid",
+                appliedBy = "GuildLeader",
+                appliedAt = LocalDateTime.now().minusDays(1),
+                expiresAt = LocalDateTime.now().plusDays(7),
+            )
+
+        every {
             behavioralActionRepository.findActiveActionsForCharacter(guildId, characterName, any())
         } returns listOf(deduction)
-        every { 
+        every {
             lootBanRepository.findActiveBanForCharacter(guildId, characterName, any())
         } returns null
 

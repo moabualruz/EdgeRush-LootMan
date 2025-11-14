@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class WoWAuditScheduler(
-    private val syncService: WoWAuditSyncService
+    private val syncService: WoWAuditSyncService,
 ) {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Scheduled(cron = "\${sync.cron}")

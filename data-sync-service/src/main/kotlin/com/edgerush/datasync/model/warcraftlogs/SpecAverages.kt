@@ -8,7 +8,7 @@ data class SpecAverages(
     val sampleSize: Int,
     val averageDeathsPerAttempt: Double,
     val averageAvoidableDamagePercentage: Double,
-    val percentile: Int
+    val percentile: Int,
 ) {
     // Convenience properties for backward compatibility
     val averageDPA: Double get() = averageDeathsPerAttempt

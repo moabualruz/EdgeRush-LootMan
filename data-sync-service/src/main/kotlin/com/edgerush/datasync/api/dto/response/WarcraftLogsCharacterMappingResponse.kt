@@ -10,5 +10,5 @@ data class WarcraftLogsCharacterMappingResponse(
     val warcraftLogsName: String,
     val warcraftLogsRealm: String,
     val createdAt: Instant,
-    val createdBy: String?
+    val createdBy: String?,
 )

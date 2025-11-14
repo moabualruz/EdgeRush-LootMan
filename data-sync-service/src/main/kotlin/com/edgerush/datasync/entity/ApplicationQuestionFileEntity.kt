@@ -11,5 +11,5 @@ data class ApplicationQuestionFileEntity(
     val questionPosition: Int?,
     val question: String?,
     val originalFilename: String?,
-    val url: String?
+    val url: String?,
 )

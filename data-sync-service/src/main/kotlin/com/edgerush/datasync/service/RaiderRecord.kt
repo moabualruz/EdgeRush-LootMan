@@ -19,7 +19,7 @@ data class RaiderRecord(
     val blizzardLastModified: OffsetDateTime?,
     val gearItems: List<RaiderGearItemRecord> = emptyList(),
     val statistics: RaiderStatisticsRecord? = null,
-    val pvpBrackets: List<RaiderPvpBracketRecord> = emptyList()
+    val pvpBrackets: List<RaiderPvpBracketRecord> = emptyList(),
 )
 
 data class RaiderGearItemRecord(
@@ -32,7 +32,7 @@ data class RaiderGearItemRecord(
     val enchantQuality: Int?,
     val upgradeLevel: Int?,
     val sockets: Int?,
-    val name: String?
+    val name: String?,
 )
 
 data class RaiderStatisticsRecord(
@@ -51,38 +51,38 @@ data class RaiderStatisticsRecord(
     val crestCounts: List<CrestCountRecord> = emptyList(),
     val vaultSlots: List<VaultSlotRecord> = emptyList(),
     val renownLevels: List<RenownRecord> = emptyList(),
-    val raidProgress: List<RaidProgressRecord> = emptyList()
+    val raidProgress: List<RaidProgressRecord> = emptyList(),
 )
 
 data class WarcraftLogRecord(
     val difficulty: String,
-    val score: Int?
+    val score: Int?,
 )
 
 data class TrackItemRecord(
     val tier: String,
-    val itemCount: Int?
+    val itemCount: Int?,
 )
 
 data class CrestCountRecord(
     val crestType: String,
-    val count: Int?
+    val count: Int?,
 )
 
 data class VaultSlotRecord(
     val slot: String,
-    val unlocked: Boolean?
+    val unlocked: Boolean?,
 )
 
 data class RenownRecord(
     val faction: String,
-    val level: Int?
+    val level: Int?,
 )
 
 data class RaidProgressRecord(
     val raid: String,
     val difficulty: String,
-    val bossesDefeated: Int?
+    val bossesDefeated: Int?,
 )
 
 data class RaiderPvpBracketRecord(
@@ -90,5 +90,5 @@ data class RaiderPvpBracketRecord(
     val rating: Int?,
     val seasonPlayed: Int?,
     val weekPlayed: Int?,
-    val maxRating: Int?
+    val maxRating: Int?,
 )

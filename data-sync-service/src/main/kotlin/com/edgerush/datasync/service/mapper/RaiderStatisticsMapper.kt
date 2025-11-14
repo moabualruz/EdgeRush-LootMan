@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderStatisticsMapper {
-
     fun toEntity(request: CreateRaiderStatisticsRequest): RaiderStatisticsEntity {
         return RaiderStatisticsEntity(
             id = null,
@@ -22,13 +21,15 @@ class RaiderStatisticsMapper {
             collectiblesToys = 0, // System populated
             collectiblesUniquePets = 0, // System populated
             collectiblesLevel25Pets = 0, // System populated
-            honorLevel = 0 // System populated
+            honorLevel = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderStatisticsEntity, request: UpdateRaiderStatisticsRequest): RaiderStatisticsEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderStatisticsEntity,
+        request: UpdateRaiderStatisticsRequest,
+    ): RaiderStatisticsEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderStatisticsEntity): RaiderStatisticsResponse {

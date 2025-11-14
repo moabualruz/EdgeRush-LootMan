@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties(prefix = "api.admin-mode")
 data class AdminModeConfig(
-    var enabled: Boolean = false
+    var enabled: Boolean = false,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
-    
+
     @PostConstruct
     fun logWarning() {
         if (enabled) {
@@ -21,6 +21,6 @@ data class AdminModeConfig(
             logger.warn("⚠️  ═══════════════════════════════════════════════════════════")
         }
     }
-    
+
     fun isEnabled(): Boolean = enabled
 }

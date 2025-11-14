@@ -6,5 +6,5 @@ data class WoWAuditSnapshotResponse(
     val id: Long?,
     val endpoint: String,
     val rawPayload: String,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

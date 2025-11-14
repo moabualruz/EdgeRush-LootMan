@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface WishlistSnapshotRepository : CrudRepository<WishlistSnapshotEntity, Long> {
-    fun deleteByCharacterNameAndCharacterRealm(characterName: String, characterRealm: String)
+    fun deleteByCharacterNameAndCharacterRealm(
+        characterName: String,
+        characterRealm: String,
+    )
 }

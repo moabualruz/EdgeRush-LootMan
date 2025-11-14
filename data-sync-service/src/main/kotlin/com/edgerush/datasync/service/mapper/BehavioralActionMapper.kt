@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class BehavioralActionMapper {
-
     fun toEntity(request: CreateBehavioralActionRequest): BehavioralActionEntity {
         return BehavioralActionEntity(
             id = null,
@@ -20,11 +19,14 @@ class BehavioralActionMapper {
             appliedBy = "", // System populated
             appliedAt = java.time.LocalDateTime.now(), // System populated
             expiresAt = null, // System populated
-            isActive = true
+            isActive = true,
         )
     }
 
-    fun updateEntity(entity: BehavioralActionEntity, request: UpdateBehavioralActionRequest): BehavioralActionEntity {
+    fun updateEntity(
+        entity: BehavioralActionEntity,
+        request: UpdateBehavioralActionRequest,
+    ): BehavioralActionEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             characterName = request.characterName ?: entity.characterName,

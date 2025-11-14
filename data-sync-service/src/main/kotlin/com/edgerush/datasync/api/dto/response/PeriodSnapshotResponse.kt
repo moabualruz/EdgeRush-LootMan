@@ -8,5 +8,5 @@ data class PeriodSnapshotResponse(
     val seasonId: Long?,
     val periodId: Long?,
     val currentPeriod: Long?,
-    val fetchedAt: OffsetDateTime
+    val fetchedAt: OffsetDateTime,
 )

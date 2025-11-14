@@ -9,5 +9,5 @@ data class SyncProperties(
     val cron: String,
     @DefaultValue("false")
     val runOnStartup: Boolean,
-    val wowaudit: WoWAuditProperties
+    val wowaudit: WoWAuditProperties,
 )

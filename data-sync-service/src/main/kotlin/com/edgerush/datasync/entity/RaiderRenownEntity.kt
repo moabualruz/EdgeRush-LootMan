@@ -11,5 +11,5 @@ data class RaiderRenownEntity(
     @Column("raider_id")
     val raiderId: Long,
     val faction: String,
-    val level: Int?
+    val level: Int?,
 )

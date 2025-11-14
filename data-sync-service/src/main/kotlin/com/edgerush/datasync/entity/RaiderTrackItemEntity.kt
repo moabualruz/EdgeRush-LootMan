@@ -12,5 +12,5 @@ data class RaiderTrackItemEntity(
     val raiderId: Long,
     val tier: String,
     @Column("item_count")
-    val itemCount: Int?
+    val itemCount: Int?,
 )

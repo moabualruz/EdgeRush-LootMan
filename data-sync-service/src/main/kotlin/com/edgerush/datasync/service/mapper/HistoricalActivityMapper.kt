@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class HistoricalActivityMapper {
-
     fun toEntity(request: CreateHistoricalActivityRequest): HistoricalActivityEntity {
         return HistoricalActivityEntity(
             id = null,
@@ -24,7 +23,10 @@ class HistoricalActivityMapper {
         )
     }
 
-    fun updateEntity(entity: HistoricalActivityEntity, request: UpdateHistoricalActivityRequest): HistoricalActivityEntity {
+    fun updateEntity(
+        entity: HistoricalActivityEntity,
+        request: UpdateHistoricalActivityRequest,
+    ): HistoricalActivityEntity {
         return entity.copy(
             characterId = request.characterId ?: entity.characterId,
             characterName = request.characterName ?: entity.characterName,

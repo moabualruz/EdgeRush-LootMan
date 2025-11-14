@@ -9,7 +9,6 @@ import java.time.Instant
 
 @Component
 class WarcraftLogsPerformanceMapper {
-
     fun toEntity(request: CreateWarcraftLogsPerformanceRequest): WarcraftLogsPerformanceEntity {
         return WarcraftLogsPerformanceEntity(
             id = null,
@@ -28,7 +27,10 @@ class WarcraftLogsPerformanceMapper {
         )
     }
 
-    fun updateEntity(entity: WarcraftLogsPerformanceEntity, request: UpdateWarcraftLogsPerformanceRequest): WarcraftLogsPerformanceEntity {
+    fun updateEntity(
+        entity: WarcraftLogsPerformanceEntity,
+        request: UpdateWarcraftLogsPerformanceRequest,
+    ): WarcraftLogsPerformanceEntity {
         return entity.copy(
             fightId = request.fightId ?: entity.fightId,
             characterName = request.characterName ?: entity.characterName,

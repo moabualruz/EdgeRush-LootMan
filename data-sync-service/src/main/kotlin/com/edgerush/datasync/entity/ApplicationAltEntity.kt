@@ -15,5 +15,5 @@ data class ApplicationAltEntity(
     val role: String?,
     val level: Int?,
     val faction: String?,
-    val race: String?
+    val race: String?,
 )

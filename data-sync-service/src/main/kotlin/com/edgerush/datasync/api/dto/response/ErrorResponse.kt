@@ -7,7 +7,7 @@ data class ErrorResponse(
     val status: Int,
     val error: String,
     val message: String,
-    val path: String
+    val path: String,
 )
 
 data class ValidationErrorResponse(
@@ -16,10 +16,10 @@ data class ValidationErrorResponse(
     val error: String,
     val message: String,
     val path: String,
-    val fieldErrors: List<FieldError>
+    val fieldErrors: List<FieldError>,
 )
 
 data class FieldError(
     val field: String,
-    val message: String
+    val message: String,
 )

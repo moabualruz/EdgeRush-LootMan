@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus
  * - How to verify database state
  */
 class IntegrationTestExample : IntegrationTest() {
-
     @Test
     fun `should demonstrate database operations`() {
         // Arrange - Verify database is clean
@@ -27,9 +26,10 @@ class IntegrationTestExample : IntegrationTest() {
         initialCount shouldBe 0
 
         // Act - Insert test data using JdbcTemplate
-        val raider = TestDataFactory.createTestRaider(
-            characterName = "TestRaider"
-        )
+        val raider =
+            TestDataFactory.createTestRaider(
+                characterName = "TestRaider",
+            )
 
         jdbcTemplate.update(
             """
@@ -44,7 +44,7 @@ class IntegrationTestExample : IntegrationTest() {
             raider.role,
             raider.rank,
             raider.status,
-            raider.lastSync
+            raider.lastSync,
         )
 
         // Assert - Verify data was inserted
@@ -52,11 +52,12 @@ class IntegrationTestExample : IntegrationTest() {
         finalCount shouldBe 1
 
         // Verify we can query the data
-        val name = jdbcTemplate.queryForObject(
-            "SELECT character_name FROM raiders WHERE character_name = ?",
-            String::class.java,
-            "TestRaider"
-        )
+        val name =
+            jdbcTemplate.queryForObject(
+                "SELECT character_name FROM raiders WHERE character_name = ?",
+                String::class.java,
+                "TestRaider",
+            )
         name shouldBe "TestRaider"
     }
 
@@ -65,10 +66,11 @@ class IntegrationTestExample : IntegrationTest() {
         // Arrange - No setup needed for health check
 
         // Act - Call the health endpoint
-        val response = restTemplate.getForEntity(
-            "/actuator/health",
-            Map::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/actuator/health",
+                Map::class.java,
+            )
 
         // Assert - Verify response
         response.statusCode shouldBe HttpStatus.OK

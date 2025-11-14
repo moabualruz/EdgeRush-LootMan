@@ -8,20 +8,21 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderRaidProgressMapper {
-
     fun toEntity(request: CreateRaiderRaidProgressRequest): RaiderRaidProgressEntity {
         return RaiderRaidProgressEntity(
             id = null,
             raiderId = 0L, // System populated
             raid = "", // System populated
             difficulty = "", // System populated
-            bossesDefeated = 0 // System populated
+            bossesDefeated = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderRaidProgressEntity, request: UpdateRaiderRaidProgressRequest): RaiderRaidProgressEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderRaidProgressEntity,
+        request: UpdateRaiderRaidProgressRequest,
+    ): RaiderRaidProgressEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderRaidProgressEntity): RaiderRaidProgressResponse {

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class WarcraftLogsFightMapper {
-
     fun toEntity(request: CreateWarcraftLogsFightRequest): WarcraftLogsFightEntity {
         return WarcraftLogsFightEntity(
             id = null,
@@ -24,7 +23,10 @@ class WarcraftLogsFightMapper {
         )
     }
 
-    fun updateEntity(entity: WarcraftLogsFightEntity, request: UpdateWarcraftLogsFightRequest): WarcraftLogsFightEntity {
+    fun updateEntity(
+        entity: WarcraftLogsFightEntity,
+        request: UpdateWarcraftLogsFightRequest,
+    ): WarcraftLogsFightEntity {
         return entity.copy(
             reportId = request.reportId ?: entity.reportId,
             fightId = request.fightId ?: entity.fightId,

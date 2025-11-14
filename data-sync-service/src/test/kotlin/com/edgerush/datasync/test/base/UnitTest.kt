@@ -39,7 +39,6 @@ import org.junit.jupiter.api.BeforeEach
  * ```
  */
 abstract class UnitTest {
-
     @BeforeEach
     fun setupMocks() {
         MockKAnnotations.init(this, relaxUnitFun = true)

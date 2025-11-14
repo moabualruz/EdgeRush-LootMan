@@ -9,7 +9,6 @@ import java.time.Instant
 
 @Component
 class WarcraftLogsReportMapper {
-
     fun toEntity(request: CreateWarcraftLogsReportRequest): WarcraftLogsReportEntity {
         return WarcraftLogsReportEntity(
             id = null,
@@ -25,7 +24,10 @@ class WarcraftLogsReportMapper {
         )
     }
 
-    fun updateEntity(entity: WarcraftLogsReportEntity, request: UpdateWarcraftLogsReportRequest): WarcraftLogsReportEntity {
+    fun updateEntity(
+        entity: WarcraftLogsReportEntity,
+        request: UpdateWarcraftLogsReportRequest,
+    ): WarcraftLogsReportEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             reportCode = request.reportCode ?: entity.reportCode,

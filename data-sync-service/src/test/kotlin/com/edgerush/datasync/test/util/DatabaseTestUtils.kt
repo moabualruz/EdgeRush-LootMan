@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate
  * - Test data setup
  */
 object DatabaseTestUtils {
-
     /**
      * Cleans all tables in the database except flyway_schema_history.
      *
@@ -20,14 +19,15 @@ object DatabaseTestUtils {
      * @param jdbcTemplate The JdbcTemplate to use for database operations
      */
     fun cleanAllTables(jdbcTemplate: JdbcTemplate) {
-        val tables = jdbcTemplate.queryForList(
-            """
+        val tables =
+            jdbcTemplate.queryForList(
+                """
             SELECT tablename FROM pg_tables 
             WHERE schemaname = 'public' 
             AND tablename != 'flyway_schema_history'
             """,
-            String::class.java
-        )
+                String::class.java,
+            )
 
         tables.forEach { table ->
             jdbcTemplate.execute("TRUNCATE TABLE $table CASCADE")
@@ -46,7 +46,7 @@ object DatabaseTestUtils {
     fun resetSequence(
         jdbcTemplate: JdbcTemplate,
         tableName: String,
-        sequenceName: String = "${tableName}_id_seq"
+        sequenceName: String = "${tableName}_id_seq",
     ) {
         jdbcTemplate.execute("ALTER SEQUENCE $sequenceName RESTART WITH 1")
     }
@@ -58,10 +58,13 @@ object DatabaseTestUtils {
      * @param tableName The name of the table
      * @return The number of rows in the table
      */
-    fun countRows(jdbcTemplate: JdbcTemplate, tableName: String): Int {
+    fun countRows(
+        jdbcTemplate: JdbcTemplate,
+        tableName: String,
+    ): Int {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM $tableName",
-            Int::class.java
+            Int::class.java,
         ) ?: 0
     }
 
@@ -72,16 +75,20 @@ object DatabaseTestUtils {
      * @param tableName The name of the table
      * @return true if the table exists, false otherwise
      */
-    fun tableExists(jdbcTemplate: JdbcTemplate, tableName: String): Boolean {
-        val count = jdbcTemplate.queryForObject(
-            """
+    fun tableExists(
+        jdbcTemplate: JdbcTemplate,
+        tableName: String,
+    ): Boolean {
+        val count =
+            jdbcTemplate.queryForObject(
+                """
             SELECT COUNT(*) FROM information_schema.tables 
             WHERE table_schema = 'public' 
             AND table_name = ?
             """,
-            Int::class.java,
-            tableName
-        ) ?: 0
+                Int::class.java,
+                tableName,
+            ) ?: 0
         return count > 0
     }
 
@@ -91,11 +98,15 @@ object DatabaseTestUtils {
      * @param jdbcTemplate The JdbcTemplate to use
      * @param scriptPath The path to the SQL script file
      */
-    fun executeSqlScript(jdbcTemplate: JdbcTemplate, scriptPath: String) {
-        val script = DatabaseTestUtils::class.java.getResourceAsStream(scriptPath)
-            ?.bufferedReader()
-            ?.readText()
-            ?: throw IllegalArgumentException("Script not found: $scriptPath")
+    fun executeSqlScript(
+        jdbcTemplate: JdbcTemplate,
+        scriptPath: String,
+    ) {
+        val script =
+            DatabaseTestUtils::class.java.getResourceAsStream(scriptPath)
+                ?.bufferedReader()
+                ?.readText()
+                ?: throw IllegalArgumentException("Script not found: $scriptPath")
 
         jdbcTemplate.execute(script)
     }

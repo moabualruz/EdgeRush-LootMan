@@ -10,5 +10,5 @@ data class WoWAuditSnapshotEntity(
     val id: Long? = null,
     val endpoint: String,
     val rawPayload: String,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

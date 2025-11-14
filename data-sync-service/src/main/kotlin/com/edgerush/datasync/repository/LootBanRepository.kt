@@ -8,8 +8,8 @@ import java.time.LocalDateTime
 
 @Repository
 interface LootBanRepository : CrudRepository<LootBanEntity, Long> {
-    
-    @Query("""
+    @Query(
+        """
         SELECT * FROM loot_bans 
         WHERE guild_id = :guildId 
         AND character_name = :characterName 
@@ -17,22 +17,25 @@ interface LootBanRepository : CrudRepository<LootBanEntity, Long> {
         AND (expires_at IS NULL OR expires_at > :currentTime)
         ORDER BY banned_at DESC
         LIMIT 1
-    """)
+    """,
+    )
     fun findActiveBanForCharacter(
-        guildId: String, 
-        characterName: String, 
-        currentTime: LocalDateTime
+        guildId: String,
+        characterName: String,
+        currentTime: LocalDateTime,
     ): LootBanEntity?
-    
-    @Query("""
+
+    @Query(
+        """
         SELECT * FROM loot_bans 
         WHERE guild_id = :guildId 
         AND is_active = true 
         AND (expires_at IS NULL OR expires_at > :currentTime)
         ORDER BY character_name, banned_at DESC
-    """)
+    """,
+    )
     fun findActiveBansForGuild(
-        guildId: String, 
-        currentTime: LocalDateTime
+        guildId: String,
+        currentTime: LocalDateTime,
     ): List<LootBanEntity>
 }

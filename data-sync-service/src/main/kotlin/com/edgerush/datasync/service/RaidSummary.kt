@@ -12,5 +12,5 @@ data class RaidSummary(
     val presentSize: Int?,
     val totalSize: Int?,
     val notes: String?,
-    val selectionsImage: String?
+    val selectionsImage: String?,
 )

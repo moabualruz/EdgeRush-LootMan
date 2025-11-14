@@ -19,55 +19,70 @@ import org.springframework.stereotype.Service
 class RaidCrudService(
     private val repository: RaidRepository,
     private val mapper: RaidMapper,
-    private val auditLogger: AuditLogger
+    private val auditLogger: AuditLogger,
 ) : CrudService<RaidEntity, Long, CreateRaidRequest, UpdateRaidRequest, RaidResponse> {
-    
     private val logger = LoggerFactory.getLogger(javaClass)
-    
+
     override fun findAll(pageable: Pageable): Page<RaidResponse> {
         return repository.findAll(pageable).map { mapper.toResponse(it) }
     }
-    
+
     override fun findById(id: Long): RaidResponse {
-        val entity = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
+        val entity =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
         return mapper.toResponse(entity)
     }
-    
-    override fun create(request: CreateRaidRequest, user: AuthenticatedUser): RaidResponse {
+
+    override fun create(
+        request: CreateRaidRequest,
+        user: AuthenticatedUser,
+    ): RaidResponse {
         logger.info("Creating raid for date: ${request.date} by user: ${user.username}")
         val entity = mapper.toEntity(request)
         val saved = repository.save(entity)
         auditLogger.logCreate("Raid", saved.raidId, user)
         return mapper.toResponse(saved)
     }
-    
-    override fun update(id: Long, request: UpdateRaidRequest, user: AuthenticatedUser): RaidResponse {
-        val existing = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
+
+    override fun update(
+        id: Long,
+        request: UpdateRaidRequest,
+        user: AuthenticatedUser,
+    ): RaidResponse {
+        val existing =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
         validateAccess(existing, user)
-        
+
         val updated = mapper.updateEntity(existing, request)
         val saved = repository.save(updated)
         auditLogger.logUpdate("Raid", id, user)
         return mapper.toResponse(saved)
     }
-    
-    override fun delete(id: Long, user: AuthenticatedUser) {
-        val entity = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
+
+    override fun delete(
+        id: Long,
+        user: AuthenticatedUser,
+    ) {
+        val entity =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("Raid not found with id: $id") }
         validateAccess(entity, user)
-        
+
         repository.delete(entity)
         auditLogger.logDelete("Raid", id, user)
     }
-    
-    override fun validateAccess(entity: RaidEntity, user: AuthenticatedUser) {
+
+    override fun validateAccess(
+        entity: RaidEntity,
+        user: AuthenticatedUser,
+    ) {
         if (!user.isGuildAdmin()) {
             throw AccessDeniedException("Insufficient permissions to access this raid")
         }
     }
-    
+
     fun findByTeamId(teamId: Long): List<RaidResponse> {
         return repository.findByTeamId(teamId).map { mapper.toResponse(it) }
     }

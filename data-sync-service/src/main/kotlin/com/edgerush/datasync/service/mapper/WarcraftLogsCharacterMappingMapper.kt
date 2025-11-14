@@ -9,7 +9,6 @@ import java.time.Instant
 
 @Component
 class WarcraftLogsCharacterMappingMapper {
-
     fun toEntity(request: CreateWarcraftLogsCharacterMappingRequest): WarcraftLogsCharacterMappingEntity {
         return WarcraftLogsCharacterMappingEntity(
             id = null,
@@ -23,7 +22,10 @@ class WarcraftLogsCharacterMappingMapper {
         )
     }
 
-    fun updateEntity(entity: WarcraftLogsCharacterMappingEntity, request: UpdateWarcraftLogsCharacterMappingRequest): WarcraftLogsCharacterMappingEntity {
+    fun updateEntity(
+        entity: WarcraftLogsCharacterMappingEntity,
+        request: UpdateWarcraftLogsCharacterMappingRequest,
+    ): WarcraftLogsCharacterMappingEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             wowauditName = request.wowauditName ?: entity.wowauditName,

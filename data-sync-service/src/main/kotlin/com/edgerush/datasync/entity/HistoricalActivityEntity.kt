@@ -15,5 +15,5 @@ data class HistoricalActivityEntity(
     val teamId: Long?,
     val seasonId: Long?,
     val dataJson: String,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

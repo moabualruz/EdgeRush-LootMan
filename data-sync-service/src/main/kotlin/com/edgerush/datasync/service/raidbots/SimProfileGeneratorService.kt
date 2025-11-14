@@ -6,17 +6,18 @@ import org.springframework.stereotype.Service
 @Service
 class SimProfileGeneratorService {
     private val logger = LoggerFactory.getLogger(javaClass)
-    
+
     fun generateProfile(
         characterName: String,
         characterRealm: String,
-        region: String
+        region: String,
     ): String {
         logger.info("Generating SimC profile for $characterName-$characterRealm")
-        
+
         // Generate basic SimulationCraft profile
         // In production, this would fetch from Blizzard API or use WoWAudit data
-        val profile = """
+        val profile =
+            """
             ${characterName.lowercase()}="$characterName"
             level=70
             race=human
@@ -30,8 +31,8 @@ class SimProfileGeneratorService {
             # - Current gear with item IDs and bonus IDs
             # - Talents and covenant
             # - Consumables and buffs
-        """.trimIndent()
-        
+            """.trimIndent()
+
         return profile
     }
 }

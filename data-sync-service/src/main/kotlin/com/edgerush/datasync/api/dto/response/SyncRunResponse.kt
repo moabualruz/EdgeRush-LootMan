@@ -8,5 +8,5 @@ data class SyncRunResponse(
     val status: String,
     val startedAt: java.time.OffsetDateTime,
     val completedAt: java.time.OffsetDateTime?,
-    val message: String?
+    val message: String?,
 )

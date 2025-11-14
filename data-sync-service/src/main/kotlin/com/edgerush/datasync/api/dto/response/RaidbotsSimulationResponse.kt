@@ -12,5 +12,5 @@ data class RaidbotsSimulationResponse(
     val submittedAt: Instant,
     val completedAt: Instant?,
     val profile: String,
-    val simOptions: String
+    val simOptions: String,
 )

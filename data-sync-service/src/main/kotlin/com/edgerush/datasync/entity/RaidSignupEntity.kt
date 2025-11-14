@@ -17,5 +17,5 @@ data class RaidSignupEntity(
     val characterGuest: Boolean?,
     val status: String?,
     val comment: String?,
-    val selected: Boolean?
+    val selected: Boolean?,
 )

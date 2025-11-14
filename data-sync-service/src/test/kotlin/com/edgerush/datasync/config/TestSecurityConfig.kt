@@ -9,7 +9,6 @@ import org.springframework.security.web.SecurityFilterChain
 @TestConfiguration
 @EnableWebSecurity
 class TestSecurityConfig {
-
     @Bean
     fun testSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -18,7 +17,7 @@ class TestSecurityConfig {
             }
             .csrf { it.disable() }
             .oauth2Client { it.disable() }
-        
+
         return http.build()
     }
 }

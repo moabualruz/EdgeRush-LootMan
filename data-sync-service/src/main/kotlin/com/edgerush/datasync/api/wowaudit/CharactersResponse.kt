@@ -3,7 +3,7 @@ package com.edgerush.datasync.api.wowaudit
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class CharactersResponse(
-    val characters: List<CharacterDto>
+    val characters: List<CharacterDto>,
 )
 
 data class CharacterDto(
@@ -17,13 +17,13 @@ data class CharacterDto(
     val gear: GearDto,
     val statistics: StatisticsDto,
     val collectibles: CollectiblesDto,
-    val timestamps: TimestampDto
+    val timestamps: TimestampDto,
 )
 
 data class GearDto(
     val equipped: EquippedGearDto,
     val best: BestGearDto?,
-    val spark: SparkGearDto?
+    val spark: SparkGearDto?,
 )
 
 data class EquippedGearDto(
@@ -48,7 +48,7 @@ data class EquippedGearDto(
     @JsonProperty("main_hand")
     val mainHand: GearItemDto?,
     @JsonProperty("off_hand")
-    val offHand: GearItemDto?
+    val offHand: GearItemDto?,
 )
 
 data class BestGearDto(
@@ -73,7 +73,7 @@ data class BestGearDto(
     @JsonProperty("main_hand")
     val mainHand: GearItemDto?,
     @JsonProperty("off_hand")
-    val offHand: GearItemDto?
+    val offHand: GearItemDto?,
 )
 
 data class SparkGearDto(
@@ -98,7 +98,7 @@ data class SparkGearDto(
     @JsonProperty("main_hand")
     val mainHand: GearItemDto?,
     @JsonProperty("off_hand")
-    val offHand: GearItemDto?
+    val offHand: GearItemDto?,
 )
 
 data class GearItemDto(
@@ -113,7 +113,7 @@ data class GearItemDto(
     @JsonProperty("upgrade_level")
     val upgradeLevel: Int?,
     val sockets: Int?,
-    val name: String?
+    val name: String?,
 )
 
 data class StatisticsDto(
@@ -134,7 +134,7 @@ data class StatisticsDto(
     val renown: RenownDto?,
     val pvp: PvpDto?,
     val worldQuests: WorldQuestStatsDto?,
-    val raidProgress: RaidProgressDto?
+    val raidProgress: RaidProgressDto?,
 )
 
 data class WarcraftLogsDto(
@@ -142,7 +142,7 @@ data class WarcraftLogsDto(
     val raidFinder: Int?,
     val normal: Int?,
     val heroic: Int?,
-    val mythic: Int?
+    val mythic: Int?,
 )
 
 data class TrackItemsDto(
@@ -150,14 +150,14 @@ data class TrackItemsDto(
     val heroic: Int?,
     val normal: Int?,
     @JsonProperty("raid_finder")
-    val raidFinder: Int?
+    val raidFinder: Int?,
 )
 
 data class CrestCountsDto(
     val runed: Int?,
     val carved: Int?,
     val gilded: Int?,
-    val weathered: Int?
+    val weathered: Int?,
 )
 
 data class VaultSlotsDto(
@@ -166,7 +166,7 @@ data class VaultSlotsDto(
     @JsonProperty("slot_2")
     val slot2: Boolean?,
     @JsonProperty("slot_3")
-    val slot3: Boolean?
+    val slot3: Boolean?,
 )
 
 data class RenownDto(
@@ -179,7 +179,7 @@ data class RenownDto(
     @JsonProperty("severed_threads")
     val severedThreads: Int?,
     @JsonProperty("the_karesh_trust")
-    val theKareshTrust: Int?
+    val theKareshTrust: Int?,
 )
 
 data class PvpDto(
@@ -191,7 +191,7 @@ data class PvpDto(
     @JsonProperty("three_v_three")
     val threeVThree: BracketStatsDto?,
     @JsonProperty("rbg")
-    val ratedBattlegrounds: BracketStatsDto?
+    val ratedBattlegrounds: BracketStatsDto?,
 )
 
 data class ShuffleStatsDto(
@@ -199,7 +199,7 @@ data class ShuffleStatsDto(
     @JsonProperty("season_played")
     val seasonPlayed: Int?,
     @JsonProperty("week_played")
-    val weekPlayed: Int?
+    val weekPlayed: Int?,
 )
 
 data class BracketStatsDto(
@@ -209,14 +209,14 @@ data class BracketStatsDto(
     @JsonProperty("week_played")
     val weekPlayed: Int?,
     @JsonProperty("max_rating")
-    val maxRating: Int?
+    val maxRating: Int?,
 )
 
 data class WorldQuestStatsDto(
     @JsonProperty("done_total")
     val doneTotal: Int?,
     @JsonProperty("this_week")
-    val thisWeek: Int?
+    val thisWeek: Int?,
 )
 
 data class RaidProgressDto(
@@ -225,14 +225,14 @@ data class RaidProgressDto(
     @JsonProperty("liberation_of_undermine")
     val liberationOfUndermine: RaidDifficultyDto?,
     @JsonProperty("manaforge_omega")
-    val manaforgeOmega: RaidDifficultyDto?
+    val manaforgeOmega: RaidDifficultyDto?,
 )
 
 data class RaidDifficultyDto(
     val lfr: Int?,
     val normal: Int?,
     val heroic: Int?,
-    val mythic: Int?
+    val mythic: Int?,
 )
 
 data class CollectiblesDto(
@@ -241,12 +241,12 @@ data class CollectiblesDto(
     @JsonProperty("unique_pets")
     val uniquePets: Int?,
     @JsonProperty("lvl_25_pets")
-    val level25Pets: Int?
+    val level25Pets: Int?,
 )
 
 data class TimestampDto(
     @JsonProperty("join_date")
     val joinDate: String?,
     @JsonProperty("blizzard_last_modified")
-    val blizzardLastModified: String?
+    val blizzardLastModified: String?,
 )

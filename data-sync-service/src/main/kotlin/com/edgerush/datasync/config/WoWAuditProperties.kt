@@ -6,6 +6,5 @@ data class WoWAuditProperties(
     @DefaultValue("https://wowaudit.com")
     val baseUrl: String,
     val guildProfileUri: String?,
-    val apiKey: String?
+    val apiKey: String?,
 )
-

@@ -1,7 +1,5 @@
 package com.edgerush.datasync.service
 
-import com.edgerush.datasync.entity.BehavioralActionEntity
-import com.edgerush.datasync.entity.LootBanEntity
 import com.edgerush.datasync.repository.BehavioralActionRepository
 import com.edgerush.datasync.repository.LootBanRepository
 import org.slf4j.LoggerFactory
@@ -11,7 +9,7 @@ import java.time.LocalDateTime
 @Service
 class BehavioralScoreService(
     private val behavioralActionRepository: BehavioralActionRepository,
-    private val lootBanRepository: LootBanRepository
+    private val lootBanRepository: LootBanRepository,
 ) {
     private val logger = LoggerFactory.getLogger(BehavioralScoreService::class.java)
 
@@ -19,14 +17,20 @@ class BehavioralScoreService(
      * Calculate behavioral score for a character.
      * Default is 1.0 (perfect behavior) minus any active deductions.
      */
-    fun calculateBehavioralScore(guildId: String, characterName: String): Double {
+    fun calculateBehavioralScore(
+        guildId: String,
+        characterName: String,
+    ): Double {
         val currentTime = LocalDateTime.now()
-        val activeActions = behavioralActionRepository.findActiveActionsForCharacter(
-            guildId, characterName, currentTime
-        )
-        
+        val activeActions =
+            behavioralActionRepository.findActiveActionsForCharacter(
+                guildId,
+                characterName,
+                currentTime,
+            )
+
         var behavioralScore = 1.0 // Start with perfect behavior
-        
+
         activeActions.forEach { action ->
             when (action.actionType) {
                 "DEDUCTION" -> {
@@ -39,7 +43,7 @@ class BehavioralScoreService(
                 }
             }
         }
-        
+
         // Ensure score stays within bounds
         return behavioralScore.coerceIn(0.0, 1.0)
     }
@@ -47,19 +51,25 @@ class BehavioralScoreService(
     /**
      * Check if a character is currently banned from loot.
      */
-    fun isCharacterBannedFromLoot(guildId: String, characterName: String): LootBanInfo {
+    fun isCharacterBannedFromLoot(
+        guildId: String,
+        characterName: String,
+    ): LootBanInfo {
         val currentTime = LocalDateTime.now()
-        val activeBan = lootBanRepository.findActiveBanForCharacter(
-            guildId, characterName, currentTime
-        )
-        
+        val activeBan =
+            lootBanRepository.findActiveBanForCharacter(
+                guildId,
+                characterName,
+                currentTime,
+            )
+
         return if (activeBan != null) {
             LootBanInfo(
                 isBanned = true,
                 reason = activeBan.reason,
                 bannedBy = activeBan.bannedBy,
                 bannedAt = activeBan.bannedAt,
-                expiresAt = activeBan.expiresAt
+                expiresAt = activeBan.expiresAt,
             )
         } else {
             LootBanInfo(isBanned = false)
@@ -69,27 +79,34 @@ class BehavioralScoreService(
     /**
      * Get behavioral breakdown for a character including actions and ban status.
      */
-    fun getBehavioralBreakdown(guildId: String, characterName: String): BehavioralBreakdown {
+    fun getBehavioralBreakdown(
+        guildId: String,
+        characterName: String,
+    ): BehavioralBreakdown {
         val currentTime = LocalDateTime.now()
         val behavioralScore = calculateBehavioralScore(guildId, characterName)
         val lootBanInfo = isCharacterBannedFromLoot(guildId, characterName)
-        val activeActions = behavioralActionRepository.findActiveActionsForCharacter(
-            guildId, characterName, currentTime
-        )
-        
+        val activeActions =
+            behavioralActionRepository.findActiveActionsForCharacter(
+                guildId,
+                characterName,
+                currentTime,
+            )
+
         return BehavioralBreakdown(
             behavioralScore = behavioralScore,
             lootBanInfo = lootBanInfo,
-            activeActions = activeActions.map { action ->
-                BehavioralActionInfo(
-                    actionType = action.actionType,
-                    deductionAmount = action.deductionAmount,
-                    reason = action.reason,
-                    appliedBy = action.appliedBy,
-                    appliedAt = action.appliedAt,
-                    expiresAt = action.expiresAt
-                )
-            }
+            activeActions =
+                activeActions.map { action ->
+                    BehavioralActionInfo(
+                        actionType = action.actionType,
+                        deductionAmount = action.deductionAmount,
+                        reason = action.reason,
+                        appliedBy = action.appliedBy,
+                        appliedAt = action.appliedAt,
+                        expiresAt = action.expiresAt,
+                    )
+                },
         )
     }
 }
@@ -99,7 +116,7 @@ data class LootBanInfo(
     val reason: String? = null,
     val bannedBy: String? = null,
     val bannedAt: LocalDateTime? = null,
-    val expiresAt: LocalDateTime? = null
+    val expiresAt: LocalDateTime? = null,
 )
 
 data class BehavioralActionInfo(
@@ -108,11 +125,11 @@ data class BehavioralActionInfo(
     val reason: String,
     val appliedBy: String,
     val appliedAt: LocalDateTime,
-    val expiresAt: LocalDateTime?
+    val expiresAt: LocalDateTime?,
 )
 
 data class BehavioralBreakdown(
     val behavioralScore: Double,
     val lootBanInfo: LootBanInfo,
-    val activeActions: List<BehavioralActionInfo>
+    val activeActions: List<BehavioralActionInfo>,
 )

@@ -15,5 +15,5 @@ data class WarcraftLogsReportEntity(
     val owner: String?,
     val zone: Int?,
     val syncedAt: Instant,
-    val rawMetadata: String?
+    val rawMetadata: String?,
 )

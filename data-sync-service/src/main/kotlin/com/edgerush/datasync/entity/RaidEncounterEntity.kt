@@ -12,6 +12,5 @@ data class RaidEncounterEntity(
     val name: String?,
     val enabled: Boolean?,
     val extra: Boolean?,
-    val notes: String?
+    val notes: String?,
 )
-

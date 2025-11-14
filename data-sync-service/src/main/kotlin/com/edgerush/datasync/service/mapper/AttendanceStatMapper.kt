@@ -5,12 +5,10 @@ import com.edgerush.datasync.api.dto.request.UpdateAttendanceStatRequest
 import com.edgerush.datasync.api.dto.response.AttendanceStatResponse
 import com.edgerush.datasync.entity.AttendanceStatEntity
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 import java.time.OffsetDateTime
 
 @Component
 class AttendanceStatMapper {
-
     fun toEntity(request: CreateAttendanceStatRequest): AttendanceStatEntity {
         return AttendanceStatEntity(
             id = null,
@@ -37,7 +35,10 @@ class AttendanceStatMapper {
         )
     }
 
-    fun updateEntity(entity: AttendanceStatEntity, request: UpdateAttendanceStatRequest): AttendanceStatEntity {
+    fun updateEntity(
+        entity: AttendanceStatEntity,
+        request: UpdateAttendanceStatRequest,
+    ): AttendanceStatEntity {
         return entity.copy(
             instance = request.instance ?: entity.instance,
             encounter = request.encounter ?: entity.encounter,

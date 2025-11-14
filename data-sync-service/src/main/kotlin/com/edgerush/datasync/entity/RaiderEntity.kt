@@ -1,8 +1,8 @@
 package com.edgerush.datasync.entity
 
 import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Table
 import java.time.OffsetDateTime
 
 @Table("raiders")
@@ -29,5 +29,5 @@ data class RaiderEntity(
     val joinDate: OffsetDateTime?,
     @Column("blizzard_last_modified")
     val blizzardLastModified: OffsetDateTime?,
-    val lastSync: OffsetDateTime
+    val lastSync: OffsetDateTime,
 )

@@ -10,5 +10,5 @@ data class LootAwardWishDataEntity(
     val lootAwardId: Long,
     val specName: String?,
     val specIcon: String?,
-    val value: Int?
+    val value: Int?,
 )

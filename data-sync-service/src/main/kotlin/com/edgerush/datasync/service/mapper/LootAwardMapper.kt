@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class LootAwardMapper {
-
     fun toEntity(request: CreateLootAwardRequest): LootAwardEntity {
         return LootAwardEntity(
             id = null,
@@ -43,7 +42,10 @@ class LootAwardMapper {
         )
     }
 
-    fun updateEntity(entity: LootAwardEntity, request: UpdateLootAwardRequest): LootAwardEntity {
+    fun updateEntity(
+        entity: LootAwardEntity,
+        request: UpdateLootAwardRequest,
+    ): LootAwardEntity {
         return entity.copy(
             raiderId = request.raiderId ?: entity.raiderId,
             itemId = request.itemId ?: entity.itemId,

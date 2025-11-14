@@ -10,5 +10,5 @@ data class WarcraftLogsReport(
     val endTime: Long,
     val owner: String,
     val zone: Int,
-    val fights: List<WarcraftLogsFight> = emptyList()
+    val fights: List<WarcraftLogsFight> = emptyList(),
 )

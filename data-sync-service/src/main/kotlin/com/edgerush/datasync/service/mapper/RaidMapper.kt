@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class RaidMapper {
-    
     fun toEntity(request: CreateRaidRequest): RaidEntity {
         return RaidEntity(
             raidId = 0, // Will be generated
@@ -29,11 +28,14 @@ class RaidMapper {
             periodId = request.periodId,
             createdAt = OffsetDateTime.now(),
             updatedAt = OffsetDateTime.now(),
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
-    fun updateEntity(entity: RaidEntity, request: UpdateRaidRequest): RaidEntity {
+
+    fun updateEntity(
+        entity: RaidEntity,
+        request: UpdateRaidRequest,
+    ): RaidEntity {
         return entity.copy(
             date = request.date ?: entity.date,
             startTime = request.startTime ?: entity.startTime,
@@ -44,10 +46,10 @@ class RaidMapper {
             status = request.status ?: entity.status,
             notes = request.notes ?: entity.notes,
             updatedAt = OffsetDateTime.now(),
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
+
     fun toResponse(entity: RaidEntity): RaidResponse {
         return RaidResponse(
             raidId = entity.raidId,
@@ -64,7 +66,7 @@ class RaidMapper {
             teamId = entity.teamId,
             seasonId = entity.seasonId,
             periodId = entity.periodId,
-            syncedAt = entity.syncedAt
+            syncedAt = entity.syncedAt,
         )
     }
 }

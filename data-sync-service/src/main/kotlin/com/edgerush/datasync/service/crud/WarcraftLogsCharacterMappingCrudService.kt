@@ -3,12 +3,12 @@ package com.edgerush.datasync.service.crud
 import com.edgerush.datasync.api.dto.request.CreateWarcraftLogsCharacterMappingRequest
 import com.edgerush.datasync.api.dto.request.UpdateWarcraftLogsCharacterMappingRequest
 import com.edgerush.datasync.api.dto.response.WarcraftLogsCharacterMappingResponse
+import com.edgerush.datasync.api.exception.ResourceNotFoundException
 import com.edgerush.datasync.entity.warcraftlogs.WarcraftLogsCharacterMappingEntity
 import com.edgerush.datasync.repository.warcraftlogs.WarcraftLogsCharacterMappingRepository
-import com.edgerush.datasync.service.mapper.WarcraftLogsCharacterMappingMapper
 import com.edgerush.datasync.security.AuthenticatedUser
-import com.edgerush.datasync.api.exception.ResourceNotFoundException
 import com.edgerush.datasync.service.AuditLogger
+import com.edgerush.datasync.service.mapper.WarcraftLogsCharacterMappingMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,11 +17,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class WarcraftLogsCharacterMappingCrudService(
     private val repository: WarcraftLogsCharacterMappingRepository,
-    private val mapper: WarcraftLogsCharacterMappingMapper
-,
-    private val auditLogger: AuditLogger
+    private val mapper: WarcraftLogsCharacterMappingMapper,
+    private val auditLogger: AuditLogger,
 ) : CrudService<WarcraftLogsCharacterMappingEntity, Long, CreateWarcraftLogsCharacterMappingRequest, UpdateWarcraftLogsCharacterMappingRequest, WarcraftLogsCharacterMappingResponse> {
-
     override fun findAll(pageable: Pageable): Page<WarcraftLogsCharacterMappingResponse> {
         val allEntities = repository.findAll().toList()
         val start = (pageable.pageNumber * pageable.pageSize).coerceAtMost(allEntities.size)
@@ -30,48 +28,60 @@ class WarcraftLogsCharacterMappingCrudService(
         return org.springframework.data.domain.PageImpl(
             pageContent.map(mapper::toResponse),
             pageable,
-            allEntities.size.toLong()
+            allEntities.size.toLong(),
         )
     }
 
     override fun findById(id: Long): WarcraftLogsCharacterMappingResponse {
-        val entity = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("WarcraftLogsCharacterMapping not found with id: $id") }
+        val entity =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("WarcraftLogsCharacterMapping not found with id: $id") }
         return mapper.toResponse(entity)
     }
 
     @Transactional
-    override fun create(request: CreateWarcraftLogsCharacterMappingRequest, user: AuthenticatedUser): WarcraftLogsCharacterMappingResponse {
+    override fun create(
+        request: CreateWarcraftLogsCharacterMappingRequest,
+        user: AuthenticatedUser,
+    ): WarcraftLogsCharacterMappingResponse {
         val entity = mapper.toEntity(request)
         val saved = repository.save(entity)
 
         auditLogger.logCreate(
             entityType = "WarcraftLogsCharacterMapping",
             entityId = saved.id!!,
-            user = user
+            user = user,
         )
 
         return mapper.toResponse(saved)
     }
 
     @Transactional
-    override fun update(id: Long, request: UpdateWarcraftLogsCharacterMappingRequest, user: AuthenticatedUser): WarcraftLogsCharacterMappingResponse {
-        val existing = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("WarcraftLogsCharacterMapping not found with id: $id") }
+    override fun update(
+        id: Long,
+        request: UpdateWarcraftLogsCharacterMappingRequest,
+        user: AuthenticatedUser,
+    ): WarcraftLogsCharacterMappingResponse {
+        val existing =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("WarcraftLogsCharacterMapping not found with id: $id") }
         val updated = mapper.updateEntity(existing, request)
         val saved = repository.save(updated)
 
         auditLogger.logUpdate(
             entityType = "WarcraftLogsCharacterMapping",
             entityId = id,
-            user = user
+            user = user,
         )
 
         return mapper.toResponse(saved)
     }
 
     @Transactional
-    override fun delete(id: Long, user: AuthenticatedUser) {
+    override fun delete(
+        id: Long,
+        user: AuthenticatedUser,
+    ) {
         if (!repository.existsById(id)) {
             throw ResourceNotFoundException("WarcraftLogsCharacterMapping not found with id: $id")
         }
@@ -81,11 +91,14 @@ class WarcraftLogsCharacterMappingCrudService(
         auditLogger.logDelete(
             entityType = "WarcraftLogsCharacterMapping",
             entityId = id,
-            user = user
+            user = user,
         )
     }
 
-    override fun validateAccess(entity: WarcraftLogsCharacterMappingEntity, user: AuthenticatedUser) {
+    override fun validateAccess(
+        entity: WarcraftLogsCharacterMappingEntity,
+        user: AuthenticatedUser,
+    ) {
         // Add guild-based access control if needed
     }
 }

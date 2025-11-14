@@ -9,7 +9,6 @@ import java.time.Instant
  * Interface for Warcraft Logs API v2 client
  */
 interface WarcraftLogsClient {
-    
     /**
      * Fetches reports for a guild within a time range
      */
@@ -18,20 +17,20 @@ interface WarcraftLogsClient {
         realm: String,
         region: String,
         startTime: Instant,
-        endTime: Instant
+        endTime: Instant,
     ): List<WarcraftLogsReport>
-    
+
     /**
      * Fetches fight data for a specific report
      */
     suspend fun fetchFightData(reportCode: String): List<WarcraftLogsFight>
-    
+
     /**
      * Fetches character performance data for a specific fight
      */
     suspend fun fetchCharacterPerformance(
         reportCode: String,
         fightId: Int,
-        characterName: String
+        characterName: String,
     ): CharacterPerformanceData?
 }

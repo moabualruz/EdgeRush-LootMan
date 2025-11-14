@@ -18,5 +18,5 @@ data class GuildConfigurationResponse(
     val lastSyncError: String?,
     val timezone: String,
     val isActive: Boolean,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
 )

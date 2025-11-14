@@ -16,5 +16,5 @@ data class GuestEntity(
     val role: String?,
     val blizzardId: Long?,
     val trackingSince: OffsetDateTime?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

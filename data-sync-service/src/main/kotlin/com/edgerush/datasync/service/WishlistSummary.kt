@@ -4,6 +4,5 @@ data class WishlistSummary(
     val id: Long,
     val name: String,
     val realm: String,
-    val region: String
+    val region: String,
 )
-

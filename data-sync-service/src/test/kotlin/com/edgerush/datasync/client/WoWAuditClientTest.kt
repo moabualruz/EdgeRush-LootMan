@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 
 class WoWAuditClientTest {
-
     private lateinit var server: MockWebServer
     private lateinit var client: WoWAuditClient
 
@@ -21,19 +20,22 @@ class WoWAuditClientTest {
     fun setUp() {
         server = MockWebServer().apply { start() }
         val baseUrl = server.url("/").toString().removeSuffix("/")
-        val props = SyncProperties(
-            cron = "0 0 4 * * *",
-            runOnStartup = false,
-            wowaudit = WoWAuditProperties(
-                baseUrl = baseUrl,
-                guildProfileUri = "https://wowaudit.com/REGION/REALM/GUILD/profile",
-                apiKey = "test-key"
+        val props =
+            SyncProperties(
+                cron = "0 0 4 * * *",
+                runOnStartup = false,
+                wowaudit =
+                    WoWAuditProperties(
+                        baseUrl = baseUrl,
+                        guildProfileUri = "https://wowaudit.com/REGION/REALM/GUILD/profile",
+                        apiKey = "test-key",
+                    ),
             )
-        )
-        val webClient = WebClient.builder()
-            .baseUrl(baseUrl)
-            .defaultHeader("Authorization", "Bearer test-key")
-            .build()
+        val webClient =
+            WebClient.builder()
+                .baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer test-key")
+                .build()
         client = WoWAuditClient(webClient, props)
     }
 
@@ -81,15 +83,17 @@ class WoWAuditClientTest {
 
     @Test
     fun `requires guild profile uri`() {
-        val props = SyncProperties(
-            cron = "0 0 4 * * *",
-            runOnStartup = false,
-            wowaudit = WoWAuditProperties(
-                baseUrl = server.url("/").toString().removeSuffix("/"),
-                guildProfileUri = null,
-                apiKey = "test-key"
+        val props =
+            SyncProperties(
+                cron = "0 0 4 * * *",
+                runOnStartup = false,
+                wowaudit =
+                    WoWAuditProperties(
+                        baseUrl = server.url("/").toString().removeSuffix("/"),
+                        guildProfileUri = null,
+                        apiKey = "test-key",
+                    ),
             )
-        )
         val webClient = WebClient.create(server.url("/").toString())
         val brokenClient = WoWAuditClient(webClient, props)
 

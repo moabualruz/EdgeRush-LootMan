@@ -8,4 +8,3 @@ import org.springframework.stereotype.Repository
 interface RaidRepository : CrudRepository<RaidEntity, Long>, org.springframework.data.repository.PagingAndSortingRepository<RaidEntity, Long> {
     fun findByTeamId(teamId: Long): List<RaidEntity>
 }
-

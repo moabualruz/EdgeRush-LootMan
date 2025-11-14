@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class PeriodSnapshotMapper {
-
     fun toEntity(request: CreatePeriodSnapshotRequest): PeriodSnapshotEntity {
         return PeriodSnapshotEntity(
             id = null,
@@ -21,7 +20,10 @@ class PeriodSnapshotMapper {
         )
     }
 
-    fun updateEntity(entity: PeriodSnapshotEntity, request: UpdatePeriodSnapshotRequest): PeriodSnapshotEntity {
+    fun updateEntity(
+        entity: PeriodSnapshotEntity,
+        request: UpdatePeriodSnapshotRequest,
+    ): PeriodSnapshotEntity {
         return entity.copy(
             teamId = request.teamId ?: entity.teamId,
             seasonId = request.seasonId ?: entity.seasonId,

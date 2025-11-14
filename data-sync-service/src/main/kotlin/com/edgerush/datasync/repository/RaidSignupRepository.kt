@@ -6,4 +6,3 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RaidSignupRepository : CrudRepository<RaidSignupEntity, Long>
-

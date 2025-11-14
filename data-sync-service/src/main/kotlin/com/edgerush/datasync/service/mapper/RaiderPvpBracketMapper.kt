@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderPvpBracketMapper {
-
     fun toEntity(request: CreateRaiderPvpBracketRequest): RaiderPvpBracketEntity {
         return RaiderPvpBracketEntity(
             id = null,
@@ -17,13 +16,15 @@ class RaiderPvpBracketMapper {
             rating = 0, // System populated
             seasonPlayed = 0, // System populated
             weekPlayed = 0, // System populated
-            maxRating = 0 // System populated
+            maxRating = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderPvpBracketEntity, request: UpdateRaiderPvpBracketRequest): RaiderPvpBracketEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderPvpBracketEntity,
+        request: UpdateRaiderPvpBracketRequest,
+    ): RaiderPvpBracketEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderPvpBracketEntity): RaiderPvpBracketResponse {

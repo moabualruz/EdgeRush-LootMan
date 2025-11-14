@@ -12,5 +12,5 @@ data class WarcraftLogsConfigResponse(
     val encryptedClientSecret: String?,
     val configJson: String,
     val updatedAt: Instant,
-    val updatedBy: String?
+    val updatedBy: String?,
 )

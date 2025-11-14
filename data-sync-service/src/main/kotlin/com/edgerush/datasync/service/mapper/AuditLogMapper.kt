@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 
 @Component
 class AuditLogMapper {
-
     fun toEntity(request: CreateAuditLogRequest): AuditLogEntity {
         return AuditLogEntity(
             id = null,
@@ -24,7 +23,10 @@ class AuditLogMapper {
         )
     }
 
-    fun updateEntity(entity: AuditLogEntity, request: UpdateAuditLogRequest): AuditLogEntity {
+    fun updateEntity(
+        entity: AuditLogEntity,
+        request: UpdateAuditLogRequest,
+    ): AuditLogEntity {
         return entity.copy(
             timestamp = request.timestamp ?: entity.timestamp,
             operation = request.operation ?: entity.operation,

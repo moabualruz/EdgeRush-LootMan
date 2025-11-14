@@ -16,7 +16,7 @@ data class CreateRaidRequest(
     val notes: String? = null,
     val teamId: Long? = null,
     val seasonId: Long? = null,
-    val periodId: Long? = null
+    val periodId: Long? = null,
 )
 
 data class UpdateRaidRequest(
@@ -27,5 +27,5 @@ data class UpdateRaidRequest(
     val difficulty: String? = null,
     val optional: Boolean? = null,
     val status: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
 )

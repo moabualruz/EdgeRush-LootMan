@@ -3,12 +3,12 @@ package com.edgerush.datasync.service.crud
 import com.edgerush.datasync.api.dto.request.CreateTeamRaidDayRequest
 import com.edgerush.datasync.api.dto.request.UpdateTeamRaidDayRequest
 import com.edgerush.datasync.api.dto.response.TeamRaidDayResponse
+import com.edgerush.datasync.api.exception.ResourceNotFoundException
 import com.edgerush.datasync.entity.TeamRaidDayEntity
 import com.edgerush.datasync.repository.TeamRaidDayRepository
-import com.edgerush.datasync.service.mapper.TeamRaidDayMapper
 import com.edgerush.datasync.security.AuthenticatedUser
-import com.edgerush.datasync.api.exception.ResourceNotFoundException
 import com.edgerush.datasync.service.AuditLogger
+import com.edgerush.datasync.service.mapper.TeamRaidDayMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,11 +17,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TeamRaidDayCrudService(
     private val repository: TeamRaidDayRepository,
-    private val mapper: TeamRaidDayMapper
-,
-    private val auditLogger: AuditLogger
+    private val mapper: TeamRaidDayMapper,
+    private val auditLogger: AuditLogger,
 ) : CrudService<TeamRaidDayEntity, Long, CreateTeamRaidDayRequest, UpdateTeamRaidDayRequest, TeamRaidDayResponse> {
-
     override fun findAll(pageable: Pageable): Page<TeamRaidDayResponse> {
         val allEntities = repository.findAll().toList()
         val start = (pageable.pageNumber * pageable.pageSize).coerceAtMost(allEntities.size)
@@ -30,48 +28,60 @@ class TeamRaidDayCrudService(
         return org.springframework.data.domain.PageImpl(
             pageContent.map(mapper::toResponse),
             pageable,
-            allEntities.size.toLong()
+            allEntities.size.toLong(),
         )
     }
 
     override fun findById(id: Long): TeamRaidDayResponse {
-        val entity = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("TeamRaidDay not found with id: $id") }
+        val entity =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("TeamRaidDay not found with id: $id") }
         return mapper.toResponse(entity)
     }
 
     @Transactional
-    override fun create(request: CreateTeamRaidDayRequest, user: AuthenticatedUser): TeamRaidDayResponse {
+    override fun create(
+        request: CreateTeamRaidDayRequest,
+        user: AuthenticatedUser,
+    ): TeamRaidDayResponse {
         val entity = mapper.toEntity(request)
         val saved = repository.save(entity)
 
         auditLogger.logCreate(
             entityType = "TeamRaidDay",
             entityId = saved.id!!,
-            user = user
+            user = user,
         )
 
         return mapper.toResponse(saved)
     }
 
     @Transactional
-    override fun update(id: Long, request: UpdateTeamRaidDayRequest, user: AuthenticatedUser): TeamRaidDayResponse {
-        val existing = repository.findById(id)
-            .orElseThrow { ResourceNotFoundException("TeamRaidDay not found with id: $id") }
+    override fun update(
+        id: Long,
+        request: UpdateTeamRaidDayRequest,
+        user: AuthenticatedUser,
+    ): TeamRaidDayResponse {
+        val existing =
+            repository.findById(id)
+                .orElseThrow { ResourceNotFoundException("TeamRaidDay not found with id: $id") }
         val updated = mapper.updateEntity(existing, request)
         val saved = repository.save(updated)
 
         auditLogger.logUpdate(
             entityType = "TeamRaidDay",
             entityId = id,
-            user = user
+            user = user,
         )
 
         return mapper.toResponse(saved)
     }
 
     @Transactional
-    override fun delete(id: Long, user: AuthenticatedUser) {
+    override fun delete(
+        id: Long,
+        user: AuthenticatedUser,
+    ) {
         if (!repository.existsById(id)) {
             throw ResourceNotFoundException("TeamRaidDay not found with id: $id")
         }
@@ -81,11 +91,14 @@ class TeamRaidDayCrudService(
         auditLogger.logDelete(
             entityType = "TeamRaidDay",
             entityId = id,
-            user = user
+            user = user,
         )
     }
 
-    override fun validateAccess(entity: TeamRaidDayEntity, user: AuthenticatedUser) {
+    override fun validateAccess(
+        entity: TeamRaidDayEntity,
+        user: AuthenticatedUser,
+    ) {
         // Add guild-based access control if needed
     }
 }

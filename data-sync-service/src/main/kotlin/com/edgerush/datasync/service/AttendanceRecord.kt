@@ -22,28 +22,29 @@ data class AttendanceRecord(
     val selectedPercentage: Double?,
     val teamId: Long?,
     val seasonId: Long?,
-    val periodId: Long?
+    val periodId: Long?,
 ) {
-    fun toEntity(): AttendanceStatEntity = AttendanceStatEntity(
-        instance = instance,
-        encounter = encounter,
-        startDate = parseLocalDate(startDate),
-        endDate = parseLocalDate(endDate),
-        characterId = characterId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterRegion = characterRegion,
-        characterClass = characterClass,
-        characterRole = characterRole,
-        attendedAmountOfRaids = attendedAmountOfRaids,
-        totalAmountOfRaids = totalAmountOfRaids,
-        attendedPercentage = attendedPercentage,
-        selectedAmountOfEncounters = selectedAmountOfEncounters,
-        totalAmountOfEncounters = totalAmountOfEncounters,
-        selectedPercentage = selectedPercentage,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        syncedAt = OffsetDateTime.now()
-    )
+    fun toEntity(): AttendanceStatEntity =
+        AttendanceStatEntity(
+            instance = instance,
+            encounter = encounter,
+            startDate = parseLocalDate(startDate),
+            endDate = parseLocalDate(endDate),
+            characterId = characterId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterRegion = characterRegion,
+            characterClass = characterClass,
+            characterRole = characterRole,
+            attendedAmountOfRaids = attendedAmountOfRaids,
+            totalAmountOfRaids = totalAmountOfRaids,
+            attendedPercentage = attendedPercentage,
+            selectedAmountOfEncounters = selectedAmountOfEncounters,
+            totalAmountOfEncounters = totalAmountOfEncounters,
+            selectedPercentage = selectedPercentage,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            syncedAt = OffsetDateTime.now(),
+        )
 }

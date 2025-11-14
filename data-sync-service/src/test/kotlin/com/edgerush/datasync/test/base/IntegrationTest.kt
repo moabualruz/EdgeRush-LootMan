@@ -49,16 +49,16 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 @ActiveProfiles("test")
 abstract class IntegrationTest {
-
     companion object {
         @Container
         @JvmStatic
-        val postgres: PostgreSQLContainer<Nothing> = PostgreSQLContainer<Nothing>("postgres:18").apply {
-            withDatabaseName("lootman_test")
-            withUsername("test")
-            withPassword("test")
-            withReuse(true)
-        }
+        val postgres: PostgreSQLContainer<Nothing> =
+            PostgreSQLContainer<Nothing>("postgres:18").apply {
+                withDatabaseName("lootman_test")
+                withUsername("test")
+                withPassword("test")
+                withReuse(true)
+            }
 
         @DynamicPropertySource
         @JvmStatic
@@ -80,14 +80,15 @@ abstract class IntegrationTest {
     @BeforeEach
     fun cleanDatabase() {
         // Clean all tables except flyway_schema_history
-        val tables = jdbcTemplate.queryForList(
-            """
+        val tables =
+            jdbcTemplate.queryForList(
+                """
             SELECT tablename FROM pg_tables 
             WHERE schemaname = 'public' 
             AND tablename != 'flyway_schema_history'
             """,
-            String::class.java
-        )
+                String::class.java,
+            )
 
         tables.forEach { table ->
             jdbcTemplate.execute("TRUNCATE TABLE $table CASCADE")

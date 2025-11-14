@@ -10,15 +10,13 @@ import reactor.core.publisher.Mono
 @Component
 class WoWAuditClient(
     private val webClient: WebClient,
-    private val properties: SyncProperties
+    private val properties: SyncProperties,
 ) {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun fetchRoster(): Mono<String> = get("/v1/characters")
 
-    fun fetchLootHistory(seasonId: Long): Mono<String> =
-        get("/v1/loot_history/$seasonId")
+    fun fetchLootHistory(seasonId: Long): Mono<String> = get("/v1/loot_history/$seasonId")
 
     fun fetchWishlists(): Mono<String> = get("/v1/wishlists")
 
@@ -30,13 +28,11 @@ class WoWAuditClient(
 
     fun fetchAttendance(): Mono<String> = get("/v1/attendance")
 
-    fun fetchRaids(includePast: Boolean = true): Mono<String> =
-        get(if (includePast) "/v1/raids?include_past=true" else "/v1/raids")
+    fun fetchRaids(includePast: Boolean = true): Mono<String> = get(if (includePast) "/v1/raids?include_past=true" else "/v1/raids")
 
     fun fetchRaidDetail(id: Long): Mono<String> = get("/v1/raids/$id")
 
-    fun fetchHistoricalData(periodId: Long): Mono<String> =
-        get("/v1/historical_data?period=$periodId")
+    fun fetchHistoricalData(periodId: Long): Mono<String> = get("/v1/historical_data?period=$periodId")
 
     fun fetchCharacterHistory(characterId: Long): Mono<String> = get("/v1/historical_data/$characterId")
 

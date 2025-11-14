@@ -17,5 +17,5 @@ data class RaiderPvpBracketEntity(
     @Column("week_played")
     val weekPlayed: Int?,
     @Column("max_rating")
-    val maxRating: Int?
+    val maxRating: Int?,
 )

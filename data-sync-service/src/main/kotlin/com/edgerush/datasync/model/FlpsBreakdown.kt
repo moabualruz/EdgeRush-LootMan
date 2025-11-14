@@ -13,6 +13,5 @@ data class FlpsBreakdown(
     val ipi: Double,
     val rdf: Double,
     val flps: Double,
-    val eligible: Boolean
+    val eligible: Boolean,
 )
-

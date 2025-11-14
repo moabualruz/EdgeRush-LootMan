@@ -33,5 +33,5 @@ data class LootAwardEntity(
     val discarded: Boolean?,
     val characterId: Long?,
     val awardedByCharacterId: Long?,
-    val awardedByName: String?
+    val awardedByName: String?,
 )

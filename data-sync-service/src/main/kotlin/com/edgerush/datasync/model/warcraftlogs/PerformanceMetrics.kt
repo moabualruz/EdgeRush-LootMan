@@ -10,5 +10,5 @@ data class PerformanceMetrics(
     val totalAttempts: Int,
     val deathsPerAttempt: Double,
     val averageAvoidableDamagePercentage: Double,
-    val fightCount: Int
+    val fightCount: Int,
 )

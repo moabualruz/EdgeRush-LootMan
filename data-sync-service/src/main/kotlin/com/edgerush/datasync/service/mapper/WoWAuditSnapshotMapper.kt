@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class WoWAuditSnapshotMapper {
-
     fun toEntity(request: CreateWoWAuditSnapshotRequest): WoWAuditSnapshotEntity {
         return WoWAuditSnapshotEntity(
             id = null,
@@ -19,7 +18,10 @@ class WoWAuditSnapshotMapper {
         )
     }
 
-    fun updateEntity(entity: WoWAuditSnapshotEntity, request: UpdateWoWAuditSnapshotRequest): WoWAuditSnapshotEntity {
+    fun updateEntity(
+        entity: WoWAuditSnapshotEntity,
+        request: UpdateWoWAuditSnapshotRequest,
+    ): WoWAuditSnapshotEntity {
         return entity.copy(
             endpoint = request.endpoint ?: entity.endpoint,
             rawPayload = request.rawPayload ?: entity.rawPayload,

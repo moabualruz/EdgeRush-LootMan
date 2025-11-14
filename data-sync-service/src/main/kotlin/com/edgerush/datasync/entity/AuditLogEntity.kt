@@ -15,5 +15,5 @@ data class AuditLogEntity(
     val userId: String,
     val username: String,
     val isAdminMode: Boolean,
-    val requestId: String?
+    val requestId: String?,
 )

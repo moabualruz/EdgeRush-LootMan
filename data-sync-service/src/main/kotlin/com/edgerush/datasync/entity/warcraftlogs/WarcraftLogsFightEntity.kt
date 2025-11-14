@@ -14,5 +14,5 @@ data class WarcraftLogsFightEntity(
     val kill: Boolean,
     val startTime: Long,
     val endTime: Long,
-    val bossPercentage: Double?
+    val bossPercentage: Double?,
 )

@@ -8,19 +8,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderVaultSlotMapper {
-
     fun toEntity(request: CreateRaiderVaultSlotRequest): RaiderVaultSlotEntity {
         return RaiderVaultSlotEntity(
             id = null,
             raiderId = 0L, // System populated
             slot = "", // System populated - String type
-            unlocked = false // System populated
+            unlocked = false, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderVaultSlotEntity, request: UpdateRaiderVaultSlotRequest): RaiderVaultSlotEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderVaultSlotEntity,
+        request: UpdateRaiderVaultSlotRequest,
+    ): RaiderVaultSlotEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderVaultSlotEntity): RaiderVaultSlotResponse {

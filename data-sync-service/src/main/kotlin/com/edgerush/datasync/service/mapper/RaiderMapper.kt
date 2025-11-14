@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderMapper {
-
     fun toEntity(request: CreateRaiderRequest): RaiderEntity {
         return RaiderEntity(
             id = null,
@@ -26,11 +25,14 @@ class RaiderMapper {
             trackingSince = java.time.OffsetDateTime.now(), // System populated - non-null
             joinDate = null, // System populated
             blizzardLastModified = null, // System populated
-            lastSync = java.time.OffsetDateTime.now() // System populated - non-null
+            lastSync = java.time.OffsetDateTime.now(), // System populated - non-null
         )
     }
 
-    fun updateEntity(entity: RaiderEntity, request: UpdateRaiderRequest): RaiderEntity {
+    fun updateEntity(
+        entity: RaiderEntity,
+        request: UpdateRaiderRequest,
+    ): RaiderEntity {
         return entity.copy(
             characterName = request.characterName ?: entity.characterName,
             realm = request.realm ?: entity.realm,

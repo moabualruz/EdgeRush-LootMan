@@ -7,5 +7,5 @@ data class PagedResponse<T>(
     val totalElements: Long,
     val totalPages: Int,
     val isFirst: Boolean,
-    val isLast: Boolean
+    val isLast: Boolean,
 )

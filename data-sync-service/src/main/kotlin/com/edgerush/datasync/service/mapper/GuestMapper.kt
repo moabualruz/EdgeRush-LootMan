@@ -9,8 +9,10 @@ import java.time.OffsetDateTime
 
 @Component
 class GuestMapper {
-    
-    fun toEntity(request: CreateGuestRequest, guestId: Long): GuestEntity {
+    fun toEntity(
+        request: CreateGuestRequest,
+        guestId: Long,
+    ): GuestEntity {
         return GuestEntity(
             guestId = guestId,
             name = request.name,
@@ -19,11 +21,14 @@ class GuestMapper {
             role = request.role,
             blizzardId = request.blizzardId,
             trackingSince = request.trackingSince,
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
-    fun toEntity(existing: GuestEntity, request: UpdateGuestRequest): GuestEntity {
+
+    fun toEntity(
+        existing: GuestEntity,
+        request: UpdateGuestRequest,
+    ): GuestEntity {
         return existing.copy(
             name = request.name ?: existing.name,
             realm = request.realm ?: existing.realm,
@@ -31,10 +36,10 @@ class GuestMapper {
             role = request.role ?: existing.role,
             blizzardId = request.blizzardId ?: existing.blizzardId,
             trackingSince = request.trackingSince ?: existing.trackingSince,
-            syncedAt = OffsetDateTime.now()
+            syncedAt = OffsetDateTime.now(),
         )
     }
-    
+
     fun toResponse(entity: GuestEntity): GuestResponse {
         return GuestResponse(
             guestId = entity.guestId,
@@ -44,7 +49,7 @@ class GuestMapper {
             role = entity.role,
             blizzardId = entity.blizzardId,
             trackingSince = entity.trackingSince,
-            syncedAt = entity.syncedAt
+            syncedAt = entity.syncedAt,
         )
     }
 }

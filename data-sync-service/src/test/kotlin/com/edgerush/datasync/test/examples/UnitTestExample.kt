@@ -1,10 +1,10 @@
 package com.edgerush.datasync.test.examples
 
 import com.edgerush.datasync.test.base.UnitTest
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 /**
@@ -18,16 +18,25 @@ import org.junit.jupiter.api.Test
  * - How to verify mock interactions
  */
 class UnitTestExample : UnitTest() {
-
     // Example service interface
     interface Calculator {
-        fun add(a: Int, b: Int): Int
-        fun multiply(a: Int, b: Int): Int
+        fun add(
+            a: Int,
+            b: Int,
+        ): Int
+
+        fun multiply(
+            a: Int,
+            b: Int,
+        ): Int
     }
 
     // Example service that depends on Calculator
     class MathService(private val calculator: Calculator) {
-        fun calculate(a: Int, b: Int): Int {
+        fun calculate(
+            a: Int,
+            b: Int,
+        ): Int {
             val sum = calculator.add(a, b)
             return calculator.multiply(sum, 2)
         }

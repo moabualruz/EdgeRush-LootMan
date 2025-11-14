@@ -25,5 +25,5 @@ data class ApplicationEntity(
     val mainCharacterFaction: String?,
     val mainCharacterLevel: Int?,
     val mainCharacterRegion: String?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

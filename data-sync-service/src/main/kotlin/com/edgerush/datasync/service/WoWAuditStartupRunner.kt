@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component
 @Component
 class WoWAuditStartupRunner(
     private val properties: SyncProperties,
-    private val syncService: WoWAuditSyncService
+    private val syncService: WoWAuditSyncService,
 ) : CommandLineRunner {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     override fun run(vararg args: String?) {

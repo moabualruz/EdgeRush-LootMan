@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaidSignupMapper {
-
     fun toEntity(request: CreateRaidSignupRequest): RaidSignupEntity {
         return RaidSignupEntity(
             id = null,
@@ -26,7 +25,10 @@ class RaidSignupMapper {
         )
     }
 
-    fun updateEntity(entity: RaidSignupEntity, request: UpdateRaidSignupRequest): RaidSignupEntity {
+    fun updateEntity(
+        entity: RaidSignupEntity,
+        request: UpdateRaidSignupRequest,
+    ): RaidSignupEntity {
         return entity.copy(
             raidId = request.raidId ?: entity.raidId,
             characterId = request.characterId ?: entity.characterId,

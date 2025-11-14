@@ -14,8 +14,6 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import java.net.URI
 import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.math.roundToInt
@@ -44,11 +42,11 @@ class WoWAuditSyncService(
     private val teamRaidDayRepository: TeamRaidDayRepository,
     private val periodSnapshotRepository: PeriodSnapshotRepository,
     private val snapshotRepository: WoWAuditSnapshotRepository,
-    private val syncRunService: SyncRunService
+    private val syncRunService: SyncRunService,
 ) {
-
-    private val objectMapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun syncRoster(): Mono<Void> {
@@ -76,26 +74,30 @@ class WoWAuditSyncService(
             .then()
     }
 
-    private fun collectGearItems(node: JsonNode?, setName: String): List<RaiderGearItemRecord> {
+    private fun collectGearItems(
+        node: JsonNode?,
+        setName: String,
+    ): List<RaiderGearItemRecord> {
         if (node == null || node.isMissingNode || node.isNull) return emptyList()
-        val slots = listOf(
-            "head",
-            "neck",
-            "shoulder",
-            "back",
-            "chest",
-            "wrist",
-            "hands",
-            "waist",
-            "legs",
-            "feet",
-            "finger_1",
-            "finger_2",
-            "trinket_1",
-            "trinket_2",
-            "main_hand",
-            "off_hand"
-        )
+        val slots =
+            listOf(
+                "head",
+                "neck",
+                "shoulder",
+                "back",
+                "chest",
+                "wrist",
+                "hands",
+                "waist",
+                "legs",
+                "feet",
+                "finger_1",
+                "finger_2",
+                "trinket_1",
+                "trinket_2",
+                "main_hand",
+                "off_hand",
+            )
         return slots.mapNotNull { slot ->
             val slotNode = node.path(slot)
             if (!slotNode.isObject) return@mapNotNull null
@@ -120,7 +122,7 @@ class WoWAuditSyncService(
                     enchantQuality = enchantQuality,
                     upgradeLevel = upgradeLevel,
                     sockets = sockets,
-                    name = name
+                    name = name,
                 )
             }
         }
@@ -134,8 +136,9 @@ class WoWAuditSyncService(
         val weeklyHighest = statisticsNode.path("weekly_highest_mplus").asIntOrNull()
         val seasonHighest = statisticsNode.path("season_highest_mplus").asIntOrNull()
 
-        val worldQuestsNode = statisticsNode.path("worldQuests").takeIf { it.isObject }
-            ?: statisticsNode.path("world_quests").takeIf { it.isObject }
+        val worldQuestsNode =
+            statisticsNode.path("worldQuests").takeIf { it.isObject }
+                ?: statisticsNode.path("world_quests").takeIf { it.isObject }
         val worldQuestsTotal = worldQuestsNode?.path("done_total")?.asIntOrNull()
         val worldQuestsThisWeek = worldQuestsNode?.path("this_week")?.asIntOrNull()
 
@@ -146,85 +149,95 @@ class WoWAuditSyncService(
 
         val honorLevel = statisticsNode.path("pvp").path("honor_level").asIntOrNull()
 
-        val warcraftLogs = statisticsNode.path("wcl").takeIf { it.isObject }?.let { wcl ->
-            listOf(
-                "raid_finder" to wcl.path("raid_finder").asIntOrNull(),
-                "normal" to wcl.path("normal").asIntOrNull(),
-                "heroic" to wcl.path("heroic").asIntOrNull(),
-                "mythic" to wcl.path("mythic").asIntOrNull()
-            ).mapNotNull { (difficulty, score) ->
-                if (score == null) null else WarcraftLogRecord(difficulty = difficulty, score = score)
-            }
-        } ?: emptyList()
+        val warcraftLogs =
+            statisticsNode.path("wcl").takeIf { it.isObject }?.let { wcl ->
+                listOf(
+                    "raid_finder" to wcl.path("raid_finder").asIntOrNull(),
+                    "normal" to wcl.path("normal").asIntOrNull(),
+                    "heroic" to wcl.path("heroic").asIntOrNull(),
+                    "mythic" to wcl.path("mythic").asIntOrNull(),
+                ).mapNotNull { (difficulty, score) ->
+                    if (score == null) null else WarcraftLogRecord(difficulty = difficulty, score = score)
+                }
+            } ?: emptyList()
 
-        val trackItemsNode = statisticsNode.path("trackItems").takeIf { it.isObject }
-            ?: statisticsNode.path("track_items").takeIf { it.isObject }
-        val trackItemsRecords = trackItemsNode?.let { track ->
-            listOf(
-                "mythic" to track.path("mythic").asIntOrNull(),
-                "heroic" to track.path("heroic").asIntOrNull(),
-                "normal" to track.path("normal").asIntOrNull(),
-                "raid_finder" to track.path("raid_finder").asIntOrNull()
-            ).mapNotNull { (tier, count) ->
-                if (count == null) null else TrackItemRecord(tier = tier, itemCount = count)
-            }
-        } ?: emptyList()
+        val trackItemsNode =
+            statisticsNode.path("trackItems").takeIf { it.isObject }
+                ?: statisticsNode.path("track_items").takeIf { it.isObject }
+        val trackItemsRecords =
+            trackItemsNode?.let { track ->
+                listOf(
+                    "mythic" to track.path("mythic").asIntOrNull(),
+                    "heroic" to track.path("heroic").asIntOrNull(),
+                    "normal" to track.path("normal").asIntOrNull(),
+                    "raid_finder" to track.path("raid_finder").asIntOrNull(),
+                ).mapNotNull { (tier, count) ->
+                    if (count == null) null else TrackItemRecord(tier = tier, itemCount = count)
+                }
+            } ?: emptyList()
 
-        val crestCountsNode = statisticsNode.path("crestCounts").takeIf { it.isObject }
-            ?: statisticsNode.path("crest_counts").takeIf { it.isObject }
-        val crestRecords = crestCountsNode?.let { crest ->
-            listOf(
-                "runed" to crest.path("runed").asIntOrNull(),
-                "carved" to crest.path("carved").asIntOrNull(),
-                "gilded" to crest.path("gilded").asIntOrNull(),
-                "weathered" to crest.path("weathered").asIntOrNull()
-            ).mapNotNull { (type, count) ->
-                if (count == null) null else CrestCountRecord(crestType = type, count = count)
-            }
-        } ?: emptyList()
+        val crestCountsNode =
+            statisticsNode.path("crestCounts").takeIf { it.isObject }
+                ?: statisticsNode.path("crest_counts").takeIf { it.isObject }
+        val crestRecords =
+            crestCountsNode?.let { crest ->
+                listOf(
+                    "runed" to crest.path("runed").asIntOrNull(),
+                    "carved" to crest.path("carved").asIntOrNull(),
+                    "gilded" to crest.path("gilded").asIntOrNull(),
+                    "weathered" to crest.path("weathered").asIntOrNull(),
+                ).mapNotNull { (type, count) ->
+                    if (count == null) null else CrestCountRecord(crestType = type, count = count)
+                }
+            } ?: emptyList()
 
-        val vaultSlotsNode = statisticsNode.path("vaultSlots").takeIf { it.isObject }
-            ?: statisticsNode.path("vault_slots").takeIf { it.isObject }
-        val vaultSlotsRecords = vaultSlotsNode?.let { slots ->
-            listOf(
-                "slot_1" to slots.path("slot_1").asBooleanOrNull(),
-                "slot_2" to slots.path("slot_2").asBooleanOrNull(),
-                "slot_3" to slots.path("slot_3").asBooleanOrNull()
-            ).mapNotNull { (slot, unlocked) ->
-                if (unlocked == null) null else VaultSlotRecord(slot = slot, unlocked = unlocked)
-            }
-        } ?: emptyList()
+        val vaultSlotsNode =
+            statisticsNode.path("vaultSlots").takeIf { it.isObject }
+                ?: statisticsNode.path("vault_slots").takeIf { it.isObject }
+        val vaultSlotsRecords =
+            vaultSlotsNode?.let { slots ->
+                listOf(
+                    "slot_1" to slots.path("slot_1").asBooleanOrNull(),
+                    "slot_2" to slots.path("slot_2").asBooleanOrNull(),
+                    "slot_3" to slots.path("slot_3").asBooleanOrNull(),
+                ).mapNotNull { (slot, unlocked) ->
+                    if (unlocked == null) null else VaultSlotRecord(slot = slot, unlocked = unlocked)
+                }
+            } ?: emptyList()
 
-        val renownRecords = statisticsNode.path("renown").takeIf { it.isObject }?.let { renown ->
-            listOf(
-                "assembly_of_the_deeps" to renown.path("assembly_of_the_deeps").asIntOrNull(),
-                "council_of_dornogal" to renown.path("council_of_dornogal").asIntOrNull(),
-                "hallowfall_arathi" to renown.path("hallowfall_arathi").asIntOrNull(),
-                "severed_threads" to renown.path("severed_threads").asIntOrNull(),
-                "the_karesh_trust" to renown.path("the_karesh_trust").asIntOrNull()
-            ).mapNotNull { (faction, level) ->
-                if (level == null) null else RenownRecord(faction = faction, level = level)
-            }
-        } ?: emptyList()
+        val renownRecords =
+            statisticsNode.path("renown").takeIf { it.isObject }?.let { renown ->
+                listOf(
+                    "assembly_of_the_deeps" to renown.path("assembly_of_the_deeps").asIntOrNull(),
+                    "council_of_dornogal" to renown.path("council_of_dornogal").asIntOrNull(),
+                    "hallowfall_arathi" to renown.path("hallowfall_arathi").asIntOrNull(),
+                    "severed_threads" to renown.path("severed_threads").asIntOrNull(),
+                    "the_karesh_trust" to renown.path("the_karesh_trust").asIntOrNull(),
+                ).mapNotNull { (faction, level) ->
+                    if (level == null) null else RenownRecord(faction = faction, level = level)
+                }
+            } ?: emptyList()
 
-        val raidProgressNode = statisticsNode.path("raidProgress").takeIf { it.isObject }
-            ?: statisticsNode.path("raid_progress").takeIf { it.isObject }
+        val raidProgressNode =
+            statisticsNode.path("raidProgress").takeIf { it.isObject }
+                ?: statisticsNode.path("raid_progress").takeIf { it.isObject }
         val raidProgressRecords = parseRaidProgress(raidProgressNode)
 
-        val hasData = listOfNotNull(
-            mythicPlusScore,
-            weeklyHighest,
-            seasonHighest,
-            worldQuestsTotal,
-            worldQuestsThisWeek,
-            collectiblesMounts,
-            collectiblesToys,
-            collectiblesUniquePets,
-            collectiblesLevel25Pets,
-            honorLevel
-        ).isNotEmpty() || warcraftLogs.isNotEmpty() || trackItemsRecords.isNotEmpty() ||
-            crestRecords.isNotEmpty() || vaultSlotsRecords.isNotEmpty() || renownRecords.isNotEmpty() ||
-            raidProgressRecords.isNotEmpty()
+        val hasData =
+            listOfNotNull(
+                mythicPlusScore,
+                weeklyHighest,
+                seasonHighest,
+                worldQuestsTotal,
+                worldQuestsThisWeek,
+                collectiblesMounts,
+                collectiblesToys,
+                collectiblesUniquePets,
+                collectiblesLevel25Pets,
+                honorLevel,
+            ).isNotEmpty() || warcraftLogs.isNotEmpty() || trackItemsRecords.isNotEmpty() ||
+                crestRecords.isNotEmpty() || vaultSlotsRecords.isNotEmpty() || renownRecords.isNotEmpty() ||
+                raidProgressRecords.isNotEmpty()
 
         if (!hasData) {
             return null
@@ -246,7 +259,7 @@ class WoWAuditSyncService(
             crestCounts = crestRecords,
             vaultSlots = vaultSlotsRecords,
             renownLevels = renownRecords,
-            raidProgress = raidProgressRecords
+            raidProgress = raidProgressRecords,
         )
     }
 
@@ -261,30 +274,35 @@ class WoWAuditSyncService(
             val seasonPlayed = shuffleNode.path("season_played").asIntOrNull()
             val weekPlayed = shuffleNode.path("week_played").asIntOrNull()
             if (rating != null || seasonPlayed != null || weekPlayed != null) {
-                brackets += RaiderPvpBracketRecord(
-                    bracket = "shuffle",
-                    rating = rating,
-                    seasonPlayed = seasonPlayed,
-                    weekPlayed = weekPlayed,
-                    maxRating = null
-                )
+                brackets +=
+                    RaiderPvpBracketRecord(
+                        bracket = "shuffle",
+                        rating = rating,
+                        seasonPlayed = seasonPlayed,
+                        weekPlayed = weekPlayed,
+                        maxRating = null,
+                    )
             }
         }
 
-        fun addBracket(name: String, node: JsonNode) {
+        fun addBracket(
+            name: String,
+            node: JsonNode,
+        ) {
             if (!node.isObject) return
             val rating = node.path("rating").asIntOrNull()
             val seasonPlayed = node.path("season_played").asIntOrNull()
             val weekPlayed = node.path("week_played").asIntOrNull()
             val maxRating = node.path("max_rating").asIntOrNull()
             if (rating != null || seasonPlayed != null || weekPlayed != null || maxRating != null) {
-                brackets += RaiderPvpBracketRecord(
-                    bracket = name,
-                    rating = rating,
-                    seasonPlayed = seasonPlayed,
-                    weekPlayed = weekPlayed,
-                    maxRating = maxRating
-                )
+                brackets +=
+                    RaiderPvpBracketRecord(
+                        bracket = name,
+                        rating = rating,
+                        seasonPlayed = seasonPlayed,
+                        weekPlayed = weekPlayed,
+                        maxRating = maxRating,
+                    )
             }
         }
 
@@ -304,11 +322,12 @@ class WoWAuditSyncService(
                 difficulties.forEach { difficulty ->
                     val defeated = value.path(difficulty).asIntOrNull()
                     if (defeated != null) {
-                        progress += RaidProgressRecord(
-                            raid = raid,
-                            difficulty = difficulty,
-                            bossesDefeated = defeated
-                        )
+                        progress +=
+                            RaidProgressRecord(
+                                raid = raid,
+                                difficulty = difficulty,
+                                bossesDefeated = defeated,
+                            )
                     }
                 }
             }
@@ -317,6 +336,7 @@ class WoWAuditSyncService(
     }
 
     private fun String?.orNullIfBlank(): String? = this?.takeIf { it.isNotBlank() }
+
     fun syncLootHistory(): Mono<Void> {
         val run = syncRunService.startRun("wowaudit-loot")
         return Mono.zip(fetchTeamInfo(), fetchCurrentPeriod())
@@ -461,22 +481,23 @@ class WoWAuditSyncService(
                     lastRefreshedPercentiles = parseOffsetDateTime(team.lastRefreshed?.percentiles),
                     lastRefreshedMythicPlus = parseOffsetDateTime(team.lastRefreshed?.mythicPlus),
                     wishlistUpdatedAt = parseEpochSecondsAsOffsetDateTime(team.wishlistUpdatedAt),
-                    syncedAt = now
-                )
+                    syncedAt = now,
+                ),
             )
             teamRaidDayRepository.deleteByTeamId(team.id)
-            val raidDays = team.raidDays.map { day ->
-                TeamRaidDayEntity(
-                    teamId = team.id,
-                    weekDay = day.weekDay,
-                    startTime = parseLocalTime(day.startTime),
-                    endTime = parseLocalTime(day.endTime),
-                    currentInstance = day.currentInstance,
-                    difficulty = day.difficulty,
-                    activeFrom = parseLocalDate(day.activeFrom),
-                    syncedAt = now
-                )
-            }
+            val raidDays =
+                team.raidDays.map { day ->
+                    TeamRaidDayEntity(
+                        teamId = team.id,
+                        weekDay = day.weekDay,
+                        startTime = parseLocalTime(day.startTime),
+                        endTime = parseLocalTime(day.endTime),
+                        currentInstance = day.currentInstance,
+                        difficulty = day.difficulty,
+                        activeFrom = parseLocalDate(day.activeFrom),
+                        syncedAt = now,
+                    )
+                }
             if (raidDays.isNotEmpty()) {
                 teamRaidDayRepository.saveAll(raidDays).forEach { }
             }
@@ -490,7 +511,7 @@ class WoWAuditSyncService(
         val (derivedRegion, derivedRealm) = deriveRegionAndRealmFromUrl(url)
         return copy(
             region = region ?: derivedRegion,
-            realm = realm ?: derivedRealm
+            realm = realm ?: derivedRealm,
         )
     }
 
@@ -511,34 +532,41 @@ class WoWAuditSyncService(
             runCatching { OffsetDateTime.ofInstant(Instant.ofEpochSecond(it), ZoneOffset.UTC) }.getOrNull()
         }
 
-    private fun persistPeriodSnapshot(team: TeamResponse?, period: PeriodResponse) {
+    private fun persistPeriodSnapshot(
+        team: TeamResponse?,
+        period: PeriodResponse,
+    ) {
         val teamId = team?.id
-        val entity = if (teamId != null && period.periodId != null) {
-            val existing = periodSnapshotRepository.findByTeamIdAndPeriodId(teamId, period.periodId)
-            PeriodSnapshotEntity(
-                id = existing?.id,
-                teamId = teamId,
-                seasonId = period.seasonId,
-                periodId = period.periodId,
-                currentPeriod = period.currentPeriod,
-                fetchedAt = OffsetDateTime.now()
-            )
-        } else {
-            PeriodSnapshotEntity(
-                teamId = teamId,
-                seasonId = period.seasonId,
-                periodId = period.periodId,
-                currentPeriod = period.currentPeriod,
-                fetchedAt = OffsetDateTime.now()
-            )
-        }
+        val entity =
+            if (teamId != null && period.periodId != null) {
+                val existing = periodSnapshotRepository.findByTeamIdAndPeriodId(teamId, period.periodId)
+                PeriodSnapshotEntity(
+                    id = existing?.id,
+                    teamId = teamId,
+                    seasonId = period.seasonId,
+                    periodId = period.periodId,
+                    currentPeriod = period.currentPeriod,
+                    fetchedAt = OffsetDateTime.now(),
+                )
+            } else {
+                PeriodSnapshotEntity(
+                    teamId = teamId,
+                    seasonId = period.seasonId,
+                    periodId = period.periodId,
+                    currentPeriod = period.currentPeriod,
+                    fetchedAt = OffsetDateTime.now(),
+                )
+            }
         runCatching { periodSnapshotRepository.save(entity) }
             .onFailure { ex ->
-                logger.warn("Failed to persist period snapshot for team ${teamId}: ${ex.message}")
+                logger.warn("Failed to persist period snapshot for team $teamId: ${ex.message}")
             }
     }
 
-    private fun parseRoster(body: String, team: TeamResponse?): List<RaiderRecord> {
+    private fun parseRoster(
+        body: String,
+        team: TeamResponse?,
+    ): List<RaiderRecord> {
         val defaultRegion = team?.region.orEmpty()
         val defaultRealm = team?.realm.orEmpty()
         return try {
@@ -547,50 +575,50 @@ class WoWAuditSyncService(
                 return emptyList()
             }
             node.mapNotNull { element ->
-                    val name = element.path("name").asText("")
-                    if (name.isBlank()) return@mapNotNull null
+                val name = element.path("name").asText("")
+                if (name.isBlank()) return@mapNotNull null
 
-                    val realm = element.path("realm").asText(defaultRealm)
-                    val region = element.path("region").asText(defaultRegion)
-                    val clazz = element.path("class").asText("")
-                    val spec = element.path("spec").asText("")
-                    val role = element.path("role").asText("")
-                    val wowauditId = element.path("id").asLong(-1).takeIf { it > 0 }
-                    val rank = element.path("rank").asText(null).orNullIfBlank()
-                    val status = element.path("status").asText(null).orNullIfBlank()
-                    val note = element.path("note").asText(null).orNullIfBlank()
-                    val blizzardId = element.path("blizzard_id").asLong(-1).takeIf { it > 0 }
-                    val trackingSince = parseOffsetDateTime(element.path("tracking_since").asText(null))
+                val realm = element.path("realm").asText(defaultRealm)
+                val region = element.path("region").asText(defaultRegion)
+                val clazz = element.path("class").asText("")
+                val spec = element.path("spec").asText("")
+                val role = element.path("role").asText("")
+                val wowauditId = element.path("id").asLong(-1).takeIf { it > 0 }
+                val rank = element.path("rank").asText(null).orNullIfBlank()
+                val status = element.path("status").asText(null).orNullIfBlank()
+                val note = element.path("note").asText(null).orNullIfBlank()
+                val blizzardId = element.path("blizzard_id").asLong(-1).takeIf { it > 0 }
+                val trackingSince = parseOffsetDateTime(element.path("tracking_since").asText(null))
 
-                    val gearItems = mutableListOf<RaiderGearItemRecord>()
-                    val gearNode = element.path("gear")
-                    gearItems += collectGearItems(gearNode.path("equipped"), "equipped")
-                    gearItems += collectGearItems(gearNode.path("best"), "best")
-                    gearItems += collectGearItems(gearNode.path("spark"), "spark")
+                val gearItems = mutableListOf<RaiderGearItemRecord>()
+                val gearNode = element.path("gear")
+                gearItems += collectGearItems(gearNode.path("equipped"), "equipped")
+                gearItems += collectGearItems(gearNode.path("best"), "best")
+                gearItems += collectGearItems(gearNode.path("spark"), "spark")
 
-                    val statistics = parseRaiderStatistics(element)
-                    val pvpBrackets = parsePvpBrackets(element.path("statistics"))
+                val statistics = parseRaiderStatistics(element)
+                val pvpBrackets = parsePvpBrackets(element.path("statistics"))
 
-                    RaiderRecord(
-                        wowauditId = wowauditId,
-                        name = name,
-                        realm = realm,
-                        region = region,
-                        clazz = clazz,
-                        spec = spec,
-                        role = role,
-                        rank = rank,
-                        status = status,
-                        note = note,
-                        blizzardId = blizzardId,
-                        trackingSince = trackingSince,
-                        joinDate = parseOffsetDateTime(element.path("timestamps").path("join_date").asText(null)),
-                        blizzardLastModified = parseOffsetDateTime(element.path("timestamps").path("blizzard_last_modified").asText(null)),
-                        gearItems = gearItems,
-                        statistics = statistics,
-                        pvpBrackets = pvpBrackets
-                    )
-                }
+                RaiderRecord(
+                    wowauditId = wowauditId,
+                    name = name,
+                    realm = realm,
+                    region = region,
+                    clazz = clazz,
+                    spec = spec,
+                    role = role,
+                    rank = rank,
+                    status = status,
+                    note = note,
+                    blizzardId = blizzardId,
+                    trackingSince = trackingSince,
+                    joinDate = parseOffsetDateTime(element.path("timestamps").path("join_date").asText(null)),
+                    blizzardLastModified = parseOffsetDateTime(element.path("timestamps").path("blizzard_last_modified").asText(null)),
+                    gearItems = gearItems,
+                    statistics = statistics,
+                    pvpBrackets = pvpBrackets,
+                )
+            }
         } catch (ex: Exception) {
             logger.error("Failed to parse roster payload", ex)
             emptyList()
@@ -600,29 +628,36 @@ class WoWAuditSyncService(
     private fun parsePeriod(body: String): PeriodResponse? =
         try {
             val node = objectMapper.readTree(body)
-            val seasonId = when {
-                node.has("season_id") -> node["season_id"].asLong()
-                node.has("current_season") && node["current_season"].has("id") -> node["current_season"]["id"].asLong()
-                else -> null
-            }
-            val currentPeriod = when {
-                node.has("current_period") -> node["current_period"].asLong()
-                node.has("period_id") -> node["period_id"].asLong()
-                else -> null
-            }
-            val periodId = when {
-                node.has("period_id") -> node["period_id"].asLong()
-                node.has("period") && node["period"].has("id") -> node["period"]["id"].asLong()
-                currentPeriod != null -> currentPeriod
-                else -> null
-            }
+            val seasonId =
+                when {
+                    node.has("season_id") -> node["season_id"].asLong()
+                    node.has("current_season") && node["current_season"].has("id") -> node["current_season"]["id"].asLong()
+                    else -> null
+                }
+            val currentPeriod =
+                when {
+                    node.has("current_period") -> node["current_period"].asLong()
+                    node.has("period_id") -> node["period_id"].asLong()
+                    else -> null
+                }
+            val periodId =
+                when {
+                    node.has("period_id") -> node["period_id"].asLong()
+                    node.has("period") && node["period"].has("id") -> node["period"]["id"].asLong()
+                    currentPeriod != null -> currentPeriod
+                    else -> null
+                }
             if (seasonId == null && periodId == null) null else PeriodResponse(seasonId, periodId, currentPeriod)
         } catch (ex: Exception) {
             logger.error("Failed to parse period payload", ex)
             null
         }
 
-    private fun processLootHistory(body: String, team: TeamResponse, period: PeriodResponse): Int {
+    private fun processLootHistory(
+        body: String,
+        team: TeamResponse,
+        period: PeriodResponse,
+    ): Int {
         return try {
             val root = objectMapper.readTree(body)
             val entriesNode: Sequence<JsonNode> =
@@ -641,24 +676,25 @@ class WoWAuditSyncService(
                 val clazz = characterNode.path("class").asText("").orEmpty()
                 val role = characterNode.path("role").asText("").orEmpty()
 
-                val raider = raiderService.upsertCharacter(
-                    RaiderRecord(
-                        wowauditId = null,
-                        name = name,
-                        realm = realm,
-                        region = region,
-                        clazz = clazz,
-                        spec = "",
-                        role = role,
-                        rank = null,
-                        status = null,
-                        note = null,
-                        blizzardId = null,
-                        trackingSince = null,
-                        joinDate = null,
-                        blizzardLastModified = null
+                val raider =
+                    raiderService.upsertCharacter(
+                        RaiderRecord(
+                            wowauditId = null,
+                            name = name,
+                            realm = realm,
+                            region = region,
+                            clazz = clazz,
+                            spec = "",
+                            role = role,
+                            rank = null,
+                            status = null,
+                            note = null,
+                            blizzardId = null,
+                            trackingSince = null,
+                            joinDate = null,
+                            blizzardLastModified = null,
+                        ),
                     )
-                )
                 val raiderId = raider.id ?: continue
 
                 val itemNode = node.path("item")
@@ -667,12 +703,13 @@ class WoWAuditSyncService(
                 val itemName = itemNode.path("name").asText("").takeIf { it.isNotBlank() } ?: continue
 
                 val tier = node.path("tier").asText("").orEmpty()
-                val awardedAt = node.path("awarded_at").asText(null)?.let {
-                    runCatching { OffsetDateTime.parse(it) }.getOrElse { parseException ->
-                        logger.debug("Unable to parse awarded_at '{}': {}", it, parseException.message)
-                        OffsetDateTime.now()
-                    }
-                } ?: OffsetDateTime.now()
+                val awardedAt =
+                    node.path("awarded_at").asText(null)?.let {
+                        runCatching { OffsetDateTime.parse(it) }.getOrElse { parseException ->
+                            logger.debug("Unable to parse awarded_at '{}': {}", it, parseException.message)
+                            OffsetDateTime.now()
+                        }
+                    } ?: OffsetDateTime.now()
 
                 val responseNode = node.path("response_type")
                 val propagatedNode = responseNode.path("propagated_to")
@@ -692,37 +729,38 @@ class WoWAuditSyncService(
                 val flps = node.path("flps").asDoubleOrNull() ?: 0.0
                 val rdf = node.path("rdf").asDoubleOrNull() ?: 1.0
 
-                val savedAward = lootAwardRepository.save(
-                    LootAwardEntity(
-                        raiderId = raiderId,
-                        itemId = itemId,
-                        itemName = itemName,
-                        tier = tier,
-                        flps = flps,
-                        rdf = rdf,
-                        awardedAt = awardedAt,
-                        rclootcouncilId = rclootcouncilId,
-                        icon = icon,
-                        slot = slot,
-                        quality = quality,
-                        responseTypeId = responseNode.path("id").asIntOrNull(),
-                        responseTypeName = responseNode.path("name").asText(null).orNullIfBlank(),
-                        responseTypeRgba = responseNode.path("rgba").asText(null).orNullIfBlank(),
-                        responseTypeExcluded = responseNode.path("excluded").asBooleanOrNull(),
-                        propagatedResponseTypeId = propagatedNode.path("id").asIntOrNull(),
-                        propagatedResponseTypeName = propagatedNode.path("name").asText(null).orNullIfBlank(),
-                        propagatedResponseTypeRgba = propagatedNode.path("rgba").asText(null).orNullIfBlank(),
-                        propagatedResponseTypeExcluded = propagatedNode.path("excluded").asBooleanOrNull(),
-                        sameResponseAmount = sameResponseAmount,
-                        note = note,
-                        wishValue = wishValue,
-                        difficulty = difficulty,
-                        discarded = discarded,
-                        characterId = characterId,
-                        awardedByCharacterId = awardedByCharacterId,
-                        awardedByName = awardedByName
+                val savedAward =
+                    lootAwardRepository.save(
+                        LootAwardEntity(
+                            raiderId = raiderId,
+                            itemId = itemId,
+                            itemName = itemName,
+                            tier = tier,
+                            flps = flps,
+                            rdf = rdf,
+                            awardedAt = awardedAt,
+                            rclootcouncilId = rclootcouncilId,
+                            icon = icon,
+                            slot = slot,
+                            quality = quality,
+                            responseTypeId = responseNode.path("id").asIntOrNull(),
+                            responseTypeName = responseNode.path("name").asText(null).orNullIfBlank(),
+                            responseTypeRgba = responseNode.path("rgba").asText(null).orNullIfBlank(),
+                            responseTypeExcluded = responseNode.path("excluded").asBooleanOrNull(),
+                            propagatedResponseTypeId = propagatedNode.path("id").asIntOrNull(),
+                            propagatedResponseTypeName = propagatedNode.path("name").asText(null).orNullIfBlank(),
+                            propagatedResponseTypeRgba = propagatedNode.path("rgba").asText(null).orNullIfBlank(),
+                            propagatedResponseTypeExcluded = propagatedNode.path("excluded").asBooleanOrNull(),
+                            sameResponseAmount = sameResponseAmount,
+                            note = note,
+                            wishValue = wishValue,
+                            difficulty = difficulty,
+                            discarded = discarded,
+                            characterId = characterId,
+                            awardedByCharacterId = awardedByCharacterId,
+                            awardedByName = awardedByName,
+                        ),
                     )
-                )
 
                 val awardId = savedAward.id
                 if (awardId != null) {
@@ -736,9 +774,10 @@ class WoWAuditSyncService(
                         }
 
                     if (aggregatedBonusIds.isNotEmpty()) {
-                        val bonusEntities = aggregatedBonusIds.map { bonusId ->
-                            LootAwardBonusIdEntity(lootAwardId = awardId, bonusId = bonusId)
-                        }
+                        val bonusEntities =
+                            aggregatedBonusIds.map { bonusId ->
+                                LootAwardBonusIdEntity(lootAwardId = awardId, bonusId = bonusId)
+                            }
                         lootAwardBonusIdRepository.saveAll(bonusEntities)
                     }
 
@@ -750,18 +789,20 @@ class WoWAuditSyncService(
                             val bonusArray = oldItem.path("bonus_ids")
                             if (bonusArray.isArray && bonusArray.size() > 0) {
                                 bonusArray.forEach { bonusNode: JsonNode ->
-                                    oldItemEntities += LootAwardOldItemEntity(
-                                        lootAwardId = awardId,
-                                        itemId = oldItemId,
-                                        bonusId = bonusNode.asText(null).orNullIfBlank()
-                                    )
+                                    oldItemEntities +=
+                                        LootAwardOldItemEntity(
+                                            lootAwardId = awardId,
+                                            itemId = oldItemId,
+                                            bonusId = bonusNode.asText(null).orNullIfBlank(),
+                                        )
                                 }
                             } else {
-                                oldItemEntities += LootAwardOldItemEntity(
-                                    lootAwardId = awardId,
-                                    itemId = oldItemId,
-                                    bonusId = null
-                                )
+                                oldItemEntities +=
+                                    LootAwardOldItemEntity(
+                                        lootAwardId = awardId,
+                                        itemId = oldItemId,
+                                        bonusId = null,
+                                    )
                             }
                         }
                         if (oldItemEntities.isNotEmpty()) {
@@ -770,27 +811,29 @@ class WoWAuditSyncService(
                     }
 
                     val wishDataNode = node.path("wish_data")
-                    val wishEntries = when {
-                        wishDataNode.isArray -> wishDataNode.elements().asSequence().toList()
-                        wishDataNode.isObject -> wishDataNode.fields().asSequence().map { it.value }.toList()
-                        else -> emptyList()
-                    }
-                    if (wishEntries.isNotEmpty()) {
-                        val wishEntities = wishEntries.mapNotNull { wish ->
-                            val specName = wish.path("spec_name").asText(null).orNullIfBlank()
-                            val specIcon = wish.path("spec_icon").asText(null).orNullIfBlank()
-                            val value = wish.path("value").asDoubleOrNull()?.roundToInt()
-                            if (specName == null && specIcon == null && value == null) {
-                                null
-                            } else {
-                                LootAwardWishDataEntity(
-                                    lootAwardId = awardId,
-                                    specName = specName,
-                                    specIcon = specIcon,
-                                    value = value
-                                )
-                            }
+                    val wishEntries =
+                        when {
+                            wishDataNode.isArray -> wishDataNode.elements().asSequence().toList()
+                            wishDataNode.isObject -> wishDataNode.fields().asSequence().map { it.value }.toList()
+                            else -> emptyList()
                         }
+                    if (wishEntries.isNotEmpty()) {
+                        val wishEntities =
+                            wishEntries.mapNotNull { wish ->
+                                val specName = wish.path("spec_name").asText(null).orNullIfBlank()
+                                val specIcon = wish.path("spec_icon").asText(null).orNullIfBlank()
+                                val value = wish.path("value").asDoubleOrNull()?.roundToInt()
+                                if (specName == null && specIcon == null && value == null) {
+                                    null
+                                } else {
+                                    LootAwardWishDataEntity(
+                                        lootAwardId = awardId,
+                                        specName = specName,
+                                        specIcon = specIcon,
+                                        value = value,
+                                    )
+                                }
+                            }
                         if (wishEntities.isNotEmpty()) {
                             lootAwardWishDataRepository.saveAll(wishEntities)
                         }
@@ -806,17 +849,21 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun parseWishlistSummary(body: String, team: TeamResponse?): List<WishlistSummary> {
+    private fun parseWishlistSummary(
+        body: String,
+        team: TeamResponse?,
+    ): List<WishlistSummary> {
         val defaultRealm = team?.realm.orEmpty()
         val defaultRegion = team?.region.orEmpty()
         val result = mutableListOf<WishlistSummary>()
         return try {
             val node = objectMapper.readTree(body)
-            val characters = when {
-                node.isArray -> node
-                node.has("characters") -> node["characters"]
-                else -> null
-            } ?: return emptyList()
+            val characters =
+                when {
+                    node.isArray -> node
+                    node.has("characters") -> node["characters"]
+                    else -> null
+                } ?: return emptyList()
             characters.forEach { element: JsonNode ->
                 val id = element.path("id").asLong(-1)
                 if (id <= 0) return@forEach
@@ -833,14 +880,20 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun saveWishlistSnapshot(summary: WishlistSummary, payload: String, team: TeamResponse?, period: PeriodResponse?) {
+    private fun saveWishlistSnapshot(
+        summary: WishlistSummary,
+        payload: String,
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ) {
         saveSnapshot("v1/wishlists/${summary.id}", payload)
-        val detailNode = try {
-            objectMapper.readTree(payload)
-        } catch (ex: Exception) {
-            logger.error("Failed to parse wishlist detail for {}", summary.name, ex)
-            return
-        }
+        val detailNode =
+            try {
+                objectMapper.readTree(payload)
+            } catch (ex: Exception) {
+                logger.error("Failed to parse wishlist detail for {}", summary.name, ex)
+                return
+            }
         val characterNode = detailNode.path("character")
         val name = characterNode.path("name").asText(summary.name)
         val realm = characterNode.path("realm").asText(summary.realm)
@@ -851,27 +904,28 @@ class WoWAuditSyncService(
         val seasonId = period?.seasonId
         val periodId = period?.periodId ?: period?.currentPeriod
 
-        val raider = raiderService.upsertCharacter(
-            RaiderRecord(
-                wowauditId = null,
-                name = name,
-                realm = realm,
-                region = region,
-                clazz = clazz,
-                spec = "",
-                role = role,
-                rank = null,
-                status = null,
-                note = null,
-                blizzardId = null,
-                trackingSince = null,
-                joinDate = null,
-                blizzardLastModified = null,
-                gearItems = emptyList(),
-                statistics = null,
-                pvpBrackets = emptyList()
+        val raider =
+            raiderService.upsertCharacter(
+                RaiderRecord(
+                    wowauditId = null,
+                    name = name,
+                    realm = realm,
+                    region = region,
+                    clazz = clazz,
+                    spec = "",
+                    role = role,
+                    rank = null,
+                    status = null,
+                    note = null,
+                    blizzardId = null,
+                    trackingSince = null,
+                    joinDate = null,
+                    blizzardLastModified = null,
+                    gearItems = emptyList(),
+                    statistics = null,
+                    pvpBrackets = emptyList(),
+                ),
             )
-        )
 
         wishlistSnapshotRepository.deleteByCharacterNameAndCharacterRealm(name, realm)
         wishlistSnapshotRepository.save(
@@ -884,12 +938,15 @@ class WoWAuditSyncService(
                 seasonId = seasonId,
                 periodId = periodId,
                 rawPayload = payload,
-                syncedAt = OffsetDateTime.now()
-            )
+                syncedAt = OffsetDateTime.now(),
+            ),
         )
     }
 
-    private fun syncAttendanceData(team: TeamResponse?, period: PeriodResponse?): Mono<Unit> =
+    private fun syncAttendanceData(
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ): Mono<Unit> =
         client.fetchAttendance()
             .flatMap { body ->
                 Mono.fromCallable {
@@ -902,7 +959,10 @@ class WoWAuditSyncService(
                 }
             }
 
-    private fun syncRaidsData(team: TeamResponse?, period: PeriodResponse?): Mono<Unit> {
+    private fun syncRaidsData(
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ): Mono<Unit> {
         if (team == null) {
             logger.warn("Team information unavailable; skipping raid sync")
             return Mono.empty()
@@ -928,7 +988,10 @@ class WoWAuditSyncService(
             .thenReturn(Unit)
     }
 
-    private fun syncHistoricalData(team: TeamResponse?, period: PeriodResponse?): Mono<Unit> {
+    private fun syncHistoricalData(
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ): Mono<Unit> {
         val periodId = period?.periodId ?: period?.currentPeriod
         if (periodId == null) {
             logger.warn("Period information unavailable; skipping historical activity sync")
@@ -947,18 +1010,21 @@ class WoWAuditSyncService(
             }
     }
 
-    private fun syncCharacterHistoryData(team: TeamResponse?, period: PeriodResponse?): Mono<Unit> {
+    private fun syncCharacterHistoryData(
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ): Mono<Unit> {
         return Mono.fromCallable {
             val characters = raiderService.findAllCharacters().filter { raider -> raider.wowauditId != null }
             var syncedCount = 0
-            
+
             characters.forEach { raider ->
                 try {
                     val body = client.fetchCharacterHistory(raider.wowauditId!!).block()
                     if (body != null) {
                         saveSnapshot("v1/historical_data/${raider.wowauditId}", body)
                         val (historyJson, bestGearJson) = parseCharacterHistory(body)
-                        
+
                         characterHistoryRepository.deleteByCharacterId(raider.wowauditId!!)
                         characterHistoryRepository.save(
                             CharacterHistoryEntity(
@@ -970,8 +1036,8 @@ class WoWAuditSyncService(
                                 seasonId = period?.seasonId,
                                 periodId = period?.periodId ?: period?.currentPeriod,
                                 historyJson = historyJson,
-                                bestGearJson = bestGearJson
-                            )
+                                bestGearJson = bestGearJson,
+                            ),
                         )
                         syncedCount++
                     }
@@ -979,7 +1045,7 @@ class WoWAuditSyncService(
                     logger.warn("Failed to sync character history for ${raider.characterName}: ${ex.message}")
                 }
             }
-            
+
             logger.info("Synced {} character histories", syncedCount)
             Unit
         }
@@ -1024,7 +1090,11 @@ class WoWAuditSyncService(
             .doOnNext { count -> logger.info("Synced {} applications", count) }
             .thenReturn(Unit)
 
-    private fun parseAttendance(body: String, team: TeamResponse?, period: PeriodResponse?): List<AttendanceRecord> {
+    private fun parseAttendance(
+        body: String,
+        team: TeamResponse?,
+        period: PeriodResponse?,
+    ): List<AttendanceRecord> {
         val defaultRealm = team?.realm.orEmpty()
         val defaultRegion = team?.region.orEmpty()
         val seasonId = period?.seasonId
@@ -1045,27 +1115,28 @@ class WoWAuditSyncService(
                 val region = element.path("region").asText(defaultRegion).ifBlank { defaultRegion }
                 val clazz = element.path("class").asText("")
                 val role = element.path("role").asText("")
-                records += AttendanceRecord(
-                    instance = instance,
-                    encounter = encounter,
-                    startDate = startDate,
-                    endDate = endDate,
-                    characterId = element.path("id").asLong(-1).takeIf { it > 0 },
-                    characterName = name,
-                    characterRealm = realm,
-                    characterRegion = region,
-                    characterClass = clazz,
-                    characterRole = role,
-                    attendedAmountOfRaids = element.path("attended_amount_of_raids").asIntOrNull(),
-                    totalAmountOfRaids = element.path("total_amount_of_raids").asIntOrNull(),
-                    attendedPercentage = element.path("attended_percentage").asDoubleOrNull(),
-                    selectedAmountOfEncounters = element.path("selected_amount_of_encounters").asIntOrNull(),
-                    totalAmountOfEncounters = element.path("total_amount_of_encounters").asIntOrNull(),
-                    selectedPercentage = element.path("selected_percentage").asDoubleOrNull(),
-                    teamId = team?.id,
-                    seasonId = seasonId,
-                    periodId = periodId
-                )
+                records +=
+                    AttendanceRecord(
+                        instance = instance,
+                        encounter = encounter,
+                        startDate = startDate,
+                        endDate = endDate,
+                        characterId = element.path("id").asLong(-1).takeIf { it > 0 },
+                        characterName = name,
+                        characterRealm = realm,
+                        characterRegion = region,
+                        characterClass = clazz,
+                        characterRole = role,
+                        attendedAmountOfRaids = element.path("attended_amount_of_raids").asIntOrNull(),
+                        totalAmountOfRaids = element.path("total_amount_of_raids").asIntOrNull(),
+                        attendedPercentage = element.path("attended_percentage").asDoubleOrNull(),
+                        selectedAmountOfEncounters = element.path("selected_amount_of_encounters").asIntOrNull(),
+                        totalAmountOfEncounters = element.path("total_amount_of_encounters").asIntOrNull(),
+                        selectedPercentage = element.path("selected_percentage").asDoubleOrNull(),
+                        teamId = team?.id,
+                        seasonId = seasonId,
+                        periodId = periodId,
+                    )
             }
             records
         } catch (ex: Exception) {
@@ -1078,28 +1149,30 @@ class WoWAuditSyncService(
         val result = mutableListOf<RaidSummary>()
         return try {
             val node = objectMapper.readTree(body)
-            val raidsNode = when {
-                node.isArray -> node
-                node.has("raids") -> node["raids"]
-                else -> null
-            } ?: return emptyList()
+            val raidsNode =
+                when {
+                    node.isArray -> node
+                    node.has("raids") -> node["raids"]
+                    else -> null
+                } ?: return emptyList()
             raidsNode.forEach { element: JsonNode ->
                 val id = element.path("id").asLong(-1)
                 if (id <= 0) return@forEach
-                result += RaidSummary(
-                    id = id,
-                    date = element.path("date").asText(null),
-                    startTime = element.path("start_time").asText(null),
-                    endTime = element.path("end_time").asText(null),
-                    instance = element.path("instance").asText(null),
-                    difficulty = element.path("difficulty").asText(null),
-                    optional = element.path("optional").asBooleanOrNull(),
-                    status = element.path("status").asText(null),
-                    presentSize = element.path("present_size").asIntOrNull(),
-                    totalSize = element.path("total_size").asIntOrNull(),
-                    notes = element.path("notes").asText(null),
-                    selectionsImage = element.path("selections_image").asText(null)
-                )
+                result +=
+                    RaidSummary(
+                        id = id,
+                        date = element.path("date").asText(null),
+                        startTime = element.path("start_time").asText(null),
+                        endTime = element.path("end_time").asText(null),
+                        instance = element.path("instance").asText(null),
+                        difficulty = element.path("difficulty").asText(null),
+                        optional = element.path("optional").asBooleanOrNull(),
+                        status = element.path("status").asText(null),
+                        presentSize = element.path("present_size").asIntOrNull(),
+                        totalSize = element.path("total_size").asIntOrNull(),
+                        notes = element.path("notes").asText(null),
+                        selectionsImage = element.path("selections_image").asText(null),
+                    )
             }
             result
         } catch (ex: Exception) {
@@ -1108,13 +1181,19 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun saveRaid(summary: RaidSummary, detailBody: String, team: TeamResponse, period: PeriodResponse?) {
-        val detailNode = try {
-            objectMapper.readTree(detailBody)
-        } catch (ex: Exception) {
-            logger.error("Failed to parse raid detail for {}", summary.id, ex)
-            return
-        }
+    private fun saveRaid(
+        summary: RaidSummary,
+        detailBody: String,
+        team: TeamResponse,
+        period: PeriodResponse?,
+    ) {
+        val detailNode =
+            try {
+                objectMapper.readTree(detailBody)
+            } catch (ex: Exception) {
+                logger.error("Failed to parse raid detail for {}", summary.id, ex)
+                return
+            }
         saveSnapshot("v1/raids/${summary.id}", detailBody)
         try {
             raidRepository.deleteById(summary.id)
@@ -1155,72 +1234,81 @@ class WoWAuditSyncService(
                 periodId = periodId,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                syncedAt = OffsetDateTime.now()
-            )
+                syncedAt = OffsetDateTime.now(),
+            ),
         )
 
         val signupsNode = detailNode.path("signups")
         if (signupsNode.isArray) {
-            val entities = signupsNode.map { signup ->
-                val character = signup.path("character")
-                RaidSignupEntity(
-                    raidId = summary.id,
-                    characterId = character.path("id").asLong(-1).takeIf { it > 0 },
-                    characterName = character.path("name").asText(null),
-                    characterRealm = character.path("realm").asText(null),
-                    characterRegion = character.path("region").asText(null),
-                    characterClass = character.path("class").asText(null),
-                    characterRole = character.path("role").asText(null),
-                    characterGuest = character.path("guest").asBooleanOrNull(),
-                    status = signup.path("status").asText(null),
-                    comment = signup.path("comment").asText(null),
-                    selected = signup.path("selected").asBooleanOrNull()
-                )
-            }
+            val entities =
+                signupsNode.map { signup ->
+                    val character = signup.path("character")
+                    RaidSignupEntity(
+                        raidId = summary.id,
+                        characterId = character.path("id").asLong(-1).takeIf { it > 0 },
+                        characterName = character.path("name").asText(null),
+                        characterRealm = character.path("realm").asText(null),
+                        characterRegion = character.path("region").asText(null),
+                        characterClass = character.path("class").asText(null),
+                        characterRole = character.path("role").asText(null),
+                        characterGuest = character.path("guest").asBooleanOrNull(),
+                        status = signup.path("status").asText(null),
+                        comment = signup.path("comment").asText(null),
+                        selected = signup.path("selected").asBooleanOrNull(),
+                    )
+                }
             raidSignupRepository.saveAll(entities).forEach { }
         }
 
         val encountersNode = detailNode.path("encounters")
         if (encountersNode.isArray) {
-            val entities = encountersNode.map { encounter ->
-                RaidEncounterEntity(
-                    raidId = summary.id,
-                    encounterId = encounter.path("id").asLong(-1).takeIf { it > 0 },
-                    name = encounter.path("name").asText(null),
-                    enabled = encounter.path("enabled").asBooleanOrNull(),
-                    extra = encounter.path("extra").asBooleanOrNull(),
-                    notes = encounter.path("notes").asText(null)
-                )
-            }
+            val entities =
+                encountersNode.map { encounter ->
+                    RaidEncounterEntity(
+                        raidId = summary.id,
+                        encounterId = encounter.path("id").asLong(-1).takeIf { it > 0 },
+                        name = encounter.path("name").asText(null),
+                        enabled = encounter.path("enabled").asBooleanOrNull(),
+                        extra = encounter.path("extra").asBooleanOrNull(),
+                        notes = encounter.path("notes").asText(null),
+                    )
+                }
             raidEncounterRepository.saveAll(entities).forEach { }
         }
     }
 
-    private fun parseHistoricalData(body: String, periodId: Long, teamId: Long?, seasonId: Long?): List<HistoricalActivityEntity> {
+    private fun parseHistoricalData(
+        body: String,
+        periodId: Long,
+        teamId: Long?,
+        seasonId: Long?,
+    ): List<HistoricalActivityEntity> {
         val result = mutableListOf<HistoricalActivityEntity>()
         return try {
             val node = objectMapper.readTree(body)
-            val characters = when {
-                node.isArray -> node
-                node.has("characters") -> node["characters"]
-                else -> null
-            } ?: return emptyList()
+            val characters =
+                when {
+                    node.isArray -> node
+                    node.has("characters") -> node["characters"]
+                    else -> null
+                } ?: return emptyList()
             characters.forEach { character: JsonNode ->
                 val name = character.path("name").asText("")
                 if (name.isBlank()) return@forEach
                 val realm = character.path("realm").asText(null)
                 val characterId = character.path("id").asLong(-1).takeIf { it > 0 }
                 val dataNode = character.path("data")
-                result += HistoricalActivityEntity(
-                    characterId = characterId,
-                    characterName = name,
-                    characterRealm = realm,
-                    periodId = periodId,
-                    teamId = teamId,
-                    seasonId = seasonId,
-                    dataJson = dataNode.toString(),
-                    syncedAt = OffsetDateTime.now()
-                )
+                result +=
+                    HistoricalActivityEntity(
+                        characterId = characterId,
+                        characterName = name,
+                        characterRealm = realm,
+                        periodId = periodId,
+                        teamId = teamId,
+                        seasonId = seasonId,
+                        dataJson = dataNode.toString(),
+                        syncedAt = OffsetDateTime.now(),
+                    )
             }
             result
         } catch (ex: Exception) {
@@ -1239,16 +1327,17 @@ class WoWAuditSyncService(
             node.forEach { guestNode: JsonNode ->
                 val id = guestNode.path("id").asLong(-1)
                 if (id <= 0) return@forEach
-                guests += GuestEntity(
-                    guestId = id,
-                    name = guestNode.path("name").asText("Unknown"),
-                    realm = guestNode.path("realm").asText(null),
-                    `class` = guestNode.path("class").asText(null),
-                    role = guestNode.path("role").asText(null),
-                    blizzardId = guestNode.path("blizzard_id").asLong(-1).takeIf { it > 0 },
-                    trackingSince = parseOffsetDateTime(guestNode.path("tracking_since").asText(null)),
-                    syncedAt = OffsetDateTime.now()
-                )
+                guests +=
+                    GuestEntity(
+                        guestId = id,
+                        name = guestNode.path("name").asText("Unknown"),
+                        realm = guestNode.path("realm").asText(null),
+                        `class` = guestNode.path("class").asText(null),
+                        role = guestNode.path("role").asText(null),
+                        blizzardId = guestNode.path("blizzard_id").asLong(-1).takeIf { it > 0 },
+                        trackingSince = parseOffsetDateTime(guestNode.path("tracking_since").asText(null)),
+                        syncedAt = OffsetDateTime.now(),
+                    )
             }
             guests
         } catch (ex: Exception) {
@@ -1261,33 +1350,35 @@ class WoWAuditSyncService(
         val summaries = mutableListOf<ApplicationSummary>()
         return try {
             val node = objectMapper.readTree(body)
-            val applications = when {
-                node.isArray -> node
-                node.has("applications") -> node["applications"]
-                else -> null
-            } ?: return emptyList()
+            val applications =
+                when {
+                    node.isArray -> node
+                    node.has("applications") -> node["applications"]
+                    else -> null
+                } ?: return emptyList()
             applications.forEach { app: JsonNode ->
                 val id = app.path("id").asLong(-1)
                 if (id <= 0) return@forEach
                 val main = app.path("main_character")
-                summaries += ApplicationSummary(
-                    id = id,
-                    appliedAt = parseOffsetDateTime(app.path("applied_at").asText(null)),
-                    status = app.path("status").asText(null),
-                    role = app.path("role").asText(null),
-                    age = app.path("age").asIntOrNull(),
-                    country = app.path("country").asText(null),
-                    battletag = app.path("battletag").asText(null),
-                    discordId = app.path("discord_id").asText(null),
-                    mainCharacterName = main.path("name").asText(null).orNullIfBlank(),
-                    mainCharacterRealm = main.path("realm").asText(null).orNullIfBlank(),
-                    mainCharacterClass = main.path("class").asText(null).orNullIfBlank(),
-                    mainCharacterRole = main.path("role").asText(null).orNullIfBlank(),
-                    mainCharacterRace = main.path("race").asText(null).orNullIfBlank(),
-                    mainCharacterFaction = main.path("faction").asText(null).orNullIfBlank(),
-                    mainCharacterLevel = main.path("level").asIntOrNull(),
-                    mainCharacterRegion = main.path("region").asText(null).orNullIfBlank()
-                )
+                summaries +=
+                    ApplicationSummary(
+                        id = id,
+                        appliedAt = parseOffsetDateTime(app.path("applied_at").asText(null)),
+                        status = app.path("status").asText(null),
+                        role = app.path("role").asText(null),
+                        age = app.path("age").asIntOrNull(),
+                        country = app.path("country").asText(null),
+                        battletag = app.path("battletag").asText(null),
+                        discordId = app.path("discord_id").asText(null),
+                        mainCharacterName = main.path("name").asText(null).orNullIfBlank(),
+                        mainCharacterRealm = main.path("realm").asText(null).orNullIfBlank(),
+                        mainCharacterClass = main.path("class").asText(null).orNullIfBlank(),
+                        mainCharacterRole = main.path("role").asText(null).orNullIfBlank(),
+                        mainCharacterRace = main.path("race").asText(null).orNullIfBlank(),
+                        mainCharacterFaction = main.path("faction").asText(null).orNullIfBlank(),
+                        mainCharacterLevel = main.path("level").asIntOrNull(),
+                        mainCharacterRegion = main.path("region").asText(null).orNullIfBlank(),
+                    )
             }
             summaries
         } catch (ex: Exception) {
@@ -1296,43 +1387,49 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun saveApplication(summary: ApplicationSummary, detailBody: String) {
+    private fun saveApplication(
+        summary: ApplicationSummary,
+        detailBody: String,
+    ) {
         saveSnapshot("v1/applications/${summary.id}", detailBody)
-        val detailNode = try {
-            objectMapper.readTree(detailBody)
-        } catch (ex: Exception) {
-            logger.error("Failed to parse application detail for {}", summary.id, ex)
-            return
-        }
+        val detailNode =
+            try {
+                objectMapper.readTree(detailBody)
+            } catch (ex: Exception) {
+                logger.error("Failed to parse application detail for {}", summary.id, ex)
+                return
+            }
         val mainDetail = detailNode.path("main_character")
-        val enrichedSummary = if (mainDetail.isObject) {
-            summary.copy(
-                mainCharacterRace = mainDetail.path("race").asText(summary.mainCharacterRace).orNullIfBlank(),
-                mainCharacterFaction = mainDetail.path("faction").asText(summary.mainCharacterFaction).orNullIfBlank(),
-                mainCharacterLevel = mainDetail.path("level").asIntOrNull() ?: summary.mainCharacterLevel,
-                mainCharacterRegion = mainDetail.path("region").asText(summary.mainCharacterRegion).orNullIfBlank()
-            )
-        } else {
-            summary
-        }
+        val enrichedSummary =
+            if (mainDetail.isObject) {
+                summary.copy(
+                    mainCharacterRace = mainDetail.path("race").asText(summary.mainCharacterRace).orNullIfBlank(),
+                    mainCharacterFaction = mainDetail.path("faction").asText(summary.mainCharacterFaction).orNullIfBlank(),
+                    mainCharacterLevel = mainDetail.path("level").asIntOrNull() ?: summary.mainCharacterLevel,
+                    mainCharacterRegion = mainDetail.path("region").asText(summary.mainCharacterRegion).orNullIfBlank(),
+                )
+            } else {
+                summary
+            }
 
         applicationRepository.save(enrichedSummary.toEntity())
 
         val altsNode = detailNode.path("alts")
         if (altsNode.isArray) {
-            val alts = altsNode.map { alt ->
-                ApplicationAltEntity(
-                    applicationId = summary.id,
-                    name = alt.path("name").asText(null).orNullIfBlank(),
-                    realm = alt.path("realm").asText(null).orNullIfBlank(),
-                    region = alt.path("region").asText(null).orNullIfBlank(),
-                    `class` = alt.path("class").asText(null).orNullIfBlank(),
-                    role = alt.path("role").asText(null).orNullIfBlank(),
-                    level = alt.path("level").asIntOrNull(),
-                    faction = alt.path("faction").asText(null).orNullIfBlank(),
-                    race = alt.path("race").asText(null).orNullIfBlank()
-                )
-            }
+            val alts =
+                altsNode.map { alt ->
+                    ApplicationAltEntity(
+                        applicationId = summary.id,
+                        name = alt.path("name").asText(null).orNullIfBlank(),
+                        realm = alt.path("realm").asText(null).orNullIfBlank(),
+                        region = alt.path("region").asText(null).orNullIfBlank(),
+                        `class` = alt.path("class").asText(null).orNullIfBlank(),
+                        role = alt.path("role").asText(null).orNullIfBlank(),
+                        level = alt.path("level").asIntOrNull(),
+                        faction = alt.path("faction").asText(null).orNullIfBlank(),
+                        race = alt.path("race").asText(null).orNullIfBlank(),
+                    )
+                }
             applicationAltRepository.saveAll(alts).forEach { }
         }
 
@@ -1340,28 +1437,30 @@ class WoWAuditSyncService(
         applicationQuestionFileRepository.deleteByApplicationId(summary.id)
         if (questionsNode.isArray) {
             val questionFiles = mutableListOf<ApplicationQuestionFileEntity>()
-            val questions = questionsNode.mapIndexed { index, question ->
-                val filesJson = if (question.has("files")) objectMapper.writeValueAsString(question["files"]) else null
-                val filesNode = question.path("files")
-                if (filesNode.isArray) {
-                    filesNode.forEach { fileNode ->
-                        questionFiles += ApplicationQuestionFileEntity(
-                            applicationId = summary.id,
-                            questionPosition = index,
-                            question = question.path("question").asText(null).orNullIfBlank(),
-                            originalFilename = fileNode.path("original_filename").asText(null).orNullIfBlank(),
-                            url = fileNode.path("url").asText(null).orNullIfBlank()
-                        )
+            val questions =
+                questionsNode.mapIndexed { index, question ->
+                    val filesJson = if (question.has("files")) objectMapper.writeValueAsString(question["files"]) else null
+                    val filesNode = question.path("files")
+                    if (filesNode.isArray) {
+                        filesNode.forEach { fileNode ->
+                            questionFiles +=
+                                ApplicationQuestionFileEntity(
+                                    applicationId = summary.id,
+                                    questionPosition = index,
+                                    question = question.path("question").asText(null).orNullIfBlank(),
+                                    originalFilename = fileNode.path("original_filename").asText(null).orNullIfBlank(),
+                                    url = fileNode.path("url").asText(null).orNullIfBlank(),
+                                )
+                        }
                     }
+                    ApplicationQuestionEntity(
+                        applicationId = summary.id,
+                        position = index,
+                        question = question.path("question").asText(null).orNullIfBlank(),
+                        answer = question.path("answer").asText(null).orNullIfBlank(),
+                        filesJson = filesJson,
+                    )
                 }
-                ApplicationQuestionEntity(
-                    applicationId = summary.id,
-                    position = index,
-                    question = question.path("question").asText(null).orNullIfBlank(),
-                    answer = question.path("answer").asText(null).orNullIfBlank(),
-                    filesJson = filesJson
-                )
-            }
             applicationQuestionRepository.saveAll(questions).forEach { }
             if (questionFiles.isNotEmpty()) {
                 applicationQuestionFileRepository.saveAll(questionFiles).forEach { }
@@ -1369,28 +1468,35 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun saveSnapshot(endpoint: String, payload: String) {
+    private fun saveSnapshot(
+        endpoint: String,
+        payload: String,
+    ) {
         snapshotRepository.save(
             WoWAuditSnapshotEntity(
                 endpoint = endpoint,
                 rawPayload = payload,
-                syncedAt = OffsetDateTime.now()
-            )
+                syncedAt = OffsetDateTime.now(),
+            ),
         )
     }
 
-    private fun saveSnapshotMono(endpoint: String, payload: String): Mono<Unit> =
+    private fun saveSnapshotMono(
+        endpoint: String,
+        payload: String,
+    ): Mono<Unit> =
         Mono.fromCallable { saveSnapshot(endpoint, payload) }
             .thenReturn(Unit)
 
     private fun extractApplicationIds(body: String): List<Long> =
         try {
             val node = objectMapper.readTree(body)
-            val applications = when {
-                node.isArray -> node
-                node.has("applications") -> node["applications"]
-                else -> return emptyList()
-            }
+            val applications =
+                when {
+                    node.isArray -> node
+                    node.has("applications") -> node["applications"]
+                    else -> return emptyList()
+                }
             applications.mapNotNull { it.path("id").asLong(-1).takeIf { id -> id > 0 } }
         } catch (ex: Exception) {
             logger.error("Failed to parse applications payload", ex)
@@ -1402,19 +1508,21 @@ class WoWAuditSyncService(
             val node = objectMapper.readTree(body)
             val historyNode = node.path("history")
             val bestGearNode = node.path("best_gear")
-            
-            val historyJson = if (historyNode.isMissingNode || historyNode.isNull) {
-                "[]"
-            } else {
-                objectMapper.writeValueAsString(historyNode)
-            }
-            
-            val bestGearJson = if (bestGearNode.isMissingNode || bestGearNode.isNull) {
-                null
-            } else {
-                objectMapper.writeValueAsString(bestGearNode)
-            }
-            
+
+            val historyJson =
+                if (historyNode.isMissingNode || historyNode.isNull) {
+                    "[]"
+                } else {
+                    objectMapper.writeValueAsString(historyNode)
+                }
+
+            val bestGearJson =
+                if (bestGearNode.isMissingNode || bestGearNode.isNull) {
+                    null
+                } else {
+                    objectMapper.writeValueAsString(bestGearNode)
+                }
+
             historyJson to bestGearJson
         } catch (ex: Exception) {
             logger.error("Failed to parse character history payload", ex)
@@ -1422,6 +1530,5 @@ class WoWAuditSyncService(
         }
     }
 
-    private fun JsonNode.arrayElementsOrNull(): Sequence<JsonNode>? =
-        if (this.isArray) this.elements().asSequence() else null
+    private fun JsonNode.arrayElementsOrNull(): Sequence<JsonNode>? = if (this.isArray) this.elements().asSequence() else null
 }

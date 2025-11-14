@@ -11,27 +11,27 @@ import java.time.LocalDateTime
 @RequestMapping("/api/guild/{guildId}/management")
 class GuildManagementController(
     private val behavioralActionRepository: BehavioralActionRepository,
-    private val lootBanRepository: LootBanRepository
+    private val lootBanRepository: LootBanRepository,
 ) {
-
     /**
      * Apply behavioral deduction to a character
      */
     @PostMapping("/behavioral/deduction")
     fun applyBehavioralDeduction(
         @PathVariable guildId: String,
-        @RequestBody request: BehavioralActionRequest
+        @RequestBody request: BehavioralActionRequest,
     ): BehavioralActionEntity {
-        val action = BehavioralActionEntity(
-            guildId = guildId,
-            characterName = request.characterName,
-            actionType = "DEDUCTION",
-            deductionAmount = request.deductionAmount,
-            reason = request.reason,
-            appliedBy = request.appliedBy,
-            appliedAt = LocalDateTime.now(),
-            expiresAt = request.expiresAt
-        )
+        val action =
+            BehavioralActionEntity(
+                guildId = guildId,
+                characterName = request.characterName,
+                actionType = "DEDUCTION",
+                deductionAmount = request.deductionAmount,
+                reason = request.reason,
+                appliedBy = request.appliedBy,
+                appliedAt = LocalDateTime.now(),
+                expiresAt = request.expiresAt,
+            )
         return behavioralActionRepository.save(action)
     }
 
@@ -41,18 +41,19 @@ class GuildManagementController(
     @PostMapping("/behavioral/restoration")
     fun applyBehavioralRestoration(
         @PathVariable guildId: String,
-        @RequestBody request: BehavioralActionRequest
+        @RequestBody request: BehavioralActionRequest,
     ): BehavioralActionEntity {
-        val action = BehavioralActionEntity(
-            guildId = guildId,
-            characterName = request.characterName,
-            actionType = "RESTORATION",
-            deductionAmount = request.deductionAmount,
-            reason = request.reason,
-            appliedBy = request.appliedBy,
-            appliedAt = LocalDateTime.now(),
-            expiresAt = request.expiresAt
-        )
+        val action =
+            BehavioralActionEntity(
+                guildId = guildId,
+                characterName = request.characterName,
+                actionType = "RESTORATION",
+                deductionAmount = request.deductionAmount,
+                reason = request.reason,
+                appliedBy = request.appliedBy,
+                appliedAt = LocalDateTime.now(),
+                expiresAt = request.expiresAt,
+            )
         return behavioralActionRepository.save(action)
     }
 
@@ -62,16 +63,17 @@ class GuildManagementController(
     @PostMapping("/loot-ban")
     fun banCharacterFromLoot(
         @PathVariable guildId: String,
-        @RequestBody request: LootBanRequest
+        @RequestBody request: LootBanRequest,
     ): LootBanEntity {
-        val ban = LootBanEntity(
-            guildId = guildId,
-            characterName = request.characterName,
-            reason = request.reason,
-            bannedBy = request.bannedBy,
-            bannedAt = LocalDateTime.now(),
-            expiresAt = request.expiresAt
-        )
+        val ban =
+            LootBanEntity(
+                guildId = guildId,
+                characterName = request.characterName,
+                reason = request.reason,
+                bannedBy = request.bannedBy,
+                bannedAt = LocalDateTime.now(),
+                expiresAt = request.expiresAt,
+            )
         return lootBanRepository.save(ban)
     }
 
@@ -81,11 +83,11 @@ class GuildManagementController(
     @DeleteMapping("/loot-ban/{characterName}")
     fun liftLootBan(
         @PathVariable guildId: String,
-        @PathVariable characterName: String
+        @PathVariable characterName: String,
     ): Map<String, String> {
         val currentTime = LocalDateTime.now()
         val activeBan = lootBanRepository.findActiveBanForCharacter(guildId, characterName, currentTime)
-        
+
         return if (activeBan != null) {
             // Deactivate the ban by setting it to inactive
             val updatedBan = activeBan.copy(isActive = false)
@@ -101,7 +103,7 @@ class GuildManagementController(
      */
     @GetMapping("/behavioral/active")
     fun getActiveBehavioralActions(
-        @PathVariable guildId: String
+        @PathVariable guildId: String,
     ): List<BehavioralActionEntity> {
         return behavioralActionRepository.findActiveActionsForGuild(guildId, LocalDateTime.now())
     }
@@ -111,7 +113,7 @@ class GuildManagementController(
      */
     @GetMapping("/loot-bans/active")
     fun getActiveLootBans(
-        @PathVariable guildId: String
+        @PathVariable guildId: String,
     ): List<LootBanEntity> {
         return lootBanRepository.findActiveBansForGuild(guildId, LocalDateTime.now())
     }
@@ -122,12 +124,12 @@ data class BehavioralActionRequest(
     val deductionAmount: Double, // 0.0 to 1.0
     val reason: String,
     val appliedBy: String,
-    val expiresAt: LocalDateTime? = null // null = permanent
+    val expiresAt: LocalDateTime? = null, // null = permanent
 )
 
 data class LootBanRequest(
     val characterName: String,
     val reason: String,
     val bannedBy: String,
-    val expiresAt: LocalDateTime? = null // null = permanent
+    val expiresAt: LocalDateTime? = null, // null = permanent
 )

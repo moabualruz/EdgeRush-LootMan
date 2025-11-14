@@ -11,5 +11,5 @@ data class RaiderVaultSlotEntity(
     @Column("raider_id")
     val raiderId: Long,
     val slot: String,
-    val unlocked: Boolean?
+    val unlocked: Boolean?,
 )

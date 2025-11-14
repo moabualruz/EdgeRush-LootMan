@@ -19,7 +19,7 @@ data class TeamResponse(
     @JsonProperty("raid_days")
     val raidDays: List<RaidDayResponse> = emptyList(),
     @JsonProperty("wishlist_updated_at")
-    val wishlistUpdatedAt: Long? = null
+    val wishlistUpdatedAt: Long? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,7 +29,7 @@ data class PeriodResponse(
     @JsonProperty("period_id")
     val periodId: Long? = null,
     @JsonProperty("current_period")
-    val currentPeriod: Long? = null
+    val currentPeriod: Long? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,7 +37,7 @@ data class LastRefreshed(
     val blizzard: String? = null,
     val percentiles: String? = null,
     @JsonProperty("mythic_plus")
-    val mythicPlus: String? = null
+    val mythicPlus: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -52,7 +52,7 @@ data class RaidDayResponse(
     val currentInstance: String? = null,
     val difficulty: String? = null,
     @JsonProperty("active_from")
-    val activeFrom: String? = null
+    val activeFrom: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -67,7 +67,7 @@ data class RosterCharacterResponse(
     val status: String? = null,
     @JsonProperty("tracking_since")
     val trackingSince: String? = null,
-    val region: String? = null
+    val region: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -76,7 +76,7 @@ data class LootHistoryEntryResponse(
     val item: LootItemNode? = null,
     val tier: String? = null,
     @JsonProperty("awarded_at")
-    val awardedAt: String? = null
+    val awardedAt: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -86,11 +86,11 @@ data class LootCharacterNode(
     val role: String? = null,
     @JsonProperty("class")
     val clazz: String? = null,
-    val region: String? = null
+    val region: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class LootItemNode(
     val id: Long? = null,
-    val name: String? = null
+    val name: String? = null,
 )

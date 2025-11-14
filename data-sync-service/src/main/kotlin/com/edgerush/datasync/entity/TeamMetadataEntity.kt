@@ -18,5 +18,5 @@ data class TeamMetadataEntity(
     val lastRefreshedPercentiles: OffsetDateTime?,
     val lastRefreshedMythicPlus: OffsetDateTime?,
     val wishlistUpdatedAt: OffsetDateTime?,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )

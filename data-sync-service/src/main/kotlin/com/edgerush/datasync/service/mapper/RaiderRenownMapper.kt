@@ -8,19 +8,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class RaiderRenownMapper {
-
     fun toEntity(request: CreateRaiderRenownRequest): RaiderRenownEntity {
         return RaiderRenownEntity(
             id = null,
             raiderId = 0L, // System populated
             faction = "", // System populated
-            level = 0 // System populated
+            level = 0, // System populated
         )
     }
 
-    fun updateEntity(entity: RaiderRenownEntity, request: UpdateRaiderRenownRequest): RaiderRenownEntity {
-        return entity.copy(
-        )
+    fun updateEntity(
+        entity: RaiderRenownEntity,
+        request: UpdateRaiderRenownRequest,
+    ): RaiderRenownEntity {
+        return entity.copy()
     }
 
     fun toResponse(entity: RaiderRenownEntity): RaiderRenownResponse {

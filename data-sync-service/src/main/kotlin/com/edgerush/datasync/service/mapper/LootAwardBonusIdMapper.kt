@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class LootAwardBonusIdMapper {
-
     fun toEntity(request: CreateLootAwardBonusIdRequest): LootAwardBonusIdEntity {
         return LootAwardBonusIdEntity(
             id = null,
@@ -17,7 +16,10 @@ class LootAwardBonusIdMapper {
         )
     }
 
-    fun updateEntity(entity: LootAwardBonusIdEntity, request: UpdateLootAwardBonusIdRequest): LootAwardBonusIdEntity {
+    fun updateEntity(
+        entity: LootAwardBonusIdEntity,
+        request: UpdateLootAwardBonusIdRequest,
+    ): LootAwardBonusIdEntity {
         return entity.copy(
             lootAwardId = request.lootAwardId ?: entity.lootAwardId,
             bonusId = request.bonusId ?: entity.bonusId,

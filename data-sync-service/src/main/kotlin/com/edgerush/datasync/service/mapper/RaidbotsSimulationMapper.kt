@@ -9,7 +9,6 @@ import java.time.Instant
 
 @Component
 class RaidbotsSimulationMapper {
-
     fun toEntity(request: CreateRaidbotsSimulationRequest): RaidbotsSimulationEntity {
         return RaidbotsSimulationEntity(
             id = null,
@@ -25,7 +24,10 @@ class RaidbotsSimulationMapper {
         )
     }
 
-    fun updateEntity(entity: RaidbotsSimulationEntity, request: UpdateRaidbotsSimulationRequest): RaidbotsSimulationEntity {
+    fun updateEntity(
+        entity: RaidbotsSimulationEntity,
+        request: UpdateRaidbotsSimulationRequest,
+    ): RaidbotsSimulationEntity {
         return entity.copy(
             guildId = request.guildId ?: entity.guildId,
             characterName = request.characterName ?: entity.characterName,

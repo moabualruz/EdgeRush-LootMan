@@ -11,10 +11,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class AcceptanceSmokeTest {
-
-    private val mapper = ObjectMapper()
-        .registerModule(KotlinModule.Builder().build())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val mapper =
+        ObjectMapper()
+            .registerModule(KotlinModule.Builder().build())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     @Test
     fun `sample datasets load`() {
@@ -29,7 +29,7 @@ class AcceptanceSmokeTest {
         assertAll(
             { assertThat(roster).isNotEmpty() },
             { assertThat(roster.first().character).isEqualTo("MageA") },
-            { assertThat(roster.first().attendance_percent).isGreaterThan(80) }
+            { assertThat(roster.first().attendance_percent).isGreaterThan(80) },
         )
     }
 }

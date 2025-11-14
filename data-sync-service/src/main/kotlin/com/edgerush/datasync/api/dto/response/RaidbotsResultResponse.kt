@@ -10,5 +10,5 @@ data class RaidbotsResultResponse(
     val slot: String,
     val dpsGain: Double,
     val percentGain: Double,
-    val calculatedAt: Instant
+    val calculatedAt: Instant,
 )

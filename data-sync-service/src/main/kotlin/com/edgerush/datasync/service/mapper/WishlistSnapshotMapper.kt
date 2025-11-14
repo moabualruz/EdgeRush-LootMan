@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
 
 @Component
 class WishlistSnapshotMapper {
-
     fun toEntity(request: CreateWishlistSnapshotRequest): WishlistSnapshotEntity {
         return WishlistSnapshotEntity(
             id = null,
@@ -25,7 +24,10 @@ class WishlistSnapshotMapper {
         )
     }
 
-    fun updateEntity(entity: WishlistSnapshotEntity, request: UpdateWishlistSnapshotRequest): WishlistSnapshotEntity {
+    fun updateEntity(
+        entity: WishlistSnapshotEntity,
+        request: UpdateWishlistSnapshotRequest,
+    ): WishlistSnapshotEntity {
         return entity.copy(
             raiderId = request.raiderId ?: entity.raiderId,
             characterName = request.characterName ?: entity.characterName,

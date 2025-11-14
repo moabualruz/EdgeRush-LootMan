@@ -24,5 +24,5 @@ data class RaiderGearItemEntity(
     @Column("upgrade_level")
     val upgradeLevel: Int?,
     val sockets: Int?,
-    val name: String?
+    val name: String?,
 )

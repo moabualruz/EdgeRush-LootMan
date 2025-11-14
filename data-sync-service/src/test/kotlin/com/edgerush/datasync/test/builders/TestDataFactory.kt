@@ -27,7 +27,6 @@ import java.util.UUID
  * Each builder should match the actual entity structure.
  */
 object TestDataFactory {
-
     /**
      * Creates a test Raider entity with sensible defaults.
      */
@@ -47,25 +46,26 @@ object TestDataFactory {
         trackingSince: java.time.OffsetDateTime? = null,
         joinDate: java.time.OffsetDateTime? = null,
         blizzardLastModified: java.time.OffsetDateTime? = null,
-        lastSync: java.time.OffsetDateTime = java.time.OffsetDateTime.now()
-    ): RaiderEntity = RaiderEntity(
-        id = id,
-        characterName = characterName,
-        realm = realm,
-        region = region,
-        wowauditId = wowauditId,
-        clazz = clazz,
-        spec = spec,
-        role = role,
-        rank = rank,
-        status = status,
-        note = note,
-        blizzardId = blizzardId,
-        trackingSince = trackingSince,
-        joinDate = joinDate,
-        blizzardLastModified = blizzardLastModified,
-        lastSync = lastSync
-    )
+        lastSync: java.time.OffsetDateTime = java.time.OffsetDateTime.now(),
+    ): RaiderEntity =
+        RaiderEntity(
+            id = id,
+            characterName = characterName,
+            realm = realm,
+            region = region,
+            wowauditId = wowauditId,
+            clazz = clazz,
+            spec = spec,
+            role = role,
+            rank = rank,
+            status = status,
+            note = note,
+            blizzardId = blizzardId,
+            trackingSince = trackingSince,
+            joinDate = joinDate,
+            blizzardLastModified = blizzardLastModified,
+            lastSync = lastSync,
+        )
 
     /**
      * Creates a test Raid entity with sensible defaults.
@@ -88,27 +88,28 @@ object TestDataFactory {
         periodId: Long? = 1L,
         createdAt: java.time.OffsetDateTime? = java.time.OffsetDateTime.now(),
         updatedAt: java.time.OffsetDateTime? = java.time.OffsetDateTime.now(),
-        syncedAt: java.time.OffsetDateTime = java.time.OffsetDateTime.now()
-    ): RaidEntity = RaidEntity(
-        raidId = raidId,
-        date = date,
-        startTime = startTime,
-        endTime = endTime,
-        instance = instance,
-        difficulty = difficulty,
-        optional = optional,
-        status = status,
-        presentSize = presentSize,
-        totalSize = totalSize,
-        notes = notes,
-        selectionsImage = selectionsImage,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        syncedAt = syncedAt
-    )
+        syncedAt: java.time.OffsetDateTime = java.time.OffsetDateTime.now(),
+    ): RaidEntity =
+        RaidEntity(
+            raidId = raidId,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
+            instance = instance,
+            difficulty = difficulty,
+            optional = optional,
+            status = status,
+            presentSize = presentSize,
+            totalSize = totalSize,
+            notes = notes,
+            selectionsImage = selectionsImage,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            syncedAt = syncedAt,
+        )
 
     /**
      * Creates a test BehavioralAction entity with sensible defaults.
@@ -122,18 +123,19 @@ object TestDataFactory {
         reason: String = "Test reason",
         appliedBy: String = "GuildLeader",
         appliedAt: LocalDateTime = LocalDateTime.now(),
-        expiresAt: LocalDateTime? = LocalDateTime.now().plusDays(7)
-    ): BehavioralActionEntity = BehavioralActionEntity(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        actionType = actionType,
-        deductionAmount = deductionAmount,
-        reason = reason,
-        appliedBy = appliedBy,
-        appliedAt = appliedAt,
-        expiresAt = expiresAt
-    )
+        expiresAt: LocalDateTime? = LocalDateTime.now().plusDays(7),
+    ): BehavioralActionEntity =
+        BehavioralActionEntity(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            actionType = actionType,
+            deductionAmount = deductionAmount,
+            reason = reason,
+            appliedBy = appliedBy,
+            appliedAt = appliedAt,
+            expiresAt = expiresAt,
+        )
 
     /**
      * Creates a test LootBan entity with sensible defaults.
@@ -145,14 +147,15 @@ object TestDataFactory {
         reason: String = "Test ban reason",
         bannedBy: String = "GuildLeader",
         bannedAt: LocalDateTime = LocalDateTime.now(),
-        expiresAt: LocalDateTime = LocalDateTime.now().plusDays(7)
-    ): LootBanEntity = LootBanEntity(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        reason = reason,
-        bannedBy = bannedBy,
-        bannedAt = bannedAt,
-        expiresAt = expiresAt
-    )
+        expiresAt: LocalDateTime = LocalDateTime.now().plusDays(7),
+    ): LootBanEntity =
+        LootBanEntity(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            reason = reason,
+            bannedBy = bannedBy,
+            bannedAt = bannedAt,
+            expiresAt = expiresAt,
+        )
 }

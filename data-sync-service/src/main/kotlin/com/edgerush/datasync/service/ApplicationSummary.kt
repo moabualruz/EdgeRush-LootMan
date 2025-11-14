@@ -19,25 +19,26 @@ data class ApplicationSummary(
     val mainCharacterRace: String?,
     val mainCharacterFaction: String?,
     val mainCharacterLevel: Int?,
-    val mainCharacterRegion: String?
+    val mainCharacterRegion: String?,
 ) {
-    fun toEntity(): ApplicationEntity = ApplicationEntity(
-        applicationId = id,
-        appliedAt = appliedAt,
-        status = status,
-        role = role,
-        age = age,
-        country = country,
-        battletag = battletag,
-        discordId = discordId,
-        mainCharacterName = mainCharacterName,
-        mainCharacterRealm = mainCharacterRealm,
-        mainCharacterClass = mainCharacterClass,
-        mainCharacterRole = mainCharacterRole,
-        mainCharacterRace = mainCharacterRace,
-        mainCharacterFaction = mainCharacterFaction,
-        mainCharacterLevel = mainCharacterLevel,
-        mainCharacterRegion = mainCharacterRegion,
-        syncedAt = OffsetDateTime.now()
-    )
+    fun toEntity(): ApplicationEntity =
+        ApplicationEntity(
+            applicationId = id,
+            appliedAt = appliedAt,
+            status = status,
+            role = role,
+            age = age,
+            country = country,
+            battletag = battletag,
+            discordId = discordId,
+            mainCharacterName = mainCharacterName,
+            mainCharacterRealm = mainCharacterRealm,
+            mainCharacterClass = mainCharacterClass,
+            mainCharacterRole = mainCharacterRole,
+            mainCharacterRace = mainCharacterRace,
+            mainCharacterFaction = mainCharacterFaction,
+            mainCharacterLevel = mainCharacterLevel,
+            mainCharacterRegion = mainCharacterRegion,
+            syncedAt = OffsetDateTime.now(),
+        )
 }

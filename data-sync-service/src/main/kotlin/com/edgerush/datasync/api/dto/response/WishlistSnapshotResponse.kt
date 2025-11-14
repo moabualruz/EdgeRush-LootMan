@@ -12,5 +12,5 @@ data class WishlistSnapshotResponse(
     val seasonId: Long?,
     val periodId: Long?,
     val rawPayload: String,
-    val syncedAt: OffsetDateTime
+    val syncedAt: OffsetDateTime,
 )
