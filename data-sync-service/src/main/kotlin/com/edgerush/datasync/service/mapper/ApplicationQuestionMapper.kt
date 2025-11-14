@@ -6,8 +6,8 @@ import com.edgerush.datasync.api.dto.response.ApplicationQuestionResponse
 import com.edgerush.datasync.entity.ApplicationQuestionEntity
 import org.springframework.stereotype.Component
 
-@Component
-class ApplicationQuestionMapper {
+@Component("legacyApplicationQuestionMapper")
+class LegacyApplicationQuestionMapper {
     fun toEntity(request: CreateApplicationQuestionRequest): ApplicationQuestionEntity {
         return ApplicationQuestionEntity(
             id = null,

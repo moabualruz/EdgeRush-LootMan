@@ -6,8 +6,8 @@ import com.edgerush.datasync.api.dto.response.ApplicationAltResponse
 import com.edgerush.datasync.entity.ApplicationAltEntity
 import org.springframework.stereotype.Component
 
-@Component
-class ApplicationAltMapper {
+@Component("legacyApplicationAltMapper")
+class LegacyApplicationAltMapper {
     fun toEntity(request: CreateApplicationAltRequest): ApplicationAltEntity {
         return ApplicationAltEntity(
             id = null,

@@ -6,7 +6,7 @@ import com.edgerush.datasync.api.dto.response.RaidEncounterResponse
 import com.edgerush.datasync.entity.RaidEncounterEntity
 import org.springframework.stereotype.Component
 
-@Component
+@Component("legacyRaidEncounterMapper")
 class LegacyRaidEncounterMapper {
     fun toEntity(request: CreateRaidEncounterRequest): RaidEncounterEntity {
         return RaidEncounterEntity(

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/flps")
-class LegacyFlpsController(
+class FlpsLegacyController(
     private val guildManagementService: GuildManagementService,
 ) {
     /**

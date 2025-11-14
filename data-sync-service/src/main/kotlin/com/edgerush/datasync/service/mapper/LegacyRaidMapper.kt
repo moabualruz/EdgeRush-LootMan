@@ -7,7 +7,7 @@ import com.edgerush.datasync.entity.RaidEntity
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 
-@Component
+@Component("legacyRaidMapper")
 class LegacyRaidMapper {
     fun toEntity(request: CreateRaidRequest): RaidEntity {
         return RaidEntity(

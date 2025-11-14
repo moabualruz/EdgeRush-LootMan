@@ -1,5 +1,7 @@
 package com.edgerush.datasync.service
 
+import com.edgerush.datasync.domain.flps.model.IpiWeights
+import com.edgerush.datasync.domain.flps.model.RmsWeights
 import com.edgerush.datasync.repository.FlpsDefaultModifierRepository
 import com.edgerush.datasync.repository.FlpsGuildModifierRepository
 import org.springframework.stereotype.Service
@@ -124,18 +126,6 @@ data class FlpsGuildConfig(
     val roleMultipliers: RoleMultipliers,
     val thresholds: Thresholds,
     val limits: Limits,
-)
-
-data class RmsWeights(
-    val attendance: Double, // Weight for ACS in RMS calculation
-    val mechanical: Double, // Weight for MAS in RMS calculation
-    val preparation: Double, // Weight for EPS in RMS calculation
-)
-
-data class IpiWeights(
-    val upgradeValue: Double, // Weight for upgrade value in IPI
-    val tierBonus: Double, // Weight for tier bonus in IPI
-    val roleMultiplier: Double, // Weight for role multiplier in IPI
 )
 
 data class RoleMultipliers(

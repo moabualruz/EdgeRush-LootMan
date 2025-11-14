@@ -55,6 +55,22 @@ class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error)
     }
 
+    @ExceptionHandler(ValidationException::class)
+    fun handleValidationException(
+        ex: ValidationException,
+        exchange: ServerWebExchange,
+    ): ResponseEntity<ErrorResponse> {
+        val error =
+            ErrorResponse(
+                timestamp = LocalDateTime.now(),
+                status = HttpStatus.BAD_REQUEST.value(),
+                error = "Bad Request",
+                message = ex.message ?: "Validation failed",
+                path = exchange.request.path.value(),
+            )
+        return ResponseEntity.badRequest().body(error)
+    }
+
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDenied(
         ex: AccessDeniedException,

@@ -7,8 +7,8 @@ import com.edgerush.datasync.entity.ApplicationEntity
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 
-@Component
-class ApplicationMapper {
+@Component("legacyApplicationMapper")
+class LegacyApplicationMapper {
     fun toEntity(
         request: CreateApplicationRequest,
         applicationId: Long,

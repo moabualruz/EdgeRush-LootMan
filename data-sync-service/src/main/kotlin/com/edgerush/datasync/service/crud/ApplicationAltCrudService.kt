@@ -8,7 +8,7 @@ import com.edgerush.datasync.entity.ApplicationAltEntity
 import com.edgerush.datasync.repository.ApplicationAltRepository
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.service.AuditLogger
-import com.edgerush.datasync.service.mapper.ApplicationAltMapper
+import com.edgerush.datasync.service.mapper.LegacyApplicationAltMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ApplicationAltCrudService(
     private val repository: ApplicationAltRepository,
-    private val mapper: ApplicationAltMapper,
+    private val mapper: LegacyApplicationAltMapper,
     private val auditLogger: AuditLogger,
 ) : CrudService<ApplicationAltEntity, Long, CreateApplicationAltRequest, UpdateApplicationAltRequest, ApplicationAltResponse> {
     override fun findAll(pageable: Pageable): Page<ApplicationAltResponse> {

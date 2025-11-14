@@ -8,7 +8,7 @@ import com.edgerush.datasync.entity.ApplicationQuestionEntity
 import com.edgerush.datasync.repository.ApplicationQuestionRepository
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.service.AuditLogger
-import com.edgerush.datasync.service.mapper.ApplicationQuestionMapper
+import com.edgerush.datasync.service.mapper.LegacyApplicationQuestionMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ApplicationQuestionCrudService(
     private val repository: ApplicationQuestionRepository,
-    private val mapper: ApplicationQuestionMapper,
+    private val mapper: LegacyApplicationQuestionMapper,
     private val auditLogger: AuditLogger,
 ) : CrudService<ApplicationQuestionEntity, Long, CreateApplicationQuestionRequest, UpdateApplicationQuestionRequest, ApplicationQuestionResponse> {
     override fun findAll(pageable: Pageable): Page<ApplicationQuestionResponse> {
