@@ -1,6 +1,7 @@
 package com.edgerush.datasync.domain.flps.service
 
 import com.edgerush.datasync.domain.flps.model.*
+import org.springframework.stereotype.Service
 import kotlin.math.max
 import kotlin.math.min
 
@@ -16,6 +17,7 @@ import kotlin.math.min
  * This service contains the core business logic for FLPS calculations,
  * independent of infrastructure concerns.
  */
+@Service
 class FlpsCalculationService {
 
     /**

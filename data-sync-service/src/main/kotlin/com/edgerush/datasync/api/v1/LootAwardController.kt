@@ -8,11 +8,23 @@ import com.edgerush.datasync.service.crud.LootAwardCrudService
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 
+/**
+ * REST controller for LootAward CRUD operations (legacy API).
+ *
+ * This controller maintains backward compatibility with the legacy CRUD API.
+ *
+ * Note: For new loot award operations, prefer using the /api/v1/loot endpoints
+ * which provide a more domain-focused API with the new domain models.
+ */
 @RestController
 @RequestMapping("/api/v1/loot-awards")
-@Tag(name = "LootAward", description = "Manage lootaward entities")
+@Tag(name = "LootAward", description = "Manage lootaward entities (legacy CRUD API)")
 class LootAwardController(
     service: LootAwardCrudService,
-) : BaseCrudController<LootAwardEntity, Long, CreateLootAwardRequest, UpdateLootAwardRequest, LootAwardResponse>(service) {
-    // Custom endpoints can be added here manually as needed
+) : BaseCrudController<LootAwardEntity, Long, CreateLootAwardRequest, UpdateLootAwardRequest, LootAwardResponse>(
+        service,
+    ) {
+    // This controller uses the legacy CRUD service for backward compatibility
+    // Custom endpoints can be added here if needed
 }
+

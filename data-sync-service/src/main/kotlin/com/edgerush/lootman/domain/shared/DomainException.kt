@@ -22,3 +22,9 @@ class GuildNotFoundException(val guildId: GuildId) :
  */
 class ItemNotFoundException(val itemId: ItemId) :
     DomainException("Item not found: ${itemId.value}")
+
+/**
+ * Exception thrown when a raider has active loot bans.
+ */
+class LootBanActiveException(val raiderId: RaiderId, val bans: List<com.edgerush.lootman.domain.loot.model.LootBan>) :
+    DomainException("Raider ${raiderId.value} has ${bans.size} active loot ban(s)")

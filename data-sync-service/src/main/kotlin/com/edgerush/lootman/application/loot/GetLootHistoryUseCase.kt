@@ -4,13 +4,15 @@ import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.repository.LootAwardRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-
 import org.springframework.stereotype.Service
 
 /**
  * Use case for retrieving loot history.
  *
- * Provides methods to query loot awards by guild or raider.
+ * This handles:
+ * - Getting loot history by guild
+ * - Getting loot history by raider
+ * - Filtering by active/revoked status
  */
 @Service
 class GetLootHistoryUseCase(
@@ -19,27 +21,50 @@ class GetLootHistoryUseCase(
     /**
      * Gets loot history for a guild.
      *
-     * @param guildId The guild to query
-     * @param limit Maximum number of awards to return (currently not used)
-     * @return List of loot awards for the guild
+     * @param query The query parameters
+     * @return Result containing list of loot awards or error
      */
-    fun getGuildHistory(
-        guildId: GuildId,
-        limit: Int = 100,
-    ): Result<List<LootAward>> =
+    fun getByGuild(query: GetLootHistoryByGuildQuery): Result<List<LootAward>> =
         runCatching {
-            lootAwardRepository.findByGuildId(guildId)
+            val awards = lootAwardRepository.findByGuildId(query.guildId)
+
+            if (query.activeOnly) {
+                awards.filter { it.isActive() }
+            } else {
+                awards
+            }
         }
 
     /**
      * Gets loot history for a raider.
      *
-     * @param raiderId The raider to query
-     * @return List of loot awards for the raider
+     * @param query The query parameters
+     * @return Result containing list of loot awards or error
      */
-    fun getRaiderHistory(raiderId: RaiderId): Result<List<LootAward>> =
+    fun getByRaider(query: GetLootHistoryByRaiderQuery): Result<List<LootAward>> =
         runCatching {
-            lootAwardRepository.findByRaiderId(raiderId)
+            val awards = lootAwardRepository.findByRaiderId(query.raiderId)
+
+            if (query.activeOnly) {
+                awards.filter { it.isActive() }
+            } else {
+                awards
+            }
         }
 }
 
+/**
+ * Query for getting loot history by guild.
+ */
+data class GetLootHistoryByGuildQuery(
+    val guildId: GuildId,
+    val activeOnly: Boolean = false,
+)
+
+/**
+ * Query for getting loot history by raider.
+ */
+data class GetLootHistoryByRaiderQuery(
+    val raiderId: RaiderId,
+    val activeOnly: Boolean = false,
+)

@@ -1,6 +1,7 @@
 package com.edgerush.lootman.domain.flps.service
 
 import com.edgerush.lootman.domain.flps.model.*
+import org.springframework.stereotype.Service
 
 /**
  * Domain service for calculating Final Loot Priority Score (FLPS).
@@ -15,6 +16,7 @@ import com.edgerush.lootman.domain.flps.model.*
  *
  * This is a stateless domain service that contains pure business logic.
  */
+@Service
 class FlpsCalculationService {
     /**
      * Calculates FLPS from the three main component scores.

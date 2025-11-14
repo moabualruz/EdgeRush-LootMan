@@ -2,10 +2,12 @@ package com.edgerush.datasync.domain.applications.service
 
 import com.edgerush.datasync.domain.applications.model.Application
 import com.edgerush.datasync.domain.applications.model.ApplicationStatus
+import org.springframework.stereotype.Service
 
 /**
  * Domain service for application review logic
  */
+@Service
 class ApplicationReviewService {
     
     /**

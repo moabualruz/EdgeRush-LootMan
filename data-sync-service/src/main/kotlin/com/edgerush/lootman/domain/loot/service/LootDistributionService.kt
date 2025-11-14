@@ -4,8 +4,10 @@ import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootBan
 import com.edgerush.lootman.domain.shared.RaiderId
+import org.springframework.stereotype.Service
 import java.time.Instant
 
+@Service
 class LootDistributionService {
     fun isEligibleForLoot(
         raiderId: RaiderId,

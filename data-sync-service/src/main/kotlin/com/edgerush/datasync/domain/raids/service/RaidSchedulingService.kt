@@ -1,12 +1,14 @@
 package com.edgerush.datasync.domain.raids.service
 
 import com.edgerush.datasync.domain.raids.model.*
+import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalTime
 
 /**
  * Domain service for raid scheduling logic.
  */
+@Service
 class RaidSchedulingService {
     
     /**

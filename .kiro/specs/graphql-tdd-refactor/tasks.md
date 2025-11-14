@@ -115,7 +115,12 @@
 
 ## Phase 3: Loot Bounded Context Refactoring
 
-- [ ] 11. Create Loot domain layer with TDD
+- [x] 11. Create Loot domain layer with TDD
+
+
+
+
+
   - Write tests for LootAward aggregate root (creation, state transitions)
   - Implement LootAward aggregate with business rules
   - Write tests for LootBan entity (validation, expiration logic)
@@ -124,7 +129,12 @@
   - Implement LootDistributionService with loot award rules
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 12. Create Loot application layer with TDD
+- [x] 12. Create Loot application layer with TDD
+
+
+
+
+
   - Write tests for AwardLootUseCase (happy path and error cases)
   - Implement AwardLootUseCase with validation and orchestration
   - Write tests for ManageLootBansUseCase
@@ -133,7 +143,12 @@
   - Implement GetLootHistoryUseCase with filtering and pagination
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
-- [ ] 13. Create Loot infrastructure layer with TDD
+- [x] 13. Create Loot infrastructure layer with TDD
+
+
+
+
+
   - Write tests for LootAwardRepository implementation
   - Implement JdbcLootAwardRepository with optimized queries
   - Write tests for LootBanRepository implementation
@@ -142,7 +157,11 @@
   - Implement mappers for LootAward and LootBan entities
   - _Requirements: 2.2, 5.4, 5.5_
 
-- [ ] 14. Update Loot API layer with TDD
+- [x] 14. Update Loot API layer with TDD
+
+
+
+
   - Write integration tests for LootController endpoints
   - Refactor LootController to use new use cases
   - Write integration tests for LootAwardController
@@ -150,7 +169,11 @@
   - Verify backward compatibility with existing endpoints
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 15. Verify Loot bounded context completion
+- [x] 15. Verify Loot bounded context completion
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run code quality checks (ktlint, detekt)

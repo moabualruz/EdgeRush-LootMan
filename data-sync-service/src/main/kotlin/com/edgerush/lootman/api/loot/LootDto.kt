@@ -5,6 +5,27 @@ import com.edgerush.lootman.domain.loot.model.LootBan
 import java.time.Instant
 
 /**
+ * Request DTO for awarding loot.
+ */
+data class AwardLootRequest(
+    val itemId: Long,
+    val raiderId: String,
+    val guildId: String,
+    val flpsScore: Double,
+    val tier: String,
+)
+
+/**
+ * Request DTO for creating a loot ban.
+ */
+data class CreateLootBanRequest(
+    val raiderId: String,
+    val guildId: String,
+    val reason: String,
+    val expiresAt: Instant?,
+)
+
+/**
  * Response DTO for loot history.
  */
 data class LootHistoryResponse(
