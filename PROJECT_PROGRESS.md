@@ -31,6 +31,15 @@
 - [x] Added Docker-based runtime (Postgres 18, Gradle runner, nginx) and documented local setup (`docs/local-setup.md`).
 - [x] Updated sync workflow to use WoWAudit `/v1` roster/team/period endpoints and guild/team loot history with JSON safeguards.
 - [x] Persisted full WoWAudit datasets locally (attendance, raids, historical activity, guests, applications, wishlists) with auditing snapshots and normalized tables.
-- [ ] Harden error handling and add unit tests for Kotlin data sync clients (WebClient, retry logic).
-- [ ] Integrate mock datasets into interim dashboard template and share link with council.
-- [ ] Compute and persist POLCP (FLPS) results using the synchronized data.
+- [x] Implemented WoWAuditDataTransformerService to bridge synced data to FLPS calculations.
+- [x] Implemented ScoreCalculator.calculateWithRealData() using actual WoWAudit data.
+- [x] Created FlpsController with comprehensive FLPS report endpoints.
+- [x] Implemented guild-specific FLPS configuration system.
+- [x] Implemented behavioral scoring and loot ban management.
+- [ ] Implement Warcraft Logs API integration for accurate MAS (Mechanical Adherence Score).
+- [ ] Implement Raidbots API integration for accurate upgrade value calculations.
+- [ ] Build web dashboard for player-facing FLPS transparency.
+- [ ] Implement Discord bot for automated notifications and commands.
+- [ ] Harden error handling and add comprehensive unit tests.
+
+**See `IMPLEMENTATION_STATUS.md` for complete, verified status.**

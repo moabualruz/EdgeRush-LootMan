@@ -52,7 +52,7 @@ class WoWAuditClientTest {
 
         val recorded = server.takeRequest()
         assertThat(recorded.method).isEqualTo("GET")
-        assertThat(recorded.path).isEqualTo("/guild/characters")
+        assertThat(recorded.path).isEqualTo("/v1/characters")
     }
 
     @Test
@@ -94,7 +94,7 @@ class WoWAuditClientTest {
         val brokenClient = WoWAuditClient(webClient, props)
 
         assertThatThrownBy { brokenClient.fetchRoster().block() }
-            .isInstanceOf(IllegalStateException::class.java)
+            .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("guild-profile-uri")
     }
 }

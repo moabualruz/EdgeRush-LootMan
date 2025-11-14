@@ -5,6 +5,7 @@ import com.edgerush.datasync.model.LootAward
 import com.edgerush.datasync.model.LootTier
 import com.edgerush.datasync.model.RaiderInput
 import com.edgerush.datasync.model.Role
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.LocalDate
@@ -15,8 +16,11 @@ import kotlin.math.min
 class ScoreCalculator(
     private val dataTransformer: WoWAuditDataTransformerService,
     private val modifierService: FlpsModifierService,
+    private val warcraftLogsPerformanceService: com.edgerush.datasync.service.warcraftlogs.WarcraftLogsPerformanceService? = null,
+    private val raidbotsUpgradeService: com.edgerush.datasync.service.raidbots.RaidbotsUpgradeService? = null,
     private val clock: Clock = Clock.systemUTC()
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun calculate(inputs: List<RaiderInput>): List<FlpsBreakdown> {
         val referenceDate = LocalDate.now(clock)
@@ -45,7 +49,8 @@ class ScoreCalculator(
                 wishlistData,
                 lootHistoryData,
                 gearData,
-                guildConfig
+                guildConfig,
+                guildId
             )
         }.sortedByDescending { it.flps }
     }    private fun calculateForCharacterWithRealData(
@@ -54,7 +59,8 @@ class ScoreCalculator(
         wishlistData: WishlistData,
         lootHistoryData: LootHistoryData,
         gearData: CharacterGearData,
-        guildConfig: FlpsGuildConfig
+        guildConfig: FlpsGuildConfig,
+        guildId: String = "default"
     ): FlpsBreakdown {
         val characterKey = "${character.characterName}-${character.characterRealm}"
         
@@ -74,7 +80,12 @@ class ScoreCalculator(
         
         // Calculate RMS using real data with guild-specific weights
         val acs = attendanceCommitmentScore(character.attendancePercentage.toInt())
-        val mas = calculateMechanicalAdherenceFromActivity(activity)
+        val mas = calculateMechanicalAdherenceWithWarcraftLogs(
+            character.characterName,
+            character.characterRealm,
+            guildId,
+            activity
+        )
         val eps = calculateExternalPreparationFromActivity(activity)
         val rms = (acs * guildConfig.rmsWeights.attendance) + 
                   (mas * guildConfig.rmsWeights.mechanical) + 
@@ -222,6 +233,32 @@ class ScoreCalculator(
         return 0.0 // Placeholder - should be replaced with actual raid performance data
     }
     
+    /**
+     * Calculate MAS using Warcraft Logs data if available, otherwise fall back to activity-based calculation
+     */
+    private fun calculateMechanicalAdherenceWithWarcraftLogs(
+        characterName: String,
+        characterRealm: String,
+        guildId: String,
+        activity: CharacterActivityInfo?
+    ): Double {
+        // Try Warcraft Logs first if service is available
+        if (warcraftLogsPerformanceService != null) {
+            try {
+                val mas = warcraftLogsPerformanceService.getMASForCharacter(characterName, characterRealm, guildId)
+                if (mas > 0.0) {
+                    return mas
+                }
+            } catch (ex: Exception) {
+                // Log and fall back to activity-based calculation
+                logger.warn("Failed to get Warcraft Logs MAS for $characterName-$characterRealm, falling back to activity-based", ex)
+            }
+        }
+        
+        // Fall back to activity-based calculation
+        return calculateMechanicalAdherenceFromActivity(activity)
+    }
+    
     private fun calculateExternalPreparationFromActivity(activity: CharacterActivityInfo?): Double {
         if (activity == null) return 0.0 // No activity data = 0 score
         
@@ -270,6 +307,33 @@ class ScoreCalculator(
         return if (upgradePercentages.isNotEmpty()) {
             round(min(1.0, upgradePercentages.average() / 100.0)) // Normalize percentage to 0-1
         } else 0.5
+    }
+    
+    /**
+     * Calculate UV using Raidbots data if available, otherwise fall back to wishlist percentages
+     */
+    private fun calculateUpgradeValueWithRaidbots(
+        characterName: String,
+        characterRealm: String,
+        guildId: String,
+        itemId: Long?,
+        wishlist: CharacterWishlistInfo?,
+        gear: CharacterCurrentGear?
+    ): Double {
+        // Try Raidbots first if service is available and we have an item ID
+        if (raidbotsUpgradeService != null && itemId != null) {
+            try {
+                val uv = raidbotsUpgradeService.getUVForItem(guildId, characterName, characterRealm, itemId)
+                if (uv > 0.0) {
+                    return uv
+                }
+            } catch (ex: Exception) {
+                logger.warn("Failed to get Raidbots UV for $characterName-$characterRealm, falling back to wishlist", ex)
+            }
+        }
+        
+        // Fall back to wishlist-based calculation
+        return calculateUpgradeValueFromWishlist(wishlist, gear)
     }
     
     private fun calculateTierBonusFromGear(gear: CharacterCurrentGear?): Double {

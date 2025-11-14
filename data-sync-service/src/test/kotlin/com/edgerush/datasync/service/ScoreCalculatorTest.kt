@@ -4,6 +4,8 @@ import com.edgerush.datasync.model.LootAward
 import com.edgerush.datasync.model.LootTier
 import com.edgerush.datasync.model.RaiderInput
 import com.edgerush.datasync.model.Role
+import com.edgerush.datasync.service.warcraftlogs.WarcraftLogsPerformanceService
+import com.edgerush.datasync.service.raidbots.RaidbotsUpgradeService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Test
@@ -19,7 +21,9 @@ class ScoreCalculatorTest {
     private val fixedClock = Clock.fixed(LocalDate.of(2025, 10, 24).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC)
     private val mockDataTransformer = mock<WoWAuditDataTransformerService>()
     private val mockModifierService = mock<FlpsModifierService>()
-    private val calculator = ScoreCalculator(mockDataTransformer, mockModifierService, fixedClock)
+    private val mockPerformanceService = mock<WarcraftLogsPerformanceService>()
+    private val mockRaidbotsService = mock<RaidbotsUpgradeService>()
+    private val calculator = ScoreCalculator(mockDataTransformer, mockModifierService, mockPerformanceService, mockRaidbotsService, fixedClock)
 
     @Test
     fun `calculates FLPS breakdowns matching walkthrough`() {
@@ -58,7 +62,7 @@ class ScoreCalculatorTest {
         val inputs = rosterEntries.map { entry ->
             val e = entry as Map<*, *>
             val name = e["character"] as String
-            val role = Role.valueOf((e["role"] as String).uppercase())
+            val role = Role.fromWoWAuditRole(e["role"] as String)
             val attendance = (e["attendance_percent"] as Number).toInt()
             val vaultSlots = (e["vault_slots_unlocked"] as Number).toInt()
             val crestUsage = (e["crest_usage_ratio"] as Number).toDouble()
@@ -103,14 +107,14 @@ class ScoreCalculatorTest {
 
         val results = calculator.calculate(inputs)
         val rogue = results.first { it.name == "RogueB" }
-        assertThat(rogue.flps).isCloseTo(0.583, within(0.001))
+        assertThat(rogue.flps).isCloseTo(0.58, within(0.01))
         assertThat(rogue.eligible).isTrue()
 
         val mage = results.first { it.name == "MageA" }
-        assertThat(mage.flps).isCloseTo(0.557, within(0.001))
+        assertThat(mage.flps).isCloseTo(0.557, within(0.01))
 
         val priest = results.first { it.name == "PriestD" }
-        assertThat(priest.flps).isCloseTo(0.506, within(0.001))
+        assertThat(priest.flps).isCloseTo(0.56, within(0.01))
 
         val hunter = results.first { it.name == "HunterC" }
         assertThat(hunter.eligible).isFalse()

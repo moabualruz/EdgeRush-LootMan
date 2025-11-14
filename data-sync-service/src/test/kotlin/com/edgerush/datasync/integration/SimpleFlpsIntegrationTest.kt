@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = ["classpath:application-test.properties"])
 @Transactional
-class ComprehensiveFlpsIntegrationTest {
+class SimpleFlpsIntegrationTest {
 
     @Autowired
     private lateinit var guildManagementService: GuildManagementService

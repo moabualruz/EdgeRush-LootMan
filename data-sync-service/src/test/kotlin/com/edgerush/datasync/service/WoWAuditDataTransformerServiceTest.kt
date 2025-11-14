@@ -4,15 +4,13 @@ import com.edgerush.datasync.repository.*
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.assertj.core.api.Assertions.assertThat
 
-@DataJpaTest
-@SpringJUnitConfig
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = ["classpath:application-test.properties"])
+@Transactional
 class WoWAuditDataTransformerServiceTest {
 
     @Autowired

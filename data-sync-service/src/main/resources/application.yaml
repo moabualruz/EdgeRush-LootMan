@@ -19,6 +19,78 @@ sync:
     guild-profile-uri: ${WOWAUDIT_GUILD_URI:}
     api-key: ${WOWAUDIT_API_KEY:}
 
+# Warcraft Logs Integration Configuration
+warcraft-logs:
+  enabled: ${WARCRAFT_LOGS_ENABLED:false}
+  client-id: ${WARCRAFT_LOGS_CLIENT_ID:}
+  client-secret: ${WARCRAFT_LOGS_CLIENT_SECRET:}
+  base-url: https://www.warcraftlogs.com/api/v2
+  token-url: https://www.warcraftlogs.com/oauth/token
+  max-retries: 3
+  retry-delay-ms: 1000
+  max-concurrent-requests: 5
+  request-timeout-seconds: 30
+  sync:
+    cron: "0 0 */6 * * *"  # Every 6 hours
+
+# Raidbots Integration Configuration
+# Note: Raidbots doesn't have a public API for automated submissions
+# This integration parses shared Droptimizer report URLs submitted by raiders
+raidbots:
+  enabled: ${RAIDBOTS_ENABLED:false}
+  base-url: https://www.raidbots.com
+  # Raiders submit Droptimizer URLs manually via WoWAudit or Discord
+  # System parses the public report pages for upgrade values
+
+# Encryption key for sensitive data (should be 32 bytes)
+encryption:
+  key: ${ENCRYPTION_KEY:default-32-byte-key-change-me!!}
+
+# API Configuration
+api:
+  version: v1
+  base-path: /api
+  
+  # Admin Mode (DEVELOPMENT ONLY - bypasses authentication)
+  admin-mode:
+    enabled: ${API_ADMIN_MODE:true}
+  
+  # Rate Limiting
+  rate-limit:
+    read-requests-per-second: 100
+    write-requests-per-second: 20
+    enabled: ${API_RATE_LIMIT_ENABLED:false}
+  
+  # Pagination
+  pagination:
+    default-page-size: 20
+    max-page-size: 100
+  
+  # CORS
+  cors:
+    allowed-origins: ${API_CORS_ORIGINS:http://localhost:3000,http://localhost:8080}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:default-secret-key-change-in-production-must-be-at-least-256-bits-long-for-security}
+  expiration-ms: 86400000  # 24 hours
+  issuer: edgerush-lootman
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  show-actuator: true
+
 # FLPS Algorithm Configuration
 flps:
   rms:

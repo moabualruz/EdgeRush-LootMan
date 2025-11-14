@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface BehavioralActionRepository : CrudRepository<BehavioralActionEntity, Long> {
+interface BehavioralActionRepository : CrudRepository<BehavioralActionEntity, Long>, org.springframework.data.repository.PagingAndSortingRepository<BehavioralActionEntity, Long> {
     
     @Query("""
         SELECT * FROM behavioral_actions 

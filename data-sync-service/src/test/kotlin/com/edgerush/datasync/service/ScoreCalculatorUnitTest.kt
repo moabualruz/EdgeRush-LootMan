@@ -133,21 +133,21 @@ class ScoreCalculatorUnitTest {
         val dpsMultiplier = 1.0
         
         // When: Testing role-based multipliers
-        val tankResult = when (Role.TANK) {
-            Role.TANK -> 1.2
-            Role.HEALER -> 1.15
+        val tankResult = when (Role.Tank) {
+            Role.Tank -> 1.2
+            Role.Healer -> 1.15
             Role.DPS -> 1.0
         }
         
-        val healerResult = when (Role.HEALER) {
-            Role.TANK -> 1.2
-            Role.HEALER -> 1.15
+        val healerResult = when (Role.Healer) {
+            Role.Tank -> 1.2
+            Role.Healer -> 1.15
             Role.DPS -> 1.0
         }
         
         val dpsResult = when (Role.DPS) {
-            Role.TANK -> 1.2
-            Role.HEALER -> 1.15
+            Role.Tank -> 1.2
+            Role.Healer -> 1.15
             Role.DPS -> 1.0
         }
         

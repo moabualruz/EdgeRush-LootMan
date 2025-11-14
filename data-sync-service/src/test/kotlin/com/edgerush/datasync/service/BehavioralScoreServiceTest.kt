@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import java.time.LocalDateTime
 
 class BehavioralScoreServiceTest {
@@ -33,8 +35,11 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
-            .thenReturn(emptyList())
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(
+            eq(guildId), 
+            eq(characterName), 
+            any()
+        )).thenReturn(emptyList())
 
         // When
         val result = behavioralScoreService.calculateBehavioralScore(guildId, characterName)
@@ -60,7 +65,7 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(deduction))
 
         // When
@@ -98,7 +103,7 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(deduction1, deduction2))
 
         // When
@@ -136,7 +141,7 @@ class BehavioralScoreServiceTest {
             expiresAt = null
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(deduction, restoration))
 
         // When
@@ -163,7 +168,7 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(largeDeduction))
 
         // When
@@ -190,7 +195,7 @@ class BehavioralScoreServiceTest {
             expiresAt = null
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(largeRestoration))
 
         // When
@@ -205,7 +210,7 @@ class BehavioralScoreServiceTest {
         // Given
         val guildId = "testguild"
         val characterName = "TestCharacter"
-        `when`(lootBanRepository.findActiveBanForCharacter(any(), any(), any()))
+        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(null)
 
         // When
@@ -231,7 +236,7 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(lootBanRepository.findActiveBanForCharacter(any(), any(), any()))
+        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(ban)
 
         // When
@@ -262,9 +267,9 @@ class BehavioralScoreServiceTest {
             expiresAt = LocalDateTime.now().plusDays(7)
         )
         
-        `when`(behavioralActionRepository.findActiveActionsForCharacter(any(), any(), any()))
+        `when`(behavioralActionRepository.findActiveActionsForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(listOf(deduction))
-        `when`(lootBanRepository.findActiveBanForCharacter(any(), any(), any()))
+        `when`(lootBanRepository.findActiveBanForCharacter(eq(guildId), eq(characterName), any()))
             .thenReturn(null)
 
         // When
