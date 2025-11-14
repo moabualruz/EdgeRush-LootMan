@@ -4,6 +4,9 @@ import com.edgerush.datasync.domain.raids.model.*
 import com.edgerush.datasync.entity.RaidEntity
 import com.edgerush.datasync.entity.RaidEncounterEntity
 import com.edgerush.datasync.entity.RaidSignupEntity
+import com.edgerush.datasync.repository.RaidEncounterRepository
+import com.edgerush.datasync.repository.RaidRepository
+import com.edgerush.datasync.repository.RaidSignupRepository
 import com.edgerush.datasync.test.base.IntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -17,11 +20,20 @@ class JdbcRaidRepositoryTest : IntegrationTest() {
     @Autowired
     private lateinit var repository: JdbcRaidRepository
     
+    @Autowired
+    private lateinit var springRaidRepository: RaidRepository
+    
+    @Autowired
+    private lateinit var encounterRepository: RaidEncounterRepository
+    
+    @Autowired
+    private lateinit var signupRepository: RaidSignupRepository
+    
     @AfterEach
     fun cleanup() {
-        jdbcTemplate.execute("DELETE FROM raid_signups")
-        jdbcTemplate.execute("DELETE FROM raid_encounters")
-        jdbcTemplate.execute("DELETE FROM raids")
+        signupRepository.deleteAll()
+        encounterRepository.deleteAll()
+        springRaidRepository.deleteAll()
     }
     
     @Test
@@ -221,16 +233,8 @@ class JdbcRaidRepositoryTest : IntegrationTest() {
         assertNull(found)
         
         // Verify cascading deletes
-        val encounterCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM raid_encounters WHERE raid_id = ?",
-            Int::class.java,
-            saved.id.value
-        )
-        val signupCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM raid_signups WHERE raid_id = ?",
-            Int::class.java,
-            saved.id.value
-        )
+        val encounterCount = encounterRepository.findByRaidId(saved.id.value).size
+        val signupCount = signupRepository.findByRaidId(saved.id.value).size
         
         assertEquals(0, encounterCount)
         assertEquals(0, signupCount)

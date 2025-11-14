@@ -331,22 +331,29 @@ interface LootAwardRepository {
     fun delete(id: LootAwardId)
 }
 
-// Infrastructure layer - implementation
+// Infrastructure layer - Spring Data repository
+@Repository
+interface SpringLootAwardRepository : CrudRepository<LootAwardEntity, Long> {
+    fun findByRaiderId(raiderId: Long): List<LootAwardEntity>
+    fun findByGuildId(guildId: String): List<LootAwardEntity>
+}
+
+// Infrastructure layer - adapter implementation
 @Repository
 class JdbcLootAwardRepository(
-    private val jdbcTemplate: JdbcTemplate,
+    private val springRepository: SpringLootAwardRepository,
     private val mapper: LootAwardMapper
 ) : LootAwardRepository {
     
     override fun findById(id: LootAwardId): LootAward? {
-        val sql = "SELECT * FROM loot_awards WHERE id = ?"
-        return jdbcTemplate.query(sql, { rs, _ -> mapper.toDomain(rs) }, id.value)
-            .firstOrNull()
+        return springRepository.findById(id.value)
+            .map { mapper.toDomain(it) }
+            .orElse(null)
     }
     
     override fun save(lootAward: LootAward): LootAward {
         val entity = mapper.toEntity(lootAward)
-        // Save logic
+        springRepository.save(entity)
         return lootAward
     }
     
@@ -360,6 +367,7 @@ class JdbcLootAwardRepository(
 - Provide collection-like methods
 - Keep queries domain-focused
 - Use mappers to convert between domain and persistence
+- ALWAYS use Spring Data repositories (see Database Access section below)
 
 ### Use Cases (Application Layer)
 
@@ -435,6 +443,148 @@ data class AwardLootCommand(
 - Validate inputs early
 - Publish domain events
 - Keep orchestration logic simple
+
+## Database Access
+
+### Required: Spring Data Repositories Only
+
+All database operations MUST use Spring Data repositories. Raw JDBC operations are PROHIBITED.
+
+**Rationale:**
+- Consistency: All 10 repositories in the codebase follow this pattern
+- Maintainability: ~70% reduction in code (from ~310 to ~80 lines per repository)
+- Automatic query generation and optimization
+- Type-safe query methods
+- Better transaction management
+- Easier testing with `@DataJdbcTest`
+
+### Correct Pattern
+
+```kotlin
+// ✅ CORRECT: Spring Data repository
+@Repository
+interface RaidRepository : CrudRepository<RaidEntity, Long> {
+    // Derived query methods (Spring Data generates SQL)
+    fun findByDate(date: LocalDate): List<RaidEntity>
+    fun findByGuildId(guildId: String): List<RaidEntity>
+    
+    // Custom query with @Query annotation
+    @Query("SELECT r FROM RaidEntity r WHERE r.date BETWEEN :start AND :end")
+    fun findByDateRange(
+        @Param("start") start: LocalDate,
+        @Param("end") end: LocalDate
+    ): List<RaidEntity>
+}
+
+// ✅ CORRECT: Adapter wrapping Spring Data repository
+@Repository
+class JdbcRaidRepository(
+    private val springRaidRepository: RaidRepository,
+    private val encounterRepository: RaidEncounterRepository,
+    private val mapper: RaidMapper
+) : com.edgerush.datasync.domain.raids.repository.RaidRepository {
+    
+    override fun findById(id: RaidId): Raid? {
+        val entity = springRaidRepository.findById(id.value).orElse(null) ?: return null
+        val encounters = encounterRepository.findByRaidId(id.value)
+        return mapper.toDomain(entity, encounters)
+    }
+    
+    @Transactional
+    override fun save(raid: Raid): Raid {
+        val entity = mapper.toEntity(raid)
+        springRaidRepository.save(entity)
+        
+        // Handle child entities
+        encounterRepository.deleteByRaidId(entity.raidId)
+        encounterRepository.saveAll(mapper.toEncounterEntities(raid))
+        
+        return raid
+    }
+}
+```
+
+### Incorrect Pattern
+
+```kotlin
+// ❌ INCORRECT: Raw JDBC with JdbcTemplate
+@Repository
+class JdbcRaidRepository(
+    private val jdbcTemplate: JdbcTemplate  // ❌ Don't use JdbcTemplate
+) : RaidRepository {
+    
+    override fun findById(id: RaidId): Raid? {
+        // ❌ Manual SQL strings are prohibited
+        val sql = "SELECT * FROM raids WHERE raid_id = ?"
+        return jdbcTemplate.query(sql, raidRowMapper, id.value).firstOrNull()
+    }
+    
+    // ❌ Manual RowMappers are prohibited
+    private val raidRowMapper = RowMapper<RaidEntity> { rs, _ ->
+        RaidEntity(
+            raidId = rs.getLong("raid_id"),
+            date = rs.getDate("date").toLocalDate()
+        )
+    }
+}
+```
+
+### Query Method Patterns
+
+**Derived Query Methods:**
+```kotlin
+// Spring Data generates SQL from method name
+fun findByGuildId(guildId: String): List<RaidEntity>
+fun findByDateBetween(start: LocalDate, end: LocalDate): List<RaidEntity>
+fun findByGuildIdAndDate(guildId: String, date: LocalDate): List<RaidEntity>
+fun deleteByRaidId(raidId: Long)
+```
+
+**Custom JPQL Queries:**
+```kotlin
+@Query("SELECT r FROM RaidEntity r WHERE r.guildId = :guildId ORDER BY r.date DESC")
+fun findRecentByGuildId(@Param("guildId") guildId: String): List<RaidEntity>
+```
+
+**Native SQL Queries (use sparingly):**
+```kotlin
+@Query(
+    value = "SELECT * FROM raids WHERE guild_id = :guildId LIMIT :limit",
+    nativeQuery = true
+)
+fun findLatestByGuildId(
+    @Param("guildId") guildId: String,
+    @Param("limit") limit: Int
+): List<RaidEntity>
+```
+
+### Exception: Database Migrations
+
+Raw SQL is ONLY allowed in Flyway migration scripts:
+
+```sql
+-- ✅ CORRECT: Flyway migration (V0001__create_raids_table.sql)
+CREATE TABLE raids (
+    raid_id BIGSERIAL PRIMARY KEY,
+    guild_id VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Benefits
+
+**Code Reduction:**
+- Before: ~310 lines with manual SQL and RowMappers
+- After: ~80 lines with Spring Data
+- Reduction: 74% less code to maintain
+
+**Improved Quality:**
+- No manual SQL string maintenance
+- No manual parameter binding
+- Type-safe query methods
+- Automatic transaction management
+- Better IDE support and refactoring
 
 ## Package Organization
 

@@ -8,75 +8,116 @@ This implementation plan converts the `JdbcRaidRepository` from raw JDBC operati
 
 ## Tasks
 
-- [ ] 1. Extend Spring Data repository interfaces
+- [x] 1. Extend Spring Data repository interfaces
+
+
+
+
+
   - Add custom query methods to existing Spring Data repositories for raid-related operations
   - Create `findByDate()` method in `RaidRepository`
   - Create `findByRaidId()` and `deleteByRaidId()` methods in `RaidEncounterRepository`
   - Create `findByRaidId()` and `deleteByRaidId()` methods in `RaidSignupRepository`
   - _Requirements: 1.1, 1.2, 2.1, 5.1, 5.2, 5.3_
 
-- [ ] 2. Rewrite JdbcRaidRepository to use Spring Data
-  - [ ] 2.1 Replace JdbcTemplate dependency with Spring Data repositories
+- [x] 2. Rewrite JdbcRaidRepository to use Spring Data
+
+
+
+
+
+  - [x] 2.1 Replace JdbcTemplate dependency with Spring Data repositories
+
+
     - Remove `JdbcTemplate` constructor parameter
     - Add `SpringRaidRepository`, `RaidEncounterRepository`, and `RaidSignupRepository` dependencies
     - Keep `RaidMapper` dependency
     - _Requirements: 1.1, 3.1, 3.2, 7.1_
 
-  - [ ] 2.2 Implement findById using Spring Data
+  - [x] 2.2 Implement findById using Spring Data
+
+
     - Replace manual SQL query with `springRaidRepository.findById()`
     - Use `encounterRepository.findByRaidId()` to load encounters
     - Use `signupRepository.findByRaidId()` to load signups
     - Assemble aggregate using mapper
     - _Requirements: 1.2, 2.3, 5.1_
 
-  - [ ] 2.3 Implement findByGuildId using Spring Data
+  - [x] 2.3 Implement findByGuildId using Spring Data
+
+
     - Replace manual SQL query with `springRaidRepository.findAll()`
     - Load encounters and signups for each raid
     - Map to domain aggregates
     - _Requirements: 1.2, 5.2_
 
-  - [ ] 2.4 Implement findByGuildIdAndDate using Spring Data
+  - [x] 2.4 Implement findByGuildIdAndDate using Spring Data
+
+
     - Replace manual SQL query with `springRaidRepository.findByDate()`
     - Load encounters and signups for each raid
     - Map to domain aggregates
     - _Requirements: 1.2, 5.3_
 
-  - [ ] 2.5 Implement save using Spring Data
+  - [x] 2.5 Implement save using Spring Data
+
+
     - Use `springRaidRepository.save()` for raid entity
     - Use `encounterRepository.deleteByRaidId()` and `saveAll()` for encounters
     - Use `signupRepository.deleteByRaidId()` and `saveAll()` for signups
     - Maintain `@Transactional` annotation
     - _Requirements: 1.1, 2.1, 2.2, 7.2_
 
-  - [ ] 2.6 Implement delete using Spring Data
+  - [x] 2.6 Implement delete using Spring Data
+
+
     - Replace manual SQL with `springRaidRepository.deleteById()`
     - Verify cascade deletes work via foreign keys
     - _Requirements: 1.1, 2.2_
 
-  - [ ] 2.7 Remove all manual SQL and RowMappers
+  - [x] 2.7 Remove all manual SQL and RowMappers
+
+
     - Delete all SQL string constants
     - Delete `raidEntityRowMapper`, `encounterEntityRowMapper`, `signupEntityRowMapper`
     - Delete helper methods: `insertRaid()`, `updateRaid()`, `insertEncounter()`, `insertSignup()`, etc.
     - _Requirements: 1.1, 1.3, 7.1, 7.2, 7.3_
 
-- [ ] 3. Update repository tests
-  - [ ] 3.1 Update test setup to use Spring Data repositories
+- [x] 3. Update repository tests
+
+
+
+
+
+  - [x] 3.1 Update test setup to use Spring Data repositories
+
+
     - Replace `JdbcTemplate` injection with Spring Data repositories
     - Update cleanup methods to use `deleteAll()` instead of manual SQL
     - _Requirements: 4.1, 4.3_
 
-  - [ ] 3.2 Update test verification to use Spring Data
+  - [x] 3.2 Update test verification to use Spring Data
+
+
     - Replace `jdbcTemplate.queryForObject()` with repository methods
     - Update assertions to work with Spring Data results
     - _Requirements: 4.1, 4.4_
 
-  - [ ] 3.3 Verify all 11 existing tests pass
+  - [x] 3.3 Verify all 11 existing tests pass
+
+
     - Run test suite and ensure 100% pass rate
     - Verify test coverage remains at 100%
     - _Requirements: 4.1, 4.2, 4.5_
 
-- [ ] 4. Update project documentation standards
-  - [ ] 4.1 Add database access standards to AI_DEVELOPMENT_STANDARDS.md
+- [x] 4. Update project documentation standards
+
+
+
+
+  - [x] 4.1 Add database access standards to AI_DEVELOPMENT_STANDARDS.md
+
+
     - Add "Database Access Pattern" section
     - Document requirement to use Spring Data repositories
     - Document prohibition of raw JDBC operations
@@ -84,14 +125,18 @@ This implementation plan converts the `JdbcRaidRepository` from raw JDBC operati
     - Note exception for database migrations
     - _Requirements: 1.1, 7.4_
 
-  - [ ] 4.2 Add database access standards to docs/code-standards.md
+
+  - [x] 4.2 Add database access standards to docs/code-standards.md
+
     - Add "Database Access" section
     - Document Spring Data repository requirement
     - Document raw JDBC prohibition
     - Add rationale and examples
     - _Requirements: 1.1, 7.4_
 
-  - [ ] 4.3 Update docs/testing-standards.md with repository testing guidelines
+
+  - [x] 4.3 Update docs/testing-standards.md with repository testing guidelines
+
     - Add "Repository Tests" section
     - Document use of `@DataJdbcTest` annotation
     - Document test isolation with `@Transactional`

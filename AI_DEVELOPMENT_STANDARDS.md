@@ -253,6 +253,167 @@ class WoWAuditClientIntegrationTest {
 }
 ```
 
+### Database Access Pattern
+
+#### Required: Spring Data Repositories
+
+All database operations MUST use Spring Data repositories. Raw JDBC operations (JdbcTemplate, NamedParameterJdbcTemplate) are PROHIBITED except for database migrations.
+
+**Rationale:**
+- Consistency across codebase (all 10 repositories follow this pattern)
+- Reduced boilerplate and maintenance overhead (~70% code reduction)
+- Automatic query generation and optimization
+- Better transaction management
+- Type-safe query methods
+- Easier testing with Spring Data test support
+
+#### Correct Pattern: Spring Data Repository
+
+```kotlin
+// ✅ CORRECT: Spring Data repository interface
+@Repository
+interface RaidRepository : CrudRepository<RaidEntity, Long> {
+    fun findByDate(date: LocalDate): List<RaidEntity>
+    fun findByGuildId(guildId: String): List<RaidEntity>
+}
+
+// ✅ CORRECT: Adapter wrapping Spring Data repository
+@Repository
+class JdbcRaidRepository(
+    private val springRaidRepository: RaidRepository,
+    private val encounterRepository: RaidEncounterRepository,
+    private val signupRepository: RaidSignupRepository,
+    private val mapper: RaidMapper
+) : com.edgerush.datasync.domain.raids.repository.RaidRepository {
+    
+    override fun findById(id: RaidId): Raid? {
+        val entity = springRaidRepository.findById(id.value).orElse(null) ?: return null
+        val encounters = encounterRepository.findByRaidId(id.value)
+        val signups = signupRepository.findByRaidId(id.value)
+        return mapper.toDomain(entity, encounters, signups)
+    }
+    
+    @Transactional
+    override fun save(raid: Raid): Raid {
+        val entity = mapper.toEntity(raid)
+        springRaidRepository.save(entity)
+        
+        // Delete and re-insert child entities
+        encounterRepository.deleteByRaidId(entity.raidId)
+        signupRepository.deleteByRaidId(entity.raidId)
+        
+        val encounterEntities = mapper.encounterMapper.toEntities(raid.getEncounters(), entity.raidId)
+        val signupEntities = mapper.signupMapper.toEntities(raid.getSignups(), entity.raidId)
+        
+        encounterRepository.saveAll(encounterEntities)
+        signupRepository.saveAll(signupEntities)
+        
+        return raid
+    }
+}
+```
+
+#### Incorrect Pattern: Raw JDBC
+
+```kotlin
+// ❌ INCORRECT: Raw JDBC with JdbcTemplate
+@Repository
+class JdbcRaidRepository(
+    private val jdbcTemplate: JdbcTemplate,
+    private val mapper: RaidMapper
+) : RaidRepository {
+    
+    override fun findById(id: RaidId): Raid? {
+        val sql = "SELECT * FROM raids WHERE raid_id = ?"
+        return jdbcTemplate.query(sql, raidEntityRowMapper, id.value)
+            .firstOrNull()
+            ?.let { entity ->
+                val encounters = loadEncounters(id.value)
+                val signups = loadSignups(id.value)
+                mapper.toDomain(entity, encounters, signups)
+            }
+    }
+    
+    private val raidEntityRowMapper = RowMapper<RaidEntity> { rs, _ ->
+        RaidEntity(
+            raidId = rs.getLong("raid_id"),
+            date = rs.getDate("date").toLocalDate(),
+            // ... manual mapping
+        )
+    }
+    
+    // ❌ Manual SQL strings and RowMappers are prohibited
+}
+```
+
+#### Custom Query Methods
+
+For complex queries, use Spring Data query methods:
+
+```kotlin
+@Repository
+interface RaidRepository : CrudRepository<RaidEntity, Long> {
+    
+    // Derived query method (Spring Data generates SQL)
+    fun findByDateBetween(start: LocalDate, end: LocalDate): List<RaidEntity>
+    
+    // Custom JPQL query
+    @Query("SELECT r FROM RaidEntity r WHERE r.guildId = :guildId AND r.date >= :since")
+    fun findRecentByGuildId(
+        @Param("guildId") guildId: String,
+        @Param("since") since: LocalDate
+    ): List<RaidEntity>
+    
+    // Native SQL query (use sparingly)
+    @Query(
+        value = "SELECT * FROM raids WHERE guild_id = :guildId ORDER BY date DESC LIMIT :limit",
+        nativeQuery = true
+    )
+    fun findLatestByGuildId(
+        @Param("guildId") guildId: String,
+        @Param("limit") limit: Int
+    ): List<RaidEntity>
+}
+```
+
+#### Exception: Database Migrations
+
+Raw SQL is ONLY allowed in Flyway migration scripts:
+
+```sql
+-- ✅ CORRECT: Flyway migration (V0001__create_raids_table.sql)
+CREATE TABLE raids (
+    raid_id BIGSERIAL PRIMARY KEY,
+    guild_id VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    difficulty VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_raids_guild_id ON raids(guild_id);
+CREATE INDEX idx_raids_date ON raids(date);
+```
+
+#### Benefits of Spring Data Pattern
+
+**Code Reduction:**
+- Before (Raw JDBC): ~310 lines with manual SQL and RowMappers
+- After (Spring Data): ~80 lines with automatic query generation
+- Reduction: ~74% less code to maintain
+
+**Improved Maintainability:**
+- No manual SQL string maintenance
+- No manual RowMapper implementations
+- Automatic parameter binding
+- Type-safe query methods
+- Better IDE support and refactoring
+
+**Better Testing:**
+- Use `@DataJdbcTest` for repository tests
+- Automatic test database configuration
+- Transaction rollback between tests
+- No need to mock JDBC infrastructure
+
 ### Configuration Management
 
 #### Properties Configuration

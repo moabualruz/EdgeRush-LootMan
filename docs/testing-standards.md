@@ -591,8 +591,175 @@ class AwardLootUseCaseTest : UnitTest() {
 
 ### Testing Repositories (Integration)
 
+#### Repository Test Requirements
+
+All repository tests MUST follow these standards:
+
+**Required Annotations:**
+- `@DataJdbcTest` - Configures Spring Data JDBC test slice
+- `@Transactional` - Ensures test isolation with automatic rollback
+- `@AutoConfigureTestDatabase(replace = NONE)` - Use real database (Testcontainers)
+
+**Prohibited:**
+- Raw JDBC operations (JdbcTemplate) in tests
+- Manual SQL for test data setup (use repository methods)
+- Shared state between tests
+
+#### Repository Test Pattern
+
 ```kotlin
-class LootAwardRepositoryIntegrationTest : IntegrationTest() {
+@DataJdbcTest
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class JdbcRaidRepositoryTest {
+    
+    @Autowired
+    private lateinit var springRaidRepository: RaidRepository
+    
+    @Autowired
+    private lateinit var encounterRepository: RaidEncounterRepository
+    
+    @Autowired
+    private lateinit var signupRepository: RaidSignupRepository
+    
+    private lateinit var repository: JdbcRaidRepository
+    private lateinit var mapper: RaidMapper
+    
+    @BeforeEach
+    fun setup() {
+        mapper = RaidMapper(RaidEncounterMapper(), RaidSignupMapper())
+        repository = JdbcRaidRepository(
+            springRaidRepository,
+            encounterRepository,
+            signupRepository,
+            mapper
+        )
+    }
+    
+    @AfterEach
+    fun cleanup() {
+        // Spring @Transactional handles rollback automatically
+        // No manual cleanup needed
+    }
+    
+    @Test
+    fun `should save and retrieve raid with encounters and signups`() {
+        // Arrange
+        val raid = createTestRaid(
+            encounters = listOf(createTestEncounter()),
+            signups = listOf(createTestSignup())
+        )
+        
+        // Act
+        val saved = repository.save(raid)
+        val retrieved = repository.findById(saved.id)
+        
+        // Assert
+        retrieved.shouldNotBeNull()
+        retrieved.id shouldBe saved.id
+        retrieved.getEncounters() shouldHaveSize 1
+        retrieved.getSignups() shouldHaveSize 1
+    }
+    
+    @Test
+    fun `should delete raid and cascade to child entities`() {
+        // Arrange
+        val raid = createTestRaid(
+            encounters = listOf(createTestEncounter()),
+            signups = listOf(createTestSignup())
+        )
+        val saved = repository.save(raid)
+        
+        // Act
+        repository.delete(saved.id)
+        
+        // Assert
+        val retrieved = repository.findById(saved.id)
+        retrieved.shouldBeNull()
+        
+        // Verify cascade delete
+        val encounters = encounterRepository.findByRaidId(saved.id.value)
+        val signups = signupRepository.findByRaidId(saved.id.value)
+        encounters.shouldBeEmpty()
+        signups.shouldBeEmpty()
+    }
+    
+    @Test
+    fun `should handle concurrent saves with optimistic locking`() {
+        // Test transaction isolation and optimistic locking
+    }
+}
+```
+
+#### Testing Custom Query Methods
+
+```kotlin
+@DataJdbcTest
+@Transactional
+class RaidRepositoryQueryTest {
+    
+    @Autowired
+    private lateinit var repository: RaidRepository
+    
+    @Test
+    fun `should find raids by date`() {
+        // Arrange
+        val date = LocalDate.of(2024, 1, 15)
+        val entity1 = RaidEntity(raidId = 0, date = date, difficulty = "MYTHIC")
+        val entity2 = RaidEntity(raidId = 0, date = date, difficulty = "HEROIC")
+        val entity3 = RaidEntity(raidId = 0, date = date.plusDays(1), difficulty = "MYTHIC")
+        
+        repository.save(entity1)
+        repository.save(entity2)
+        repository.save(entity3)
+        
+        // Act
+        val results = repository.findByDate(date)
+        
+        // Assert
+        results shouldHaveSize 2
+        results.all { it.date == date } shouldBe true
+    }
+    
+    @Test
+    fun `should delete by raid id`() {
+        // Arrange
+        val entity = RaidEntity(raidId = 0, date = LocalDate.now(), difficulty = "MYTHIC")
+        val saved = repository.save(entity)
+        
+        // Act
+        repository.deleteByRaidId(saved.raidId)
+        
+        // Assert
+        repository.findById(saved.raidId).isEmpty shouldBe true
+    }
+}
+```
+
+#### Testing with Testcontainers
+
+```kotlin
+@SpringBootTest
+@Testcontainers
+@Transactional
+class LootAwardRepositoryIntegrationTest {
+    
+    companion object {
+        @Container
+        val postgres = PostgreSQLContainer<Nothing>("postgres:18").apply {
+            withDatabaseName("lootman_test")
+            withUsername("test")
+            withPassword("test")
+        }
+        
+        @DynamicPropertySource
+        @JvmStatic
+        fun configureProperties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgres::getJdbcUrl)
+            registry.add("spring.datasource.username", postgres::getUsername)
+            registry.add("spring.datasource.password", postgres::getPassword)
+        }
+    }
     
     @Autowired
     private lateinit var repository: LootAwardRepository
@@ -630,6 +797,27 @@ class LootAwardRepositoryIntegrationTest : IntegrationTest() {
     }
 }
 ```
+
+#### Repository Testing Best Practices
+
+**DO:**
+- ✅ Use `@DataJdbcTest` for Spring Data repository tests
+- ✅ Use `@Transactional` for automatic rollback between tests
+- ✅ Test with real database (Testcontainers)
+- ✅ Test custom query methods
+- ✅ Test cascade operations (save, delete)
+- ✅ Test transaction boundaries
+- ✅ Verify constraint violations
+- ✅ Test optimistic locking scenarios
+
+**DON'T:**
+- ❌ Use JdbcTemplate in repository tests
+- ❌ Use manual SQL for test data setup
+- ❌ Share state between tests
+- ❌ Use in-memory H2 database (use Testcontainers with PostgreSQL)
+- ❌ Mock Spring Data repositories in integration tests
+- ❌ Test Spring Data framework behavior (trust the framework)
+- ❌ Write tests for simple CRUD operations (focus on custom logic)
 
 ### Testing API Endpoints (Integration)
 
