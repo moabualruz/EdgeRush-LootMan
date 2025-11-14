@@ -45,6 +45,11 @@
 ## Phase 2: FLPS Bounded Context Refactoring
 
 - [x] 6. Create FLPS domain layer with TDD
+
+
+
+
+
   - Write tests for FlpsScore value object (validation, operations)
   - Implement FlpsScore value object with immutability
   - Write tests for RaiderMeritScore, ItemPriorityIndex, RecencyDecayFactor
@@ -54,6 +59,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] 7. Create FLPS application layer with TDD
+
+
+
+
+
   - Write tests for CalculateFlpsScoreUseCase
   - Implement CalculateFlpsScoreUseCase orchestrating domain services
   - Write tests for UpdateModifiersUseCase
@@ -63,6 +73,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
 - [x] 8. Create FLPS infrastructure layer with TDD
+
+
+
+
+
   - Write tests for FlpsModifierRepository implementation
   - Implement JdbcFlpsModifierRepository with CRUD operations
   - Write tests for entity-to-domain mappers
@@ -72,6 +87,12 @@
   - _Requirements: 2.2, 5.4, 5.5_
 
 - [x] 9. Update FLPS API layer with TDD
+
+
+
+
+
+
   - Write integration tests for FlpsController endpoints
   - Refactor FlpsController to use new use cases
   - Update DTOs to match new domain models
@@ -80,6 +101,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
 - [x] 10. Verify FLPS bounded context completion
+
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run ktlint and detekt, fix any violations
@@ -90,6 +116,11 @@
 ## Phase 3: Loot Bounded Context Refactoring
 
 - [x] 11. Create Loot domain layer with TDD
+
+
+
+
+
   - Write tests for LootAward aggregate root (creation, state transitions)
   - Implement LootAward aggregate with business rules
   - Write tests for LootBan entity (validation, expiration logic)
@@ -99,6 +130,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] 12. Create Loot application layer with TDD
+
+
+
+
+
   - Write tests for AwardLootUseCase (happy path and error cases)
   - Implement AwardLootUseCase with validation and orchestration
   - Write tests for ManageLootBansUseCase
@@ -108,6 +144,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
 - [x] 13. Create Loot infrastructure layer with TDD
+
+
+
+
+
   - Write tests for LootAwardRepository implementation
   - Implement JdbcLootAwardRepository with optimized queries
   - Write tests for LootBanRepository implementation
@@ -117,6 +158,10 @@
   - _Requirements: 2.2, 5.4, 5.5_
 
 - [x] 14. Update Loot API layer with TDD
+
+
+
+
   - Write integration tests for LootController endpoints
   - Refactor LootController to use new use cases
   - Write integration tests for LootAwardController
@@ -125,6 +170,10 @@
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
 - [x] 15. Verify Loot bounded context completion
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run code quality checks (ktlint, detekt)
@@ -135,6 +184,11 @@
 ## Phase 4: Attendance Bounded Context Refactoring
 
 - [x] 16. Create Attendance domain layer with TDD
+
+
+
+
+
   - Write tests for AttendanceRecord entity
   - Implement AttendanceRecord with validation
   - Write tests for AttendanceStats value object
@@ -144,6 +198,10 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] 17. Create Attendance application layer with TDD
+
+
+
+
   - Write tests for TrackAttendanceUseCase
   - Implement TrackAttendanceUseCase with raid attendance tracking
   - Write tests for GetAttendanceReportUseCase
@@ -151,6 +209,10 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
 - [x] 18. Create Attendance infrastructure layer with TDD
+
+
+
+
   - Write tests for AttendanceRepository implementation
   - Implement JdbcAttendanceRepository with date range queries
   - Write tests for entity mappers
@@ -158,12 +220,21 @@
   - _Requirements: 2.2, 5.4, 5.5_
 
 - [x] 19. Update Attendance API layer with TDD
+
+
+
+
+
   - Write integration tests for AttendanceController
   - Refactor AttendanceController to use new use cases
   - Verify backward compatibility
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
 - [x] 20. Verify Attendance bounded context completion
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run code quality checks
@@ -173,6 +244,13 @@
 ## Phase 5: Raids Bounded Context Refactoring
 
 - [x] 21. Create Raids domain layer with TDD
+
+
+
+
+
+
+
   - Write tests for Raid aggregate root (scheduling, state transitions)
   - Implement Raid aggregate with business rules
   - Write tests for RaidEncounter entity
@@ -183,7 +261,13 @@
   - Implement RaidSchedulingService with scheduling logic
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
+
 - [x] 22. Create Raids application layer with TDD
+
+
+
+
+
   - Write tests for ScheduleRaidUseCase
   - Implement ScheduleRaidUseCase with validation
   - Write tests for ManageSignupsUseCase
@@ -193,19 +277,41 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
 - [x] 23. Create Raids infrastructure layer with TDD
+
+
+
+
+
+
+
+
+
   - Write tests for RaidRepository implementation
   - Implement JdbcRaidRepository with complex queries
   - Write tests for entity mappers
   - Implement mappers for Raid, RaidEncounter, RaidSignup
   - _Requirements: 2.2, 5.4, 5.5_
 
+
 - [x] 24. Update Raids API layer with TDD
+
+
+
+
+
   - Write integration tests for RaidController
   - Refactor RaidController to use new use cases
   - Verify backward compatibility
   - _Requirements: 1.1, 1.2, 1.3, 6.5, 8.1, 8.2, 8.3, 8.4_
 
+
 - [x] 25. Verify Raids bounded context completion
+
+
+
+
+
+
   - Run full test suite and verify all tests pass
   - Generate coverage report and verify ≥85% coverage
   - Run code quality checks
@@ -214,7 +320,13 @@
 
 ## Phase 6: Remaining Bounded Contexts
 
+
+
+
 - [x] 26. Refactor Applications bounded context
+
+
+
   - Create domain layer for guild applications
   - Create application layer with use cases
   - Create infrastructure layer with repositories
@@ -222,7 +334,12 @@
   - Write comprehensive tests
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
+
 - [x] 27. Refactor Integrations bounded context
+
+
+
+
   - Create domain layer for external integrations (WoWAudit, WarcraftLogs, Raidbots)
   - Create application layer for sync use cases
   - Refactor existing clients into infrastructure layer
@@ -231,6 +348,11 @@
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] 28. Refactor Shared context
+
+
+
+
+
   - Create domain layer for Raider and Guild entities
   - Create application layer for common use cases (raider management, guild config)
   - Create infrastructure layer for shared repositories
@@ -241,101 +363,59 @@
 
 ## Phase 7: Cleanup and Optimization
 
-- [x] 29. Remove deprecated code and consolidate package structure
+- [x] 29. Remove deprecated code
+  - Identify and mark old service layer as deprecated
+  - Remove unused entity classes from old entity/ package
+  - Clean up old mapper implementations in service/mapper/
+  - Remove duplicate code between old and new implementations
+  - Update imports across codebase to use new domain/application layers
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
+- [ ] 30. Optimize database queries
+  - [ ] 30.1 Add database indexes for frequently queried fields
+    - Add indexes for loot_awards (raider_id, guild_id, awarded_at)
+    - Add indexes for attendance_stats (raider_id, guild_id, date)
+    - Add indexes for raids (guild_id, scheduled_at, status)
+    - Add indexes for raid_signups (raid_id, raider_id)
+    - Add indexes for loot_bans (raider_id, guild_id, expires_at)
+    - Add indexes for flps_guild_modifiers (guild_id)
+    - _Requirements: 9.1, 9.2_
+  - [ ] 30.2 Optimize N+1 query problems with joins
+    - Refactor getLootHistory to use single query with raider join
+    - Refactor getRaidWithSignups to use single query with signup join
+    - Refactor getAttendanceReport to batch raider lookups
+    - _Requirements: 9.2, 9.3_
+  - [ ] 30.3 Add query result caching where appropriate
+    - Add caching for FLPS modifiers (invalidate on update)
+    - Add caching for guild configuration (invalidate on update)
+    - Add caching for raider profiles (TTL-based)
+    - _Requirements: 9.3, 9.4_
+  - [ ] 30.4 Write performance tests for critical queries
+    - Write performance test for FLPS calculation with 30 raiders
+    - Write performance test for loot history with 1000+ awards
+    - Write performance test for attendance report with 90-day range
+    - Verify all queries complete in < 1 second
+    - _Requirements: 9.4, 9.5_
 
-
-
-
-  - [x] 29.1 Audit datasync vs lootman package usage
-
-
-    - Identify which files in datasync are still actively used
-    - Identify which files have been superseded by lootman implementations
-    - Document migration plan for remaining datasync files
-    - _Requirements: 8.1, 8.2_
-  - [x] 29.2 Move or remove old entity classes
-
-
-    - Move RaidEntity, RaidEncounterEntity, RaidSignupEntity to infrastructure/persistence/entity if still needed
-    - Remove duplicate entity classes that exist in both datasync and lootman
-    - Update all imports to use consolidated entity locations
-    - _Requirements: 8.2, 8.3_
-
-  - [x] 29.3 Consolidate repository interfaces
-
-    - Move RaidRepository, RaidEncounterRepository, RaidSignupRepository to domain layer if still needed
-    - Remove old Spring Data repositories from datasync/repository
-    - Ensure all repositories follow the new domain-driven pattern
-    - _Requirements: 8.3, 8.4_
-  - [x] 29.4 Clean up empty service/mapper directories
-
-
-    - Remove empty datasync/service/crud/ directory
-    - Remove empty datasync/service/mapper/ directory
-    - Remove empty datasync/service/raidbots/ directory
-    - Remove empty datasync/service/warcraftlogs/ directory (if empty)
-    - _Requirements: 8.4, 8.5_
-  - [x] 29.5 Consolidate configuration and client code
-
-
-    - Evaluate if datasync/config files should move to lootman/config
-    - Evaluate if datasync/client files should move to lootman/infrastructure/external
-    - Evaluate if datasync/security files should move to lootman/config or shared location
-    - Update all imports across codebase
-    - _Requirements: 8.5_
-  - [x] 29.6 Verify no broken imports or references
-
-
-    - Run full build to check for compilation errors
-    - Fix any broken imports from moved/removed files
-    - Run full test suite to verify nothing broke
-    - _Requirements: 8.5_
-
-- [x] 30. Optimize database queries
-  - **NOTE**: This task has been moved to the new spec `.kiro/specs/post-refactoring-cleanup/`
-  - The refactoring is complete, but requires cleanup and verification
-  - See post-refactoring-cleanup spec for:
-    - Fixing 59 failing integration tests
-    - Fixing 1251 code quality issues
-    - Removing unused code
-    - Verifying functionality completeness
-    - Performance optimization
-  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
-
-- [x] 31. Final verification and documentation
-
-
-
-
-
-  - [x] 31.1 Run complete test suite and verify coverage
-
-
+- [ ] 31. Final verification and documentation
+  - [ ] 31.1 Run complete test suite and verify coverage
     - Run full test suite across all bounded contexts
     - Generate JaCoCo coverage report
     - Verify ≥85% coverage threshold is met
     - Fix any failing tests
-
-
     - _Requirements: 2.4, 2.5, 10.3_
-  - [x] 31.2 Run code quality checks
-
+  - [ ] 31.2 Run code quality checks
     - Run ktlint and fix formatting violations
-
     - Run detekt and fix code quality issues
     - Verify no critical violations remain
     - _Requirements: 10.4, 10.5_
-  - [x] 31.3 Update documentation
-
+  - [ ] 31.3 Update documentation
     - Update CODE_ARCHITECTURE.md with new bounded context structure
     - Update API_REFERENCE.md with new endpoint documentation
     - Verify docs/testing-standards.md is complete
     - Verify docs/code-standards.md is complete
     - _Requirements: 3.5, 4.5, 8.5_
-  - [x] 31.4 Create Architecture Decision Records
-
-
+  - [ ] 31.4 Create Architecture Decision Records
     - Create ADR-001: Adoption of Domain-Driven Design
     - Create ADR-002: Test-Driven Development Standards
     - Create ADR-003: Bounded Context Boundaries

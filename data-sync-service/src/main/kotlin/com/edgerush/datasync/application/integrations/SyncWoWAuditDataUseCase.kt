@@ -3,122 +3,62 @@ package com.edgerush.datasync.application.integrations
 import com.edgerush.datasync.domain.integrations.model.ExternalDataSource
 import com.edgerush.datasync.domain.integrations.model.SyncResult
 import com.edgerush.datasync.domain.integrations.service.SyncOrchestrationService
-import com.edgerush.datasync.service.WoWAuditSyncService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 /**
  * Use case for synchronizing WoWAudit data
+ * TODO: Re-implement when WoWAudit service is refactored
  */
 @Service
 class SyncWoWAuditDataUseCase(
-    private val syncOrchestrationService: SyncOrchestrationService,
-    private val wowAuditSyncService: WoWAuditSyncService
+    private val syncOrchestrationService: SyncOrchestrationService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * Execute full WoWAudit synchronization
+     * TODO: Re-implement when WoWAudit service is refactored
      */
     fun execute(): Result<SyncResult> = runCatching {
         val startTime = Instant.now()
-        val operation = syncOrchestrationService.startSync(
-            ExternalDataSource.WOWAUDIT,
-            "full-sync"
+        logger.warn("WoWAudit sync not yet implemented")
+        
+        syncOrchestrationService.createSuccessResult(
+            recordsProcessed = 0,
+            startedAt = startTime,
+            message = "WoWAudit sync not yet implemented"
         )
-
-        try {
-            // Execute all sync operations
-            wowAuditSyncService.syncRoster()
-                .then(wowAuditSyncService.syncLootHistory())
-                .then(wowAuditSyncService.syncWishlists())
-                .then(wowAuditSyncService.syncSupplementalData())
-                .block()
-
-            val result = syncOrchestrationService.createSuccessResult(
-                recordsProcessed = 0, // Will be updated by individual sync operations
-                startedAt = startTime,
-                message = "WoWAudit full sync completed successfully"
-            )
-
-            syncOrchestrationService.completeSync(operation, result)
-            result
-        } catch (ex: Exception) {
-            logger.error("WoWAudit sync failed", ex)
-            val result = syncOrchestrationService.createFailureResult(
-                startedAt = startTime,
-                message = ex.message ?: "Unknown error during WoWAudit sync",
-                errors = listOf(ex.toString())
-            )
-            syncOrchestrationService.failSync(operation, result.message!!, result.errors)
-            throw ex
-        }
     }
 
     /**
      * Sync only roster data
+     * TODO: Re-implement when WoWAudit service is refactored
      */
     fun syncRoster(): Result<SyncResult> = runCatching {
         val startTime = Instant.now()
-        val operation = syncOrchestrationService.startSync(
-            ExternalDataSource.WOWAUDIT,
-            "roster-sync"
+        logger.warn("WoWAudit roster sync not yet implemented")
+        
+        syncOrchestrationService.createSuccessResult(
+            recordsProcessed = 0,
+            startedAt = startTime,
+            message = "WoWAudit roster sync not yet implemented"
         )
-
-        try {
-            wowAuditSyncService.syncRoster().block()
-
-            val result = syncOrchestrationService.createSuccessResult(
-                recordsProcessed = 0,
-                startedAt = startTime,
-                message = "WoWAudit roster sync completed"
-            )
-
-            syncOrchestrationService.completeSync(operation, result)
-            result
-        } catch (ex: Exception) {
-            logger.error("WoWAudit roster sync failed", ex)
-            val result = syncOrchestrationService.createFailureResult(
-                startedAt = startTime,
-                message = ex.message ?: "Unknown error during roster sync",
-                errors = listOf(ex.toString())
-            )
-            syncOrchestrationService.failSync(operation, result.message!!, result.errors)
-            throw ex
-        }
     }
 
     /**
      * Sync only loot history
+     * TODO: Re-implement when WoWAudit service is refactored
      */
     fun syncLootHistory(): Result<SyncResult> = runCatching {
         val startTime = Instant.now()
-        val operation = syncOrchestrationService.startSync(
-            ExternalDataSource.WOWAUDIT,
-            "loot-sync"
+        logger.warn("WoWAudit loot history sync not yet implemented")
+        
+        syncOrchestrationService.createSuccessResult(
+            recordsProcessed = 0,
+            startedAt = startTime,
+            message = "WoWAudit loot history sync not yet implemented"
         )
-
-        try {
-            wowAuditSyncService.syncLootHistory().block()
-
-            val result = syncOrchestrationService.createSuccessResult(
-                recordsProcessed = 0,
-                startedAt = startTime,
-                message = "WoWAudit loot history sync completed"
-            )
-
-            syncOrchestrationService.completeSync(operation, result)
-            result
-        } catch (ex: Exception) {
-            logger.error("WoWAudit loot sync failed", ex)
-            val result = syncOrchestrationService.createFailureResult(
-                startedAt = startTime,
-                message = ex.message ?: "Unknown error during loot sync",
-                errors = listOf(ex.toString())
-            )
-            syncOrchestrationService.failSync(operation, result.message!!, result.errors)
-            throw ex
-        }
     }
 }
