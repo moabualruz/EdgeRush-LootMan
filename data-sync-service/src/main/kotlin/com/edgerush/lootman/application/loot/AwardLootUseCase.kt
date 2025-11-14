@@ -8,9 +8,12 @@ import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 
+import org.springframework.stereotype.Service
+
 /**
  * Use case for awarding loot to a raider.
  */
+@Service
 class AwardLootUseCase(
     private val lootAwardRepository: LootAwardRepository,
 ) {

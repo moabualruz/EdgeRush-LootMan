@@ -128,7 +128,9 @@
 
 ## Phase 3: Loot Bounded Context Refactoring
 
-- [ ] 11. Create Loot domain layer with TDD
+- [x] 11. Create Loot domain layer with TDD
+
+
 
 
 
@@ -143,7 +145,10 @@
   - Implement LootDistributionService with loot award rules
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 12. Create Loot application layer with TDD
+- [x] 12. Create Loot application layer with TDD
+
+
+
 
 
 
@@ -155,7 +160,9 @@
   - Implement GetLootHistoryUseCase with filtering and pagination
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2_
 
-- [ ] 13. Create Loot infrastructure layer with TDD
+- [x] 13. Create Loot infrastructure layer with TDD
+
+
 
 
 
@@ -167,7 +174,10 @@
   - Implement mappers for LootAward and LootBan entities
   - _Requirements: 2.2, 5.4, 5.5_
 
-- [ ] 14. Update Loot API layer with TDD
+- [x] 14. Update Loot API layer with TDD
+
+
+
 
 
   - Write integration tests for LootController endpoints
