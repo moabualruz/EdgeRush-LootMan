@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class InMemoryAttendanceRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemoryAttendanceRepository
 
     @BeforeEach
@@ -56,36 +55,40 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val record1 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 7)
-        )
-        val record2 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = LocalDate.of(2024, 11, 8),
-            endDate = LocalDate.of(2024, 11, 14)
-        )
-        val record3 = createAttendanceRecord(
-            raiderId = RaiderId(2L),
-            guildId = guildId,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14)
-        )
+        val record1 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 7),
+            )
+        val record2 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 11, 8),
+                endDate = LocalDate.of(2024, 11, 14),
+            )
+        val record3 =
+            createAttendanceRecord(
+                raiderId = RaiderId(2L),
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+            )
 
         repository.save(record1)
         repository.save(record2)
         repository.save(record3)
 
         // Act
-        val results = repository.findByRaiderIdAndGuildIdAndDateRange(
-            raiderId,
-            guildId,
-            startDate,
-            endDate
-        )
+        val results =
+            repository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                startDate,
+                endDate,
+            )
 
         // Assert
         results shouldHaveSize 2
@@ -100,28 +103,31 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         val guildId = GuildId("test-guild")
         val instance = "Nerub-ar Palace"
 
-        val record1 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            instance = instance
-        )
-        val record2 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            instance = "Amirdrassil"
-        )
+        val record1 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = instance,
+            )
+        val record2 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = "Amirdrassil",
+            )
 
         repository.save(record1)
         repository.save(record2)
 
         // Act
-        val results = repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
-            raiderId,
-            guildId,
-            instance,
-            LocalDate.of(2024, 11, 1),
-            LocalDate.of(2024, 11, 14)
-        )
+        val results =
+            repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
 
         // Assert
         results shouldHaveSize 1
@@ -136,31 +142,34 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         val instance = "Nerub-ar Palace"
         val encounter = "Queen Ansurek"
 
-        val record1 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            instance = instance,
-            encounter = encounter
-        )
-        val record2 = createAttendanceRecord(
-            raiderId = raiderId,
-            guildId = guildId,
-            instance = instance,
-            encounter = "Sikran"
-        )
+        val record1 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = instance,
+                encounter = encounter,
+            )
+        val record2 =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = instance,
+                encounter = "Sikran",
+            )
 
         repository.save(record1)
         repository.save(record2)
 
         // Act
-        val results = repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
-            raiderId,
-            guildId,
-            instance,
-            encounter,
-            LocalDate.of(2024, 11, 1),
-            LocalDate.of(2024, 11, 14)
-        )
+        val results =
+            repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                encounter,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
 
         // Assert
         results shouldHaveSize 1
@@ -174,18 +183,21 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val record1 = createAttendanceRecord(
-            raiderId = RaiderId(1L),
-            guildId = guildId
-        )
-        val record2 = createAttendanceRecord(
-            raiderId = RaiderId(2L),
-            guildId = guildId
-        )
-        val record3 = createAttendanceRecord(
-            raiderId = RaiderId(3L),
-            guildId = GuildId("other-guild")
-        )
+        val record1 =
+            createAttendanceRecord(
+                raiderId = RaiderId(1L),
+                guildId = guildId,
+            )
+        val record2 =
+            createAttendanceRecord(
+                raiderId = RaiderId(2L),
+                guildId = guildId,
+            )
+        val record3 =
+            createAttendanceRecord(
+                raiderId = RaiderId(3L),
+                guildId = GuildId("other-guild"),
+            )
 
         repository.save(record1)
         repository.save(record2)
@@ -221,12 +233,13 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         val guildId = GuildId("test-guild")
 
         // Act
-        val results = repository.findByRaiderIdAndGuildIdAndDateRange(
-            raiderId,
-            guildId,
-            LocalDate.of(2024, 11, 1),
-            LocalDate.of(2024, 11, 14)
-        )
+        val results =
+            repository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
 
         // Assert
         results.shouldBeEmpty()
@@ -252,7 +265,7 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
         instance: String = "Nerub-ar Palace",
         encounter: String? = null,
         startDate: LocalDate = LocalDate.of(2024, 11, 1),
-        endDate: LocalDate = LocalDate.of(2024, 11, 14)
+        endDate: LocalDate = LocalDate.of(2024, 11, 14),
     ): AttendanceRecord {
         return AttendanceRecord.create(
             raiderId = raiderId,
@@ -262,7 +275,7 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
             startDate = startDate,
             endDate = endDate,
             attendedRaids = 8,
-            totalRaids = 10
+            totalRaids = 10,
         )
     }
 }

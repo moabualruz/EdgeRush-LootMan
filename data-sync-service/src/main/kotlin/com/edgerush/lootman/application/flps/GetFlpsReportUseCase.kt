@@ -1,6 +1,7 @@
 package com.edgerush.lootman.application.flps
 
 import com.edgerush.lootman.domain.shared.GuildId
+import org.springframework.stereotype.Service
 
 /**
  * Use case for generating FLPS reports.
@@ -8,6 +9,7 @@ import com.edgerush.lootman.domain.shared.GuildId
  * This use case aggregates multiple FLPS calculations and sorts them
  * by score for easy comparison and decision-making.
  */
+@Service
 class GetFlpsReportUseCase {
     /**
      * Executes the report generation.

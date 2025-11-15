@@ -15,32 +15,34 @@ import java.time.LocalDate
  * 2. Creating an attendance record
  * 3. Persisting the record
  */
+@Service
 class TrackAttendanceUseCase(
-    private val attendanceRepository: AttendanceRepository
+    private val attendanceRepository: AttendanceRepository,
 ) {
-
     /**
      * Execute the track attendance use case.
      *
      * @param command The command containing attendance tracking details
      * @return Result containing the created AttendanceRecord or an exception
      */
-    fun execute(command: TrackAttendanceCommand): Result<AttendanceRecord> = runCatching {
-        // Create the attendance record (validation happens in the domain model)
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(command.raiderId),
-            guildId = GuildId(command.guildId),
-            instance = command.instance,
-            encounter = command.encounter,
-            startDate = command.startDate,
-            endDate = command.endDate,
-            attendedRaids = command.attendedRaids,
-            totalRaids = command.totalRaids
-        )
+    fun execute(command: TrackAttendanceCommand): Result<AttendanceRecord> =
+        runCatching {
+            // Create the attendance record (validation happens in the domain model)
+            val record =
+                AttendanceRecord.create(
+                    raiderId = RaiderId(command.raiderId),
+                    guildId = GuildId(command.guildId),
+                    instance = command.instance,
+                    encounter = command.encounter,
+                    startDate = command.startDate,
+                    endDate = command.endDate,
+                    attendedRaids = command.attendedRaids,
+                    totalRaids = command.totalRaids,
+                )
 
-        // Persist the record
-        attendanceRepository.save(record)
-    }
+            // Persist the record
+            attendanceRepository.save(record)
+        }
 }
 
 /**
@@ -63,5 +65,5 @@ data class TrackAttendanceCommand(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val attendedRaids: Int,
-    val totalRaids: Int
+    val totalRaids: Int,
 )

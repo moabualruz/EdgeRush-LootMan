@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class AttendanceCalculationServiceTest : UnitTest() {
-
     @MockK
     private lateinit var attendanceRepository: AttendanceRepository
 
@@ -29,18 +28,19 @@ class AttendanceCalculationServiceTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val records = listOf(
-            createAttendanceRecord(raiderId, guildId, 8, 10),
-            createAttendanceRecord(raiderId, guildId, 9, 10),
-            createAttendanceRecord(raiderId, guildId, 7, 10)
-        )
+        val records =
+            listOf(
+                createAttendanceRecord(raiderId, guildId, 8, 10),
+                createAttendanceRecord(raiderId, guildId, 9, 10),
+                createAttendanceRecord(raiderId, guildId, 7, 10),
+            )
 
         every {
             attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
                 raiderId,
                 guildId,
                 startDate,
-                endDate
+                endDate,
             )
         } returns records
 
@@ -67,7 +67,7 @@ class AttendanceCalculationServiceTest : UnitTest() {
                 raiderId,
                 guildId,
                 startDate,
-                endDate
+                endDate,
             )
         } returns emptyList()
 
@@ -86,17 +86,18 @@ class AttendanceCalculationServiceTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val records = listOf(
-            createAttendanceRecord(raiderId, guildId, 10, 10),
-            createAttendanceRecord(raiderId, guildId, 10, 10)
-        )
+        val records =
+            listOf(
+                createAttendanceRecord(raiderId, guildId, 10, 10),
+                createAttendanceRecord(raiderId, guildId, 10, 10),
+            )
 
         every {
             attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
                 raiderId,
                 guildId,
                 startDate,
-                endDate
+                endDate,
             )
         } returns records
 
@@ -117,10 +118,11 @@ class AttendanceCalculationServiceTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val records = listOf(
-            createAttendanceRecord(raiderId, guildId, 8, 10, instance = instance),
-            createAttendanceRecord(raiderId, guildId, 9, 10, instance = instance)
-        )
+        val records =
+            listOf(
+                createAttendanceRecord(raiderId, guildId, 8, 10, instance = instance),
+                createAttendanceRecord(raiderId, guildId, 9, 10, instance = instance),
+            )
 
         every {
             attendanceRepository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
@@ -128,18 +130,19 @@ class AttendanceCalculationServiceTest : UnitTest() {
                 guildId,
                 instance,
                 startDate,
-                endDate
+                endDate,
             )
         } returns records
 
         // Act
-        val stats = service.calculateAttendanceStatsForInstance(
-            raiderId,
-            guildId,
-            instance,
-            startDate,
-            endDate
-        )
+        val stats =
+            service.calculateAttendanceStatsForInstance(
+                raiderId,
+                guildId,
+                instance,
+                startDate,
+                endDate,
+            )
 
         // Assert
         stats.totalRaids shouldBe 20
@@ -157,16 +160,17 @@ class AttendanceCalculationServiceTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val records = listOf(
-            createAttendanceRecord(
-                raiderId,
-                guildId,
-                5,
-                10,
-                instance = instance,
-                encounter = encounter
+        val records =
+            listOf(
+                createAttendanceRecord(
+                    raiderId,
+                    guildId,
+                    5,
+                    10,
+                    instance = instance,
+                    encounter = encounter,
+                ),
             )
-        )
 
         every {
             attendanceRepository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
@@ -175,19 +179,20 @@ class AttendanceCalculationServiceTest : UnitTest() {
                 instance,
                 encounter,
                 startDate,
-                endDate
+                endDate,
             )
         } returns records
 
         // Act
-        val stats = service.calculateAttendanceStatsForEncounter(
-            raiderId,
-            guildId,
-            instance,
-            encounter,
-            startDate,
-            endDate
-        )
+        val stats =
+            service.calculateAttendanceStatsForEncounter(
+                raiderId,
+                guildId,
+                instance,
+                encounter,
+                startDate,
+                endDate,
+            )
 
         // Assert
         stats.totalRaids shouldBe 10
@@ -202,11 +207,12 @@ class AttendanceCalculationServiceTest : UnitTest() {
         val startDate = LocalDate.of(2024, 11, 1)
         val endDate = LocalDate.of(2024, 11, 14)
 
-        val allRecords = listOf(
-            createAttendanceRecord(RaiderId(1L), guildId, 8, 10),
-            createAttendanceRecord(RaiderId(2L), guildId, 9, 10),
-            createAttendanceRecord(RaiderId(3L), guildId, 7, 10)
-        )
+        val allRecords =
+            listOf(
+                createAttendanceRecord(RaiderId(1L), guildId, 8, 10),
+                createAttendanceRecord(RaiderId(2L), guildId, 9, 10),
+                createAttendanceRecord(RaiderId(3L), guildId, 7, 10),
+            )
 
         every {
             attendanceRepository.findByGuildIdAndDateRange(guildId, startDate, endDate)
@@ -227,7 +233,7 @@ class AttendanceCalculationServiceTest : UnitTest() {
         attendedRaids: Int,
         totalRaids: Int,
         instance: String = "Nerub-ar Palace",
-        encounter: String? = null
+        encounter: String? = null,
     ): AttendanceRecord {
         return AttendanceRecord.create(
             raiderId = raiderId,
@@ -237,7 +243,7 @@ class AttendanceCalculationServiceTest : UnitTest() {
             startDate = LocalDate.of(2024, 11, 1),
             endDate = LocalDate.of(2024, 11, 14),
             attendedRaids = attendedRaids,
-            totalRaids = totalRaids
+            totalRaids = totalRaids,
         )
     }
 }

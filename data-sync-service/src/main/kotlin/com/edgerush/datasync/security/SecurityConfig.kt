@@ -71,10 +71,14 @@ class SecurityConfig(
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = !adminModeConfig.isEnabled()
-        configuration.maxAge = 3600L
+        configuration.maxAge = CORS_MAX_AGE_SECONDS
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
+    }
+
+    companion object {
+        private const val CORS_MAX_AGE_SECONDS = 3600L // 1 hour
     }
 }

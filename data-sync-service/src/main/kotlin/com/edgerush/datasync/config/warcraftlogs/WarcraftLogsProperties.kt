@@ -20,9 +20,13 @@ data class WarcraftLogsProperties(
             require(clientId.isNotBlank()) { "Warcraft Logs client ID is required when enabled=true" }
             require(clientSecret.isNotBlank()) { "Warcraft Logs client secret is required when enabled=true" }
             require(maxRetries >= 1) { "Max retries must be at least 1" }
-            require(retryDelayMs >= 100) { "Retry delay must be at least 100ms" }
+            require(retryDelayMs >= MIN_RETRY_DELAY_MS) { "Retry delay must be at least ${MIN_RETRY_DELAY_MS}ms" }
             require(maxConcurrentRequests >= 1) { "Max concurrent requests must be at least 1" }
             require(requestTimeoutSeconds >= 1) { "Request timeout must be at least 1 second" }
         }
+    }
+
+    companion object {
+        private const val MIN_RETRY_DELAY_MS = 100L
     }
 }

@@ -22,7 +22,7 @@ class LootDistributionService {
         decayThresholdDays: Int = 14,
         now: Instant = Instant.now(),
     ): Boolean {
-        val thresholdTime = now.minusSeconds(decayThresholdDays.toLong() * 24 * 60 * 60)
+        val thresholdTime = now.minusSeconds(decayThresholdDays.toLong() * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE)
         return recentAwards.any { it.awardedAt.isAfter(thresholdTime) }
     }
 
@@ -41,7 +41,13 @@ class LootDistributionService {
         now: Instant = Instant.now(),
     ): Boolean {
         if (!lootAward.isActive()) return false
-        val deadline = lootAward.awardedAt.plusSeconds(maxRevocationDays.toLong() * 24 * 60 * 60)
+        val deadline = lootAward.awardedAt.plusSeconds(maxRevocationDays.toLong() * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE)
         return now.isBefore(deadline)
+    }
+
+    companion object {
+        private const val HOURS_PER_DAY = 24
+        private const val MINUTES_PER_HOUR = 60
+        private const val SECONDS_PER_MINUTE = 60
     }
 }

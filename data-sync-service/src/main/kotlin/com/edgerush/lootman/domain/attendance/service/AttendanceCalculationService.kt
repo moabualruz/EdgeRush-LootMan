@@ -12,8 +12,9 @@ import java.time.LocalDate
  *
  * Provides methods to aggregate and calculate attendance metrics from attendance records.
  */
+@Service
 class AttendanceCalculationService(
-    private val attendanceRepository: AttendanceRepository
+    private val attendanceRepository: AttendanceRepository,
 ) {
     /**
      * Calculates overall attendance stats for a raider in a guild within a date range.
@@ -28,14 +29,15 @@ class AttendanceCalculationService(
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): AttendanceStats {
-        val records = attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
-            raiderId,
-            guildId,
-            startDate,
-            endDate
-        )
+        val records =
+            attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                startDate,
+                endDate,
+            )
 
         return aggregateRecords(records)
     }
@@ -55,15 +57,16 @@ class AttendanceCalculationService(
         guildId: GuildId,
         instance: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): AttendanceStats {
-        val records = attendanceRepository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
-            raiderId,
-            guildId,
-            instance,
-            startDate,
-            endDate
-        )
+        val records =
+            attendanceRepository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                startDate,
+                endDate,
+            )
 
         return aggregateRecords(records)
     }
@@ -85,16 +88,17 @@ class AttendanceCalculationService(
         instance: String,
         encounter: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): AttendanceStats {
-        val records = attendanceRepository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
-            raiderId,
-            guildId,
-            instance,
-            encounter,
-            startDate,
-            endDate
-        )
+        val records =
+            attendanceRepository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                encounter,
+                startDate,
+                endDate,
+            )
 
         return aggregateRecords(records)
     }
@@ -110,13 +114,14 @@ class AttendanceCalculationService(
     fun calculateGuildAttendanceStats(
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): AttendanceStats {
-        val records = attendanceRepository.findByGuildIdAndDateRange(
-            guildId,
-            startDate,
-            endDate
-        )
+        val records =
+            attendanceRepository.findByGuildIdAndDateRange(
+                guildId,
+                startDate,
+                endDate,
+            )
 
         return aggregateRecords(records)
     }

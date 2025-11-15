@@ -22,20 +22,20 @@ import java.time.LocalDate
  * - Backward compatibility with existing endpoints
  */
 class AttendanceControllerIntegrationTest : IntegrationTest() {
-
     @Test
     fun `should track attendance and return 201 Created`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 12345L,
-            guildId = "test-guild-123",
-            instance = "Nerub-ar Palace",
-            encounter = null, // Overall instance attendance
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 12345L,
+                guildId = "test-guild-123",
+                instance = "Nerub-ar Palace",
+                encounter = null, // Overall instance attendance
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -43,11 +43,12 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val entity = HttpEntity(request, headers)
 
         // When
-        val response = restTemplate.postForEntity(
-            "/api/v1/attendance/track",
-            entity,
-            TrackAttendanceResponse::class.java
-        )
+        val response =
+            restTemplate.postForEntity(
+                "/api/v1/attendance/track",
+                entity,
+                TrackAttendanceResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.CREATED, response.statusCode)
@@ -65,16 +66,17 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should track encounter-specific attendance and return 201 Created`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 12345L,
-            guildId = "test-guild-123",
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 6,
-            totalRaids = 8
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 12345L,
+                guildId = "test-guild-123",
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 6,
+                totalRaids = 8,
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -82,11 +84,12 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val entity = HttpEntity(request, headers)
 
         // When
-        val response = restTemplate.postForEntity(
-            "/api/v1/attendance/track",
-            entity,
-            TrackAttendanceResponse::class.java
-        )
+        val response =
+            restTemplate.postForEntity(
+                "/api/v1/attendance/track",
+                entity,
+                TrackAttendanceResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.CREATED, response.statusCode)
@@ -104,10 +107,11 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val endDate = LocalDate.of(2024, 11, 14)
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate",
-            AttendanceReportResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate",
+                AttendanceReportResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -131,10 +135,11 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val endDate = LocalDate.of(2024, 11, 14)
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&instance=$instance",
-            AttendanceReportResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&instance=$instance",
+                AttendanceReportResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -154,10 +159,11 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val endDate = LocalDate.of(2024, 11, 14)
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&instance=$instance&encounter=$encounter",
-            AttendanceReportResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&instance=$instance&encounter=$encounter",
+                AttendanceReportResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -170,16 +176,17 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should return 400 Bad Request when tracking attendance with invalid dates`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 12345L,
-            guildId = "test-guild-123",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 14),
-            endDate = LocalDate.of(2024, 11, 1), // End before start
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 12345L,
+                guildId = "test-guild-123",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 14),
+                endDate = LocalDate.of(2024, 11, 1), // End before start
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -187,11 +194,12 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val entity = HttpEntity(request, headers)
 
         // When
-        val response = restTemplate.postForEntity(
-            "/api/v1/attendance/track",
-            entity,
-            String::class.java
-        )
+        val response =
+            restTemplate.postForEntity(
+                "/api/v1/attendance/track",
+                entity,
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -200,16 +208,17 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should return 400 Bad Request when tracking attendance with negative raids`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 12345L,
-            guildId = "test-guild-123",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = -1, // Invalid
-            totalRaids = 10
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 12345L,
+                guildId = "test-guild-123",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = -1, // Invalid
+                totalRaids = 10,
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -217,11 +226,12 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val entity = HttpEntity(request, headers)
 
         // When
-        val response = restTemplate.postForEntity(
-            "/api/v1/attendance/track",
-            entity,
-            String::class.java
-        )
+        val response =
+            restTemplate.postForEntity(
+                "/api/v1/attendance/track",
+                entity,
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -230,16 +240,17 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should return 400 Bad Request when tracking attendance with attended greater than total`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 12345L,
-            guildId = "test-guild-123",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 15, // Greater than total
-            totalRaids = 10
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 12345L,
+                guildId = "test-guild-123",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 15, // Greater than total
+                totalRaids = 10,
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -247,11 +258,12 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val entity = HttpEntity(request, headers)
 
         // When
-        val response = restTemplate.postForEntity(
-            "/api/v1/attendance/track",
-            entity,
-            String::class.java
-        )
+        val response =
+            restTemplate.postForEntity(
+                "/api/v1/attendance/track",
+                entity,
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -267,10 +279,11 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val endDate = LocalDate.of(2024, 11, 14)
 
         // When - Note: no instance parameter
-        val response = restTemplate.getForEntity(
-            "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&encounter=$encounter",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/attendance/raiders/$raiderId/report?guildId=$guildId&startDate=$startDate&endDate=$endDate&encounter=$encounter",
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -282,10 +295,11 @@ class AttendanceControllerIntegrationTest : IntegrationTest() {
         val raiderId = 12345L
 
         // When - Missing guildId, startDate, endDate
-        val response = restTemplate.getForEntity(
-            "/api/v1/attendance/raiders/$raiderId/report",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/attendance/raiders/$raiderId/report",
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)

@@ -1,23 +1,18 @@
 package com.edgerush.datasync.config
 
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.web.SecurityFilterChain
+import org.springframework.context.annotation.Profile
 
+/**
+ * Test security configuration placeholder.
+ *
+ * Security is disabled in tests by excluding WebMvc security auto-configuration.
+ * Admin mode is enabled in test profile, so no authentication is required.
+ *
+ * Only active in test profile.
+ */
 @TestConfiguration
-@EnableWebSecurity
+@Profile("test")
 class TestSecurityConfig {
-    @Bean
-    fun testSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .authorizeHttpRequests { auth ->
-                auth.anyRequest().permitAll()
-            }
-            .csrf { it.disable() }
-            .oauth2Client { it.disable() }
-
-        return http.build()
-    }
+    // No beans needed - security is disabled via exclusions
 }

@@ -20,7 +20,7 @@ data class AttendanceRecord private constructor(
     val endDate: LocalDate,
     val attendedRaids: Int,
     val totalRaids: Int,
-    val recordedAt: Instant
+    val recordedAt: Instant,
 ) {
     /**
      * Calculated attendance percentage.
@@ -50,7 +50,7 @@ data class AttendanceRecord private constructor(
             startDate: LocalDate,
             endDate: LocalDate,
             attendedRaids: Int,
-            totalRaids: Int
+            totalRaids: Int,
         ): AttendanceRecord {
             require(instance.isNotBlank()) {
                 "Instance name cannot be blank"
@@ -78,7 +78,7 @@ data class AttendanceRecord private constructor(
                 endDate = endDate,
                 attendedRaids = attendedRaids,
                 totalRaids = totalRaids,
-                recordedAt = Instant.now()
+                recordedAt = Instant.now(),
             )
         }
     }

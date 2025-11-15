@@ -1,0 +1,82 @@
+
+> Task :data-sync-service:detekt FAILED
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\WoWAuditClient.kt:11:7: Class 'WoWAuditClient' with '20' functions detected. Defined threshold inside classes is set to '15' [TooManyFunctions]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\api\attendance\AttendanceController.kt:90:28: The function getAttendanceReport(raiderId: Long, guildId: String, startDate: LocalDate, endDate: LocalDate, instance: String?, encounter: String?) has too many parameters. The current threshold is set to 6. [LongParameterList]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\attendance\model\AttendanceRecord.kt:45:19: The function create(raiderId: RaiderId, guildId: GuildId, instance: String, encounter: String?, startDate: LocalDate, endDate: LocalDate, attendedRaids: Int, totalRaids: Int) has too many parameters. The current threshold is set to 6. [LongParameterList]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\attendance\repository\AttendanceRepository.kt:68:57: The function findByRaiderIdAndGuildIdAndEncounterAndDateRange(raiderId: RaiderId, guildId: GuildId, instance: String, encounter: String, startDate: LocalDate, endDate: LocalDate) has too many parameters. The current threshold is set to 6. [LongParameterList]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\attendance\service\AttendanceCalculationService.kt:85:45: The function calculateAttendanceStatsForEncounter(raiderId: RaiderId, guildId: GuildId, instance: String, encounter: String, startDate: LocalDate, endDate: LocalDate) has too many parameters. The current threshold is set to 6. [LongParameterList]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\service\FlpsCalculationService.kt:68:36: The function calculateFlpsFromComponents(acs: AttendanceCommitmentScore, mas: MechanicalAdherenceScore, eps: ExternalPreparationScore, uv: UpgradeValue, tb: TierBonus, rm: RoleMultiplier, rdf: RecencyDecayFactor, attendanceWeight: Double, mechanicalWeight: Double, preparationWeight: Double, upgradeWeight: Double, tierWeight: Double, roleWeight: Double) has too many parameters. The current threshold is set to 6. [LongParameterList]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtAuthenticationFilter.kt:39:22: The caught exception is too generic. Prefer catching specific exceptions to the case that is currently handled. [TooGenericExceptionCaught]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtAuthenticationFilter.kt:39:22: The caught exception is swallowed. The original exception could be lost. [SwallowedException]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtService.kt:34:18: The caught exception is too generic. Prefer catching specific exceptions to the case that is currently handled. [TooGenericExceptionCaught]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtService.kt:34:18: The caught exception is swallowed. The original exception could be lost. [SwallowedException]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\datasync\RaiderSample.kt:6:5: Constructor parameter names should match the pattern: [a-z][A-Za-z0-9]* [ConstructorParameterNaming]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\DataSyncApplication.kt:19:40: In most cases using a spread operator causes a full copy of the array to be created before calling a method. This may result in a performance penalty. [SpreadOperator]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\raidbots\RaidbotsClient.kt:11:17: Private property `webClient` is unused. [UnusedPrivateProperty]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\WoWAuditClient.kt:36:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\WoWAuditClient.kt:62:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\WoWAuditClient.kt:68:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\client\WoWAuditClient.kt:74:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:9:5: The data class FlpsConfigProperties contains a mutable property. The offending property is called rms [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:10:5: The data class FlpsConfigProperties contains a mutable property. The offending property is called ipi [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:11:5: The data class FlpsConfigProperties contains a mutable property. The offending property is called roleMultipliers [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:12:5: The data class FlpsConfigProperties contains a mutable property. The offending property is called thresholds [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:15:9: The data class RmsWeights contains a mutable property. The offending property is called attendance [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:16:9: The data class RmsWeights contains a mutable property. The offending property is called mechanical [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:17:9: The data class RmsWeights contains a mutable property. The offending property is called preparation [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:21:9: The data class IpiWeights contains a mutable property. The offending property is called upgradeValue [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:22:9: The data class IpiWeights contains a mutable property. The offending property is called tierBonus [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:23:9: The data class IpiWeights contains a mutable property. The offending property is called roleMultiplier [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:27:9: The data class RoleMultipliers contains a mutable property. The offending property is called tank [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:28:9: The data class RoleMultipliers contains a mutable property. The offending property is called healer [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:29:9: The data class RoleMultipliers contains a mutable property. The offending property is called dps [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:33:9: The data class Thresholds contains a mutable property. The offending property is called eligibilityAttendance [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:34:9: The data class Thresholds contains a mutable property. The offending property is called eligibilityActivity [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:35:9: The data class Thresholds contains a mutable property. The offending property is called recencyDecayDays [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:36:9: The data class Thresholds contains a mutable property. The offending property is called maxAttendanceBonus [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:37:9: The data class Thresholds contains a mutable property. The offending property is called minMechanicalScore [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\FlpsConfigProperties.kt:38:9: The data class Thresholds contains a mutable property. The offending property is called maxPreparationScore [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\RateLimitConfig.kt:18:5: The data class RateLimitProperties contains a mutable property. The offending property is called enabled [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\RateLimitConfig.kt:19:5: The data class RateLimitProperties contains a mutable property. The offending property is called readRequestsPerSecond [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\config\RateLimitConfig.kt:20:5: The data class RateLimitProperties contains a mutable property. The offending property is called writeRequestsPerSecond [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\AdminModeConfig.kt:11:5: The data class AdminModeConfig contains a mutable property. The offending property is called enabled [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtService.kt:14:5: The data class JwtProperties contains a mutable property. The offending property is called secret [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtService.kt:15:5: The data class JwtProperties contains a mutable property. The offending property is called expirationMs [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\datasync\security\JwtService.kt:16:5: The data class JwtProperties contains a mutable property. The offending property is called issuer [DataClassShouldBeImmutable]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\api\flps\FlpsController.kt:74:23: Function parameter `guildId` is unused. [UnusedParameter]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\api\flps\FlpsController.kt:26:17: Private property `calculateFlpsScoreUseCase` is unused. [UnusedPrivateProperty]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\application\attendance\GetAttendanceReportUseCase.kt:32:17: Use require() instead of throwing an IllegalArgumentException. [UseRequire]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\attendance\service\AttendanceCalculationService.kt:135:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\ItemPriorityIndex.kt:54:17: Parentheses in (uv.value * upgradeWeight) are unnecessary and can be replaced with: uv.value * upgradeWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\ItemPriorityIndex.kt:55:21: Parentheses in (tb.value * tierWeight) are unnecessary and can be replaced with: tb.value * tierWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\ItemPriorityIndex.kt:56:21: Parentheses in (rm.value * roleWeight) are unnecessary and can be replaced with: rm.value * roleWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\RaiderMeritScore.kt:54:17: Parentheses in (acs.value * attendanceWeight) are unnecessary and can be replaced with: acs.value * attendanceWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\RaiderMeritScore.kt:55:21: Parentheses in (mas.value * mechanicalWeight) are unnecessary and can be replaced with: mas.value * mechanicalWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\model\RaiderMeritScore.kt:56:21: Parentheses in (eps.value * preparationWeight) are unnecessary and can be replaced with: eps.value * preparationWeight [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\flps\service\FlpsCalculationService.kt:43:25: Parentheses in (rms.value * ipi.value) are unnecessary and can be replaced with: rms.value * ipi.value [UnnecessaryParentheses]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\loot\model\LootAward.kt:27:16: Function parameter `reason` is unused. [UnusedParameter]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\loot\service\LootDistributionService.kt:25:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\loot\service\LootDistributionService.kt:44:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\main\kotlin\com\edgerush\lootman\domain\loot\service\LootDistributionService.kt:13:9: Function parameter `raiderId` is unused. [UnusedParameter]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\datasync\test\base\IntegrationTest.kt:54:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\datasync\test\util\TestAssertions.kt:23:9: Function parameter `message` is unused. [UnusedParameter]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\lootman\api\attendance\AttendanceControllerIntegrationTest.kt:140:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\lootman\api\attendance\AttendanceControllerIntegrationTest.kt:164:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\lootman\api\attendance\AttendanceControllerIntegrationTest.kt:284:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+D:\work\dod\looter\data-sync-service\src\test\kotlin\com\edgerush\lootman\application\loot\AwardLootUseCaseTest.kt:121:1: Line detected, which is longer than the defined maximum line length in the code style. [MaxLineLength]
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':data-sync-service:detekt'.
+> Analysis failed with 65 weighted issues.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 2s
+1 actionable task: 1 executed

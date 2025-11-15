@@ -47,10 +47,14 @@ class JwtAuthenticationFilter(
     private fun extractToken(exchange: ServerWebExchange): String? {
         val authHeader = exchange.request.headers.getFirst("Authorization")
         return if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            authHeader.substring(7)
+            authHeader.substring(BEARER_PREFIX_LENGTH)
         } else {
             null
         }
+    }
+
+    companion object {
+        private const val BEARER_PREFIX_LENGTH = 7 // Length of "Bearer "
     }
 
     private fun createAuthentication(user: AuthenticatedUser): UsernamePasswordAuthenticationToken {

@@ -33,7 +33,7 @@ interface AttendanceRepository {
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord>
 
     /**
@@ -51,7 +51,7 @@ interface AttendanceRepository {
         guildId: GuildId,
         instance: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord>
 
     /**
@@ -71,7 +71,7 @@ interface AttendanceRepository {
         instance: String,
         encounter: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord>
 
     /**
@@ -85,7 +85,7 @@ interface AttendanceRepository {
     fun findByGuildIdAndDateRange(
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord>
 
     /**

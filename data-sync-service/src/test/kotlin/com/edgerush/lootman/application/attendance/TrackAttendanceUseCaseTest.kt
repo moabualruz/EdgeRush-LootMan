@@ -1,7 +1,9 @@
 package com.edgerush.lootman.application.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.attendance.model.*
+import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
+import com.edgerush.lootman.domain.attendance.model.GuildId
+import com.edgerush.lootman.domain.attendance.model.RaiderId
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -16,7 +18,6 @@ import java.time.LocalDate
  * Unit tests for TrackAttendanceUseCase.
  */
 class TrackAttendanceUseCaseTest : UnitTest() {
-
     private lateinit var attendanceRepository: AttendanceRepository
     private lateinit var useCase: TrackAttendanceUseCase
 
@@ -29,27 +30,29 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should track attendance successfully when valid command provided`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
-        val expectedRecord = AttendanceRecord.create(
-            raiderId = RaiderId(command.raiderId),
-            guildId = GuildId(command.guildId),
-            instance = command.instance,
-            encounter = command.encounter,
-            startDate = command.startDate,
-            endDate = command.endDate,
-            attendedRaids = command.attendedRaids,
-            totalRaids = command.totalRaids
-        )
+        val expectedRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(command.raiderId),
+                guildId = GuildId(command.guildId),
+                instance = command.instance,
+                encounter = command.encounter,
+                startDate = command.startDate,
+                endDate = command.endDate,
+                attendedRaids = command.attendedRaids,
+                totalRaids = command.totalRaids,
+            )
 
         every { attendanceRepository.save(any()) } returns expectedRecord
 
@@ -72,27 +75,29 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should track attendance with encounter when encounter specified`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 5,
-            totalRaids = 8
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 5,
+                totalRaids = 8,
+            )
 
-        val expectedRecord = AttendanceRecord.create(
-            raiderId = RaiderId(command.raiderId),
-            guildId = GuildId(command.guildId),
-            instance = command.instance,
-            encounter = command.encounter,
-            startDate = command.startDate,
-            endDate = command.endDate,
-            attendedRaids = command.attendedRaids,
-            totalRaids = command.totalRaids
-        )
+        val expectedRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(command.raiderId),
+                guildId = GuildId(command.guildId),
+                instance = command.instance,
+                encounter = command.encounter,
+                startDate = command.startDate,
+                endDate = command.endDate,
+                attendedRaids = command.attendedRaids,
+                totalRaids = command.totalRaids,
+            )
 
         every { attendanceRepository.save(any()) } returns expectedRecord
 
@@ -110,16 +115,17 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should return failure when attended raids exceeds total raids`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 12,
-            totalRaids = 10
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 12,
+                totalRaids = 10,
+            )
 
         // When
         val result = useCase.execute(command)
@@ -134,16 +140,17 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should return failure when total raids is zero`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 0,
-            totalRaids = 0
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 0,
+                totalRaids = 0,
+            )
 
         // When
         val result = useCase.execute(command)
@@ -158,16 +165,17 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should return failure when end date is before start date`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 31),
-            endDate = LocalDate.of(2024, 1, 1),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 31),
+                endDate = LocalDate.of(2024, 1, 1),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         // When
         val result = useCase.execute(command)
@@ -182,27 +190,29 @@ class TrackAttendanceUseCaseTest : UnitTest() {
     @Test
     fun `should track perfect attendance when attended equals total`() {
         // Given
-        val command = TrackAttendanceCommand(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 10,
-            totalRaids = 10
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 10,
+                totalRaids = 10,
+            )
 
-        val expectedRecord = AttendanceRecord.create(
-            raiderId = RaiderId(command.raiderId),
-            guildId = GuildId(command.guildId),
-            instance = command.instance,
-            encounter = command.encounter,
-            startDate = command.startDate,
-            endDate = command.endDate,
-            attendedRaids = command.attendedRaids,
-            totalRaids = command.totalRaids
-        )
+        val expectedRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(command.raiderId),
+                guildId = GuildId(command.guildId),
+                instance = command.instance,
+                encounter = command.encounter,
+                startDate = command.startDate,
+                endDate = command.endDate,
+                attendedRaids = command.attendedRaids,
+                totalRaids = command.totalRaids,
+            )
 
         every { attendanceRepository.save(any()) } returns expectedRecord
 

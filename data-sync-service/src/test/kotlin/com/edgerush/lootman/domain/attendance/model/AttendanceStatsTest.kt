@@ -6,16 +6,16 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class AttendanceStatsTest : UnitTest() {
-
     @Test
     fun `should create valid attendance stats with all fields`() {
         // Arrange & Act
-        val stats = AttendanceStats.of(
-            attendancePercentage = 0.85,
-            totalRaids = 20,
-            attendedRaids = 17,
-            missedRaids = 3
-        )
+        val stats =
+            AttendanceStats.of(
+                attendancePercentage = 0.85,
+                totalRaids = 20,
+                attendedRaids = 17,
+                missedRaids = 3,
+            )
 
         // Assert
         stats.attendancePercentage shouldBe 0.85
@@ -27,10 +27,11 @@ class AttendanceStatsTest : UnitTest() {
     @Test
     fun `should calculate attendance percentage correctly`() {
         // Arrange & Act
-        val stats = AttendanceStats.calculate(
-            attendedRaids = 15,
-            totalRaids = 20
-        )
+        val stats =
+            AttendanceStats.calculate(
+                attendedRaids = 15,
+                totalRaids = 20,
+            )
 
         // Assert
         stats.attendancePercentage shouldBe 0.75
@@ -42,10 +43,11 @@ class AttendanceStatsTest : UnitTest() {
     @Test
     fun `should handle perfect attendance`() {
         // Arrange & Act
-        val stats = AttendanceStats.calculate(
-            attendedRaids = 20,
-            totalRaids = 20
-        )
+        val stats =
+            AttendanceStats.calculate(
+                attendedRaids = 20,
+                totalRaids = 20,
+            )
 
         // Assert
         stats.attendancePercentage shouldBe 1.0
@@ -55,10 +57,11 @@ class AttendanceStatsTest : UnitTest() {
     @Test
     fun `should handle zero attendance`() {
         // Arrange & Act
-        val stats = AttendanceStats.calculate(
-            attendedRaids = 0,
-            totalRaids = 20
-        )
+        val stats =
+            AttendanceStats.calculate(
+                attendedRaids = 0,
+                totalRaids = 20,
+            )
 
         // Assert
         stats.attendancePercentage shouldBe 0.0
@@ -85,7 +88,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = -0.1,
                 totalRaids = 20,
                 attendedRaids = 17,
-                missedRaids = 3
+                missedRaids = 3,
             )
         }
     }
@@ -98,7 +101,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = 1.1,
                 totalRaids = 20,
                 attendedRaids = 17,
-                missedRaids = 3
+                missedRaids = 3,
             )
         }
     }
@@ -111,7 +114,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = 0.85,
                 totalRaids = -1,
                 attendedRaids = 17,
-                missedRaids = 3
+                missedRaids = 3,
             )
         }
     }
@@ -124,7 +127,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = 0.85,
                 totalRaids = 20,
                 attendedRaids = -1,
-                missedRaids = 3
+                missedRaids = 3,
             )
         }
     }
@@ -137,7 +140,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = 0.85,
                 totalRaids = 20,
                 attendedRaids = 17,
-                missedRaids = -1
+                missedRaids = -1,
             )
         }
     }
@@ -148,7 +151,7 @@ class AttendanceStatsTest : UnitTest() {
         shouldThrow<IllegalArgumentException> {
             AttendanceStats.calculate(
                 attendedRaids = 21,
-                totalRaids = 20
+                totalRaids = 20,
             )
         }
     }
@@ -159,7 +162,7 @@ class AttendanceStatsTest : UnitTest() {
         shouldThrow<IllegalArgumentException> {
             AttendanceStats.calculate(
                 attendedRaids = 1,
-                totalRaids = 0
+                totalRaids = 0,
             )
         }
     }
@@ -172,7 +175,7 @@ class AttendanceStatsTest : UnitTest() {
                 attendancePercentage = 0.85,
                 totalRaids = 20,
                 attendedRaids = 15,
-                missedRaids = 3  // Should be 5
+                missedRaids = 3, // Should be 5
             )
         }
     }

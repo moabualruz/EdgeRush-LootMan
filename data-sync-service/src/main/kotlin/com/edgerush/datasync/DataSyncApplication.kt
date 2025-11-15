@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @ConfigurationPropertiesScan
 @EnableConfigurationProperties(SyncProperties::class)
-@ComponentScan(basePackages = ["com.edgerush.datasync", "com.edgerush.lootman.config", "com.edgerush.lootman.api"])
+@ComponentScan(basePackages = ["com.edgerush.datasync", "com.edgerush.lootman"])
 class DataSyncApplication
 
 fun main(args: Array<String>) {

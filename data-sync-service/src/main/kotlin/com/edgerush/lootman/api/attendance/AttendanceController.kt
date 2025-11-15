@@ -31,9 +31,8 @@ import java.time.LocalDate
 @RequestMapping("/api/v1/attendance")
 class AttendanceController(
     private val trackAttendanceUseCase: TrackAttendanceUseCase,
-    private val getAttendanceReportUseCase: GetAttendanceReportUseCase
+    private val getAttendanceReportUseCase: GetAttendanceReportUseCase,
 ) {
-
     /**
      * Track attendance for a raider.
      *
@@ -45,18 +44,19 @@ class AttendanceController(
      */
     @PostMapping("/track")
     fun trackAttendance(
-        @RequestBody request: TrackAttendanceRequest
+        @RequestBody request: TrackAttendanceRequest,
     ): ResponseEntity<TrackAttendanceResponse> {
-        val command = TrackAttendanceCommand(
-            raiderId = request.raiderId,
-            guildId = request.guildId,
-            instance = request.instance,
-            encounter = request.encounter,
-            startDate = request.startDate,
-            endDate = request.endDate,
-            attendedRaids = request.attendedRaids,
-            totalRaids = request.totalRaids
-        )
+        val command =
+            TrackAttendanceCommand(
+                raiderId = request.raiderId,
+                guildId = request.guildId,
+                instance = request.instance,
+                encounter = request.encounter,
+                startDate = request.startDate,
+                endDate = request.endDate,
+                attendedRaids = request.attendedRaids,
+                totalRaids = request.totalRaids,
+            )
 
         return trackAttendanceUseCase.execute(command)
             .map { record ->
@@ -93,16 +93,17 @@ class AttendanceController(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate,
         @RequestParam(required = false) instance: String?,
-        @RequestParam(required = false) encounter: String?
+        @RequestParam(required = false) encounter: String?,
     ): AttendanceReportResponse {
-        val query = GetAttendanceReportQuery(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = instance,
-            encounter = encounter
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = instance,
+                encounter = encounter,
+            )
 
         return getAttendanceReportUseCase.execute(query)
             .map { report -> AttendanceReportResponse.from(report) }

@@ -1,7 +1,9 @@
 package com.edgerush.lootman.application.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.attendance.model.*
+import com.edgerush.lootman.domain.attendance.model.AttendanceStats
+import com.edgerush.lootman.domain.attendance.model.GuildId
+import com.edgerush.lootman.domain.attendance.model.RaiderId
 import com.edgerush.lootman.domain.attendance.service.AttendanceCalculationService
 import io.mockk.every
 import io.mockk.mockk
@@ -16,7 +18,6 @@ import java.time.LocalDate
  * Unit tests for GetAttendanceReportUseCase.
  */
 class GetAttendanceReportUseCaseTest : UnitTest() {
-
     private lateinit var attendanceCalculationService: AttendanceCalculationService
     private lateinit var useCase: GetAttendanceReportUseCase
 
@@ -29,14 +30,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should get overall attendance report when no instance specified`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = null,
-            encounter = null
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = null,
+                encounter = null,
+            )
 
         val expectedStats = AttendanceStats.calculate(8, 10)
 
@@ -45,7 +47,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 
@@ -68,7 +70,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         }
     }
@@ -76,14 +78,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should get instance-specific attendance report when instance specified`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = "Nerub-ar Palace",
-            encounter = null
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+            )
 
         val expectedStats = AttendanceStats.calculate(6, 8)
 
@@ -93,7 +96,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 GuildId(query.guildId),
                 query.instance!!,
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 
@@ -112,7 +115,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 GuildId(query.guildId),
                 query.instance!!,
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         }
     }
@@ -120,14 +123,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should get encounter-specific attendance report when encounter specified`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek"
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+            )
 
         val expectedStats = AttendanceStats.calculate(4, 5)
 
@@ -138,7 +142,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 query.instance!!,
                 query.encounter!!,
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 
@@ -159,7 +163,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 query.instance!!,
                 query.encounter!!,
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         }
     }
@@ -167,14 +171,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should return zero stats when no attendance data exists`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 999L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = null,
-            encounter = null
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 999L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = null,
+                encounter = null,
+            )
 
         val expectedStats = AttendanceStats.zero()
 
@@ -183,7 +188,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 
@@ -202,7 +207,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         }
     }
@@ -210,14 +215,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should return failure when encounter specified without instance`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = null,
-            encounter = "Queen Ansurek"
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = null,
+                encounter = "Queen Ansurek",
+            )
 
         // When
         val result = useCase.execute(query)
@@ -235,14 +241,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should handle perfect attendance in report`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            instance = null,
-            encounter = null
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                instance = null,
+                encounter = null,
+            )
 
         val expectedStats = AttendanceStats.calculate(10, 10)
 
@@ -251,7 +258,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 
@@ -269,14 +276,15 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
     @Test
     fun `should aggregate data correctly for date range`() {
         // Given
-        val query = GetAttendanceReportQuery(
-            raiderId = 123L,
-            guildId = "guild-456",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 3, 31),
-            instance = null,
-            encounter = null
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = 123L,
+                guildId = "guild-456",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 3, 31),
+                instance = null,
+                encounter = null,
+            )
 
         val expectedStats = AttendanceStats.calculate(24, 30)
 
@@ -285,7 +293,7 @@ class GetAttendanceReportUseCaseTest : UnitTest() {
                 RaiderId(query.raiderId),
                 GuildId(query.guildId),
                 query.startDate,
-                query.endDate
+                query.endDate,
             )
         } returns expectedStats
 

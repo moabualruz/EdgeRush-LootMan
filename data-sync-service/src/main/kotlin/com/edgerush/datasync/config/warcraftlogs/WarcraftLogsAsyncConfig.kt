@@ -12,13 +12,20 @@ class WarcraftLogsAsyncConfig {
     @Bean("warcraftLogsExecutor")
     fun warcraftLogsExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {
-            corePoolSize = 2
-            maxPoolSize = 5
-            queueCapacity = 100
+            corePoolSize = CORE_POOL_SIZE
+            maxPoolSize = MAX_POOL_SIZE
+            queueCapacity = QUEUE_CAPACITY
             setThreadNamePrefix("wcl-sync-")
             setWaitForTasksToCompleteOnShutdown(true)
-            setAwaitTerminationSeconds(60)
+            setAwaitTerminationSeconds(AWAIT_TERMINATION_SECONDS)
             initialize()
         }
+    }
+
+    companion object {
+        private const val CORE_POOL_SIZE = 2
+        private const val MAX_POOL_SIZE = 5
+        private const val QUEUE_CAPACITY = 100
+        private const val AWAIT_TERMINATION_SECONDS = 60
     }
 }

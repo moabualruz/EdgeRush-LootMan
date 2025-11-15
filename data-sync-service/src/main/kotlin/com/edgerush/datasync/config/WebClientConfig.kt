@@ -27,9 +27,13 @@ class WebClientConfig {
             .defaultHeaders(defaultHeaders)
             .exchangeStrategies(
                 ExchangeStrategies.builder()
-                    .codecs { it.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) }
+                    .codecs { it.defaultCodecs().maxInMemorySize(MAX_IN_MEMORY_SIZE_BYTES) }
                     .build(),
             )
             .build()
+    }
+
+    companion object {
+        private const val MAX_IN_MEMORY_SIZE_BYTES = 16 * 1024 * 1024 // 16 MB
     }
 }

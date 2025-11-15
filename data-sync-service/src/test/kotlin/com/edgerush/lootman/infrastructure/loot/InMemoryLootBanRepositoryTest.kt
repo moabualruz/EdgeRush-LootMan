@@ -5,7 +5,6 @@ import com.edgerush.lootman.domain.loot.model.LootBan
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -102,4 +101,3 @@ class InMemoryLootBanRepositoryTest : UnitTest() {
         activeBans.size shouldBe 0
     }
 }
-

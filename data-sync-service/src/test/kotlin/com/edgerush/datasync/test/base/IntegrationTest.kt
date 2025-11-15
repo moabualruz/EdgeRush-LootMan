@@ -1,9 +1,11 @@
 package com.edgerush.datasync.test.base
 
+import com.edgerush.datasync.config.TestSecurityConfig
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -47,8 +49,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = [com.edgerush.datasync.DataSyncApplication::class]
+    classes = [com.edgerush.datasync.DataSyncApplication::class],
+    properties = [
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration,org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration,org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration",
+    ],
 )
+@Import(TestSecurityConfig::class)
 @Testcontainers
 @ActiveProfiles("test")
 abstract class IntegrationTest {

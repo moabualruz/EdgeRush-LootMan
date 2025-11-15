@@ -27,7 +27,7 @@ class InMemoryAttendanceRepository : AttendanceRepository {
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
         return storage.values.filter { record ->
             record.raiderId == raiderId &&
@@ -41,7 +41,7 @@ class InMemoryAttendanceRepository : AttendanceRepository {
         guildId: GuildId,
         instance: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
         return storage.values.filter { record ->
             record.raiderId == raiderId &&
@@ -57,7 +57,7 @@ class InMemoryAttendanceRepository : AttendanceRepository {
         instance: String,
         encounter: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
         return storage.values.filter { record ->
             record.raiderId == raiderId &&
@@ -71,7 +71,7 @@ class InMemoryAttendanceRepository : AttendanceRepository {
     override fun findByGuildIdAndDateRange(
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
         return storage.values.filter { record ->
             record.guildId == guildId &&
@@ -95,7 +95,7 @@ class InMemoryAttendanceRepository : AttendanceRepository {
         recordStart: LocalDate,
         recordEnd: LocalDate,
         queryStart: LocalDate,
-        queryEnd: LocalDate
+        queryEnd: LocalDate,
     ): Boolean {
         return !recordEnd.isBefore(queryStart) && !recordStart.isAfter(queryEnd)
     }

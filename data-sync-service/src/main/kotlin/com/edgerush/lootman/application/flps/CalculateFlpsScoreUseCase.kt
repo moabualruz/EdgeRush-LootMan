@@ -1,11 +1,21 @@
 package com.edgerush.lootman.application.flps
 
-import com.edgerush.lootman.domain.flps.model.*
+import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
+import com.edgerush.lootman.domain.flps.model.ExternalPreparationScore
+import com.edgerush.lootman.domain.flps.model.FlpsScore
+import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
+import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
+import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
+import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
+import com.edgerush.lootman.domain.flps.model.RoleMultiplier
+import com.edgerush.lootman.domain.flps.model.TierBonus
+import com.edgerush.lootman.domain.flps.model.UpgradeValue
 import com.edgerush.lootman.domain.flps.repository.FlpsModifierRepository
 import com.edgerush.lootman.domain.flps.service.FlpsCalculationService
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
+import org.springframework.stereotype.Service
 
 /**
  * Use case for calculating FLPS score for a raider and item.
@@ -16,6 +26,7 @@ import com.edgerush.lootman.domain.shared.RaiderId
  * 3. Calculating IPI from component values
  * 4. Calculating final FLPS using the domain service
  */
+@Service
 class CalculateFlpsScoreUseCase(
     private val flpsCalculationService: FlpsCalculationService,
     private val modifierRepository: FlpsModifierRepository,

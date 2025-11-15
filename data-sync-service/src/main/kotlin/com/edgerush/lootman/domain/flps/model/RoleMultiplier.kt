@@ -15,12 +15,15 @@ data class RoleMultiplier private constructor(val value: Double) {
     }
 
     companion object {
+        private const val TANK_MULTIPLIER = 0.8
+        private const val HEALER_MULTIPLIER = 0.7
+
         fun of(value: Double): RoleMultiplier = RoleMultiplier(value)
 
         fun dps(): RoleMultiplier = RoleMultiplier(1.0)
 
-        fun tank(): RoleMultiplier = RoleMultiplier(0.8)
+        fun tank(): RoleMultiplier = RoleMultiplier(TANK_MULTIPLIER)
 
-        fun healer(): RoleMultiplier = RoleMultiplier(0.7)
+        fun healer(): RoleMultiplier = RoleMultiplier(HEALER_MULTIPLIER)
     }
 }

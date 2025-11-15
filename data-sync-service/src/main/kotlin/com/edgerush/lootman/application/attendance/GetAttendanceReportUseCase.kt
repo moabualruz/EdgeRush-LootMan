@@ -15,70 +15,72 @@ import java.time.LocalDate
  * 2. Calculating attendance statistics based on the query scope
  * 3. Returning an aggregated attendance report
  */
+@Service
 class GetAttendanceReportUseCase(
-    private val attendanceCalculationService: AttendanceCalculationService
+    private val attendanceCalculationService: AttendanceCalculationService,
 ) {
-
     /**
      * Execute the get attendance report use case.
      *
      * @param query The query containing report parameters
      * @return Result containing the AttendanceReport or an exception
      */
-    fun execute(query: GetAttendanceReportQuery): Result<AttendanceReport> = runCatching {
-        // Validate that encounter is not specified without instance
-        if (query.encounter != null && query.instance == null) {
-            throw IllegalArgumentException("Cannot query encounter attendance without specifying an instance")
+    fun execute(query: GetAttendanceReportQuery): Result<AttendanceReport> =
+        runCatching {
+            // Validate that encounter is not specified without instance
+            if (query.encounter != null && query.instance == null) {
+                throw IllegalArgumentException("Cannot query encounter attendance without specifying an instance")
+            }
+
+            val raiderId = RaiderId(query.raiderId)
+            val guildId = GuildId(query.guildId)
+
+            // Calculate stats based on query scope
+            val stats =
+                when {
+                    query.encounter != null && query.instance != null -> {
+                        // Encounter-specific stats
+                        attendanceCalculationService.calculateAttendanceStatsForEncounter(
+                            raiderId = raiderId,
+                            guildId = guildId,
+                            instance = query.instance,
+                            encounter = query.encounter,
+                            startDate = query.startDate,
+                            endDate = query.endDate,
+                        )
+                    }
+                    query.instance != null -> {
+                        // Instance-specific stats
+                        attendanceCalculationService.calculateAttendanceStatsForInstance(
+                            raiderId = raiderId,
+                            guildId = guildId,
+                            instance = query.instance,
+                            startDate = query.startDate,
+                            endDate = query.endDate,
+                        )
+                    }
+                    else -> {
+                        // Overall stats
+                        attendanceCalculationService.calculateAttendanceStats(
+                            raiderId = raiderId,
+                            guildId = guildId,
+                            startDate = query.startDate,
+                            endDate = query.endDate,
+                        )
+                    }
+                }
+
+            // Create the report
+            AttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = query.startDate,
+                endDate = query.endDate,
+                instance = query.instance,
+                encounter = query.encounter,
+                stats = stats,
+            )
         }
-
-        val raiderId = RaiderId(query.raiderId)
-        val guildId = GuildId(query.guildId)
-
-        // Calculate stats based on query scope
-        val stats = when {
-            query.encounter != null && query.instance != null -> {
-                // Encounter-specific stats
-                attendanceCalculationService.calculateAttendanceStatsForEncounter(
-                    raiderId = raiderId,
-                    guildId = guildId,
-                    instance = query.instance,
-                    encounter = query.encounter,
-                    startDate = query.startDate,
-                    endDate = query.endDate
-                )
-            }
-            query.instance != null -> {
-                // Instance-specific stats
-                attendanceCalculationService.calculateAttendanceStatsForInstance(
-                    raiderId = raiderId,
-                    guildId = guildId,
-                    instance = query.instance,
-                    startDate = query.startDate,
-                    endDate = query.endDate
-                )
-            }
-            else -> {
-                // Overall stats
-                attendanceCalculationService.calculateAttendanceStats(
-                    raiderId = raiderId,
-                    guildId = guildId,
-                    startDate = query.startDate,
-                    endDate = query.endDate
-                )
-            }
-        }
-
-        // Create the report
-        AttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = query.startDate,
-            endDate = query.endDate,
-            instance = query.instance,
-            encounter = query.encounter,
-            stats = stats
-        )
-    }
 }
 
 /**
@@ -97,7 +99,7 @@ data class GetAttendanceReportQuery(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val instance: String? = null,
-    val encounter: String? = null
+    val encounter: String? = null,
 )
 
 /**
@@ -118,5 +120,5 @@ data class AttendanceReport(
     val endDate: LocalDate,
     val instance: String?,
     val encounter: String?,
-    val stats: AttendanceStats
+    val stats: AttendanceStats,
 )

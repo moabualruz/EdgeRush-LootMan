@@ -9,7 +9,9 @@ import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 
 class GetLootHistoryUseCaseTest : UnitTest() {
@@ -28,20 +30,22 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val guildId = GuildId("guild-123")
         val query = GetLootHistoryByGuildQuery(guildId)
 
-        val award1 = LootAward.create(
-            itemId = ItemId(12345),
-            raiderId = RaiderId("raider-1"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC
-        )
-        val award2 = LootAward.create(
-            itemId = ItemId(12346),
-            raiderId = RaiderId("raider-2"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.72),
-            tier = LootTier.HEROIC
-        )
+        val award1 =
+            LootAward.create(
+                itemId = ItemId(12345),
+                raiderId = RaiderId("raider-1"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
+        val award2 =
+            LootAward.create(
+                itemId = ItemId(12346),
+                raiderId = RaiderId("raider-2"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.72),
+                tier = LootTier.HEROIC,
+            )
 
         every { lootAwardRepository.findByGuildId(guildId) } returns listOf(award1, award2)
 
@@ -63,20 +67,22 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val raiderId = RaiderId("raider-123")
         val query = GetLootHistoryByRaiderQuery(raiderId)
 
-        val award1 = LootAward.create(
-            itemId = ItemId(12345),
-            raiderId = raiderId,
-            guildId = GuildId("guild-1"),
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC
-        )
-        val award2 = LootAward.create(
-            itemId = ItemId(12346),
-            raiderId = raiderId,
-            guildId = GuildId("guild-1"),
-            flpsScore = FlpsScore.of(0.72),
-            tier = LootTier.HEROIC
-        )
+        val award1 =
+            LootAward.create(
+                itemId = ItemId(12345),
+                raiderId = raiderId,
+                guildId = GuildId("guild-1"),
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
+        val award2 =
+            LootAward.create(
+                itemId = ItemId(12346),
+                raiderId = raiderId,
+                guildId = GuildId("guild-1"),
+                flpsScore = FlpsScore.of(0.72),
+                tier = LootTier.HEROIC,
+            )
 
         every { lootAwardRepository.findByRaiderId(raiderId) } returns listOf(award1, award2)
 
@@ -136,20 +142,22 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val guildId = GuildId("guild-123")
         val query = GetLootHistoryByGuildQuery(guildId, activeOnly = true)
 
-        val activeAward = LootAward.create(
-            itemId = ItemId(12345),
-            raiderId = RaiderId("raider-1"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC
-        )
-        val revokedAward = LootAward.create(
-            itemId = ItemId(12346),
-            raiderId = RaiderId("raider-2"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.72),
-            tier = LootTier.HEROIC
-        ).revoke("Mistake")
+        val activeAward =
+            LootAward.create(
+                itemId = ItemId(12345),
+                raiderId = RaiderId("raider-1"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
+        val revokedAward =
+            LootAward.create(
+                itemId = ItemId(12346),
+                raiderId = RaiderId("raider-2"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.72),
+                tier = LootTier.HEROIC,
+            ).revoke("Mistake")
 
         every { lootAwardRepository.findByGuildId(guildId) } returns listOf(activeAward, revokedAward)
 
@@ -171,20 +179,22 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val guildId = GuildId("guild-123")
         val query = GetLootHistoryByGuildQuery(guildId, activeOnly = false)
 
-        val activeAward = LootAward.create(
-            itemId = ItemId(12345),
-            raiderId = RaiderId("raider-1"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC
-        )
-        val revokedAward = LootAward.create(
-            itemId = ItemId(12346),
-            raiderId = RaiderId("raider-2"),
-            guildId = guildId,
-            flpsScore = FlpsScore.of(0.72),
-            tier = LootTier.HEROIC
-        ).revoke("Mistake")
+        val activeAward =
+            LootAward.create(
+                itemId = ItemId(12345),
+                raiderId = RaiderId("raider-1"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
+        val revokedAward =
+            LootAward.create(
+                itemId = ItemId(12346),
+                raiderId = RaiderId("raider-2"),
+                guildId = guildId,
+                flpsScore = FlpsScore.of(0.72),
+                tier = LootTier.HEROIC,
+            ).revoke("Mistake")
 
         every { lootAwardRepository.findByGuildId(guildId) } returns listOf(activeAward, revokedAward)
 

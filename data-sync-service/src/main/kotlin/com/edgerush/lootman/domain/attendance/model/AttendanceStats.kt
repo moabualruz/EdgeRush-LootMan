@@ -11,7 +11,7 @@ data class AttendanceStats private constructor(
     val attendancePercentage: Double,
     val totalRaids: Int,
     val attendedRaids: Int,
-    val missedRaids: Int
+    val missedRaids: Int,
 ) {
     init {
         require(attendancePercentage in 0.0..1.0) {
@@ -45,13 +45,14 @@ data class AttendanceStats private constructor(
             attendancePercentage: Double,
             totalRaids: Int,
             attendedRaids: Int,
-            missedRaids: Int
-        ): AttendanceStats = AttendanceStats(
-            attendancePercentage,
-            totalRaids,
-            attendedRaids,
-            missedRaids
-        )
+            missedRaids: Int,
+        ): AttendanceStats =
+            AttendanceStats(
+                attendancePercentage,
+                totalRaids,
+                attendedRaids,
+                missedRaids,
+            )
 
         /**
          * Calculates AttendanceStats from attended and total raids.
@@ -60,7 +61,10 @@ data class AttendanceStats private constructor(
          * @param totalRaids Total number of raids
          * @return A new AttendanceStats instance with calculated percentage
          */
-        fun calculate(attendedRaids: Int, totalRaids: Int): AttendanceStats {
+        fun calculate(
+            attendedRaids: Int,
+            totalRaids: Int,
+        ): AttendanceStats {
             require(attendedRaids >= 0) {
                 "Attended raids cannot be negative, got $attendedRaids"
             }
@@ -78,7 +82,7 @@ data class AttendanceStats private constructor(
                 attendancePercentage = percentage,
                 totalRaids = totalRaids,
                 attendedRaids = attendedRaids,
-                missedRaids = missed
+                missedRaids = missed,
             )
         }
 
@@ -87,11 +91,12 @@ data class AttendanceStats private constructor(
          *
          * @return An AttendanceStats instance with zero values
          */
-        fun zero(): AttendanceStats = AttendanceStats(
-            attendancePercentage = 0.0,
-            totalRaids = 0,
-            attendedRaids = 0,
-            missedRaids = 0
-        )
+        fun zero(): AttendanceStats =
+            AttendanceStats(
+                attendancePercentage = 0.0,
+                totalRaids = 0,
+                attendedRaids = 0,
+                missedRaids = 0,
+            )
     }
 }

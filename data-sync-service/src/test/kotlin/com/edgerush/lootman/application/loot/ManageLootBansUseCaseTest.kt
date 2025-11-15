@@ -7,7 +7,11 @@ import com.edgerush.lootman.domain.loot.repository.LootBanRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -24,12 +28,13 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should create temporary loot ban successfully`() {
         // Given
-        val command = CreateLootBanCommand(
-            raiderId = RaiderId("raider-123"),
-            guildId = GuildId("guild-456"),
-            reason = "Missed raid without notice",
-            expiresAt = Instant.now().plusSeconds(604800) // 7 days
-        )
+        val command =
+            CreateLootBanCommand(
+                raiderId = RaiderId("raider-123"),
+                guildId = GuildId("guild-456"),
+                reason = "Missed raid without notice",
+                expiresAt = Instant.now().plusSeconds(604800), // 7 days
+            )
 
         every { lootBanRepository.save(any()) } answers { firstArg() }
 
@@ -51,12 +56,13 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should create permanent loot ban successfully`() {
         // Given
-        val command = CreateLootBanCommand(
-            raiderId = RaiderId("raider-123"),
-            guildId = GuildId("guild-456"),
-            reason = "Severe behavioral violation",
-            expiresAt = null // Permanent
-        )
+        val command =
+            CreateLootBanCommand(
+                raiderId = RaiderId("raider-123"),
+                guildId = GuildId("guild-456"),
+                reason = "Severe behavioral violation",
+                expiresAt = null, // Permanent
+            )
 
         every { lootBanRepository.save(any()) } answers { firstArg() }
 
@@ -96,18 +102,20 @@ class ManageLootBansUseCaseTest : UnitTest() {
         val guildId = GuildId("guild-456")
         val query = GetActiveBansQuery(raiderId, guildId)
 
-        val activeBan1 = LootBan.create(
-            raiderId = raiderId,
-            guildId = guildId,
-            reason = "Reason 1",
-            expiresAt = Instant.now().plusSeconds(86400)
-        )
-        val activeBan2 = LootBan.create(
-            raiderId = raiderId,
-            guildId = guildId,
-            reason = "Reason 2",
-            expiresAt = null
-        )
+        val activeBan1 =
+            LootBan.create(
+                raiderId = raiderId,
+                guildId = guildId,
+                reason = "Reason 1",
+                expiresAt = Instant.now().plusSeconds(86400),
+            )
+        val activeBan2 =
+            LootBan.create(
+                raiderId = raiderId,
+                guildId = guildId,
+                reason = "Reason 2",
+                expiresAt = null,
+            )
 
         every { lootBanRepository.findActiveByRaiderId(raiderId, guildId) } returns listOf(activeBan1, activeBan2)
 
@@ -146,12 +154,13 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should handle repository errors when creating ban`() {
         // Given
-        val command = CreateLootBanCommand(
-            raiderId = RaiderId("raider-123"),
-            guildId = GuildId("guild-456"),
-            reason = "Test reason",
-            expiresAt = Instant.now().plusSeconds(86400)
-        )
+        val command =
+            CreateLootBanCommand(
+                raiderId = RaiderId("raider-123"),
+                guildId = GuildId("guild-456"),
+                reason = "Test reason",
+                expiresAt = Instant.now().plusSeconds(86400),
+            )
 
         every { lootBanRepository.save(any()) } throws RuntimeException("Database error")
 
@@ -186,12 +195,13 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should validate ban reason is not blank`() {
         // Given
-        val command = CreateLootBanCommand(
-            raiderId = RaiderId("raider-123"),
-            guildId = GuildId("guild-456"),
-            reason = "",
-            expiresAt = Instant.now().plusSeconds(86400)
-        )
+        val command =
+            CreateLootBanCommand(
+                raiderId = RaiderId("raider-123"),
+                guildId = GuildId("guild-456"),
+                reason = "",
+                expiresAt = Instant.now().plusSeconds(86400),
+            )
 
         every { lootBanRepository.save(any()) } answers { firstArg() }
 
@@ -208,12 +218,13 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should validate expiration is in the future when provided`() {
         // Given
-        val command = CreateLootBanCommand(
-            raiderId = RaiderId("raider-123"),
-            guildId = GuildId("guild-456"),
-            reason = "Test reason",
-            expiresAt = Instant.now().minusSeconds(86400) // Past
-        )
+        val command =
+            CreateLootBanCommand(
+                raiderId = RaiderId("raider-123"),
+                guildId = GuildId("guild-456"),
+                reason = "Test reason",
+                expiresAt = Instant.now().minusSeconds(86400), // Past
+            )
 
         every { lootBanRepository.save(any()) } answers { firstArg() }
 

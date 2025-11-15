@@ -1,7 +1,16 @@
 package com.edgerush.lootman.application.flps
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.flps.model.*
+import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
+import com.edgerush.lootman.domain.flps.model.ExternalPreparationScore
+import com.edgerush.lootman.domain.flps.model.FlpsScore
+import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
+import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
+import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
+import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
+import com.edgerush.lootman.domain.flps.model.RoleMultiplier
+import com.edgerush.lootman.domain.flps.model.TierBonus
+import com.edgerush.lootman.domain.flps.model.UpgradeValue
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId

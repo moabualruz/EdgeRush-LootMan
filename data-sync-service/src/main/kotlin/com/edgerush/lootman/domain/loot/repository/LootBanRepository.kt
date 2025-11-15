@@ -22,4 +22,3 @@ interface LootBanRepository {
 
     fun delete(id: LootBanId)
 }
-

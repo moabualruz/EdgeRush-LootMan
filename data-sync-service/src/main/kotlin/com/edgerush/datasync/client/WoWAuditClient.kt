@@ -14,6 +14,11 @@ class WoWAuditClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    companion object {
+        private const val LOG_SNIPPET_LENGTH = 120
+        private const val ERROR_SNIPPET_LENGTH = 200
+    }
+
     fun fetchRoster(): Mono<String> = get("/v1/characters")
 
     fun fetchLootHistory(seasonId: Long): Mono<String> = get("/v1/loot_history/$seasonId")
@@ -47,33 +52,52 @@ class WoWAuditClient(
             .get()
             .uri(path)
             .retrieve()
-            .onStatus({ it == HttpStatus.TOO_MANY_REQUESTS }) { response ->
-                response.bodyToMono(String::class.java)
-                    .defaultIfEmpty("WoWAudit rate limit hit")
-                    .flatMap { Mono.error(WoWAuditRateLimitException(it)) }
-            }
-            .onStatus({ it.is5xxServerError }) { response ->
-                response.bodyToMono(String::class.java)
-                    .defaultIfEmpty("WoWAudit server error (${response.statusCode()})")
-                    .flatMap { Mono.error(WoWAuditServerException(it)) }
-            }
-            .onStatus({ it.is4xxClientError }) { response ->
-                response.bodyToMono(String::class.java)
-                    .defaultIfEmpty("WoWAudit client error (${response.statusCode()})")
-                    .flatMap { body -> Mono.error(WoWAuditClientErrorException(body)) }
-            }
+            .onStatus({ it == HttpStatus.TOO_MANY_REQUESTS }, ::handleRateLimitError)
+            .onStatus({ it.is5xxServerError }, ::handleServerError)
+            .onStatus({ it.is4xxClientError }, ::handleClientError)
             .bodyToMono(String::class.java)
-            .map { body ->
-                val snippet = body.trim()
-                if (snippet.startsWith("<")) {
-                    log.warn("WoWAudit response for '{}' was not JSON. First bytes: {}", path, snippet.take(120))
-                    throw WoWAuditUnexpectedResponse("Expected JSON but received HTML. Snippet: ${snippet.take(200)}")
-                }
-                body
-            }
-            .doOnSubscribe {
-                require(!properties.wowaudit.guildProfileUri.isNullOrBlank()) {
-                    "sync.wowaudit.guild-profile-uri must be configured"
-                }
-            }
+            .map { body -> validateJsonResponse(body, path) }
+            .doOnSubscribe { validateConfiguration() }
+
+    private fun handleRateLimitError(response: org.springframework.web.reactive.function.client.ClientResponse): Mono<Throwable> {
+        return response.bodyToMono(String::class.java)
+            .defaultIfEmpty("WoWAudit rate limit hit")
+            .flatMap { Mono.error(WoWAuditRateLimitException(it)) }
+    }
+
+    private fun handleServerError(response: org.springframework.web.reactive.function.client.ClientResponse): Mono<Throwable> {
+        return response.bodyToMono(String::class.java)
+            .defaultIfEmpty("WoWAudit server error (${response.statusCode()})")
+            .flatMap { Mono.error(WoWAuditServerException(it)) }
+    }
+
+    private fun handleClientError(response: org.springframework.web.reactive.function.client.ClientResponse): Mono<Throwable> {
+        return response.bodyToMono(String::class.java)
+            .defaultIfEmpty("WoWAudit client error (${response.statusCode()})")
+            .flatMap { body -> Mono.error(WoWAuditClientErrorException(body)) }
+    }
+
+    private fun validateJsonResponse(
+        body: String,
+        path: String,
+    ): String {
+        val snippet = body.trim()
+        if (snippet.startsWith("<")) {
+            log.warn(
+                "WoWAudit response for '{}' was not JSON. First bytes: {}",
+                path,
+                snippet.take(LOG_SNIPPET_LENGTH),
+            )
+            throw WoWAuditUnexpectedResponse(
+                "Expected JSON but received HTML. Snippet: ${snippet.take(ERROR_SNIPPET_LENGTH)}",
+            )
+        }
+        return body
+    }
+
+    private fun validateConfiguration() {
+        require(!properties.wowaudit.guildProfileUri.isNullOrBlank()) {
+            "sync.wowaudit.guild-profile-uri must be configured"
+        }
+    }
 }

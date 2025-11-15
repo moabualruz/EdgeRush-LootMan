@@ -40,4 +40,3 @@ class InMemoryLootBanRepository : LootBanRepository {
         storage.remove(id)
     }
 }
-

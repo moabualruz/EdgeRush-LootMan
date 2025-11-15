@@ -97,3 +97,30 @@ data class FlpsStatusResponse(
     val features: List<String>,
     val endpoints: Map<String, String>,
 )
+
+/**
+ * Response DTO for comprehensive FLPS report (simplified for backward compatibility).
+ */
+data class ComprehensiveFlpsReportDto(
+    val raiderId: String,
+    val raiderName: String,
+    val flpsScore: Double,
+    val eligible: Boolean,
+)
+
+/**
+ * Response DTO for perfect score benchmarks.
+ */
+data class PerfectScoreBenchmarkDto(
+    val theoretical: Double,
+    val topPerformer: Double,
+)
+
+/**
+ * Response DTO for FLPS data status.
+ */
+data class FlpsDataStatusDto(
+    val message: String,
+    val features: List<String>,
+    val endpoints: Map<String, String>,
+)

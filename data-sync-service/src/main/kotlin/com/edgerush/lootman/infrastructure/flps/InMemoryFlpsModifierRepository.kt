@@ -1,6 +1,11 @@
 package com.edgerush.lootman.infrastructure.flps
 
-import com.edgerush.lootman.domain.flps.repository.*
+import com.edgerush.lootman.domain.flps.repository.FlpsModifierRepository
+import com.edgerush.lootman.domain.flps.repository.FlpsModifiers
+import com.edgerush.lootman.domain.flps.repository.FlpsThresholds
+import com.edgerush.lootman.domain.flps.repository.IpiWeights
+import com.edgerush.lootman.domain.flps.repository.RmsWeights
+import com.edgerush.lootman.domain.flps.repository.RoleMultipliers
 import com.edgerush.lootman.domain.shared.GuildId
 import org.springframework.stereotype.Repository
 

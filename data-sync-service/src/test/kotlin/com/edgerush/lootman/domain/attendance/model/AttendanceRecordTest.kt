@@ -5,24 +5,23 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Test
-import java.time.Instant
 import java.time.LocalDate
 
 class AttendanceRecordTest : UnitTest() {
-
     @Test
     fun `should create valid attendance record with all required fields`() {
         // Arrange & Act
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         // Assert
         record shouldNotBe null
@@ -38,16 +37,17 @@ class AttendanceRecordTest : UnitTest() {
     @Test
     fun `should calculate attendance percentage correctly`() {
         // Arrange & Act
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 7,
-            totalRaids = 10
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 7,
+                totalRaids = 10,
+            )
 
         // Assert
         record.attendancePercentage shouldBe 0.7
@@ -56,16 +56,17 @@ class AttendanceRecordTest : UnitTest() {
     @Test
     fun `should handle perfect attendance`() {
         // Arrange & Act
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 10,
-            totalRaids = 10
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 10,
+                totalRaids = 10,
+            )
 
         // Assert
         record.attendancePercentage shouldBe 1.0
@@ -74,16 +75,17 @@ class AttendanceRecordTest : UnitTest() {
     @Test
     fun `should handle zero attendance`() {
         // Arrange & Act
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 0,
-            totalRaids = 10
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 0,
+                totalRaids = 10,
+            )
 
         // Assert
         record.attendancePercentage shouldBe 0.0
@@ -101,7 +103,7 @@ class AttendanceRecordTest : UnitTest() {
                 startDate = LocalDate.of(2024, 11, 1),
                 endDate = LocalDate.of(2024, 11, 14),
                 attendedRaids = 11,
-                totalRaids = 10
+                totalRaids = 10,
             )
         }
     }
@@ -118,7 +120,7 @@ class AttendanceRecordTest : UnitTest() {
                 startDate = LocalDate.of(2024, 11, 1),
                 endDate = LocalDate.of(2024, 11, 14),
                 attendedRaids = -1,
-                totalRaids = 10
+                totalRaids = 10,
             )
         }
     }
@@ -135,7 +137,7 @@ class AttendanceRecordTest : UnitTest() {
                 startDate = LocalDate.of(2024, 11, 1),
                 endDate = LocalDate.of(2024, 11, 14),
                 attendedRaids = 0,
-                totalRaids = 0
+                totalRaids = 0,
             )
         }
     }
@@ -152,7 +154,7 @@ class AttendanceRecordTest : UnitTest() {
                 startDate = LocalDate.of(2024, 11, 1),
                 endDate = LocalDate.of(2024, 11, 14),
                 attendedRaids = 0,
-                totalRaids = -1
+                totalRaids = -1,
             )
         }
     }
@@ -169,7 +171,7 @@ class AttendanceRecordTest : UnitTest() {
                 startDate = LocalDate.of(2024, 11, 14),
                 endDate = LocalDate.of(2024, 11, 1),
                 attendedRaids = 8,
-                totalRaids = 10
+                totalRaids = 10,
             )
         }
     }
@@ -177,16 +179,17 @@ class AttendanceRecordTest : UnitTest() {
     @Test
     fun `should allow null encounter for overall instance attendance`() {
         // Arrange & Act
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         // Assert
         record.encounter shouldBe null
@@ -195,27 +198,29 @@ class AttendanceRecordTest : UnitTest() {
     @Test
     fun `should have unique identity based on id`() {
         // Arrange
-        val record1 = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val record1 =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
-        val record2 = AttendanceRecord.create(
-            raiderId = RaiderId(1L),
-            guildId = GuildId("test-guild"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 11, 1),
-            endDate = LocalDate.of(2024, 11, 14),
-            attendedRaids = 8,
-            totalRaids = 10
-        )
+        val record2 =
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         // Assert - Different instances should have different IDs
         record1.id shouldNotBe record2.id

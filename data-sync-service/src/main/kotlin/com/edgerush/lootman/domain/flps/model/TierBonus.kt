@@ -15,10 +15,12 @@ data class TierBonus private constructor(val value: Double) {
     }
 
     companion object {
+        private const val MAX_TIER_BONUS = 1.2
+
         fun of(value: Double): TierBonus = TierBonus(value)
 
         fun none(): TierBonus = TierBonus(1.0)
 
-        fun max(): TierBonus = TierBonus(1.2)
+        fun max(): TierBonus = TierBonus(MAX_TIER_BONUS)
     }
 }

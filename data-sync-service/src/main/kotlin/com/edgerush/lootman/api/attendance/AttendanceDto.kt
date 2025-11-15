@@ -17,7 +17,7 @@ data class TrackAttendanceRequest(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val attendedRaids: Int,
-    val totalRaids: Int
+    val totalRaids: Int,
 )
 
 /**
@@ -34,7 +34,7 @@ data class TrackAttendanceResponse(
     val attendedRaids: Int,
     val totalRaids: Int,
     val attendancePercentage: Double,
-    val recordedAt: Instant
+    val recordedAt: Instant,
 ) {
     companion object {
         fun from(record: AttendanceRecord): TrackAttendanceResponse {
@@ -49,7 +49,7 @@ data class TrackAttendanceResponse(
                 attendedRaids = record.attendedRaids,
                 totalRaids = record.totalRaids,
                 attendancePercentage = record.attendancePercentage,
-                recordedAt = record.recordedAt
+                recordedAt = record.recordedAt,
             )
         }
     }
@@ -65,7 +65,7 @@ data class AttendanceReportResponse(
     val encounter: String?,
     val startDate: LocalDate,
     val endDate: LocalDate,
-    val stats: AttendanceStatsDto
+    val stats: AttendanceStatsDto,
 ) {
     companion object {
         fun from(report: AttendanceReport): AttendanceReportResponse {
@@ -76,13 +76,11 @@ data class AttendanceReportResponse(
                 encounter = report.encounter,
                 startDate = report.startDate,
                 endDate = report.endDate,
-                stats = AttendanceStatsDto.from(report.stats)
+                stats = AttendanceStatsDto.from(report.stats),
             )
         }
     }
 }
-
-
 
 /**
  * DTO for attendance statistics.
@@ -91,7 +89,7 @@ data class AttendanceStatsDto(
     val attendancePercentage: Double,
     val totalRaids: Int,
     val attendedRaids: Int,
-    val missedRaids: Int
+    val missedRaids: Int,
 ) {
     companion object {
         fun from(stats: AttendanceStats): AttendanceStatsDto {
@@ -99,7 +97,7 @@ data class AttendanceStatsDto(
                 attendancePercentage = stats.attendancePercentage,
                 totalRaids = stats.totalRaids,
                 attendedRaids = stats.attendedRaids,
-                missedRaids = stats.missedRaids
+                missedRaids = stats.missedRaids,
             )
         }
     }

@@ -1,11 +1,6 @@
 package com.edgerush.lootman.api.loot
 
 import com.edgerush.datasync.test.base.IntegrationTest
-import com.edgerush.lootman.domain.flps.model.FlpsScore
-import com.edgerush.lootman.domain.loot.model.LootTier
-import com.edgerush.lootman.domain.shared.GuildId
-import com.edgerush.lootman.domain.shared.ItemId
-import com.edgerush.lootman.domain.shared.RaiderId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -239,4 +234,3 @@ class LootControllerIntegrationTest : IntegrationTest() {
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
     }
 }
-
