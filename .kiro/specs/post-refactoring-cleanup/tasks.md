@@ -322,7 +322,12 @@
 
 ## Phase 5: Verification and Testing
 
-- [ ] 20. Verify test coverage
+- [x] 20. Verify test coverage
+
+
+
+
+
   - Generate JaCoCo coverage report
   - Verify overall coverage ≥85%
   - Verify domain layer coverage ≥90%
@@ -331,7 +336,12 @@
   - Add tests if coverage is insufficient
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
-- [ ] 21. Verify database migrations
+- [x] 21. Verify database migrations
+
+
+
+
+
   - Run Flyway info to check migration status
   - Verify all migrations applied successfully
   - Check database schema matches entity expectations
@@ -340,7 +350,12 @@
   - Test clean database initialization
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-- [ ] 22. Run performance tests
+- [x] 22. Run performance tests
+
+
+
+
+
   - Test FLPS calculation performance (30 raiders, <1 second)
   - Test loot history query performance (1000 records, <500ms)
   - Test attendance report performance (90-day range, <500ms)
