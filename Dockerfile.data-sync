@@ -1,5 +1,5 @@
-# Use Eclipse Temurin JDK 24 as base
-FROM eclipse-temurin:24-jdk
+# Use Eclipse Temurin JDK 21 as base (project requires JDK 21)
+FROM eclipse-temurin:21-jdk
 
 # Install necessary tools
 RUN apt-get update && apt-get install -y \
