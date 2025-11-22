@@ -2,7 +2,7 @@ package com.edgerush.lootman.application.attendance
 
 import com.edgerush.lootman.domain.attendance.model.AttendanceStats
 import com.edgerush.lootman.domain.attendance.model.GuildId
-import com.edgerush.lootman.domain.attendance.model.RaiderId
+import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.attendance.service.AttendanceCalculationService
 import org.springframework.stereotype.Service
 import java.time.LocalDate

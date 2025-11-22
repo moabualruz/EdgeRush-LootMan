@@ -3,8 +3,8 @@ package com.edgerush.lootman.domain.shared
 /**
  * Value object representing a Raider identifier.
  */
-data class RaiderId(val value: String) {
+data class RaiderId(val value: Long) {
     init {
-        require(value.isNotBlank()) { "Raider ID cannot be blank" }
+        require(value > 0) { "Raider ID must be positive, got $value" }
     }
 }
