@@ -22,7 +22,8 @@
       "Bash(/c/Users/mkh/.gradle/wrapper/dists/gradle-8.10.2-bin/*/gradle-8.10.2/bin/gradle.bat)",
       "Bash(test --tests \"com.edgerush.lootman.application.flps.*\")",
       "Bash(MSYS_NO_PATHCONV=1 bash gradlew test:*)",
-      "Bash(MSYS_NO_PATHCONV=1 bash gradlew clean test:*)"
+      "Bash(MSYS_NO_PATHCONV=1 bash gradlew clean test:*)",
+      "Bash(docker info:*)"
     ]
   }
 }
