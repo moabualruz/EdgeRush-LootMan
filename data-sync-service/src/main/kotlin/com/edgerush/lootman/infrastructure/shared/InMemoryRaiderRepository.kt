@@ -21,6 +21,15 @@ class InMemoryRaiderRepository : RaiderRepository {
     override fun findByGuildId(guildId: GuildId): List<Raider> =
         storage.values.filter { it.guildId == guildId }
 
+    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider> =
+        storage.values
+            .filter { it.guildId == guildId }
+            .drop(offset.toInt())
+            .take(limit)
+
+    override fun countByGuildId(guildId: GuildId): Long =
+        storage.values.count { it.guildId == guildId }.toLong()
+
     override fun findByCharacterNameAndRealm(characterName: String, realm: String): Raider? =
         storage.values.find { it.characterName == characterName && it.realm == realm }
 

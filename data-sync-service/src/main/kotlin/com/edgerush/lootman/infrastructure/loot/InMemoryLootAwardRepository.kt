@@ -21,6 +21,15 @@ class InMemoryLootAwardRepository : LootAwardRepository {
 
     override fun findByGuildId(guildId: GuildId): List<LootAward> = storage.values.filter { it.guildId == guildId }
 
+    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<LootAward> =
+        storage.values
+            .filter { it.guildId == guildId }
+            .drop(offset.toInt())
+            .take(limit)
+
+    override fun countByGuildId(guildId: GuildId): Long =
+        storage.values.count { it.guildId == guildId }.toLong()
+
     override fun save(lootAward: LootAward): LootAward {
         storage[lootAward.id] = lootAward
         return lootAward

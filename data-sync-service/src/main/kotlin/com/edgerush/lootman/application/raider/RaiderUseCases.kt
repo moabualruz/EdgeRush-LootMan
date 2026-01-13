@@ -96,7 +96,22 @@ class ListRaidersUseCase(
     fun executeByGuild(query: ListRaidersByGuildQuery): Result<List<Raider>> = runCatching {
         raiderRepository.findByGuildId(GuildId(query.guildId))
     }
+
+    fun executeByGuildPaginated(query: ListRaidersByGuildPaginatedQuery): Result<PaginatedRaiders> = runCatching {
+        val guildId = GuildId(query.guildId)
+        val raiders = raiderRepository.findByGuildId(guildId, query.offset, query.limit)
+        val totalCount = raiderRepository.countByGuildId(guildId)
+        PaginatedRaiders(raiders, totalCount)
+    }
 }
+
+/**
+ * Result of a paginated raiders query.
+ */
+data class PaginatedRaiders(
+    val raiders: List<Raider>,
+    val totalCount: Long
+)
 
 // Commands and Queries
 
@@ -128,3 +143,9 @@ data class DeleteRaiderCommand(val id: Long)
 data class GetRaiderQuery(val id: Long)
 
 data class ListRaidersByGuildQuery(val guildId: String)
+
+data class ListRaidersByGuildPaginatedQuery(
+    val guildId: String,
+    val offset: Long,
+    val limit: Int
+)

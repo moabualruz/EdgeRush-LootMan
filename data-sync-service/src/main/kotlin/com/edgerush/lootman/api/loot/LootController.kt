@@ -8,8 +8,11 @@ import com.edgerush.lootman.application.loot.GetLootAwardUseCase
 import com.edgerush.lootman.application.loot.GetLootBanQuery
 import com.edgerush.lootman.application.loot.GetLootBanUseCase
 import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
+import com.edgerush.lootman.application.loot.ListLootAwardsByGuildPaginatedQuery
 import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
 import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
+import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
 import com.edgerush.lootman.application.loot.RemoveLootBanCommand
 import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
@@ -54,6 +57,7 @@ class LootController(
     private val revokeLootAwardUseCase: RevokeLootAwardUseCase,
     private val getLootBanUseCase: GetLootBanUseCase,
     private val updateLootBanUseCase: UpdateLootBanUseCase,
+    private val paginationProperties: PaginationProperties,
 ) {
     /**
      * Award loot to a raider.
@@ -186,14 +190,41 @@ class LootController(
     }
 
     /**
-     * Get all loot awards for a guild.
+     * Get all loot awards for a guild (non-paginated, for backwards compatibility).
      */
-    @GetMapping("/awards")
-    fun listLootAwards(
+    @GetMapping("/awards/all")
+    fun listAllLootAwards(
         @RequestParam guildId: String
     ): LootAwardsListResponse {
         return listLootAwardsUseCase.executeByGuild(ListLootAwardsByGuildQuery(guildId))
             .map { awards -> LootAwardsListResponse.from(awards) }
+            .getOrThrow()
+    }
+
+    /**
+     * Get loot awards for a guild with pagination.
+     */
+    @GetMapping("/awards")
+    fun listLootAwards(
+        @RequestParam guildId: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(required = false) size: Int?
+    ): PagedResponse<LootAwardDto> {
+        val pageRequest = paginationProperties.createPageRequest(page, size)
+        val query = ListLootAwardsByGuildPaginatedQuery(
+            guildId = guildId,
+            offset = pageRequest.offset,
+            limit = pageRequest.size
+        )
+
+        return listLootAwardsUseCase.executeByGuildPaginated(query)
+            .map { result ->
+                PagedResponse.of(
+                    content = result.awards.map { LootAwardDto.from(it) },
+                    pageRequest = pageRequest,
+                    totalElements = result.totalCount
+                )
+            }
             .getOrThrow()
     }
 

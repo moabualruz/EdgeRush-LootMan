@@ -7,10 +7,13 @@ import com.edgerush.lootman.application.raider.DeleteRaiderCommand
 import com.edgerush.lootman.application.raider.DeleteRaiderUseCase
 import com.edgerush.lootman.application.raider.GetRaiderQuery
 import com.edgerush.lootman.application.raider.GetRaiderUseCase
+import com.edgerush.lootman.application.raider.ListRaidersByGuildPaginatedQuery
 import com.edgerush.lootman.application.raider.ListRaidersByGuildQuery
 import com.edgerush.lootman.application.raider.ListRaidersUseCase
+import com.edgerush.lootman.application.raider.PaginatedRaiders
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -40,6 +43,7 @@ class RaiderControllerTest : UnitTest() {
     private lateinit var deleteRaiderUseCase: DeleteRaiderUseCase
     private lateinit var getRaiderUseCase: GetRaiderUseCase
     private lateinit var listRaidersUseCase: ListRaidersUseCase
+    private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaiderController
 
     @BeforeEach
@@ -49,12 +53,14 @@ class RaiderControllerTest : UnitTest() {
         deleteRaiderUseCase = mockk()
         getRaiderUseCase = mockk()
         listRaidersUseCase = mockk()
+        paginationProperties = PaginationProperties(defaultPageSize = 20, maxPageSize = 100)
         controller = RaiderController(
             createRaiderUseCase,
             updateRaiderUseCase,
             deleteRaiderUseCase,
             getRaiderUseCase,
-            listRaidersUseCase
+            listRaidersUseCase,
+            paginationProperties
         )
     }
 
@@ -336,7 +342,100 @@ class RaiderControllerTest : UnitTest() {
     @Nested
     inner class ListRaidersByGuildTests {
         @Test
-        fun `should return list of raiders for guild`() {
+        fun `should return paginated list of raiders for guild`() {
+            // Given
+            val guildId = "test-guild"
+            val raiders = listOf(
+                createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                createRaider(id = RaiderId(3L), characterName = "Raider3")
+            )
+            val paginatedResult = PaginatedRaiders(raiders, 3L)
+
+            every { listRaidersUseCase.executeByGuildPaginated(any()) } returns Result.success(paginatedResult)
+
+            // When
+            val response = controller.getRaidersByGuild(guildId, page = 0, size = 20)
+
+            // Then
+            response.totalElements shouldBe 3
+            response.content.size shouldBe 3
+            response.content[0].characterName shouldBe "Raider1"
+            response.content[1].characterName shouldBe "Raider2"
+            response.content[2].characterName shouldBe "Raider3"
+            response.page shouldBe 0
+            response.size shouldBe 20
+
+            verify(exactly = 1) { listRaidersUseCase.executeByGuildPaginated(any()) }
+        }
+
+        @Test
+        fun `should pass correct query to use case with pagination`() {
+            // Given
+            val querySlot = slot<ListRaidersByGuildPaginatedQuery>()
+            val paginatedResult = PaginatedRaiders(emptyList(), 0L)
+
+            every { listRaidersUseCase.executeByGuildPaginated(capture(querySlot)) } returns Result.success(paginatedResult)
+
+            // When
+            controller.getRaidersByGuild("my-guild", page = 2, size = 10)
+
+            // Then
+            querySlot.captured.guildId shouldBe "my-guild"
+            querySlot.captured.offset shouldBe 20L  // page 2 * size 10
+            querySlot.captured.limit shouldBe 10
+        }
+
+        @Test
+        fun `should return empty paginated response when guild has no raiders`() {
+            // Given
+            val paginatedResult = PaginatedRaiders(emptyList(), 0L)
+            every { listRaidersUseCase.executeByGuildPaginated(any()) } returns Result.success(paginatedResult)
+
+            // When
+            val response = controller.getRaidersByGuild("empty-guild", page = 0, size = 20)
+
+            // Then
+            response.totalElements shouldBe 0
+            response.content shouldBe emptyList()
+            response.totalPages shouldBe 0
+        }
+
+        @Test
+        fun `should use default page size when size not provided`() {
+            // Given
+            val querySlot = slot<ListRaidersByGuildPaginatedQuery>()
+            val paginatedResult = PaginatedRaiders(emptyList(), 0L)
+
+            every { listRaidersUseCase.executeByGuildPaginated(capture(querySlot)) } returns Result.success(paginatedResult)
+
+            // When
+            controller.getRaidersByGuild("my-guild", page = 0, size = null)
+
+            // Then
+            querySlot.captured.limit shouldBe 20  // default page size
+        }
+
+        @Test
+        fun `should cap size at maxPageSize`() {
+            // Given
+            val querySlot = slot<ListRaidersByGuildPaginatedQuery>()
+            val paginatedResult = PaginatedRaiders(emptyList(), 0L)
+
+            every { listRaidersUseCase.executeByGuildPaginated(capture(querySlot)) } returns Result.success(paginatedResult)
+
+            // When
+            controller.getRaidersByGuild("my-guild", page = 0, size = 500)
+
+            // Then
+            querySlot.captured.limit shouldBe 100  // maxPageSize
+        }
+    }
+
+    @Nested
+    inner class GetAllRaidersByGuildTests {
+        @Test
+        fun `should return all raiders for guild without pagination`() {
             // Given
             val guildId = "test-guild"
             val raiders = listOf(
@@ -348,7 +447,7 @@ class RaiderControllerTest : UnitTest() {
             every { listRaidersUseCase.executeByGuild(any()) } returns Result.success(raiders)
 
             // When
-            val response = controller.getRaidersByGuild(guildId)
+            val response = controller.getAllRaidersByGuild(guildId)
 
             // Then
             response.count shouldBe 3
@@ -358,33 +457,6 @@ class RaiderControllerTest : UnitTest() {
             response.raiders[2].characterName shouldBe "Raider3"
 
             verify(exactly = 1) { listRaidersUseCase.executeByGuild(any()) }
-        }
-
-        @Test
-        fun `should pass correct query to use case`() {
-            // Given
-            val querySlot = slot<ListRaidersByGuildQuery>()
-
-            every { listRaidersUseCase.executeByGuild(capture(querySlot)) } returns Result.success(emptyList())
-
-            // When
-            controller.getRaidersByGuild("my-guild")
-
-            // Then
-            querySlot.captured.guildId shouldBe "my-guild"
-        }
-
-        @Test
-        fun `should return empty list when guild has no raiders`() {
-            // Given
-            every { listRaidersUseCase.executeByGuild(any()) } returns Result.success(emptyList())
-
-            // When
-            val response = controller.getRaidersByGuild("empty-guild")
-
-            // Then
-            response.count shouldBe 0
-            response.raiders shouldBe emptyList()
         }
     }
 

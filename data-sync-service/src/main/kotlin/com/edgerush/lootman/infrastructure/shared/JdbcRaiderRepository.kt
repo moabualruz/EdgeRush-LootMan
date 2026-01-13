@@ -50,6 +50,24 @@ class JdbcRaiderRepository(
         return jdbcTemplate.query(sql, raiderRowMapper, guildId.value)
     }
 
+    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider> {
+        val sql = """
+            SELECT id, guild_id, characterName, realm, characterClass, role,
+                   rank, status, joinDate, wowauditId
+            FROM raiders
+            WHERE guild_id = ?
+            ORDER BY characterName
+            LIMIT ? OFFSET ?
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, raiderRowMapper, guildId.value, limit, offset)
+    }
+
+    override fun countByGuildId(guildId: GuildId): Long {
+        val sql = "SELECT COUNT(*) FROM raiders WHERE guild_id = ?"
+        return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
+    }
+
     override fun findByCharacterNameAndRealm(characterName: String, realm: String): Raider? {
         val sql = """
             SELECT id, guild_id, characterName, realm, characterClass, role,

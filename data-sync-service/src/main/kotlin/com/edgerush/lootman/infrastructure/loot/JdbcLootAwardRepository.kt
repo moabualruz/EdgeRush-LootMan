@@ -56,6 +56,23 @@ class JdbcLootAwardRepository(
         return jdbcTemplate.query(sql, lootAwardRowMapper, guildId.value)
     }
 
+    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<LootAward> {
+        val sql = """
+            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
+            FROM loot_awards
+            WHERE guild_id = ?
+            ORDER BY awardedAt DESC
+            LIMIT ? OFFSET ?
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, lootAwardRowMapper, guildId.value, limit, offset)
+    }
+
+    override fun countByGuildId(guildId: GuildId): Long {
+        val sql = "SELECT COUNT(*) FROM loot_awards WHERE guild_id = ?"
+        return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
+    }
+
     override fun save(lootAward: LootAward): LootAward {
         val exists = existsById(lootAward.id)
 

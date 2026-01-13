@@ -33,7 +33,22 @@ class ListLootAwardsUseCase(
     fun executeByGuild(query: ListLootAwardsByGuildQuery): Result<List<LootAward>> = runCatching {
         lootAwardRepository.findByGuildId(GuildId(query.guildId))
     }
+
+    fun executeByGuildPaginated(query: ListLootAwardsByGuildPaginatedQuery): Result<PaginatedLootAwards> = runCatching {
+        val guildId = GuildId(query.guildId)
+        val awards = lootAwardRepository.findByGuildId(guildId, query.offset, query.limit)
+        val totalCount = lootAwardRepository.countByGuildId(guildId)
+        PaginatedLootAwards(awards, totalCount)
+    }
 }
+
+/**
+ * Result of a paginated loot awards query.
+ */
+data class PaginatedLootAwards(
+    val awards: List<LootAward>,
+    val totalCount: Long
+)
 
 /**
  * Use case for revoking/deleting a loot award.
@@ -91,6 +106,12 @@ data class GetLootAwardQuery(
 
 data class ListLootAwardsByGuildQuery(
     val guildId: String
+)
+
+data class ListLootAwardsByGuildPaginatedQuery(
+    val guildId: String,
+    val offset: Long,
+    val limit: Int
 )
 
 data class RevokeLootAwardCommand(

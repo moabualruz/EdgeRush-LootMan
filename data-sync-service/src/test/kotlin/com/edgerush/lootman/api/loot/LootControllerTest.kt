@@ -10,6 +10,7 @@ import com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery
 import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
 import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.loot.RevokeLootAwardUseCase
 import com.edgerush.lootman.application.loot.UpdateLootBanUseCase
 import com.edgerush.lootman.domain.flps.model.FlpsScore
@@ -45,6 +46,7 @@ class LootControllerTest : UnitTest() {
     private lateinit var revokeLootAwardUseCase: RevokeLootAwardUseCase
     private lateinit var getLootBanUseCase: GetLootBanUseCase
     private lateinit var updateLootBanUseCase: UpdateLootBanUseCase
+    private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: LootController
 
     @BeforeEach
@@ -57,6 +59,7 @@ class LootControllerTest : UnitTest() {
         revokeLootAwardUseCase = mockk()
         getLootBanUseCase = mockk()
         updateLootBanUseCase = mockk()
+        paginationProperties = PaginationProperties(defaultPageSize = 20, maxPageSize = 100)
         controller = LootController(
             awardLootUseCase,
             getLootHistoryUseCase,
@@ -66,6 +69,7 @@ class LootControllerTest : UnitTest() {
             revokeLootAwardUseCase,
             getLootBanUseCase,
             updateLootBanUseCase,
+            paginationProperties,
         )
     }
 

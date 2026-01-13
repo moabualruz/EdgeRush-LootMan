@@ -27,6 +27,24 @@ interface RaiderRepository {
     fun findByGuildId(guildId: GuildId): List<Raider>
 
     /**
+     * Finds raiders in a guild with pagination.
+     *
+     * @param guildId The guild's unique identifier
+     * @param offset The number of records to skip
+     * @param limit The maximum number of records to return
+     * @return Paginated list of raiders
+     */
+    fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider>
+
+    /**
+     * Counts total raiders in a guild.
+     *
+     * @param guildId The guild's unique identifier
+     * @return The total count of raiders
+     */
+    fun countByGuildId(guildId: GuildId): Long
+
+    /**
      * Finds a raider by character name and realm.
      *
      * @param characterName The character's name

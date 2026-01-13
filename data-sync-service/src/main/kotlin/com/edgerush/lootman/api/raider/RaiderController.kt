@@ -6,10 +6,13 @@ import com.edgerush.lootman.application.raider.DeleteRaiderCommand
 import com.edgerush.lootman.application.raider.DeleteRaiderUseCase
 import com.edgerush.lootman.application.raider.GetRaiderQuery
 import com.edgerush.lootman.application.raider.GetRaiderUseCase
+import com.edgerush.lootman.application.raider.ListRaidersByGuildPaginatedQuery
 import com.edgerush.lootman.application.raider.ListRaidersByGuildQuery
 import com.edgerush.lootman.application.raider.ListRaidersUseCase
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
+import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.api.common.PaginationProperties
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -33,7 +37,8 @@ class RaiderController(
     private val updateRaiderUseCase: UpdateRaiderUseCase,
     private val deleteRaiderUseCase: DeleteRaiderUseCase,
     private val getRaiderUseCase: GetRaiderUseCase,
-    private val listRaidersUseCase: ListRaidersUseCase
+    private val listRaidersUseCase: ListRaidersUseCase,
+    private val paginationProperties: PaginationProperties
 ) {
     /**
      * Create a new raider.
@@ -119,15 +124,47 @@ class RaiderController(
     }
 
     /**
-     * Get all raiders for a guild.
+     * Get all raiders for a guild (non-paginated, for backwards compatibility).
      *
      * @param guildId The guild's unique identifier
      * @return 200 OK with the list of raiders
      */
-    @GetMapping("/guild/{guildId}")
-    fun getRaidersByGuild(@PathVariable guildId: String): RaiderListResponse {
+    @GetMapping("/guild/{guildId}/all")
+    fun getAllRaidersByGuild(@PathVariable guildId: String): RaiderListResponse {
         return listRaidersUseCase.executeByGuild(ListRaidersByGuildQuery(guildId))
             .map { raiders -> RaiderListResponse.from(raiders) }
+            .getOrThrow()
+    }
+
+    /**
+     * Get raiders for a guild with pagination.
+     *
+     * @param guildId The guild's unique identifier
+     * @param page The page number (0-indexed)
+     * @param size The page size (optional, uses default from configuration)
+     * @return 200 OK with paginated list of raiders
+     */
+    @GetMapping("/guild/{guildId}")
+    fun getRaidersByGuild(
+        @PathVariable guildId: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(required = false) size: Int?
+    ): PagedResponse<RaiderResponse> {
+        val pageRequest = paginationProperties.createPageRequest(page, size)
+        val query = ListRaidersByGuildPaginatedQuery(
+            guildId = guildId,
+            offset = pageRequest.offset,
+            limit = pageRequest.size
+        )
+
+        return listRaidersUseCase.executeByGuildPaginated(query)
+            .map { result ->
+                PagedResponse.of(
+                    content = result.raiders.map { RaiderResponse.from(it) },
+                    pageRequest = pageRequest,
+                    totalElements = result.totalCount
+                )
+            }
             .getOrThrow()
     }
 }
