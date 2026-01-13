@@ -35,7 +35,11 @@
       "Bash(do grep -l \"gear\\\\|wishlist\" \"$f\")",
       "Bash(done)",
       "Bash(do grep -l \"simulation\" \"$f\")",
-      "Bash(xxd:*)"
+      "Bash(xxd:*)",
+      "Bash(git -C /f/work/dod/looter log --oneline --all)",
+      "Bash(git -C /f/work/dod/looter log --pretty=format:\"%h %s\" -n 10)",
+      "Bash(git -C /f/work/dod/looter show --name-only --pretty=format:\"%H %s\" e15bf3f)",
+      "Bash(git -C /f/work/dod/looter show --name-only --pretty=format:\"%H %s\" cbc029d)"
     ]
   }
 }
