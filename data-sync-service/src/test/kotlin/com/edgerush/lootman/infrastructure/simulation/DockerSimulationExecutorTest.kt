@@ -212,5 +212,227 @@ class DockerSimulationExecutorTest : UnitTest() {
             // Assert
             slot shouldBe "trinket1"
         }
+
+        @Test
+        fun `should return null for invalid item id format`() {
+            // Arrange
+            val invalidName = "head=invalid_no_id"
+
+            // Act
+            val itemId = executor.extractItemIdFromName(invalidName)
+
+            // Assert
+            itemId shouldBe null
+        }
+
+        @Test
+        fun `should return null for invalid slot format`() {
+            // Arrange
+            val invalidName = "=no_slot,id=12345"
+
+            // Act
+            val slot = executor.extractSlotFromName(invalidName)
+
+            // Assert
+            slot shouldBe null
+        }
+
+        @Test
+        fun `should handle malformed json gracefully`() {
+            // Arrange
+            val invalidJson = "{ this is not valid json }"
+
+            // Act
+            val results = executor.parseSimulationResults(invalidJson)
+
+            // Assert
+            results shouldHaveSize 0
+        }
+
+        @Test
+        fun `should handle json with missing profilesets path`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "players": []
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert
+            results shouldHaveSize 0
+        }
+
+        @Test
+        fun `should handle profileset with missing item id`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "collected_data": {
+                                    "dps": { "mean": 100000.0 }
+                                }
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should skip items without valid id
+            results shouldHaveSize 0
+        }
+
+        @Test
+        fun `should handle profileset with missing slot`() {
+            // Arrange - name starts with non-word character so slot extraction fails
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "=id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "collected_data": {
+                                    "dps": { "mean": 100000.0 }
+                                }
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should skip items without valid slot
+            results shouldHaveSize 0
+        }
+
+        @Test
+        fun `should use default base dps when players array is empty`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": []
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert
+            results shouldHaveSize 1
+            // DPS gain should be 100000 * (5.0 / 100.0) = 5000
+            results[0].dpsGain shouldBe 5000.0
+        }
+
+        @Test
+        fun `should calculate dps gain correctly from percentage`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 10.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "collected_data": {
+                                    "dps": { "mean": 200000.0 }
+                                }
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert
+            results shouldHaveSize 1
+            // DPS gain = 200000 * (10.0 / 100.0) = 20000
+            results[0].dpsGain shouldBe 20000.0
+            results[0].percentGain shouldBe 10.0
+        }
+    }
+
+    @Nested
+    inner class ProfileDirectoryHandling {
+        @Test
+        fun `should create profile directory if not exists`() {
+            // Arrange
+            val nonExistentDir = tempDir.resolve("non-existent-dir").toString()
+            val executorWithNonExistentDir = DockerSimulationExecutor(
+                dockerImage = "simulationcraftorg/simc",
+                profileDirectory = nonExistentDir,
+                dockerCommand = "docker"
+            )
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+
+            // Act
+            val profileFile = executorWithNonExistentDir.writeProfileToFile(request)
+
+            // Assert
+            profileFile.parentFile.exists() shouldBe true
+            profileFile.exists() shouldBe true
+        }
+    }
+
+    @Nested
+    inner class VolumeMapping {
+        @Test
+        fun `should include volume mapping for profiles`() {
+            // Arrange
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+            val profileFile = File(tempDir.toFile(), "test.simc")
+
+            // Act
+            val command = executor.buildDockerCommand(request, profileFile)
+
+            // Assert
+            command shouldContain "-v"
+            command.any { it.contains(":/simc/profiles") } shouldBe true
+        }
     }
 }

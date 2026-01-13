@@ -257,5 +257,209 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             // Assert
             found shouldBe result
         }
+
+        @Test
+        fun `should return null when no results found`() {
+            // Arrange
+            every {
+                jdbcTemplate.query(
+                    any<String>(),
+                    any<RowMapper<SimulationResult>>(),
+                    any<Long>(),
+                    any<Long>(),
+                )
+            } returns emptyList<SimulationResult>()
+
+            // Act
+            val found = repository.findLatestResultForItem(1L, 99999L)
+
+            // Assert
+            found shouldBe null
+        }
+    }
+
+    @Nested
+    inner class FindProfileById {
+        @Test
+        fun `should query by profile id`() {
+            // Arrange
+            val profile = createProfile()
+            every {
+                jdbcTemplate.query(
+                    match { it.contains("SELECT") && it.contains("WHERE id = ?") },
+                    any<RowMapper<SimulationProfile>>(),
+                    eq(42L),
+                )
+            } returns listOf(profile)
+
+            // Act
+            val result = repository.findProfileById(42L)
+
+            // Assert
+            result shouldBe profile
+        }
+
+        @Test
+        fun `should return null when profile not found`() {
+            // Arrange
+            every {
+                jdbcTemplate.query(
+                    any<String>(),
+                    any<RowMapper<SimulationProfile>>(),
+                    any<Long>(),
+                )
+            } returns emptyList<SimulationProfile>()
+
+            // Act
+            val result = repository.findProfileById(99999L)
+
+            // Assert
+            result shouldBe null
+        }
+    }
+
+    @Nested
+    inner class FindRequestById {
+        @Test
+        fun `should return null when request not found`() {
+            // Arrange
+            every {
+                jdbcTemplate.query(
+                    any<String>(),
+                    any<RowMapper<SimulationRequest>>(),
+                    any<Long>(),
+                )
+            } returns emptyList<SimulationRequest>()
+
+            // Act
+            val result = repository.findRequestById(99999L)
+
+            // Assert
+            result shouldBe null
+        }
+    }
+
+    @Nested
+    inner class FindResultsByProfile {
+        @Test
+        fun `should return all results for profile ordered by date`() {
+            // Arrange
+            val result1 = SimulationResult.create(
+                itemId = 12345L,
+                itemName = "Item 1",
+                slot = "head",
+                dpsGain = 1000.0,
+                percentGain = 1.0,
+                simulatedAt = Instant.now(),
+            )
+            val result2 = SimulationResult.create(
+                itemId = 12346L,
+                itemName = "Item 2",
+                slot = "neck",
+                dpsGain = 500.0,
+                percentGain = 0.5,
+                simulatedAt = Instant.now(),
+            )
+
+            every {
+                jdbcTemplate.query(
+                    match { it.contains("WHERE profile_id = ?") && it.contains("ORDER BY simulated_at DESC") },
+                    any<RowMapper<SimulationResult>>(),
+                    eq(1L),
+                )
+            } returns listOf(result1, result2)
+
+            // Act
+            val results = repository.findResultsByProfile(1L)
+
+            // Assert
+            results shouldHaveSize 2
+            results[0] shouldBe result1
+            results[1] shouldBe result2
+        }
+
+        @Test
+        fun `should return empty list when no results found`() {
+            // Arrange
+            every {
+                jdbcTemplate.query(
+                    any<String>(),
+                    any<RowMapper<SimulationResult>>(),
+                    any<Long>(),
+                )
+            } returns emptyList<SimulationResult>()
+
+            // Act
+            val results = repository.findResultsByProfile(99999L)
+
+            // Assert
+            results.shouldBeEmpty()
+        }
+    }
+
+    @Nested
+    inner class SaveRequestUpdate {
+        @Test
+        fun `should update existing request when id is present`() {
+            // Arrange
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+                .withId(42L)
+                .markRunning()
+
+            every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // Act
+            val result = repository.saveRequest(request)
+
+            // Assert
+            result.id shouldBe 42L
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("UPDATE simulation_requests") && it.contains("SET status = ?") },
+                    *anyVararg(),
+                )
+            }
+        }
+
+        @Test
+        fun `should update status to completed`() {
+            // Arrange
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+                .withId(42L)
+                .markRunning()
+                .markCompleted(emptyList())
+
+            every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // Act
+            val result = repository.saveRequest(request)
+
+            // Assert
+            result.status shouldBe SimulationStatus.COMPLETED
+        }
+
+        @Test
+        fun `should update status to failed with error message`() {
+            // Arrange
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+                .withId(42L)
+                .markRunning()
+                .markFailed("Test error")
+
+            every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // Act
+            val result = repository.saveRequest(request)
+
+            // Assert
+            result.status shouldBe SimulationStatus.FAILED
+            result.errorMessage shouldBe "Test error"
+        }
     }
 }

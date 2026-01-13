@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.DockerClientFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -25,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * - JdbcTemplate for database operations
  * - Automatic database cleanup between tests
  * - Test profile activation
+ * - Automatic skip when Docker is not available
  *
  * Usage:
  * ```kotlin
@@ -48,6 +48,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * }
  * ```
  */
+@EnabledIfDockerAvailable
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = [com.edgerush.datasync.DataSyncApplication::class],

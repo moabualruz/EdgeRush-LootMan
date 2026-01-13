@@ -23,7 +23,14 @@
       "Bash(test --tests \"com.edgerush.lootman.application.flps.*\")",
       "Bash(MSYS_NO_PATHCONV=1 bash gradlew test:*)",
       "Bash(MSYS_NO_PATHCONV=1 bash gradlew clean test:*)",
-      "Bash(docker info:*)"
+      "Bash(docker info:*)",
+      "Bash(./gradlew.bat test:*)",
+      "Bash(cmd.exe /c \"gradlew.bat test --tests \"\"*AttendanceRecordTest*\"\" --tests \"\"*LootAwardTest*\"\" -q\")",
+      "Bash(cmd.exe /c \"gradlew.bat test -q --console=plain\")",
+      "Bash(xargs:*)",
+      "Bash(cmd.exe /c:*)",
+      "Bash(test:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
