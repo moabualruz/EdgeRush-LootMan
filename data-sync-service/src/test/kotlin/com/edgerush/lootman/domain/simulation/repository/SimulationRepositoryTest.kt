@@ -303,6 +303,18 @@ class InMemorySimulationRepository : SimulationRepository {
         }
     }
 
+    override fun findProfileIdByCharacter(
+        guildId: String,
+        characterName: String,
+        characterRealm: String
+    ): Long? {
+        return profiles.entries.find {
+            it.value.guildId == guildId &&
+                it.value.characterName == characterName &&
+                it.value.characterRealm == characterRealm
+        }?.key
+    }
+
     override fun saveRequest(request: SimulationRequest): SimulationRequest {
         val id = request.id ?: requestIdCounter++
         val savedRequest = if (request.id == null) {

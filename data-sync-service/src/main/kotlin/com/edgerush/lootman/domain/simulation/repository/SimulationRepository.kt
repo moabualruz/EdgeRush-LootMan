@@ -46,6 +46,20 @@ interface SimulationRepository {
     ): SimulationProfile?
 
     /**
+     * Finds a profile ID by guild and character identifiers.
+     *
+     * @param guildId The guild ID
+     * @param characterName The character name
+     * @param characterRealm The realm name
+     * @return The profile ID, or null if not found
+     */
+    fun findProfileIdByCharacter(
+        guildId: String,
+        characterName: String,
+        characterRealm: String
+    ): Long?
+
+    /**
      * Saves a simulation request.
      *
      * @param request The request to save

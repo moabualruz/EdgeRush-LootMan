@@ -127,9 +127,10 @@ class UpgradeValueCalculator(
         characterName: String,
         characterRealm: String
     ): Long? {
-        // This is a workaround - in production the repository would return ID with profile
-        // For now, we rely on the in-memory implementation tracking this
-        // The JDBC implementation will handle this properly
-        return 1L // Placeholder - will be fixed in infrastructure layer
+        return simulationRepository.findProfileIdByCharacter(
+            guildId = guildId,
+            characterName = characterName,
+            characterRealm = characterRealm
+        )
     }
 }

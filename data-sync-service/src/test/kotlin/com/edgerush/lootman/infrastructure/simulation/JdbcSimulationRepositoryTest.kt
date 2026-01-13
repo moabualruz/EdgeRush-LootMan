@@ -112,6 +112,47 @@ class JdbcSimulationRepositoryTest : UnitTest() {
     }
 
     @Nested
+    inner class FindProfileIdByCharacter {
+        @Test
+        fun `should return profile ID when found`() {
+            // Arrange
+            every {
+                jdbcTemplate.queryForObject(
+                    match { it.contains("SELECT id FROM simulation_profiles") },
+                    eq(Long::class.java),
+                    eq("guild-123"),
+                    eq("Testchar"),
+                    eq("TestRealm")
+                )
+            } returns 42L
+
+            // Act
+            val result = repository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm")
+
+            // Assert
+            result shouldBe 42L
+        }
+
+        @Test
+        fun `should return null when not found`() {
+            // Arrange
+            every {
+                jdbcTemplate.queryForObject(
+                    any<String>(),
+                    eq(Long::class.java),
+                    *anyVararg()
+                )
+            } throws org.springframework.dao.EmptyResultDataAccessException(1)
+
+            // Act
+            val result = repository.findProfileIdByCharacter("guild-123", "Unknown", "TestRealm")
+
+            // Assert
+            result shouldBe null
+        }
+    }
+
+    @Nested
     inner class SaveRequest {
         @Test
         fun `should insert new request`() {

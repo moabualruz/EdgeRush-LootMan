@@ -52,8 +52,8 @@ A progression-first guild operations platform for World of Warcraft that automat
 | Spec | Status | Description |
 |------|--------|-------------|
 | `warcraft-logs-integration/` | Complete | Warcraft Logs API integration |
+| `simulation-integration/` | Complete | Local SimulationCraft via Docker |
 | `rest-api-layer/` | 40% | REST API for all entities |
-| `raidbots-integration/` | Blocked | Simulation data integration |
 | `web-dashboard/` | Planned | User-facing dashboard |
 | `discord-bot/` | Planned | Notification bot |
 
@@ -107,8 +107,7 @@ data-sync-service/
 │       ├── raids/                   # Raid Management Domain
 │       ├── integrations/            # External API Clients
 │       │   ├── wowaudit/           # WoWAudit API
-│       │   ├── warcraftlogs/       # Warcraft Logs API
-│       │   └── raidbots/           # Raidbots API (partial)
+│       │   └── warcraftlogs/       # Warcraft Logs API
 │       │
 │       └── shared/                  # Shared Components
 │           ├── domain/              # Common domain models
@@ -154,8 +153,8 @@ data-sync-service/
 |-----------|--------|----------|-------------|
 | Test Coverage 85% | In Progress | P0 | Currently 64%, need API controller tests |
 | REST API Complete | 40% | P1 | CRUD for all 45+ entities |
-| GraphQL API | Planned | P2 | Flexible queries, subscriptions |
-| Raidbots Integration | Blocked | P3 | Awaiting API key availability |
+| SimulationCraft Integration | Complete | P2 | Local Docker simulation for UV |
+| GraphQL API | Planned | P3 | Flexible queries, subscriptions |
 
 ### Phase 3: User Facing (Planned)
 
@@ -287,7 +286,8 @@ docs(readme): update setup instructions
 | `WOWAUDIT_GUILD_ID` | WoWAudit guild identifier | Yes |
 | `WARCRAFTLOGS_CLIENT_ID` | WCL OAuth client ID | Yes |
 | `WARCRAFTLOGS_CLIENT_SECRET` | WCL OAuth secret | Yes |
-| `RAIDBOTS_API_KEY` | Raidbots API key | No (blocked) |
+| `SIMULATION_DOCKER_IMAGE` | SimC Docker image | No (default: simulationcraftorg/simc) |
+| `SIMULATION_DOCKER_TIMEOUT_MINUTES` | Simulation timeout | No (default: 30) |
 
 ### FLPS Configuration (per-guild)
 ```yaml
@@ -319,13 +319,11 @@ flps:
 ### What Needs Work
 - Test coverage: 64% → 85% target
 - REST API: 40% → 100% (30+ entities remaining)
-- Raidbots integration: blocked on API key
 - GraphQL API: not started
 - Web dashboard: not started
 - Discord bot: not started
 
 ### Blockers
-- **Raidbots API**: Awaiting API key availability
 - **Test Coverage**: Must reach 85% before Phase 2 features
 
 ---

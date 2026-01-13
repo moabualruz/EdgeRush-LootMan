@@ -83,7 +83,8 @@ class SimulationService(
             profileContent = profileContent,
             createdAt = Instant.now()
         )
-        simulationRepository.saveProfile(profile)
+        val (profileId, _) = simulationRepository.saveProfile(profile)
+        logger.debug("Saved profile with id=$profileId for $characterName-$characterRealm")
 
         // Create and save request
         val request = SimulationRequest.create(
@@ -187,7 +188,10 @@ class SimulationService(
         characterName: String,
         characterRealm: String
     ): Long? {
-        // Placeholder - infrastructure layer will handle proper ID management
-        return 1L
+        return simulationRepository.findProfileIdByCharacter(
+            guildId = guildId,
+            characterName = characterName,
+            characterRealm = characterRealm
+        )
     }
 }

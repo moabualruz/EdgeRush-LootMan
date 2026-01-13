@@ -96,6 +96,24 @@ class JdbcSimulationRepository(
         return profiles.firstOrNull()
     }
 
+    override fun findProfileIdByCharacter(
+        guildId: String,
+        characterName: String,
+        characterRealm: String
+    ): Long? {
+        return try {
+            jdbcTemplate.queryForObject(
+                "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
+                Long::class.java,
+                guildId,
+                characterName,
+                characterRealm
+            )
+        } catch (e: org.springframework.dao.EmptyResultDataAccessException) {
+            null
+        }
+    }
+
     override fun saveRequest(request: SimulationRequest): SimulationRequest {
         // Get profile ID
         val profileId = jdbcTemplate.queryForObject(

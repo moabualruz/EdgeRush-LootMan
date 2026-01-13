@@ -1,11 +1,19 @@
 # Use Eclipse Temurin JDK 21 as base (project requires JDK 21)
 FROM eclipse-temurin:21-jdk
 
-# Install necessary tools
+# Install necessary tools including python3 for secrets parsing
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
+    python3 \
+    python3-yaml \
     && rm -rf /var/lib/apt/lists/*
+
+# Install sops for secrets decryption
+ENV SOPS_VERSION=3.8.1
+RUN curl -L "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" \
+    -o /usr/local/bin/sops \
+    && chmod +x /usr/local/bin/sops
 
 # Install Gradle
 ENV GRADLE_VERSION=8.10.1
@@ -20,6 +28,13 @@ ENV PATH="/opt/gradle/bin:${PATH}"
 # Create gradle user and set up working directory
 RUN useradd -m gradle
 WORKDIR /home/gradle/project
+
+# Copy entrypoint script
+COPY deploy/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Use entrypoint for secrets decryption
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Default command - run as root to avoid permission issues with mounted volume
 CMD ["gradle", ":data-sync-service:bootRun"]

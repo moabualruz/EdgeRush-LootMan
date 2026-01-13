@@ -68,7 +68,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val result = createResult(itemId = 12345L, percentGain = 5.0)
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findLatestResultForItem(any(), 12345L) } returns result
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
             val uv = calculator.calculateUpgradeValue(
@@ -91,7 +92,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val result = createResult(itemId = 12345L, percentGain = 15.0)
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findLatestResultForItem(any(), 12345L) } returns result
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
             val uv = calculator.calculateUpgradeValue(
@@ -114,7 +116,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val result = createResult(itemId = 12345L, percentGain = -2.0)
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findLatestResultForItem(any(), 12345L) } returns result
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
             val uv = calculator.calculateUpgradeValue(
@@ -162,7 +165,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val wishlist = mockk<Wishlist>()
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findLatestResultForItem(any(), 12345L) } returns null
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns null
             every { wishlist.getUpgradePercentage(itemId) } returns 80.0
 
             // Act
@@ -209,7 +213,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val result = createResult(itemId = 12345L, percentGain = 5.0)
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findLatestResultForItem(any(), 12345L) } returns result
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
             val uv = calculator.calculateUpgradeValue(
@@ -234,7 +239,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val profile = createProfile()
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findResultsByProfile(any()) } returns listOf(createResult())
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findResultsByProfile(42L) } returns listOf(createResult())
 
             // Act
             val hasData = calculator.hasSimulationData(
@@ -269,7 +275,8 @@ class UpgradeValueCalculatorTest : UnitTest() {
             val profile = createProfile()
 
             every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
-            every { simulationRepository.findResultsByProfile(any()) } returns emptyList()
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns 42L
+            every { simulationRepository.findResultsByProfile(42L) } returns emptyList()
 
             // Act
             val hasData = calculator.hasSimulationData(

@@ -99,31 +99,33 @@ The post-refactoring cleanup phase has been **successfully completed**, establis
 
 ---
 
-### PRIORITY 3: Raidbots Integration (BLOCKED)
-**Timeline:** 3-4 weeks  
-**Status:** ⚠️ 40% Complete, Blocked by API Key Availability  
-**Spec:** `.kiro/specs/raidbots-integration/`
+### PRIORITY 3: SimulationCraft Integration (COMPLETE)
 
-**Current Status:**
-- ✅ Database schema and entities
-- ✅ Configuration system
-- ✅ SimC profile generation
-- ❌ API client (requires API key)
-- ❌ Simulation service
-- ❌ Upgrade value calculation
+**Timeline:** Complete
+**Status:** ✅ Fully Implemented
+**Spec:** `.kiro/specs/simulation-integration/`
 
-**Blocker:**
-- Raidbots API key availability uncertain
-- Need to verify developer access to Raidbots API
+**Completed:**
+
+- ✅ Database schema for simulation profiles and results
+- ✅ SimC profile generation from character data
+- ✅ Docker-based SimulationCraft execution
+- ✅ Upgrade value calculation from simulation results
+- ✅ FLPS integration with fallback to wishlist percentages
+- ✅ SOPS + age secrets management integration
 
 **Impact:**
-- Currently using wishlist percentages as proxy for upgrade values
-- Achieving 100% accurate FLPS scores requires this integration
 
-**Next Steps:**
-1. Verify Raidbots API key availability
-2. If available: Complete API client implementation
-3. If not available: Explore alternative upgrade value calculation methods
+- Provides accurate upgrade values via local SimulationCraft Docker
+- No external API dependencies or keys required
+- Graceful fallback to wishlist percentages when simulation data unavailable
+
+**Architecture:**
+
+- `DockerSimulationExecutor` - Runs SimC via Docker container
+- `SimulationService` - Orchestrates simulation workflow
+- `UpgradeValueCalculator` - Calculates UV from simulation data
+- `ProfileGeneratorService` - Generates SimC profiles from gear data
 
 ---
 
@@ -247,7 +249,7 @@ The post-refactoring cleanup phase has been **successfully completed**, establis
 | **Test Coverage Improvement** | 🔄 In Progress | 64% | None - Active work |
 | **GraphQL API** | 📋 Spec Complete | 0% | Awaiting test coverage |
 | **REST API Layer** | 🔄 In Progress | 40% | None |
-| **Raidbots Integration** | ⚠️ Blocked | 40% | API Key Availability |
+| **SimulationCraft Integration** | ✅ Complete | 100% | None |
 | **Web Dashboard** | 📋 Planned | 0% | Requires GraphQL |
 | **Discord Bot** | 📋 Planned | 0% | Requires API |
 | **Warcraft Logs** | ✅ Complete | 100% | None |

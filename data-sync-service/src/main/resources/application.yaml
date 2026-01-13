@@ -33,14 +33,17 @@ warcraft-logs:
   sync:
     cron: "0 0 */6 * * *"  # Every 6 hours
 
-# Raidbots Integration Configuration
-# Note: Raidbots doesn't have a public API for automated submissions
-# This integration parses shared Droptimizer report URLs submitted by raiders
-raidbots:
-  enabled: ${RAIDBOTS_ENABLED:false}
-  base-url: https://www.raidbots.com
-  # Raiders submit Droptimizer URLs manually via WoWAudit or Discord
-  # System parses the public report pages for upgrade values
+# SimulationCraft Integration Configuration (local Docker execution)
+simulation:
+  enabled: ${SIMULATION_ENABLED:true}
+  docker:
+    image: ${SIMULATION_DOCKER_IMAGE:simulationcraftorg/simc}
+    profile-directory: ${SIMULATION_DOCKER_PROFILE_DIR:./simc-profiles}
+    timeout-minutes: ${SIMULATION_DOCKER_TIMEOUT_MINUTES:30}
+  # Default simulation parameters
+  iterations: ${SIMULATION_ITERATIONS:10000}
+  fight-length: ${SIMULATION_FIGHT_LENGTH:300}
+  fight-style: ${SIMULATION_FIGHT_STYLE:Patchwerk}
 
 # Encryption key for sensitive data (should be 32 bytes)
 encryption:
