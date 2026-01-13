@@ -1,6 +1,8 @@
 # Kotlin build
-/.gradle/
+.gradle/
+**/.gradle/
 .kotlin/
+*-cwd
 
 # IntelliJ / JetBrains
 .idea/
@@ -10,7 +12,8 @@
 .vscode/
 
 # Runtime artifacts
-/tmp/
+tmp/
+**/tmp/
 *.log
 *.db
 
