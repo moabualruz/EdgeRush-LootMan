@@ -2,7 +2,15 @@ package com.edgerush.lootman.application.flps
 
 import com.edgerush.lootman.application.simulation.UpgradeValueCalculator
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
-import com.edgerush.lootman.domain.flps.model.*
+import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
+import com.edgerush.lootman.domain.flps.model.ExternalPreparationScore
+import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
+import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
+import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
+import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
+import com.edgerush.lootman.domain.flps.model.RoleMultiplier
+import com.edgerush.lootman.domain.flps.model.TierBonus
+import com.edgerush.lootman.domain.flps.model.UpgradeValue
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootBan
 import com.edgerush.lootman.domain.loot.model.LootTier
@@ -46,23 +54,136 @@ class FlpsComponentCalculator(
     }
 
     /**
-     * Calculate Mechanical Adherence Score (MAS).
-     * Currently returns 0.0 - requires Warcraft Logs integration.
+     * Calculate Mechanical Adherence Score (MAS) from Warcraft Logs performance data.
+     *
+     * MAS is calculated based on:
+     * - Deaths per attempt (DPA): Lower is better, weighted at 60%
+     * - Avoidable damage percentage (ADT): Lower is better, weighted at 40%
+     *
+     * @param performanceData Aggregated performance data from Warcraft Logs, or null if unavailable
+     * @return MAS score between 0.0 and 1.0
      */
+    fun calculateMAS(performanceData: RaiderPerformanceData?): MechanicalAdherenceScore {
+        if (performanceData == null || performanceData.totalFights == 0) {
+            return MechanicalAdherenceScore.of(0.0)
+        }
+
+        // Weight factors (configurable via guild settings in future)
+        val deathsWeight = 0.6
+        val avoidableDamageWeight = 0.4
+
+        // Calculate deaths per attempt score
+        // 0 deaths = 1.0, 1 death/attempt = 0.5, 2+ deaths/attempt = approaching 0
+        val dpa = performanceData.deathsPerAttempt
+        val deathsScore = when {
+            dpa <= 0.0 -> 1.0
+            dpa <= 0.5 -> 1.0 - (dpa * 0.4)  // 0.5 dpa = 0.8 score
+            dpa <= 1.0 -> 0.8 - ((dpa - 0.5) * 0.6) // 1.0 dpa = 0.5 score
+            dpa <= 2.0 -> 0.5 - ((dpa - 1.0) * 0.3) // 2.0 dpa = 0.2 score
+            else -> (0.2 - ((dpa - 2.0) * 0.1)).coerceAtLeast(0.0)
+        }
+
+        // Calculate avoidable damage score
+        // 0% = 1.0, 50% = 0.5, 100%+ = approaching 0
+        val adtPct = performanceData.avoidableDamagePercentage
+        val avoidableDamageScore = when {
+            adtPct <= 10.0 -> 1.0 - (adtPct * 0.01) // 10% = 0.9 score
+            adtPct <= 30.0 -> 0.9 - ((adtPct - 10.0) * 0.015) // 30% = 0.6 score
+            adtPct <= 60.0 -> 0.6 - ((adtPct - 30.0) * 0.01) // 60% = 0.3 score
+            adtPct <= 100.0 -> 0.3 - ((adtPct - 60.0) * 0.005) // 100% = 0.1 score
+            else -> (0.1 - ((adtPct - 100.0) * 0.001)).coerceAtLeast(0.0)
+        }
+
+        // Combine weighted scores
+        val masValue = (deathsScore * deathsWeight) + (avoidableDamageScore * avoidableDamageWeight)
+
+        return MechanicalAdherenceScore.of(masValue.coerceIn(0.0, 1.0))
+    }
+
+    /**
+     * Calculate Mechanical Adherence Score (MAS) - legacy no-args version.
+     * Returns 0.0 as fallback when no performance data is available.
+     *
+     * @deprecated Use calculateMAS(performanceData) instead
+     */
+    @Deprecated("Use calculateMAS(performanceData) instead", ReplaceWith("calculateMAS(null)"))
     fun calculateMAS(): MechanicalAdherenceScore {
-        // TODO: Implement with Warcraft Logs data (deaths, avoidable damage)
         return MechanicalAdherenceScore.of(0.0)
     }
 
     /**
-     * Calculate External Preparation Score (EPS) from gear and activity.
-     * Currently simplified - needs vault/crest/M+ data.
+     * Calculate External Preparation Score (EPS) from gear and preparation data.
+     *
+     * EPS is calculated based on:
+     * - Vault unlock status (raid, M+, PvP) - weighted by importance
+     * - Mythic+ rating - normalized to 0-1 scale
+     * - Heroic/Normal clear status - bonus points
+     * - Base gear presence - fallback when no preparation data
+     *
+     * Weights (total 100%):
+     * - Raid vault: 35% (most important for raiders)
+     * - M+ vault: 20%
+     * - PvP vault: 5%
+     * - M+ rating: 25%
+     * - Heroic clear: 10%
+     * - Normal clear: 5%
+     *
+     * @param gear The raider's current gear set, or null if unavailable
+     * @param preparation The raider's vault/activity data, or null if unavailable
+     * @return EPS score between 0.0 and 1.0
      */
-    fun calculateEPS(gear: GearSet?): ExternalPreparationScore {
-        // Simplified: Base score on having gear
-        val baseScore = if (gear != null) 0.7 else 0.0
+    fun calculateEPS(gear: GearSet?, preparation: RaiderPreparationData?): ExternalPreparationScore {
+        // If both are null, return zero
+        if (gear == null && preparation == null) {
+            return ExternalPreparationScore.of(0.0)
+        }
 
-        // TODO: Add vault unlocks, crest usage, M+ score
+        // If no preparation data, fall back to legacy behavior
+        if (preparation == null) {
+            return ExternalPreparationScore.of(if (gear != null) 0.7 else 0.0)
+        }
+
+        // Raid vault contribution (35% max, ~11.67% per slot)
+        val raidVaultScore = (preparation.raidVaultSlots / 3.0) * 0.35
+
+        // M+ vault contribution (20% max, ~6.67% per slot)
+        val mythicPlusVaultScore = (preparation.mythicPlusVaultSlots / 3.0) * 0.20
+
+        // PvP vault contribution (5% max)
+        val pvpVaultScore = (preparation.pvpVaultSlots / 3.0) * 0.05
+
+        // M+ rating contribution (25% max)
+        // Rating normalized: 0 = 0, 2500+ = 1.0
+        val normalizedRating = (preparation.mythicPlusRating / 2500.0).coerceIn(0.0, 1.0)
+        val ratingScore = normalizedRating * 0.25
+
+        // Heroic clear bonus (10%)
+        val heroicClearScore = if (preparation.hasHeroicClear) 0.10 else 0.0
+
+        // Normal clear bonus (5%)
+        val normalClearScore = if (preparation.hasNormalClear) 0.05 else 0.0
+
+        // Total score
+        val totalScore = raidVaultScore +
+            mythicPlusVaultScore +
+            pvpVaultScore +
+            ratingScore +
+            heroicClearScore +
+            normalClearScore
+
+        return ExternalPreparationScore.of(totalScore.coerceIn(0.0, 1.0))
+    }
+
+    /**
+     * Calculate External Preparation Score (EPS) from gear only.
+     * This is the legacy method - prefer calculateEPS(gear, preparation) when preparation data is available.
+     *
+     * @deprecated Use calculateEPS(gear, preparation) instead
+     */
+    @Deprecated("Use calculateEPS(gear, preparation) instead", ReplaceWith("calculateEPS(gear, null)"))
+    fun calculateEPS(gear: GearSet?): ExternalPreparationScore {
+        // Legacy behavior: Base score on having gear
+        val baseScore = if (gear != null) 0.7 else 0.0
         return ExternalPreparationScore.of(baseScore.coerceIn(0.0, 1.0))
     }
 

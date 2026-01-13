@@ -102,3 +102,77 @@ data class AttendanceStatsDto(
         }
     }
 }
+
+/**
+ * Request DTO for updating attendance.
+ */
+data class UpdateAttendanceRequest(
+    val instance: String? = null,
+    val encounter: String? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val attendedRaids: Int? = null,
+    val totalRaids: Int? = null
+)
+
+/**
+ * Response DTO for raider attendance history.
+ */
+data class RaiderAttendanceHistoryResponse(
+    val raiderId: Long,
+    val guildId: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val records: List<TrackAttendanceResponse>,
+    val totalRecords: Int
+)
+
+/**
+ * Response DTO for guild attendance summary.
+ */
+data class GuildAttendanceSummaryResponse(
+    val guildId: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val totalRecords: Int,
+    val uniqueRaiders: Int,
+    val overallAttendancePercentage: Double,
+    val raiderSummaries: List<RaiderAttendanceSummaryResponse>
+) {
+    companion object {
+        fun from(summary: com.edgerush.lootman.application.attendance.GuildAttendanceSummary): GuildAttendanceSummaryResponse {
+            return GuildAttendanceSummaryResponse(
+                guildId = summary.guildId,
+                startDate = summary.startDate,
+                endDate = summary.endDate,
+                totalRecords = summary.totalRecords,
+                uniqueRaiders = summary.uniqueRaiders,
+                overallAttendancePercentage = summary.overallAttendancePercentage,
+                raiderSummaries = summary.raiderSummaries.map { RaiderAttendanceSummaryResponse.from(it) }
+            )
+        }
+    }
+}
+
+/**
+ * Response DTO for raider attendance summary within a guild.
+ */
+data class RaiderAttendanceSummaryResponse(
+    val raiderId: Long,
+    val totalRecords: Int,
+    val totalAttendedRaids: Int,
+    val totalRaids: Int,
+    val averageAttendancePercentage: Double
+) {
+    companion object {
+        fun from(summary: com.edgerush.lootman.application.attendance.RaiderAttendanceSummary): RaiderAttendanceSummaryResponse {
+            return RaiderAttendanceSummaryResponse(
+                raiderId = summary.raiderId,
+                totalRecords = summary.totalRecords,
+                totalAttendedRaids = summary.totalAttendedRaids,
+                totalRaids = summary.totalRaids,
+                averageAttendancePercentage = summary.averageAttendancePercentage
+            )
+        }
+    }
+}

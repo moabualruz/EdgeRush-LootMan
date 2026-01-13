@@ -2,10 +2,15 @@ package com.edgerush.lootman.api.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.application.attendance.AttendanceReport
+import com.edgerush.lootman.application.attendance.DeleteAttendanceUseCase
+import com.edgerush.lootman.application.attendance.GetAttendanceRecordUseCase
 import com.edgerush.lootman.application.attendance.GetAttendanceReportQuery
 import com.edgerush.lootman.application.attendance.GetAttendanceReportUseCase
+import com.edgerush.lootman.application.attendance.GetGuildAttendanceSummaryUseCase
+import com.edgerush.lootman.application.attendance.ListRaiderAttendanceUseCase
 import com.edgerush.lootman.application.attendance.TrackAttendanceCommand
 import com.edgerush.lootman.application.attendance.TrackAttendanceUseCase
+import com.edgerush.lootman.application.attendance.UpdateAttendanceUseCase
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.model.AttendanceStats
 import com.edgerush.lootman.domain.shared.GuildId
@@ -29,15 +34,30 @@ import java.time.LocalDate
 class AttendanceControllerTest : UnitTest() {
     private lateinit var trackAttendanceUseCase: TrackAttendanceUseCase
     private lateinit var getAttendanceReportUseCase: GetAttendanceReportUseCase
+    private lateinit var getAttendanceRecordUseCase: GetAttendanceRecordUseCase
+    private lateinit var updateAttendanceUseCase: UpdateAttendanceUseCase
+    private lateinit var deleteAttendanceUseCase: DeleteAttendanceUseCase
+    private lateinit var listRaiderAttendanceUseCase: ListRaiderAttendanceUseCase
+    private lateinit var getGuildAttendanceSummaryUseCase: GetGuildAttendanceSummaryUseCase
     private lateinit var controller: AttendanceController
 
     @BeforeEach
     fun setup() {
         trackAttendanceUseCase = mockk()
         getAttendanceReportUseCase = mockk()
+        getAttendanceRecordUseCase = mockk()
+        updateAttendanceUseCase = mockk()
+        deleteAttendanceUseCase = mockk()
+        listRaiderAttendanceUseCase = mockk()
+        getGuildAttendanceSummaryUseCase = mockk()
         controller = AttendanceController(
             trackAttendanceUseCase,
             getAttendanceReportUseCase,
+            getAttendanceRecordUseCase,
+            updateAttendanceUseCase,
+            deleteAttendanceUseCase,
+            listRaiderAttendanceUseCase,
+            getGuildAttendanceSummaryUseCase,
         )
     }
 

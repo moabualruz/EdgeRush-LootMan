@@ -1,0 +1,130 @@
+package com.edgerush.lootman.application.raider
+
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
+import com.edgerush.lootman.domain.shared.model.CharacterClass
+import com.edgerush.lootman.domain.shared.model.Raider
+import com.edgerush.lootman.domain.shared.model.RaiderStatus
+import com.edgerush.lootman.domain.shared.model.Role
+import com.edgerush.lootman.domain.shared.repository.RaiderRepository
+import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+
+/**
+ * Use case for creating a new raider.
+ */
+@Service
+class CreateRaiderUseCase(
+    private val raiderRepository: RaiderRepository
+) {
+    fun execute(command: CreateRaiderCommand): Result<Raider> = runCatching {
+        val raider = Raider(
+            id = RaiderId(command.id),
+            guildId = GuildId(command.guildId),
+            characterName = command.characterName,
+            realm = command.realm,
+            characterClass = CharacterClass.valueOf(command.characterClass.uppercase()),
+            role = Role.valueOf(command.role.uppercase()),
+            rank = command.rank,
+            status = RaiderStatus.valueOf(command.status.uppercase()),
+            joinDate = command.joinDate,
+            wowauditId = command.wowauditId
+        )
+        raiderRepository.save(raider)
+    }
+}
+
+/**
+ * Use case for updating an existing raider.
+ */
+@Service
+class UpdateRaiderUseCase(
+    private val raiderRepository: RaiderRepository
+) {
+    fun execute(command: UpdateRaiderCommand): Result<Raider> = runCatching {
+        val existingRaider = raiderRepository.findById(RaiderId(command.id))
+            ?: throw NoSuchElementException("Raider not found with id: ${command.id}")
+
+        val updatedRaider = existingRaider.copy(
+            characterName = command.characterName ?: existingRaider.characterName,
+            realm = command.realm ?: existingRaider.realm,
+            characterClass = command.characterClass?.let { CharacterClass.valueOf(it.uppercase()) }
+                ?: existingRaider.characterClass,
+            role = command.role?.let { Role.valueOf(it.uppercase()) } ?: existingRaider.role,
+            rank = command.rank ?: existingRaider.rank,
+            status = command.status?.let { RaiderStatus.valueOf(it.uppercase()) }
+                ?: existingRaider.status
+        )
+        raiderRepository.save(updatedRaider)
+    }
+}
+
+/**
+ * Use case for deleting a raider.
+ */
+@Service
+class DeleteRaiderUseCase(
+    private val raiderRepository: RaiderRepository
+) {
+    fun execute(command: DeleteRaiderCommand): Result<Unit> = runCatching {
+        val existingRaider = raiderRepository.findById(RaiderId(command.id))
+            ?: throw NoSuchElementException("Raider not found with id: ${command.id}")
+        raiderRepository.delete(existingRaider.id)
+    }
+}
+
+/**
+ * Use case for getting a raider by ID.
+ */
+@Service
+class GetRaiderUseCase(
+    private val raiderRepository: RaiderRepository
+) {
+    fun execute(query: GetRaiderQuery): Result<Raider> = runCatching {
+        raiderRepository.findById(RaiderId(query.id))
+            ?: throw NoSuchElementException("Raider not found with id: ${query.id}")
+    }
+}
+
+/**
+ * Use case for listing raiders.
+ */
+@Service
+class ListRaidersUseCase(
+    private val raiderRepository: RaiderRepository
+) {
+    fun executeByGuild(query: ListRaidersByGuildQuery): Result<List<Raider>> = runCatching {
+        raiderRepository.findByGuildId(GuildId(query.guildId))
+    }
+}
+
+// Commands and Queries
+
+data class CreateRaiderCommand(
+    val id: Long,
+    val guildId: String,
+    val characterName: String,
+    val realm: String,
+    val characterClass: String,
+    val role: String,
+    val rank: String? = null,
+    val status: String = "ACTIVE",
+    val joinDate: LocalDateTime? = null,
+    val wowauditId: Long? = null
+)
+
+data class UpdateRaiderCommand(
+    val id: Long,
+    val characterName: String? = null,
+    val realm: String? = null,
+    val characterClass: String? = null,
+    val role: String? = null,
+    val rank: String? = null,
+    val status: String? = null
+)
+
+data class DeleteRaiderCommand(val id: Long)
+
+data class GetRaiderQuery(val id: Long)
+
+data class ListRaidersByGuildQuery(val guildId: String)

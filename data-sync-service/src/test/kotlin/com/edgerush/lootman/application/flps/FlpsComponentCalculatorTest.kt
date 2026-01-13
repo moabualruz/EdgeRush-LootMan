@@ -3,6 +3,8 @@ package com.edgerush.lootman.application.flps
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.flps.model.FlpsScore
+import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
+import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootAwardId
 import com.edgerush.lootman.domain.loot.model.LootBan
@@ -19,6 +21,7 @@ import com.edgerush.lootman.domain.shared.model.ItemQuality
 import com.edgerush.lootman.domain.shared.model.Role
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import com.edgerush.lootman.domain.shared.model.WishlistItem
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -127,8 +130,142 @@ class FlpsComponentCalculatorTest : UnitTest() {
     // ===== MAS (Mechanical Adherence Score) Tests =====
 
     @Test
-    fun `calculateMAS should return zero until Warcraft Logs integration`() {
+    fun `calculateMAS should return zero when performance data is null`() {
         // Act
+        val result = calculator.calculateMAS(null)
+
+        // Assert
+        result.value shouldBe 0.0
+    }
+
+    @Test
+    fun `calculateMAS should return perfect score for zero deaths and low avoidable damage`() {
+        // Arrange
+        val performanceData = createPerformanceData(
+            totalDeaths = 0,
+            totalFights = 10,
+            avoidableDamagePercentage = 0.0, // Perfect avoidable damage
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        result.value shouldBe (1.0 plusOrMinus 0.01)
+    }
+
+    @Test
+    fun `calculateMAS should return high score for zero deaths and minimal avoidable damage`() {
+        // Arrange
+        val performanceData = createPerformanceData(
+            totalDeaths = 0,
+            totalFights = 10,
+            avoidableDamagePercentage = 5.0, // Low but non-zero
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert - expect high score (0.95+) for minimal avoidable damage
+        result.value shouldBe (0.98 plusOrMinus 0.02)
+    }
+
+    @Test
+    fun `calculateMAS should return lower score for moderate deaths`() {
+        // Arrange - 0.5 deaths per attempt (5 deaths in 10 fights)
+        val performanceData = createPerformanceData(
+            totalDeaths = 5,
+            totalFights = 10,
+            avoidableDamagePercentage = 20.0,
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        // With 0.5 dpa (deaths score ~0.8) and 20% avoidable (damage score ~0.75)
+        // Weighted: 0.8 * 0.6 + 0.75 * 0.4 = 0.48 + 0.30 = 0.78
+        result.value shouldBe (0.78 plusOrMinus 0.05)
+    }
+
+    @Test
+    fun `calculateMAS should return low score for high deaths`() {
+        // Arrange - 2 deaths per attempt (high death rate)
+        val performanceData = createPerformanceData(
+            totalDeaths = 20,
+            totalFights = 10,
+            avoidableDamagePercentage = 50.0,
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        // With high deaths and avoidable damage, expect low score
+        result.value shouldBe (0.3 plusOrMinus 0.15)
+    }
+
+    @Test
+    fun `calculateMAS should floor at zero for extremely bad performance`() {
+        // Arrange - extremely high deaths and avoidable damage
+        val performanceData = createPerformanceData(
+            totalDeaths = 50,
+            totalFights = 10,
+            avoidableDamagePercentage = 200.0,
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        result.value shouldBe (0.0 plusOrMinus 0.1)
+    }
+
+    @Test
+    fun `calculateMAS should return zero when no fights analyzed`() {
+        // Arrange
+        val performanceData = createPerformanceData(
+            totalDeaths = 0,
+            totalFights = 0,
+            avoidableDamagePercentage = 0.0,
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        result.value shouldBe 0.0
+    }
+
+    @Test
+    fun `calculateMAS should weight deaths per attempt more than avoidable damage`() {
+        // Arrange - high deaths, low avoidable damage
+        val highDeathsData = createPerformanceData(
+            totalDeaths = 15,
+            totalFights = 10,
+            avoidableDamagePercentage = 10.0,
+        )
+
+        // Arrange - low deaths, high avoidable damage
+        val highDamageData = createPerformanceData(
+            totalDeaths = 2,
+            totalFights = 10,
+            avoidableDamagePercentage = 80.0,
+        )
+
+        // Act
+        val highDeathsResult = calculator.calculateMAS(highDeathsData)
+        val highDamageResult = calculator.calculateMAS(highDamageData)
+
+        // Assert - deaths should have more impact, so high deaths = lower score
+        highDeathsResult.value shouldBeLessThan highDamageResult.value
+    }
+
+    // Legacy no-args version for backwards compatibility
+    @Test
+    fun `calculateMAS no-args should return zero as fallback`() {
+        // Act
+        @Suppress("DEPRECATION")
         val result = calculator.calculateMAS()
 
         // Assert
@@ -138,8 +275,140 @@ class FlpsComponentCalculatorTest : UnitTest() {
     // ===== EPS (External Preparation Score) Tests =====
 
     @Test
-    fun `calculateEPS should return zero when gear is null`() {
+    fun `calculateEPS should return zero when both gear and preparation are null`() {
         // Act
+        val result = calculator.calculateEPS(null, null)
+
+        // Assert
+        result.value shouldBe 0.0
+    }
+
+    @Test
+    fun `calculateEPS should return base score when only gear is present`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 0)
+
+        // Act
+        val result = calculator.calculateEPS(gear, null)
+
+        // Assert
+        // Base score for having gear (legacy behavior)
+        result.value shouldBe (0.7 plusOrMinus 0.1)
+    }
+
+    @Test
+    fun `calculateEPS should return perfect score for full vault and high M+ rating`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 4)
+        val preparation = createPreparationData(
+            raidVaultSlots = 3,
+            mythicPlusVaultSlots = 3,
+            pvpVaultSlots = 3,
+            mythicPlusRating = 2500,
+            hasHeroicClear = true,
+            hasNormalClear = true,
+        )
+
+        // Act
+        val result = calculator.calculateEPS(gear, preparation)
+
+        // Assert
+        // Full score: raid(35%) + m+(20%) + pvp(5%) + rating(25%) + heroic(10%) + normal(5%) = 100%
+        result.value shouldBe (1.0 plusOrMinus 0.05)
+    }
+
+    @Test
+    fun `calculateEPS should give higher score for raid vault than M+ vault`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 0)
+
+        val raidVaultOnly = createPreparationData(
+            raidVaultSlots = 3,
+            mythicPlusVaultSlots = 0,
+        )
+
+        val mplusVaultOnly = createPreparationData(
+            raidVaultSlots = 0,
+            mythicPlusVaultSlots = 3,
+        )
+
+        // Act
+        val raidResult = calculator.calculateEPS(gear, raidVaultOnly)
+        val mplusResult = calculator.calculateEPS(gear, mplusVaultOnly)
+
+        // Assert - raid vault should contribute more to EPS
+        raidResult.value shouldBeLessThan mplusResult.value + 0.2 // Within 0.2 tolerance
+    }
+
+    @Test
+    fun `calculateEPS should return moderate score for partial preparation`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 2)
+        val preparation = createPreparationData(
+            raidVaultSlots = 2,
+            mythicPlusVaultSlots = 1,
+            mythicPlusRating = 1500,
+            hasHeroicClear = false,
+            hasNormalClear = true,
+        )
+
+        // Act
+        val result = calculator.calculateEPS(gear, preparation)
+
+        // Assert - should be moderate (roughly 50%)
+        // Calculation: raid(2/3*35%=23.3%) + m+(1/3*20%=6.7%) + rating(1500/2500*25%=15%) + normal(5%) = 50%
+        result.value shouldBe (0.50 plusOrMinus 0.10)
+    }
+
+    @Test
+    fun `calculateEPS should include M+ rating in score`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 0)
+
+        val lowRating = createPreparationData(
+            mythicPlusRating = 500,
+        )
+
+        val highRating = createPreparationData(
+            mythicPlusRating = 2500,
+        )
+
+        // Act
+        val lowResult = calculator.calculateEPS(gear, lowRating)
+        val highResult = calculator.calculateEPS(gear, highRating)
+
+        // Assert - higher M+ rating should give higher EPS
+        lowResult.value shouldBeLessThan highResult.value
+    }
+
+    @Test
+    fun `calculateEPS should give bonus for heroic clear`() {
+        // Arrange
+        val gear = createGearSet(tierPieces = 0)
+
+        val noClears = createPreparationData(
+            hasHeroicClear = false,
+            hasNormalClear = false,
+        )
+
+        val heroicClear = createPreparationData(
+            hasHeroicClear = true,
+            hasNormalClear = true,
+        )
+
+        // Act
+        val noResult = calculator.calculateEPS(gear, noClears)
+        val heroicResult = calculator.calculateEPS(gear, heroicClear)
+
+        // Assert - heroic clear should boost EPS
+        noResult.value shouldBeLessThan heroicResult.value
+    }
+
+    // Legacy no-preparation version tests
+    @Test
+    fun `calculateEPS legacy should return zero when gear is null`() {
+        // Act
+        @Suppress("DEPRECATION")
         val result = calculator.calculateEPS(null)
 
         // Assert
@@ -147,11 +416,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     }
 
     @Test
-    fun `calculateEPS should return base score when gear is present`() {
+    fun `calculateEPS legacy should return base score when gear is present`() {
         // Arrange
         val gear = createGearSet(tierPieces = 0)
 
         // Act
+        @Suppress("DEPRECATION")
         val result = calculator.calculateEPS(gear)
 
         // Assert
@@ -629,5 +899,41 @@ class FlpsComponentCalculatorTest : UnitTest() {
             reason = "Test ban",
             bannedAt = Instant.now(),
             expiresAt = Instant.now().plus(7, ChronoUnit.DAYS),
+        )
+
+    private fun createPerformanceData(
+        totalDeaths: Int,
+        totalFights: Int,
+        avoidableDamagePercentage: Double,
+    ): RaiderPerformanceData =
+        RaiderPerformanceData.create(
+            raiderId = RaiderId(1),
+            characterName = "TestCharacter",
+            characterRealm = "TestRealm",
+            totalDeaths = totalDeaths,
+            totalFights = totalFights,
+            avoidableDamagePercentage = avoidableDamagePercentage,
+            periodStart = Instant.now().minus(30, ChronoUnit.DAYS),
+            periodEnd = Instant.now(),
+        )
+
+    private fun createPreparationData(
+        raidVaultSlots: Int = 0,
+        mythicPlusVaultSlots: Int = 0,
+        pvpVaultSlots: Int = 0,
+        mythicPlusRating: Int = 0,
+        crestsUsed: Int = 0,
+        hasHeroicClear: Boolean = false,
+        hasNormalClear: Boolean = false,
+    ): RaiderPreparationData =
+        RaiderPreparationData.create(
+            raiderId = RaiderId(1),
+            raidVaultSlots = raidVaultSlots,
+            mythicPlusVaultSlots = mythicPlusVaultSlots,
+            pvpVaultSlots = pvpVaultSlots,
+            mythicPlusRating = mythicPlusRating,
+            crestsUsed = crestsUsed,
+            hasHeroicClear = hasHeroicClear,
+            hasNormalClear = hasNormalClear,
         )
 }

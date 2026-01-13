@@ -110,3 +110,51 @@ data class LootBanDto(
         }
     }
 }
+
+/**
+ * Request DTO for updating a loot ban.
+ */
+data class UpdateLootBanRequest(
+    val reason: String? = null,
+    val expiresAt: Instant? = null
+)
+
+/**
+ * Response DTO for a list of loot awards with metadata.
+ */
+data class LootAwardsListResponse(
+    val awards: List<LootAwardDto>,
+    val totalCount: Int,
+    val activeCount: Int
+) {
+    companion object {
+        fun from(awards: List<LootAward>): LootAwardsListResponse {
+            val awardDtos = awards.map { LootAwardDto.from(it) }
+            return LootAwardsListResponse(
+                awards = awardDtos,
+                totalCount = awardDtos.size,
+                activeCount = awardDtos.count { it.isActive }
+            )
+        }
+    }
+}
+
+/**
+ * Response DTO for a list of loot bans with metadata.
+ */
+data class LootBansListResponse(
+    val bans: List<LootBanDto>,
+    val totalCount: Int,
+    val activeCount: Int
+) {
+    companion object {
+        fun from(bans: List<LootBan>): LootBansListResponse {
+            val banDtos = bans.map { LootBanDto.from(it) }
+            return LootBansListResponse(
+                bans = banDtos,
+                totalCount = banDtos.size,
+                activeCount = banDtos.count { it.isActive }
+            )
+        }
+    }
+}

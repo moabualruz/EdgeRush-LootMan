@@ -3,10 +3,15 @@ package com.edgerush.lootman.api.loot
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.application.loot.AwardLootUseCase
 import com.edgerush.lootman.application.loot.GetActiveBansQuery
+import com.edgerush.lootman.application.loot.GetLootAwardUseCase
+import com.edgerush.lootman.application.loot.GetLootBanUseCase
 import com.edgerush.lootman.application.loot.GetLootHistoryByGuildQuery
 import com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery
 import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
+import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
+import com.edgerush.lootman.application.loot.RevokeLootAwardUseCase
+import com.edgerush.lootman.application.loot.UpdateLootBanUseCase
 import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootBan
@@ -35,6 +40,11 @@ class LootControllerTest : UnitTest() {
     private lateinit var awardLootUseCase: AwardLootUseCase
     private lateinit var getLootHistoryUseCase: GetLootHistoryUseCase
     private lateinit var manageLootBansUseCase: ManageLootBansUseCase
+    private lateinit var getLootAwardUseCase: GetLootAwardUseCase
+    private lateinit var listLootAwardsUseCase: ListLootAwardsUseCase
+    private lateinit var revokeLootAwardUseCase: RevokeLootAwardUseCase
+    private lateinit var getLootBanUseCase: GetLootBanUseCase
+    private lateinit var updateLootBanUseCase: UpdateLootBanUseCase
     private lateinit var controller: LootController
 
     @BeforeEach
@@ -42,10 +52,20 @@ class LootControllerTest : UnitTest() {
         awardLootUseCase = mockk()
         getLootHistoryUseCase = mockk()
         manageLootBansUseCase = mockk()
+        getLootAwardUseCase = mockk()
+        listLootAwardsUseCase = mockk()
+        revokeLootAwardUseCase = mockk()
+        getLootBanUseCase = mockk()
+        updateLootBanUseCase = mockk()
         controller = LootController(
             awardLootUseCase,
             getLootHistoryUseCase,
             manageLootBansUseCase,
+            getLootAwardUseCase,
+            listLootAwardsUseCase,
+            revokeLootAwardUseCase,
+            getLootBanUseCase,
+            updateLootBanUseCase,
         )
     }
 

@@ -3,9 +3,19 @@ package com.edgerush.lootman.api.loot
 import com.edgerush.lootman.application.loot.AwardLootCommand
 import com.edgerush.lootman.application.loot.AwardLootUseCase
 import com.edgerush.lootman.application.loot.CreateLootBanCommand
+import com.edgerush.lootman.application.loot.GetLootAwardQuery
+import com.edgerush.lootman.application.loot.GetLootAwardUseCase
+import com.edgerush.lootman.application.loot.GetLootBanQuery
+import com.edgerush.lootman.application.loot.GetLootBanUseCase
 import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
+import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
+import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
 import com.edgerush.lootman.application.loot.RemoveLootBanCommand
+import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
+import com.edgerush.lootman.application.loot.RevokeLootAwardUseCase
+import com.edgerush.lootman.application.loot.UpdateLootBanCommand
+import com.edgerush.lootman.application.loot.UpdateLootBanUseCase
 import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.loot.model.LootBanId
 import com.edgerush.lootman.domain.loot.model.LootTier
@@ -18,6 +28,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -38,6 +49,11 @@ class LootController(
     private val awardLootUseCase: AwardLootUseCase,
     private val getLootHistoryUseCase: GetLootHistoryUseCase,
     private val manageLootBansUseCase: ManageLootBansUseCase,
+    private val getLootAwardUseCase: GetLootAwardUseCase,
+    private val listLootAwardsUseCase: ListLootAwardsUseCase,
+    private val revokeLootAwardUseCase: RevokeLootAwardUseCase,
+    private val getLootBanUseCase: GetLootBanUseCase,
+    private val updateLootBanUseCase: UpdateLootBanUseCase,
 ) {
     /**
      * Award loot to a raider.
@@ -166,6 +182,66 @@ class LootController(
         val result = manageLootBansUseCase.getActiveBans(query)
         return result
             .map { bans -> LootBansResponse.from(bans) }
+            .getOrThrow()
+    }
+
+    /**
+     * Get all loot awards for a guild.
+     */
+    @GetMapping("/awards")
+    fun listLootAwards(
+        @RequestParam guildId: String
+    ): LootAwardsListResponse {
+        return listLootAwardsUseCase.executeByGuild(ListLootAwardsByGuildQuery(guildId))
+            .map { awards -> LootAwardsListResponse.from(awards) }
+            .getOrThrow()
+    }
+
+    /**
+     * Get a specific loot award by ID.
+     */
+    @GetMapping("/awards/{awardId}")
+    fun getLootAward(@PathVariable awardId: String): LootAwardDto {
+        return getLootAwardUseCase.execute(GetLootAwardQuery(awardId))
+            .map { award -> LootAwardDto.from(award) }
+            .getOrThrow()
+    }
+
+    /**
+     * Revoke/delete a loot award.
+     */
+    @DeleteMapping("/awards/{awardId}")
+    fun revokeLootAward(@PathVariable awardId: String): ResponseEntity<Void> {
+        return revokeLootAwardUseCase.execute(RevokeLootAwardCommand(awardId))
+            .map { ResponseEntity.noContent().build<Void>() }
+            .getOrThrow()
+    }
+
+    /**
+     * Get a specific loot ban by ID.
+     */
+    @GetMapping("/bans/{banId}")
+    fun getLootBan(@PathVariable banId: String): LootBanDto {
+        return getLootBanUseCase.execute(GetLootBanQuery(banId))
+            .map { ban -> LootBanDto.from(ban) }
+            .getOrThrow()
+    }
+
+    /**
+     * Update a loot ban.
+     */
+    @PutMapping("/bans/{banId}")
+    fun updateLootBan(
+        @PathVariable banId: String,
+        @RequestBody request: UpdateLootBanRequest
+    ): LootBanDto {
+        val command = UpdateLootBanCommand(
+            banId = banId,
+            reason = request.reason,
+            expiresAt = request.expiresAt
+        )
+        return updateLootBanUseCase.execute(command)
+            .map { ban -> LootBanDto.from(ban) }
             .getOrThrow()
     }
 }
