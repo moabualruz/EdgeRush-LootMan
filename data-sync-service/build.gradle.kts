@@ -34,6 +34,9 @@ dependencies {
     // Rate Limiting
     implementation("com.google.guava:guava:33.0.0-jre")
 
+    // Prometheus Metrics
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

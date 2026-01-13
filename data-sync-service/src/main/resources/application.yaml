@@ -94,6 +94,22 @@ springdoc:
     tags-sorter: alpha
   show-actuator: true
 
+# Actuator & Metrics Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: lootman
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
 # FLPS Algorithm Configuration
 flps:
   rms:

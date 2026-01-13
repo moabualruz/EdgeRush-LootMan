@@ -34,7 +34,8 @@
       "Bash(for f in /f/work/dod/looter/data-sync-service/bin/main/db/migration/postgres/V*.sql)",
       "Bash(do grep -l \"gear\\\\|wishlist\" \"$f\")",
       "Bash(done)",
-      "Bash(do grep -l \"simulation\" \"$f\")"
+      "Bash(do grep -l \"simulation\" \"$f\")",
+      "Bash(xxd:*)"
     ]
   }
 }
