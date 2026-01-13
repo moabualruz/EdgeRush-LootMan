@@ -27,8 +27,8 @@ class InMemoryFlpsModifierRepository : FlpsModifierRepository {
         )
 
     override fun findByGuildId(guildId: GuildId): FlpsModifiers {
-        // For now, return default modifiers for all guilds
-        // TODO: Implement database-backed storage
+        // Return default modifiers for all guilds.
+        // For database-backed storage, use JdbcFlpsModifierRepository instead.
         return defaultModifiers.copy(guildId = guildId)
     }
 }

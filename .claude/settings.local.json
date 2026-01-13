@@ -30,7 +30,11 @@
       "Bash(xargs:*)",
       "Bash(cmd.exe /c:*)",
       "Bash(test:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(for f in /f/work/dod/looter/data-sync-service/bin/main/db/migration/postgres/V*.sql)",
+      "Bash(do grep -l \"gear\\\\|wishlist\" \"$f\")",
+      "Bash(done)",
+      "Bash(do grep -l \"simulation\" \"$f\")"
     ]
   }
 }

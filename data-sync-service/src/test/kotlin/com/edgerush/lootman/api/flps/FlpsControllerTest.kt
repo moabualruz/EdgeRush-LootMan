@@ -70,6 +70,8 @@ class FlpsControllerTest : UnitTest() {
             calculations = emptyList(),
         )
 
+        // Mock flpsDataAssembler to return empty list (no raiders)
+        every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns emptyList()
         every { getFlpsReportUseCase.execute(any()) } returns Result.success(flpsReport)
 
         // When
@@ -79,6 +81,7 @@ class FlpsControllerTest : UnitTest() {
         response.guildId shouldBe guildId
         response.calculations shouldHaveSize 0
 
+        verify(exactly = 1) { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) }
         verify(exactly = 1) { getFlpsReportUseCase.execute(any()) }
     }
 
@@ -88,6 +91,8 @@ class FlpsControllerTest : UnitTest() {
         val guildId = "failing-guild"
         val exception = RuntimeException("Failed to generate FLPS report")
 
+        // Mock flpsDataAssembler to return empty list (no raiders)
+        every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns emptyList()
         every { getFlpsReportUseCase.execute(any()) } returns Result.failure(exception)
 
         // When / Then
@@ -96,6 +101,7 @@ class FlpsControllerTest : UnitTest() {
         }
 
         thrownException.message shouldBe "Failed to generate FLPS report"
+        verify(exactly = 1) { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) }
         verify(exactly = 1) { getFlpsReportUseCase.execute(any()) }
     }
 
@@ -103,12 +109,35 @@ class FlpsControllerTest : UnitTest() {
     fun `getFlpsReportV1 should include calculations in response`() {
         // Given
         val guildId = "test-guild"
+        val raider = mockk<Raider>()
+        every { raider.id } returns RaiderId(1L)
+        every { raider.characterName } returns "TestRaider"
+        every { raider.role } returns Role.DPS
+
+        val raiderData = RaiderFlpsData(
+            raider = raider,
+            attendance = emptyList(),
+            lootHistory = emptyList(),
+            wishlist = null,
+            gear = null,
+            activeBans = emptyList(),
+        )
+
         val calculation = createFlpsCalculationResult(guildId, 1L, 0.85)
         val flpsReport = FlpsReport(
             guildId = GuildId(guildId),
             calculations = listOf(calculation),
         )
 
+        every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns listOf(raiderData)
+        every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
+        every { componentCalculator.calculateMAS() } returns MechanicalAdherenceScore.of(0.8)
+        every { componentCalculator.calculateEPS(any()) } returns ExternalPreparationScore.of(0.7)
+        every { componentCalculator.calculateUV(any(), any()) } returns UpgradeValue.of(0.6)
+        every { componentCalculator.calculateTierBonus(any()) } returns TierBonus.of(1.1)
+        every { componentCalculator.calculateRoleMultiplier(any()) } returns RoleMultiplier.of(1.0)
+        every { componentCalculator.calculateRDF(any(), any()) } returns RecencyDecayFactor.of(1.0)
+        every { calculateFlpsScoreUseCase.execute(any()) } returns Result.success(calculation)
         every { getFlpsReportUseCase.execute(any()) } returns Result.success(flpsReport)
 
         // When
@@ -120,6 +149,8 @@ class FlpsControllerTest : UnitTest() {
         response.calculations[0].raiderId shouldBe "1"
         response.calculations[0].flpsScore shouldBe 0.85
 
+        verify(exactly = 1) { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) }
+        verify(exactly = 1) { calculateFlpsScoreUseCase.execute(any()) }
         verify(exactly = 1) { getFlpsReportUseCase.execute(any()) }
     }
 

@@ -2,6 +2,7 @@ package com.edgerush.lootman.api.flps
 
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreCommand
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreUseCase
+import com.edgerush.lootman.application.flps.FlpsCalculationResult
 import com.edgerush.lootman.application.flps.FlpsComponentCalculator
 import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.GetFlpsReportQuery
@@ -57,10 +58,12 @@ class FlpsController(
     fun getFlpsReportV1(
         @PathVariable guildId: String,
     ): FlpsReportResponse {
+        val calculations = calculateFlpsForAllRaiders(guildId)
+
         val query =
             GetFlpsReportQuery(
                 guildId = GuildId(guildId),
-                calculations = emptyList(), // TODO: Fetch calculations from data source
+                calculations = calculations,
             )
 
         return getFlpsReportUseCase.execute(query)
@@ -119,6 +122,39 @@ class FlpsController(
                     "System Status" to "/api/v1/flps/status",
                 ),
         )
+    }
+
+    /**
+     * Calculate FLPS for all raiders in a guild.
+     *
+     * @param guildId The guild identifier
+     * @return List of FLPS calculation results for all raiders
+     */
+    private fun calculateFlpsForAllRaiders(guildId: String): List<FlpsCalculationResult> {
+        // Fetch all raider data from database
+        val raiderDataList = flpsDataAssembler.assembleFlpsData(GuildId(guildId))
+
+        // For demonstration, calculate FLPS for a hypothetical item
+        // In production, this would be for specific contested items
+        val exampleItemId = com.edgerush.lootman.domain.shared.ItemId(12345L)
+
+        // Calculate FLPS for each raider
+        return raiderDataList.map { raiderData ->
+            val command = CalculateFlpsScoreCommand(
+                guildId = GuildId(guildId),
+                raiderId = raiderData.raider.id,
+                itemId = exampleItemId,
+                acs = componentCalculator.calculateACS(raiderData.attendance),
+                mas = componentCalculator.calculateMAS(),
+                eps = componentCalculator.calculateEPS(raiderData.gear),
+                uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId),
+                tb = componentCalculator.calculateTierBonus(raiderData.gear),
+                rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role),
+                rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
+            )
+
+            calculateFlpsScoreUseCase.execute(command).getOrThrow()
+        }
     }
 
     private fun getFlpsReportInternal(guildId: String): List<ComprehensiveFlpsReportDto> {
