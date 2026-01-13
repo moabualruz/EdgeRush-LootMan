@@ -55,7 +55,7 @@ class FlpsDataAssemblerService(
                 lootHistory = lootAwardRepository.findByRaiderId(raider.id),
                 wishlist = wishlistRepository.findByRaiderId(raider.id),
                 gear = gearRepository.findCurrentGear(raider.id),
-                activeBans = lootBanRepository.findActiveByRaiderId(raider.id)
+                activeBans = lootBanRepository.findActiveByRaiderId(raider.id, guildId)
             )
         }
     }

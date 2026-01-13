@@ -32,7 +32,7 @@ class GetFlpsReportUseCaseTest : UnitTest() {
             listOf(
                 FlpsCalculationResult(
                     guildId = guildId,
-                    raiderId = RaiderId("raider1"),
+                    raiderId = RaiderId(1L),
                     itemId = ItemId(12345),
                     acs = AttendanceCommitmentScore.of(0.9),
                     mas = MechanicalAdherenceScore.of(0.8),
@@ -48,7 +48,7 @@ class GetFlpsReportUseCaseTest : UnitTest() {
                 ),
                 FlpsCalculationResult(
                     guildId = guildId,
-                    raiderId = RaiderId("raider2"),
+                    raiderId = RaiderId(2L),
                     itemId = ItemId(12345),
                     acs = AttendanceCommitmentScore.of(0.85),
                     mas = MechanicalAdherenceScore.of(0.75),
@@ -85,9 +85,9 @@ class GetFlpsReportUseCaseTest : UnitTest() {
         val guildId = GuildId("test-guild")
         val calculations =
             listOf(
-                createCalculation(RaiderId("raider1"), FlpsScore.of(0.5)),
-                createCalculation(RaiderId("raider2"), FlpsScore.of(0.9)),
-                createCalculation(RaiderId("raider3"), FlpsScore.of(0.7)),
+                createCalculation(RaiderId(1L), FlpsScore.of(0.5)),
+                createCalculation(RaiderId(2L), FlpsScore.of(0.9)),
+                createCalculation(RaiderId(3L), FlpsScore.of(0.7)),
             )
 
         val query = GetFlpsReportQuery(guildId, calculations)
@@ -118,6 +118,99 @@ class GetFlpsReportUseCaseTest : UnitTest() {
         val report = result.getOrNull()!!
 
         report.calculations shouldHaveSize 0
+    }
+
+    @Test
+    fun `should access all properties of FlpsReport`() {
+        // Arrange
+        val guildId = GuildId("test-guild")
+        val calculations =
+            listOf(
+                createCalculation(RaiderId(1L), FlpsScore.of(0.8)),
+            )
+
+        val query = GetFlpsReportQuery(guildId, calculations)
+
+        // Act
+        val result = useCase.execute(query)
+
+        // Assert
+        result.isSuccess shouldBe true
+        val report = result.getOrNull()!!
+
+        // Access all properties explicitly to ensure coverage
+        report.guildId shouldBe guildId
+        report.guildId.value shouldBe "test-guild"
+        report.calculations shouldHaveSize 1
+        report.calculations[0].raiderId.value shouldBe 1L
+    }
+
+    @Test
+    fun `should handle single calculation in report`() {
+        // Arrange
+        val guildId = GuildId("single-calc-guild")
+        val calculation = createCalculation(RaiderId(1L), FlpsScore.of(0.75))
+        val query = GetFlpsReportQuery(guildId, listOf(calculation))
+
+        // Act
+        val result = useCase.execute(query)
+
+        // Assert
+        result.isSuccess shouldBe true
+        val report = result.getOrNull()!!
+
+        report.guildId shouldBe guildId
+        report.calculations shouldHaveSize 1
+        report.calculations[0].flps.value shouldBe 0.75
+    }
+
+    @Test
+    fun `should preserve all calculation details in report`() {
+        // Arrange
+        val guildId = GuildId("test-guild")
+        val calculation =
+            FlpsCalculationResult(
+                guildId = guildId,
+                raiderId = RaiderId(1L),
+                itemId = ItemId(99999),
+                acs = AttendanceCommitmentScore.of(0.95),
+                mas = MechanicalAdherenceScore.of(0.85),
+                eps = ExternalPreparationScore.of(0.75),
+                rms = RaiderMeritScore.of(0.88),
+                uv = UpgradeValue.of(0.9),
+                tb = TierBonus.of(1.2),
+                rm = RoleMultiplier.of(1.1),
+                ipi = ItemPriorityIndex.of(0.99),
+                rdf = RecencyDecayFactor.of(0.95),
+                flps = FlpsScore.of(0.85),
+                eligible = false,
+            )
+
+        val query = GetFlpsReportQuery(guildId, listOf(calculation))
+
+        // Act
+        val result = useCase.execute(query)
+
+        // Assert
+        result.isSuccess shouldBe true
+        val report = result.getOrNull()!!
+        val reportedCalc = report.calculations[0]
+
+        // Verify all properties are preserved
+        reportedCalc.guildId shouldBe guildId
+        reportedCalc.raiderId.value shouldBe 1L
+        reportedCalc.itemId.value shouldBe 99999
+        reportedCalc.acs.value shouldBe 0.95
+        reportedCalc.mas.value shouldBe 0.85
+        reportedCalc.eps.value shouldBe 0.75
+        reportedCalc.rms.value shouldBe 0.88
+        reportedCalc.uv.value shouldBe 0.9
+        reportedCalc.tb.value shouldBe 1.2
+        reportedCalc.rm.value shouldBe 1.1
+        reportedCalc.ipi.value shouldBe 0.99
+        reportedCalc.rdf.value shouldBe 0.95
+        reportedCalc.flps.value shouldBe 0.85
+        reportedCalc.eligible shouldBe false
     }
 
     private fun createCalculation(

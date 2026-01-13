@@ -43,7 +43,7 @@ class AwardLootUseCaseTest : UnitTest() {
         val command =
             AwardLootCommand(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-456"),
+                raiderId = RaiderId(456L),
                 guildId = GuildId("guild-789"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -77,7 +77,7 @@ class AwardLootUseCaseTest : UnitTest() {
         val command =
             AwardLootCommand(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-456"),
+                raiderId = RaiderId(456L),
                 guildId = GuildId("guild-789"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -112,7 +112,7 @@ class AwardLootUseCaseTest : UnitTest() {
         val command =
             AwardLootCommand(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-456"),
+                raiderId = RaiderId(456L),
                 guildId = GuildId("guild-789"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -137,7 +137,7 @@ class AwardLootUseCaseTest : UnitTest() {
         val command =
             AwardLootCommand(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-456"),
+                raiderId = RaiderId(456L),
                 guildId = GuildId("guild-789"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,

@@ -19,14 +19,14 @@ class LootBanTest : UnitTest() {
         // Arrange & Act
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Behavioral issue",
                 expiresAt = Instant.now().plusSeconds(86400 * 7), // 7 days
             )
 
         // Assert
-        lootBan.raiderId.value shouldBe "test-raider"
+        lootBan.raiderId.value shouldBe 1L
         lootBan.guildId.value shouldBe "test-guild"
         lootBan.reason shouldBe "Behavioral issue"
         lootBan.isActive() shouldBe true
@@ -37,7 +37,7 @@ class LootBanTest : UnitTest() {
         // Arrange & Act
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Permanent ban",
                 expiresAt = null,
@@ -54,7 +54,7 @@ class LootBanTest : UnitTest() {
         val futureExpiration = Instant.now().plusSeconds(3600) // 1 hour from now
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Test ban",
                 expiresAt = futureExpiration,
@@ -73,7 +73,7 @@ class LootBanTest : UnitTest() {
         val pastExpiration = Instant.now().minusSeconds(3600) // 1 hour ago
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Test ban",
                 expiresAt = pastExpiration,
@@ -91,7 +91,7 @@ class LootBanTest : UnitTest() {
         // Arrange
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Permanent ban",
                 expiresAt = null,
@@ -114,7 +114,7 @@ class LootBanTest : UnitTest() {
         val lootBan =
             LootBan(
                 id = LootBanId.generate(),
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Test ban",
                 bannedAt = Instant.parse("2024-01-10T12:00:00Z"),
@@ -135,14 +135,14 @@ class LootBanTest : UnitTest() {
         // Arrange & Act
         val ban1 =
             LootBan.create(
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(101L),
                 guildId = GuildId("guild-1"),
                 reason = "Ban 1",
                 expiresAt = null,
             )
         val ban2 =
             LootBan.create(
-                raiderId = RaiderId("raider-2"),
+                raiderId = RaiderId(102L),
                 guildId = GuildId("guild-1"),
                 reason = "Ban 2",
                 expiresAt = null,
@@ -171,7 +171,7 @@ class LootBanTest : UnitTest() {
         // Act
         val lootBan =
             LootBan.create(
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Test ban",
                 expiresAt = Instant.now().plusSeconds(86400),
@@ -191,7 +191,7 @@ class LootBanTest : UnitTest() {
         val lootBan =
             LootBan(
                 id = LootBanId.generate(),
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 reason = "Test ban",
                 bannedAt = Instant.parse("2024-01-10T12:00:00Z"),
@@ -211,7 +211,7 @@ class LootBanTest : UnitTest() {
         // Arrange & Act
         val behavioralBan =
             LootBan.create(
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(101L),
                 guildId = GuildId("guild-1"),
                 reason = "Toxic behavior in raid",
                 expiresAt = Instant.now().plusSeconds(86400 * 7),
@@ -219,7 +219,7 @@ class LootBanTest : UnitTest() {
 
         val attendanceBan =
             LootBan.create(
-                raiderId = RaiderId("raider-2"),
+                raiderId = RaiderId(102L),
                 guildId = GuildId("guild-1"),
                 reason = "Poor attendance record",
                 expiresAt = Instant.now().plusSeconds(86400 * 14),

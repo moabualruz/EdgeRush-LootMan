@@ -2,7 +2,7 @@ package com.edgerush.lootman.domain.attendance.repository
 
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecordId
-import com.edgerush.lootman.domain.attendance.model.GuildId
+import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import java.time.LocalDate
 

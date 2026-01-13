@@ -1,5 +1,7 @@
 package com.edgerush.lootman.domain.attendance.model
 
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
 import java.time.Instant
 import java.time.LocalDate
 

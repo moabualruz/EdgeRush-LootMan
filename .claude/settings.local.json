@@ -3,7 +3,26 @@
     "allow": [
       "Bash(./gradlew:*)",
       "Bash(tree:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(gradle test:*)",
+      "Bash(where:*)",
+      "Bash(cmd //c:*)",
+      "Bash(bash gradlew:*)",
+      "Bash(gradlew.bat test:*)",
+      "Bash(cmd.exe /c \"cd /d f:\\\\work\\\\dod\\\\looter && gradlew.bat :data-sync-service:test --tests \"\"com.edgerush.lootman.api.flps.FlpsControllerTest\"\" --tests \"\"com.edgerush.lootman.api.loot.LootControllerTest\"\" --tests \"\"com.edgerush.lootman.api.attendance.AttendanceControllerTest\"\" 2>&1\")",
+      "Bash(cmd.exe /c \"cd /d f:\\\\work\\\\dod\\\\looter && gradlew.bat :data-sync-service:test --tests \"\"com.edgerush.lootman.api.flps.FlpsControllerTest\"\" --tests \"\"com.edgerush.lootman.api.loot.LootControllerTest\"\" --tests \"\"com.edgerush.lootman.api.attendance.AttendanceControllerTest\"\" --no-daemon\")",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(./gradlew.bat compileTestKotlin:*)",
+      "Bash(/c/Users/mkh/.gradle/wrapper/dists/gradle-8.10.2-bin/*/gradle-8.10.2/bin/gradle.bat)",
+      "Bash(test --tests \"com.edgerush.lootman.application.flps.*\")",
+      "Bash(MSYS_NO_PATHCONV=1 bash gradlew test:*)",
+      "Bash(MSYS_NO_PATHCONV=1 bash gradlew clean test:*)"
     ]
   }
 }

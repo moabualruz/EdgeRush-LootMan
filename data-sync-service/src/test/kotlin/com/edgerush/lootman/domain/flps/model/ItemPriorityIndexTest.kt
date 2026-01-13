@@ -1,6 +1,7 @@
 package com.edgerush.lootman.domain.flps.model
 
 import com.edgerush.datasync.test.base.UnitTest
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -33,7 +34,7 @@ class ItemPriorityIndexTest : UnitTest() {
         // Assert
         // Default weights: upgrade=0.45, tier=0.35, role=0.20
         // (0.8 * 0.45) + (1.1 * 0.35) + (1.0 * 0.20) = 0.36 + 0.385 + 0.20 = 0.945
-        ipi.value shouldBe 0.945
+        ipi.value shouldBe (0.945 plusOrMinus 0.0001)
     }
 
     @Test
@@ -56,7 +57,7 @@ class ItemPriorityIndexTest : UnitTest() {
 
         // Assert
         // (0.8 * 0.5) + (1.1 * 0.3) + (1.0 * 0.2) = 0.4 + 0.33 + 0.2 = 0.93
-        ipi.value shouldBe 0.93
+        ipi.value shouldBe (0.93 plusOrMinus 0.0001)
     }
 
     @Test

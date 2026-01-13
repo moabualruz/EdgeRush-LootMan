@@ -2,8 +2,6 @@ package com.edgerush.lootman.performance
 
 import com.edgerush.datasync.test.base.IntegrationTest
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
-import com.edgerush.lootman.domain.attendance.model.GuildId as AttendanceGuildId
-import com.edgerush.lootman.domain.attendance.model.RaiderId as AttendanceRaiderId
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
 import com.edgerush.lootman.domain.flps.model.ExternalPreparationScore
@@ -28,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
 /**
@@ -50,7 +49,6 @@ class PerformanceTest : IntegrationTest() {
     private lateinit var attendanceRepository: AttendanceRepository
 
     private val testGuildId = GuildId(UUID.randomUUID().toString())
-    private val testAttendanceGuildId = AttendanceGuildId(testGuildId.value)
 
     @BeforeEach
     fun setupPerformanceTestData() {
@@ -63,7 +61,7 @@ class PerformanceTest : IntegrationTest() {
         val raiderCount = 30
         val raiders = (1..raiderCount).map { index ->
             RaiderData(
-                raiderId = RaiderId(UUID.randomUUID().toString()),
+                raiderId = RaiderId(index.toLong()),
                 acs = AttendanceCommitmentScore.of(0.85 + (index % 10) * 0.01),
                 mas = MechanicalAdherenceScore.of(0.80 + (index % 15) * 0.01),
                 eps = ExternalPreparationScore.of(0.90 + (index % 5) * 0.01),
@@ -120,7 +118,7 @@ class PerformanceTest : IntegrationTest() {
                     val lootAward =
                         LootAward.create(
                             itemId = ItemId(200000L + index),
-                            raiderId = RaiderId(UUID.randomUUID().toString()),
+                            raiderId = RaiderId(1000L + index),
                             guildId = testGuildId,
                             flpsScore = FlpsScore.of(0.75 + (index % 25) * 0.01),
                             tier = LootTier.HEROIC,
@@ -159,7 +157,7 @@ class PerformanceTest : IntegrationTest() {
         val creationTime =
             measureTimeMillis {
                 (1..raiderCount).forEach { raiderIndex ->
-                    val raiderId = AttendanceRaiderId(raiderIndex.toLong())
+                    val raiderId = RaiderId(raiderIndex.toLong())
 
                     // Create aggregated attendance record for the period
                     // Simulate 3 raids per week over 90 days
@@ -169,7 +167,7 @@ class PerformanceTest : IntegrationTest() {
                     val record =
                         AttendanceRecord.create(
                             raiderId = raiderId,
-                            guildId = testAttendanceGuildId,
+                            guildId = testGuildId,
                             instance = "Nerub-ar Palace",
                             encounter = null,
                             startDate = startDate,
@@ -185,7 +183,7 @@ class PerformanceTest : IntegrationTest() {
         // Act: Measure time to query attendance for 90-day range
         val executionTime =
             measureTimeMillis {
-                val records = attendanceRepository.findByGuildIdAndDateRange(testAttendanceGuildId, startDate, endDate)
+                val records = attendanceRepository.findByGuildIdAndDateRange(testGuildId, startDate, endDate)
                 assertTrue(records.isNotEmpty(), "Expected attendance records, got none")
             }
 
@@ -202,8 +200,8 @@ class PerformanceTest : IntegrationTest() {
         // Arrange: Prepare data for raid scheduling simulation
         val raiderCount = 30
         val raiders =
-            (1..raiderCount).map {
-                RaiderId(UUID.randomUUID().toString())
+            (1..raiderCount).map { index ->
+                RaiderId(2000L + index)
             }
 
         // Act: Measure time for typical raid scheduling operations

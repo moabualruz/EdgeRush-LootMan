@@ -49,7 +49,7 @@ class LootController(
         val command =
             AwardLootCommand(
                 itemId = ItemId(request.itemId),
-                raiderId = RaiderId(request.raiderId),
+                raiderId = RaiderId(request.raiderId.toLong()),
                 guildId = GuildId(request.guildId),
                 flpsScore = FlpsScore.of(request.flpsScore),
                 tier = LootTier.valueOf(request.tier),
@@ -95,7 +95,7 @@ class LootController(
     ): LootHistoryResponse {
         val query =
             com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery(
-                raiderId = RaiderId(raiderId),
+                raiderId = RaiderId(raiderId.toLong()),
                 activeOnly = activeOnly,
             )
         val result = getLootHistoryUseCase.getByRaider(query)
@@ -113,7 +113,7 @@ class LootController(
     ): ResponseEntity<LootBanDto> {
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId(request.raiderId),
+                raiderId = RaiderId(request.raiderId.toLong()),
                 guildId = GuildId(request.guildId),
                 reason = request.reason,
                 expiresAt = request.expiresAt,
@@ -160,7 +160,7 @@ class LootController(
     ): LootBansResponse {
         val query =
             com.edgerush.lootman.application.loot.GetActiveBansQuery(
-                raiderId = RaiderId(raiderId),
+                raiderId = RaiderId(raiderId.toLong()),
                 guildId = GuildId(guildId),
             )
         val result = manageLootBansUseCase.getActiveBans(query)

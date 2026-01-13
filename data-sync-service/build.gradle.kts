@@ -73,6 +73,17 @@ tasks.jacocoTestReport {
         html.required.set(true)
         csv.required.set(false)
     }
+    // Exclude main application class and generated code from coverage report
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/DataSyncApplication*",
+                    "**/DataSyncApplicationKt*",
+                )
+            }
+        })
+    )
 }
 
 tasks.jacocoTestCoverageVerification {

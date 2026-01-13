@@ -1,0 +1,25 @@
+# SOPS configuration for EdgeRush LootMan
+# Uses age encryption for local secrets management
+#
+# Setup:
+# 1. Install age: https://github.com/FiloSottile/age
+# 2. Install sops: https://github.com/getsops/sops
+# 3. Run: ./scripts/setup-secrets.sh
+# 4. Edit secrets: sops secrets/secrets.enc.yaml
+
+creation_rules:
+  # Encrypt all files matching this pattern with age
+  - path_regex: secrets/.*\.enc\.yaml$
+    age: >-
+      # This will be replaced with your actual age public key
+      # Run ./scripts/setup-secrets.sh to generate keys
+      age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  # Environment-specific secrets (future use)
+  - path_regex: secrets/.*\.prod\.enc\.yaml$
+    age: >-
+      age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  - path_regex: secrets/.*\.dev\.enc\.yaml$
+    age: >-
+      age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

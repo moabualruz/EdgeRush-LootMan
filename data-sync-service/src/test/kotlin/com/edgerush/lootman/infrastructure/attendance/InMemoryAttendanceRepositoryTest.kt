@@ -2,8 +2,8 @@ package com.edgerush.lootman.infrastructure.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
-import com.edgerush.lootman.domain.attendance.model.GuildId
-import com.edgerush.lootman.domain.attendance.model.RaiderId
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize

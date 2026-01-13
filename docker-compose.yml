@@ -22,6 +22,8 @@ services:
     working_dir: /home/gradle/project
     volumes:
       - ./:/home/gradle/project
+      - simc_profiles:/home/gradle/project/simc-profiles
+      - /var/run/docker.sock:/var/run/docker.sock  # For running SimC Docker from container
     depends_on:
       - postgres
     environment:
@@ -34,6 +36,10 @@ services:
       WOWAUDIT_GUILD_URI: ${WOWAUDIT_GUILD_URI}
       SYNC_RUN_ON_STARTUP: ${SYNC_RUN_ON_STARTUP:-false}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      # Simulation Configuration
+      SIMULATION_DOCKER_IMAGE: ${SIMULATION_DOCKER_IMAGE:-simulationcraftorg/simc}
+      SIMULATION_DOCKER_PROFILE_DIR: /home/gradle/project/simc-profiles
+      SIMULATION_DOCKER_TIMEOUT_MINUTES: ${SIMULATION_DOCKER_TIMEOUT_MINUTES:-30}
     ports:
       - "8080:8080"
 
@@ -49,4 +55,6 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  simc_profiles:
     driver: local

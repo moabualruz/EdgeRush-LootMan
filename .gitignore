@@ -22,6 +22,14 @@ tmp/
 .env.*
 !.env.example
 
+# Secrets management (SOPS + age)
+# Keep encrypted files, ignore unencrypted and keys
+secrets/*.yaml
+!secrets/*.enc.yaml
+secrets/*.template.yaml
+*.age
+keys.txt
+
 # Guild-provided exports (keep local only)
 wowaudit/
 build/

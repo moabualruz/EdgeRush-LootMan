@@ -33,7 +33,7 @@ data class FlpsCalculationResponse(
     companion object {
         fun from(result: FlpsCalculationResult): FlpsCalculationResponse {
             return FlpsCalculationResponse(
-                raiderId = result.raiderId.value,
+                raiderId = result.raiderId.value.toString(),
                 itemId = result.itemId.value,
                 components =
                     FlpsComponentsResponse(

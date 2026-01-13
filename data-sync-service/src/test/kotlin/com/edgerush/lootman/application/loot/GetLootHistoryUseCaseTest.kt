@@ -33,7 +33,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val award1 =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -41,7 +41,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val award2 =
             LootAward.create(
                 itemId = ItemId(12346),
-                raiderId = RaiderId("raider-2"),
+                raiderId = RaiderId(2L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.72),
                 tier = LootTier.HEROIC,
@@ -64,7 +64,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
     @Test
     fun `should get loot history by raider ID`() {
         // Given
-        val raiderId = RaiderId("raider-123")
+        val raiderId = RaiderId(123L)
         val query = GetLootHistoryByRaiderQuery(raiderId)
 
         val award1 =
@@ -120,7 +120,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
     @Test
     fun `should return empty list when no loot history exists for raider`() {
         // Given
-        val raiderId = RaiderId("raider-123")
+        val raiderId = RaiderId(123L)
         val query = GetLootHistoryByRaiderQuery(raiderId)
 
         every { lootAwardRepository.findByRaiderId(raiderId) } returns emptyList()
@@ -145,7 +145,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val activeAward =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -153,7 +153,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val revokedAward =
             LootAward.create(
                 itemId = ItemId(12346),
-                raiderId = RaiderId("raider-2"),
+                raiderId = RaiderId(2L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.72),
                 tier = LootTier.HEROIC,
@@ -182,7 +182,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val activeAward =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -190,7 +190,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
         val revokedAward =
             LootAward.create(
                 itemId = ItemId(12346),
-                raiderId = RaiderId("raider-2"),
+                raiderId = RaiderId(2L),
                 guildId = guildId,
                 flpsScore = FlpsScore.of(0.72),
                 tier = LootTier.HEROIC,
@@ -230,7 +230,7 @@ class GetLootHistoryUseCaseTest : UnitTest() {
     @Test
     fun `should handle repository errors when getting by raider`() {
         // Given
-        val raiderId = RaiderId("raider-123")
+        val raiderId = RaiderId(123L)
         val query = GetLootHistoryByRaiderQuery(raiderId)
 
         every { lootAwardRepository.findByRaiderId(raiderId) } throws RuntimeException("Database error")

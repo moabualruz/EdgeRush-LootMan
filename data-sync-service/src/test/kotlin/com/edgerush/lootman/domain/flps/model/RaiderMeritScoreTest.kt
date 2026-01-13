@@ -1,6 +1,7 @@
 package com.edgerush.lootman.domain.flps.model
 
 import com.edgerush.datasync.test.base.UnitTest
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -33,7 +34,7 @@ class RaiderMeritScoreTest : UnitTest() {
         // Assert
         // Default weights: attendance=0.4, mechanical=0.4, preparation=0.2
         // (0.9 * 0.4) + (0.8 * 0.4) + (0.7 * 0.2) = 0.36 + 0.32 + 0.14 = 0.82
-        rms.value shouldBe 0.82
+        rms.value shouldBe (0.82 plusOrMinus 0.0001)
     }
 
     @Test

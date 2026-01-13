@@ -1,6 +1,8 @@
 package com.edgerush.lootman.domain.attendance.model
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

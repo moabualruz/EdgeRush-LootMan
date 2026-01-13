@@ -30,7 +30,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
         // Given
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId("raider-123"),
+                raiderId = RaiderId(123L),
                 guildId = GuildId("guild-456"),
                 reason = "Missed raid without notice",
                 expiresAt = Instant.now().plusSeconds(604800), // 7 days
@@ -58,7 +58,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
         // Given
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId("raider-123"),
+                raiderId = RaiderId(123L),
                 guildId = GuildId("guild-456"),
                 reason = "Severe behavioral violation",
                 expiresAt = null, // Permanent
@@ -98,7 +98,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should get active bans for raider`() {
         // Given
-        val raiderId = RaiderId("raider-123")
+        val raiderId = RaiderId(123L)
         val guildId = GuildId("guild-456")
         val query = GetActiveBansQuery(raiderId, guildId)
 
@@ -134,7 +134,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
     @Test
     fun `should return empty list when no active bans exist`() {
         // Given
-        val raiderId = RaiderId("raider-123")
+        val raiderId = RaiderId(123L)
         val guildId = GuildId("guild-456")
         val query = GetActiveBansQuery(raiderId, guildId)
 
@@ -156,7 +156,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
         // Given
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId("raider-123"),
+                raiderId = RaiderId(123L),
                 guildId = GuildId("guild-456"),
                 reason = "Test reason",
                 expiresAt = Instant.now().plusSeconds(86400),
@@ -197,7 +197,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
         // Given
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId("raider-123"),
+                raiderId = RaiderId(123L),
                 guildId = GuildId("guild-456"),
                 reason = "",
                 expiresAt = Instant.now().plusSeconds(86400),
@@ -220,7 +220,7 @@ class ManageLootBansUseCaseTest : UnitTest() {
         // Given
         val command =
             CreateLootBanCommand(
-                raiderId = RaiderId("raider-123"),
+                raiderId = RaiderId(123L),
                 guildId = GuildId("guild-456"),
                 reason = "Test reason",
                 expiresAt = Instant.now().minusSeconds(86400), // Past

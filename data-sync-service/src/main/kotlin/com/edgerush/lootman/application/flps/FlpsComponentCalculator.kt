@@ -1,5 +1,6 @@
 package com.edgerush.lootman.application.flps
 
+import com.edgerush.lootman.application.simulation.UpgradeValueCalculator
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.flps.model.*
 import com.edgerush.lootman.domain.loot.model.LootAward
@@ -10,7 +11,8 @@ import com.edgerush.lootman.domain.shared.model.GearSet
 import com.edgerush.lootman.domain.shared.model.Role
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * Service to calculate individual FLPS components from raider data.
@@ -19,7 +21,9 @@ import java.time.LocalDateTime
  * into FLPS component scores (ACS, MAS, EPS, UV, TB, RM, RDF).
  */
 @Service
-class FlpsComponentCalculator {
+class FlpsComponentCalculator(
+    private val upgradeValueCalculator: UpgradeValueCalculator? = null
+) {
 
     /**
      * Calculate Attendance Commitment Score (ACS) from attendance records.
@@ -29,8 +33,8 @@ class FlpsComponentCalculator {
             return AttendanceCommitmentScore.of(0.0)
         }
 
-        val totalAttended = attendance.sumOf { it.attendedAmount }
-        val totalPossible = attendance.sumOf { it.totalAmount }
+        val totalAttended = attendance.sumOf { it.attendedRaids }
+        val totalPossible = attendance.sumOf { it.totalRaids }
 
         val percentage = if (totalPossible > 0) {
             totalAttended.toDouble() / totalPossible
@@ -64,6 +68,7 @@ class FlpsComponentCalculator {
 
     /**
      * Calculate Upgrade Value (UV) from wishlist data.
+     * This is the legacy method - prefer calculateUVWithSimulation when character context is available.
      */
     fun calculateUV(wishlist: Wishlist?, itemId: ItemId): UpgradeValue {
         val upgradePercentage = wishlist?.getUpgradePercentage(itemId) ?: 0.0
@@ -72,6 +77,58 @@ class FlpsComponentCalculator {
         val normalizedValue = (upgradePercentage / 100.0).coerceIn(0.0, 1.0)
 
         return UpgradeValue.of(normalizedValue)
+    }
+
+    /**
+     * Calculate Upgrade Value (UV) from simulation data with wishlist fallback.
+     *
+     * Priority:
+     * 1. Use SimulationCraft simulation results if available
+     * 2. Fall back to wishlist percentage if no simulation data
+     * 3. Return zero if no data available
+     *
+     * @param guildId The guild identifier
+     * @param characterName The character name
+     * @param characterRealm The realm name
+     * @param itemId The WoW item ID
+     * @param wishlist Optional wishlist for fallback
+     * @return The calculated UpgradeValue (0.0-1.0)
+     */
+    fun calculateUVWithSimulation(
+        guildId: String,
+        characterName: String,
+        characterRealm: String,
+        itemId: ItemId,
+        wishlist: Wishlist?
+    ): UpgradeValue {
+        // Use simulation-based calculator if available
+        if (upgradeValueCalculator != null) {
+            return upgradeValueCalculator.calculateUpgradeValue(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+                itemId = itemId,
+                wishlistFallback = wishlist
+            )
+        }
+
+        // Fall back to wishlist-only calculation
+        return calculateUV(wishlist, itemId)
+    }
+
+    /**
+     * Checks if simulation data is available for a character.
+     */
+    fun hasSimulationData(
+        guildId: String,
+        characterName: String,
+        characterRealm: String
+    ): Boolean {
+        return upgradeValueCalculator?.hasSimulationData(
+            guildId = guildId,
+            characterName = characterName,
+            characterRealm = characterRealm
+        ) ?: false
     }
 
     /**
@@ -122,24 +179,24 @@ class FlpsComponentCalculator {
             return RecencyDecayFactor.of(0.0)
         }
 
-        val now = LocalDateTime.now()
-        val twoWeeksAgo = now.minusWeeks(2)
-        val oneWeekAgo = now.minusWeeks(1)
+        val now = Instant.now()
+        val twoWeeksAgo = now.minus(14, ChronoUnit.DAYS)
+        val oneWeekAgo = now.minus(7, ChronoUnit.DAYS)
 
-        // Count recent A-tier and B-tier loot
-        val recentATier = lootHistory.count {
-            it.tier == LootTier.A && it.awardedAt.isAfter(twoWeeksAgo)
+        // Count recent Mythic and Heroic tier loot
+        val recentMythic = lootHistory.count {
+            it.tier == LootTier.MYTHIC && it.awardedAt.isAfter(twoWeeksAgo)
         }
 
-        val recentBTier = lootHistory.count {
-            it.tier == LootTier.B && it.awardedAt.isAfter(oneWeekAgo)
+        val recentHeroic = lootHistory.count {
+            it.tier == LootTier.HEROIC && it.awardedAt.isAfter(oneWeekAgo)
         }
 
         // Apply decay based on recent loot
         val decayValue = when {
-            recentATier > 0 -> 0.8  // 20% penalty for A-tier loot
-            recentBTier > 0 -> 0.9  // 10% penalty for B-tier loot
-            else -> 1.0             // No penalty
+            recentMythic > 0 -> 0.8  // 20% penalty for Mythic loot
+            recentHeroic > 0 -> 0.9  // 10% penalty for Heroic loot
+            else -> 1.0              // No penalty
         }
 
         return RecencyDecayFactor.of(decayValue)

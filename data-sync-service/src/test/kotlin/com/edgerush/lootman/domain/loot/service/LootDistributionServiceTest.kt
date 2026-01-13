@@ -23,7 +23,7 @@ class LootDistributionServiceTest : UnitTest() {
     @Test
     fun `should return true when raider has no active bans`() {
         // Arrange
-        val raiderId = RaiderId("raider-1")
+        val raiderId = RaiderId(1L)
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -36,7 +36,7 @@ class LootDistributionServiceTest : UnitTest() {
     @Test
     fun `should return false when raider has active ban`() {
         // Arrange
-        val raiderId = RaiderId("raider-1")
+        val raiderId = RaiderId(1L)
         val activeBan =
             LootBan(
                 id = LootBanId.generate(),
@@ -58,7 +58,7 @@ class LootDistributionServiceTest : UnitTest() {
     @Test
     fun `should return true when ban has expired`() {
         // Arrange
-        val raiderId = RaiderId("raider-1")
+        val raiderId = RaiderId(1L)
         val expiredBan =
             LootBan(
                 id = LootBanId.generate(),
@@ -97,7 +97,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(86400), // 1 day ago
                 flpsScore = FlpsScore.of(0.85),
@@ -119,7 +119,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(86400 * 20), // 20 days ago
                 flpsScore = FlpsScore.of(0.85),
@@ -155,7 +155,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(86400),
                 flpsScore = FlpsScore.of(0.85),
@@ -179,7 +179,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(86400),
                 flpsScore = FlpsScore.of(0.85),
@@ -189,7 +189,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12346),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(172800),
                 flpsScore = FlpsScore.of(0.85),
@@ -212,7 +212,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(3600), // 1 hour ago
                 flpsScore = FlpsScore.of(0.85),
@@ -233,7 +233,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(86400 * 10), // 10 days ago
                 flpsScore = FlpsScore.of(0.85),
@@ -254,7 +254,7 @@ class LootDistributionServiceTest : UnitTest() {
             LootAward(
                 id = LootAwardId.generate(),
                 itemId = ItemId(12345),
-                raiderId = RaiderId("raider-1"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("guild-1"),
                 awardedAt = Instant.now().minusSeconds(3600),
                 flpsScore = FlpsScore.of(0.85),

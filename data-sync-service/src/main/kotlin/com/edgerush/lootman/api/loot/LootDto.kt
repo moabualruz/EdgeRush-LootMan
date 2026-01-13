@@ -58,7 +58,7 @@ data class LootAwardDto(
             return LootAwardDto(
                 id = award.id.value,
                 itemId = award.itemId.value,
-                raiderId = award.raiderId.value,
+                raiderId = award.raiderId.value.toString(),
                 guildId = award.guildId.value,
                 awardedAt = award.awardedAt,
                 flpsScore = award.flpsScore.value,
@@ -100,7 +100,7 @@ data class LootBanDto(
         fun from(ban: LootBan): LootBanDto {
             return LootBanDto(
                 id = ban.id.value,
-                raiderId = ban.raiderId.value,
+                raiderId = ban.raiderId.value.toString(),
                 guildId = ban.guildId.value,
                 reason = ban.reason,
                 bannedAt = ban.bannedAt,

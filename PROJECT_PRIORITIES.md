@@ -14,36 +14,36 @@ The post-refactoring cleanup phase has been **successfully completed**, establis
 
 ## 🎯 Current Priority Order
 
-### PRIORITY 0: Improve Test Coverage (CURRENT FOCUS)
-**Timeline:** 2-3 weeks  
-**Status:** 🔄 In Progress  
-**Current Coverage:** 64% (Target: 85%)
+### PRIORITY 0: Achieve 100% Test Coverage (BLOCKING)
+**Timeline:** Until complete
+**Status:** 🔄 In Progress
+**Current Coverage:** 64% (Target: 100%)
 
-**Why This is Priority 0:**
-- Foundation is solid but test coverage below target
-- API controllers need integration tests
-- Security configuration needs verification
-- Quick wins available to reach 85% threshold
+**Why This is Priority 0 and BLOCKING:**
+- No new features until 100% test coverage achieved
+- Foundation must be rock-solid before proceeding
+- Every line of code must be verified
+- Prevents regressions and ensures reliability
 
 **Objectives:**
-1. Add API controller integration tests (FlpsController, LootController)
-2. Add domain shared model tests
-3. Add security configuration tests
-4. Reach 85% overall test coverage
+1. Achieve 100% coverage on Domain layer (current: 87.7%)
+2. Achieve 100% coverage on Application layer (current: 91.7%)
+3. Achieve 100% coverage on API layer (current: ~30%)
+4. Achieve 100% coverage on Infrastructure layer
+5. Achieve 100% overall test coverage
 
-**Key Deliverables:**
-- FlpsController integration tests (~10% coverage gain)
-- LootController integration tests (~10% coverage gain)
-- Domain shared model tests (~3% coverage gain)
-- Security configuration tests (~5% coverage gain)
-- Total estimated coverage: 87%
+**Coverage Gap Analysis:**
+- Domain layer: 87.7% → 100% (12.3% gap)
+- Application layer: 91.7% → 100% (8.3% gap)
+- API layer: ~30% → 100% (70% gap)
+- Infrastructure: ~40% → 100% (60% gap)
 
 **Next Steps:**
-1. Create integration tests for FlpsController
-2. Create integration tests for LootController
-3. Add unit tests for domain shared models
-4. Add security configuration tests
-5. Re-run coverage verification
+1. Run coverage report to identify all uncovered lines
+2. Systematically add tests for each uncovered class/method
+3. Prioritize by layer: Domain → Application → API → Infrastructure
+4. Re-run coverage after each batch of tests
+5. Do not proceed to any other priority until 100% achieved
 
 ---
 
@@ -257,13 +257,15 @@ The post-refactoring cleanup phase has been **successfully completed**, establis
 
 ## 🎯 Success Criteria
 
-### For Priority 0 (Test Coverage Improvement)
-- [ ] Overall test coverage ≥ 85%
-- [ ] API controller integration tests complete
-- [ ] Domain shared model tests complete
-- [ ] Security configuration tests complete
-- [ ] All tests passing (509+)
-- [ ] Coverage report generated and verified
+### For Priority 0 (100% Test Coverage - BLOCKING)
+
+- [ ] Overall test coverage = 100%
+- [ ] Domain layer coverage = 100%
+- [ ] Application layer coverage = 100%
+- [ ] API layer coverage = 100%
+- [ ] Infrastructure layer coverage = 100%
+- [ ] All tests passing
+- [ ] Coverage report verified
 
 ### For Priority 1 (GraphQL)
 - [ ] Complete schema covering all 45+ entities

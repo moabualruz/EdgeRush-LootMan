@@ -10,6 +10,7 @@ import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -33,7 +34,7 @@ class FlpsCalculationServiceTest : UnitTest() {
 
         // Assert
         // FLPS = (0.8 × 0.9) × 1.0 = 0.72
-        flps.value shouldBe 0.72
+        flps.value shouldBe (0.72 plusOrMinus 0.0001)
     }
 
     @Test
@@ -48,7 +49,7 @@ class FlpsCalculationServiceTest : UnitTest() {
 
         // Assert
         // FLPS = (0.8 × 0.9) × 0.85 = 0.612
-        flps.value shouldBe 0.612
+        flps.value shouldBe (0.612 plusOrMinus 0.0001)
     }
 
     @Test
@@ -126,6 +127,6 @@ class FlpsCalculationServiceTest : UnitTest() {
         // RMS = (0.9 * 0.4) + (0.8 * 0.4) + (0.7 * 0.2) = 0.82
         // IPI = (0.8 * 0.45) + (1.1 * 0.35) + (1.0 * 0.20) = 0.945
         // FLPS = (0.82 × 0.945) × 1.0 = 0.7749
-        flps.value shouldBe 0.7749
+        flps.value shouldBe (0.7749 plusOrMinus 0.0001)
     }
 }

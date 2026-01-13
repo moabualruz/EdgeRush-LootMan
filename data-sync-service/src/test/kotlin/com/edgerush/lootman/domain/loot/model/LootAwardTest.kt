@@ -16,7 +16,7 @@ class LootAwardTest : UnitTest() {
         val lootAward =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -34,7 +34,7 @@ class LootAwardTest : UnitTest() {
         val lootAward =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,
@@ -53,7 +53,7 @@ class LootAwardTest : UnitTest() {
         val lootAward =
             LootAward.create(
                 itemId = ItemId(12345),
-                raiderId = RaiderId("test-raider"),
+                raiderId = RaiderId(1L),
                 guildId = GuildId("test-guild"),
                 flpsScore = FlpsScore.of(0.85),
                 tier = LootTier.MYTHIC,

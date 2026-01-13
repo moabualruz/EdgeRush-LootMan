@@ -210,10 +210,13 @@ Example: V0018__add_warcraft_logs_config.sql
 ## Testing Standards
 
 ### Coverage Requirements
-- **Overall**: 85% minimum (current: 64%)
-- **Domain Layer**: 85%+ (current: 87.7%)
-- **Application Layer**: 85%+ (current: 91.7%)
-- **API Layer**: 80%+ (current: needs improvement)
+- **Overall**: 100% required (current: 64%)
+- **Domain Layer**: 100% (current: 87.7%)
+- **Application Layer**: 100% (current: 91.7%)
+- **API Layer**: 100% (current: needs improvement)
+- **Infrastructure Layer**: 100%
+
+**BLOCKING REQUIREMENT**: No new features until 100% test coverage achieved.
 
 ### Test Organization
 ```

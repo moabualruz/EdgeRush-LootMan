@@ -3,8 +3,8 @@ package com.edgerush.lootman.domain.attendance.service
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.model.AttendanceStats
-import com.edgerush.lootman.domain.attendance.model.GuildId
-import com.edgerush.lootman.domain.attendance.model.RaiderId
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.every
