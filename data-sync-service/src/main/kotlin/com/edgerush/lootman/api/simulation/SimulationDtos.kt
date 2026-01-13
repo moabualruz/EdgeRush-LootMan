@@ -3,18 +3,36 @@ package com.edgerush.lootman.api.simulation
 import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
 import java.time.Instant
 
 /**
  * Request body for submitting a new simulation.
  */
 data class SubmitSimulationRequest(
+    @field:NotBlank(message = "Character realm is required")
     val characterRealm: String,
+
+    @field:NotBlank(message = "Character class is required")
     val characterClass: String,
+
+    @field:NotBlank(message = "Character spec is required")
     val characterSpec: String,
+
+    @field:Min(value = 1, message = "Character level must be at least 1")
+    @field:Max(value = 80, message = "Character level cannot exceed 80")
     val characterLevel: Int? = null,
+
     val characterRace: String? = null,
+
+    @field:Min(value = 100, message = "Iterations must be at least 100")
+    @field:Max(value = 100000, message = "Iterations cannot exceed 100000")
     val iterations: Int? = null,
+
+    @field:Min(value = 60, message = "Fight length must be at least 60 seconds")
+    @field:Max(value = 1800, message = "Fight length cannot exceed 1800 seconds")
     val fightLengthSeconds: Int? = null
 )
 

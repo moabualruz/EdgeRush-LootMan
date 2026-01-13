@@ -1,16 +1,29 @@
 package com.edgerush.lootman.api.guild
 
 import com.edgerush.lootman.domain.guild.model.Guild
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 
 /**
  * Request DTO for creating a guild.
  */
 data class CreateGuildRequest(
+    @field:NotBlank(message = "Guild ID is required")
     val id: String,
+
+    @field:NotBlank(message = "Guild name is required")
+    @field:Size(min = 2, max = 24, message = "Guild name must be between 2 and 24 characters")
     val name: String,
+
+    @field:Size(max = 500, message = "Description cannot exceed 500 characters")
     val description: String? = null,
+
     val realm: String? = null,
+
+    @field:Pattern(regexp = "US|EU|KR|TW|CN", message = "Region must be one of: US, EU, KR, TW, CN")
     val region: String = "US",
+
     val syncEnabled: Boolean = true,
     val syncCronExpression: String = "0 0 4 * * *",
     val timezone: String = "UTC",

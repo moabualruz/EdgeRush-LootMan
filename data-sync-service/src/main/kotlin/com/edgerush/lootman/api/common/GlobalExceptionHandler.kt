@@ -1,5 +1,9 @@
 package com.edgerush.lootman.api.common
 
+import com.edgerush.lootman.domain.shared.GuildNotFoundException
+import com.edgerush.lootman.domain.shared.ItemNotFoundException
+import com.edgerush.lootman.domain.shared.LootBanActiveException
+import com.edgerush.lootman.domain.shared.RaiderNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -13,6 +17,74 @@ import org.springframework.web.bind.annotation.ResponseStatus
  */
 @ControllerAdvice(basePackages = ["com.edgerush.lootman.api"])
 class GlobalExceptionHandler {
+    /**
+     * Handle RaiderNotFoundException as 404 Not Found.
+     */
+    @ExceptionHandler(RaiderNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleRaiderNotFoundException(ex: RaiderNotFoundException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.NOT_FOUND.value(),
+                    error = "Not Found",
+                    message = ex.message ?: "Raider not found",
+                ),
+            )
+    }
+
+    /**
+     * Handle GuildNotFoundException as 404 Not Found.
+     */
+    @ExceptionHandler(GuildNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleGuildNotFoundException(ex: GuildNotFoundException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.NOT_FOUND.value(),
+                    error = "Not Found",
+                    message = ex.message ?: "Guild not found",
+                ),
+            )
+    }
+
+    /**
+     * Handle ItemNotFoundException as 404 Not Found.
+     */
+    @ExceptionHandler(ItemNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleItemNotFoundException(ex: ItemNotFoundException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.NOT_FOUND.value(),
+                    error = "Not Found",
+                    message = ex.message ?: "Item not found",
+                ),
+            )
+    }
+
+    /**
+     * Handle LootBanActiveException as 409 Conflict.
+     */
+    @ExceptionHandler(LootBanActiveException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun handleLootBanActiveException(ex: LootBanActiveException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.CONFLICT.value(),
+                    error = "Conflict",
+                    message = ex.message ?: "Raider has active loot bans",
+                ),
+            )
+    }
+
     /**
      * Handle IllegalArgumentException as 400 Bad Request.
      */

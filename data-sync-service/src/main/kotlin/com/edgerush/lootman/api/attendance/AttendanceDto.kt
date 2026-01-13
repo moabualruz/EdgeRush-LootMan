@@ -3,6 +3,9 @@ package com.edgerush.lootman.api.attendance
 import com.edgerush.lootman.application.attendance.AttendanceReport
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.model.AttendanceStats
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.Instant
 import java.time.LocalDate
 
@@ -10,13 +13,27 @@ import java.time.LocalDate
  * Request DTO for tracking attendance.
  */
 data class TrackAttendanceRequest(
+    @field:Min(value = 1, message = "Raider ID must be positive")
     val raiderId: Long,
+
+    @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
+
+    @field:NotBlank(message = "Instance is required")
     val instance: String,
+
     val encounter: String? = null,
+
+    @field:NotNull(message = "Start date is required")
     val startDate: LocalDate,
+
+    @field:NotNull(message = "End date is required")
     val endDate: LocalDate,
+
+    @field:Min(value = 0, message = "Attended raids must be non-negative")
     val attendedRaids: Int,
+
+    @field:Min(value = 1, message = "Total raids must be at least 1")
     val totalRaids: Int,
 )
 

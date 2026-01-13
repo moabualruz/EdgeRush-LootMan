@@ -2,12 +2,22 @@ package com.edgerush.lootman.api.gear
 
 import com.edgerush.lootman.domain.shared.model.GearItem
 import com.edgerush.lootman.domain.shared.model.GearSet
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.Size
 
 /**
  * Request to save gear for a raider.
  */
 data class SaveGearRequest(
+    @field:NotBlank(message = "Gear set type is required")
     val gearSetType: String,
+
+    @field:NotEmpty(message = "Gear set must contain at least one item")
+    @field:Valid
     val items: List<GearItemRequest>
 )
 
@@ -15,13 +25,28 @@ data class SaveGearRequest(
  * Request for a single gear item.
  */
 data class GearItemRequest(
+    @field:Min(value = 1, message = "Item ID must be positive")
     val itemId: Long,
+
+    @field:NotBlank(message = "Item name is required")
+    @field:Size(max = 100, message = "Item name cannot exceed 100 characters")
     val name: String,
+
+    @field:Min(value = 1, message = "Item level must be at least 1")
+    @field:Max(value = 1000, message = "Item level cannot exceed 1000")
     val itemLevel: Int,
+
+    @field:NotBlank(message = "Quality is required")
     val quality: String,
+
+    @field:NotBlank(message = "Slot is required")
     val slot: String,
+
     val isTierPiece: Boolean = false,
     val enchant: String? = null,
+
+    @field:Min(value = 0, message = "Sockets must be non-negative")
+    @field:Max(value = 3, message = "Sockets cannot exceed 3")
     val sockets: Int = 0
 )
 

@@ -2,16 +2,31 @@ package com.edgerush.lootman.api.loot
 
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootBan
+import jakarta.validation.constraints.DecimalMax
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import java.time.Instant
 
 /**
  * Request DTO for awarding loot.
  */
 data class AwardLootRequest(
+    @field:Min(value = 1, message = "Item ID must be positive")
     val itemId: Long,
+
+    @field:NotBlank(message = "Raider ID is required")
     val raiderId: String,
+
+    @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
+
+    @field:DecimalMin(value = "0.0", message = "FLPS score must be non-negative")
+    @field:DecimalMax(value = "1.0", message = "FLPS score cannot exceed 1.0")
     val flpsScore: Double,
+
+    @field:NotBlank(message = "Tier is required")
     val tier: String,
 )
 
@@ -19,9 +34,16 @@ data class AwardLootRequest(
  * Request DTO for creating a loot ban.
  */
 data class CreateLootBanRequest(
+    @field:NotBlank(message = "Raider ID is required")
     val raiderId: String,
+
+    @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
+
+    @field:NotBlank(message = "Reason is required")
+    @field:Size(min = 5, max = 500, message = "Reason must be between 5 and 500 characters")
     val reason: String,
+
     val expiresAt: Instant?,
 )
 
