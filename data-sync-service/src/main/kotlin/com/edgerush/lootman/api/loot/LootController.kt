@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.loot
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.loot.AwardLootCommand
 import com.edgerush.lootman.application.loot.AwardLootUseCase
 import com.edgerush.lootman.application.loot.CreateLootBanCommand
@@ -25,8 +27,11 @@ import com.edgerush.lootman.domain.loot.model.LootTier
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -58,6 +63,7 @@ class LootController(
     private val getLootBanUseCase: GetLootBanUseCase,
     private val updateLootBanUseCase: UpdateLootBanUseCase,
     private val paginationProperties: PaginationProperties,
+    private val currentUserService: CurrentUserService,
 ) {
     /**
      * Award loot to a raider.
@@ -84,6 +90,31 @@ class LootController(
             }.getOrElse { exception ->
                 throw exception
             }
+    }
+
+    /**
+     * Get loot history for the current authenticated user.
+     */
+    @GetMapping("/guilds/{guildId}/me/history")
+    @Operation(
+        summary = "Get my loot history",
+        description = "Returns loot history for the current user's primary linked character"
+    )
+    fun getMyLootHistory(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @RequestParam(defaultValue = "false") activeOnly: Boolean,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): LootHistoryResponse {
+        val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(user)
+        val query = com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery(
+            raiderId = raiderId,
+            activeOnly = activeOnly,
+        )
+        val result = getLootHistoryUseCase.getByRaider(query)
+        return result
+            .map { awards -> LootHistoryResponse.from(awards) }
+            .getOrThrow()
     }
 
     /**

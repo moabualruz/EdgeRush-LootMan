@@ -27,6 +27,7 @@ import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
 import com.edgerush.lootman.application.loot.PaginatedLootAwards
 import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
 import com.edgerush.lootman.application.loot.UpdateLootBanCommand
+import com.edgerush.lootman.api.auth.CurrentUserService
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -55,6 +56,7 @@ class LootControllerTest : UnitTest() {
     private lateinit var getLootBanUseCase: GetLootBanUseCase
     private lateinit var updateLootBanUseCase: UpdateLootBanUseCase
     private lateinit var paginationProperties: PaginationProperties
+    private lateinit var currentUserService: CurrentUserService
     private lateinit var controller: LootController
 
     @BeforeEach
@@ -68,6 +70,7 @@ class LootControllerTest : UnitTest() {
         getLootBanUseCase = mockk()
         updateLootBanUseCase = mockk()
         paginationProperties = PaginationProperties(defaultPageSize = 20, maxPageSize = 100)
+        currentUserService = mockk()
         controller = LootController(
             awardLootUseCase,
             getLootHistoryUseCase,
@@ -78,6 +81,7 @@ class LootControllerTest : UnitTest() {
             getLootBanUseCase,
             updateLootBanUseCase,
             paginationProperties,
+            currentUserService,
         )
     }
 

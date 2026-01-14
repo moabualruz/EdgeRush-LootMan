@@ -158,3 +158,47 @@ data class LeaderboardFilters(
     val characterClass: String?,
     val eligible: Boolean?,
 )
+
+/**
+ * Response DTO for personal FLPS score (current user's /me endpoint).
+ */
+data class PersonalFlpsResponse(
+    val raiderId: Long,
+    val raiderName: String,
+    val characterClass: String,
+    val role: String,
+    val flpsScore: Double,
+    val rank: Int,
+    val totalRaiders: Int,
+    val eligible: Boolean,
+    val breakdown: FlpsBreakdownResponse,
+)
+
+/**
+ * Detailed breakdown of FLPS score components.
+ */
+data class FlpsBreakdownResponse(
+    val rms: RmsBreakdownResponse,
+    val ipi: IpiBreakdownResponse,
+    val rdf: Double,
+)
+
+/**
+ * RMS (Raider Merit Score) breakdown for personal score.
+ */
+data class RmsBreakdownResponse(
+    val value: Double,
+    val acs: Double,
+    val mas: Double,
+    val eps: Double,
+)
+
+/**
+ * IPI (Item Priority Index) breakdown for personal score.
+ */
+data class IpiBreakdownResponse(
+    val value: Double,
+    val uv: Double,
+    val tierBonus: Double,
+    val roleMultiplier: Double,
+)

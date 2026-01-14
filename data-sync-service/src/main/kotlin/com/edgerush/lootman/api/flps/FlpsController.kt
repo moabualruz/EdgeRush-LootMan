@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.flps
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreCommand
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreUseCase
 import com.edgerush.lootman.application.flps.FlpsCalculationResult
@@ -10,9 +12,11 @@ import com.edgerush.lootman.application.flps.GetFlpsReportUseCase
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.RaiderId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -40,6 +44,7 @@ class FlpsController(
     private val flpsDataAssembler: FlpsDataAssemblerService,
     private val componentCalculator: FlpsComponentCalculator,
     private val configPreviewService: FlpsConfigPreviewService,
+    private val currentUserService: CurrentUserService,
 ) {
     /**
      * Get comprehensive FLPS report for a guild (legacy endpoint).
@@ -55,6 +60,29 @@ class FlpsController(
         @PathVariable guildId: String,
     ): List<ComprehensiveFlpsReportDto> {
         return getFlpsReportInternal(guildId)
+    }
+
+    /**
+     * Get FLPS score for the current authenticated user.
+     *
+     * Returns the FLPS score and breakdown for the user's primary linked character.
+     *
+     * @param guildId The guild identifier
+     * @param user The authenticated user (injected from security context)
+     * @return Personal FLPS score response
+     */
+    @GetMapping("/api/v1/flps/guilds/{guildId}/me")
+    @Operation(
+        summary = "Get my FLPS score",
+        description = "Returns the FLPS score for the current user's primary linked character"
+    )
+    fun getMyFlpsScore(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): PersonalFlpsResponse {
+        val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(user)
+        return calculateFlpsForRaider(guildId, raiderId)
     }
 
     /**
@@ -385,6 +413,85 @@ class FlpsController(
                     "V1 Guild Report" to "/api/v1/flps/guilds/{guildId}/report",
                     "V1 System Status" to "/api/v1/flps/status",
                 ),
+        )
+    }
+
+    /**
+     * Calculate FLPS for a specific raider and return personal response.
+     */
+    private fun calculateFlpsForRaider(guildId: String, raiderId: RaiderId): PersonalFlpsResponse {
+        // Fetch all raider data from database
+        val raiderDataList = flpsDataAssembler.assembleFlpsData(GuildId(guildId))
+        val exampleItemId = com.edgerush.lootman.domain.shared.ItemId(12345L)
+
+        // Find the specific raider
+        val raiderData = raiderDataList.find { it.raider.id == raiderId }
+            ?: throw IllegalArgumentException("Raider not found in guild: ${raiderId.value}")
+
+        // Calculate components
+        val acs = componentCalculator.calculateACS(raiderData.attendance)
+        val mas = componentCalculator.calculateMAS()
+        val eps = componentCalculator.calculateEPS(raiderData.gear)
+        val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
+        val tb = componentCalculator.calculateTierBonus(raiderData.gear)
+        val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
+        val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
+
+        val command = CalculateFlpsScoreCommand(
+            guildId = GuildId(guildId),
+            raiderId = raiderId,
+            itemId = exampleItemId,
+            acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf
+        )
+
+        val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
+
+        // Calculate all scores to determine rank
+        val allScores = raiderDataList.map { rd ->
+            val rdAcs = componentCalculator.calculateACS(rd.attendance)
+            val rdMas = componentCalculator.calculateMAS()
+            val rdEps = componentCalculator.calculateEPS(rd.gear)
+            val rdUv = componentCalculator.calculateUV(rd.wishlist, exampleItemId)
+            val rdTb = componentCalculator.calculateTierBonus(rd.gear)
+            val rdRm = componentCalculator.calculateRoleMultiplier(rd.raider.role)
+            val rdRdf = componentCalculator.calculateRDF(rd.lootHistory, rd.activeBans)
+
+            val rdCommand = CalculateFlpsScoreCommand(
+                guildId = GuildId(guildId),
+                raiderId = rd.raider.id,
+                itemId = exampleItemId,
+                acs = rdAcs, mas = rdMas, eps = rdEps, uv = rdUv, tb = rdTb, rm = rdRm, rdf = rdRdf
+            )
+
+            rd.raider.id to calculateFlpsScoreUseCase.execute(rdCommand).getOrThrow().flps.value
+        }.sortedByDescending { it.second }
+
+        val rank = allScores.indexOfFirst { it.first == raiderId } + 1
+
+        return PersonalFlpsResponse(
+            raiderId = raiderId.value,
+            raiderName = raiderData.raider.characterName,
+            characterClass = raiderData.raider.characterClass.name,
+            role = raiderData.raider.role.name,
+            flpsScore = result.flps.value,
+            rank = rank,
+            totalRaiders = allScores.size,
+            eligible = result.eligible,
+            breakdown = FlpsBreakdownResponse(
+                rms = RmsBreakdownResponse(
+                    value = result.rms.value,
+                    acs = acs.value,
+                    mas = mas.value,
+                    eps = eps.value,
+                ),
+                ipi = IpiBreakdownResponse(
+                    value = result.ipi.value,
+                    uv = uv.value,
+                    tierBonus = tb.value,
+                    roleMultiplier = rm.value,
+                ),
+                rdf = rdf.value,
+            ),
         )
     }
 }

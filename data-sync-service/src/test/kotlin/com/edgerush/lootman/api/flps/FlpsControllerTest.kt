@@ -25,6 +25,7 @@ import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.Raider
 import com.edgerush.lootman.domain.shared.model.Role
+import com.edgerush.lootman.api.auth.CurrentUserService
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -46,6 +47,7 @@ class FlpsControllerTest : UnitTest() {
     private lateinit var flpsDataAssembler: FlpsDataAssemblerService
     private lateinit var componentCalculator: FlpsComponentCalculator
     private lateinit var configPreviewService: FlpsConfigPreviewService
+    private lateinit var currentUserService: CurrentUserService
     private lateinit var controller: FlpsController
 
     @BeforeEach
@@ -55,12 +57,14 @@ class FlpsControllerTest : UnitTest() {
         flpsDataAssembler = mockk()
         componentCalculator = mockk()
         configPreviewService = mockk()
+        currentUserService = mockk()
         controller = FlpsController(
             calculateFlpsScoreUseCase,
             getFlpsReportUseCase,
             flpsDataAssembler,
             componentCalculator,
             configPreviewService,
+            currentUserService,
         )
     }
 
