@@ -219,6 +219,121 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
     }
 
     @Nested
+    inner class FindByGuildIdPaginatedTests {
+        @Test
+        fun `should return paginated results with offset and limit`() {
+            // Arrange
+            val guildId = GuildId("test-guild")
+            val raiders = (1..10).map { index ->
+                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+            }
+            raiders.forEach { repository.save(it) }
+
+            // Act
+            val results = repository.findByGuildId(guildId, offset = 2, limit = 3)
+
+            // Assert
+            results shouldHaveSize 3
+        }
+
+        @Test
+        fun `should return empty list when offset exceeds total count`() {
+            // Arrange
+            val guildId = GuildId("test-guild")
+            val raider = createRaider(guildId = guildId)
+            repository.save(raider)
+
+            // Act
+            val results = repository.findByGuildId(guildId, offset = 10, limit = 5)
+
+            // Assert
+            results.shouldBeEmpty()
+        }
+
+        @Test
+        fun `should return remaining items when limit exceeds available`() {
+            // Arrange
+            val guildId = GuildId("test-guild")
+            val raiders = (1..5).map { index ->
+                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+            }
+            raiders.forEach { repository.save(it) }
+
+            // Act
+            val results = repository.findByGuildId(guildId, offset = 3, limit = 10)
+
+            // Assert
+            results shouldHaveSize 2
+        }
+
+        @Test
+        fun `should return empty list when guild has no raiders`() {
+            // Arrange
+            val guildId = GuildId("empty-guild")
+
+            // Act
+            val results = repository.findByGuildId(guildId, offset = 0, limit = 10)
+
+            // Assert
+            results.shouldBeEmpty()
+        }
+    }
+
+    @Nested
+    inner class CountByGuildIdTests {
+        @Test
+        fun `should return correct count for guild with raiders`() {
+            // Arrange
+            val guildId = GuildId("test-guild")
+            val raiders = (1..5).map { index ->
+                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+            }
+            raiders.forEach { repository.save(it) }
+
+            // Act
+            val count = repository.countByGuildId(guildId)
+
+            // Assert
+            count shouldBe 5L
+        }
+
+        @Test
+        fun `should return zero for guild with no raiders`() {
+            // Arrange
+            val guildId = GuildId("empty-guild")
+
+            // Act
+            val count = repository.countByGuildId(guildId)
+
+            // Assert
+            count shouldBe 0L
+        }
+
+        @Test
+        fun `should only count raiders for specific guild`() {
+            // Arrange
+            val guild1 = GuildId("guild-1")
+            val guild2 = GuildId("guild-2")
+            val raiders1 = (1..3).map { index ->
+                createRaider(id = RaiderId(index.toLong()), guildId = guild1, characterName = "G1Raider$index")
+            }
+            val raiders2 = (4..6).map { index ->
+                createRaider(id = RaiderId(index.toLong()), guildId = guild2, characterName = "G2Raider$index")
+            }
+            raiders1.forEach { repository.save(it) }
+            raiders2.forEach { repository.save(it) }
+
+            // Act
+            val count1 = repository.countByGuildId(guild1)
+            val count2 = repository.countByGuildId(guild2)
+
+            // Assert
+            count1 shouldBe 3L
+            count2 shouldBe 3L
+        }
+    }
+
+    @Nested
     inner class FindByCharacterNameAndRealmTests {
         @Test
         fun `should return raider when found by name and realm`() {

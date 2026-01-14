@@ -30,7 +30,10 @@ import java.time.Instant
 class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var repository: SimulationRepository
+    private lateinit var jdbcSimulationRepository: JdbcSimulationRepository
+
+    private val repository: SimulationRepository
+        get() = jdbcSimulationRepository
 
     private fun createProfile(
         guildId: String = "guild-123",
@@ -235,6 +238,98 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
             // Then
             val found = repository.findRequestById(saved.id!!)
             found?.status shouldBe SimulationStatus.RUNNING
+        }
+
+        @Test
+        fun `should retrieve request with RUNNING status`() {
+            // Given
+            val profile = createProfile(characterName = "RunningStatus")
+            repository.saveProfile(profile)
+            val request = SimulationRequest.create(profile = profile)
+            val saved = repository.saveRequest(request)
+            val running = saved.markRunning()
+            repository.saveRequest(running)
+
+            // When
+            val found = repository.findRequestById(saved.id!!)
+
+            // Then
+            found shouldNotBe null
+            found?.status shouldBe SimulationStatus.RUNNING
+            found?.profile?.characterName shouldBe "RunningStatus"
+        }
+
+        @Test
+        fun `should retrieve request with COMPLETED status`() {
+            // Given
+            val profile = createProfile(characterName = "CompletedStatus")
+            repository.saveProfile(profile)
+            val request = SimulationRequest.create(profile = profile)
+            val saved = repository.saveRequest(request)
+            val running = saved.markRunning()
+            val completed = running.markCompleted(emptyList())
+            repository.saveRequest(completed)
+
+            // When
+            val found = repository.findRequestById(saved.id!!)
+
+            // Then
+            found shouldNotBe null
+            found?.status shouldBe SimulationStatus.COMPLETED
+            found?.completedAt shouldNotBe null
+        }
+
+        @Test
+        fun `should retrieve request with FAILED status and error message`() {
+            // Given
+            val profile = createProfile(characterName = "FailedStatus")
+            repository.saveProfile(profile)
+            val request = SimulationRequest.create(profile = profile)
+            val saved = repository.saveRequest(request)
+            val running = saved.markRunning()
+            val failed = running.markFailed("Simulation timed out")
+            repository.saveRequest(failed)
+
+            // When
+            val found = repository.findRequestById(saved.id!!)
+
+            // Then
+            found shouldNotBe null
+            found?.status shouldBe SimulationStatus.FAILED
+            found?.errorMessage shouldBe "Simulation timed out"
+        }
+
+        @Test
+        fun `should retrieve PENDING request via findPendingRequests`() {
+            // Given
+            val profile = createProfile(characterName = "PendingViaFind")
+            repository.saveProfile(profile)
+            val request = SimulationRequest.create(
+                profile = profile,
+                iterations = 5000,
+                fightLengthSeconds = 180
+            )
+            repository.saveRequest(request)
+
+            // When
+            val pendingList = repository.findPendingRequests()
+
+            // Then
+            pendingList.isNotEmpty() shouldBe true
+            val found = pendingList.find { it.profile.characterName == "PendingViaFind" }
+            found shouldNotBe null
+            found?.status shouldBe SimulationStatus.PENDING
+            found?.iterations shouldBe 5000
+            found?.fightLengthSeconds shouldBe 180
+        }
+
+        @Test
+        fun `should return null when request not found`() {
+            // When
+            val found = repository.findRequestById(999999L)
+
+            // Then
+            found shouldBe null
         }
     }
 

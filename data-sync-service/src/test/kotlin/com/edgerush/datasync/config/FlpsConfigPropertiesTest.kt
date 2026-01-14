@@ -2,6 +2,7 @@ package com.edgerush.datasync.config
 
 import com.edgerush.datasync.test.base.UnitTest
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Test
 
 /**
@@ -209,5 +210,183 @@ class FlpsConfigPropertiesTest : UnitTest() {
         // Assert
         copied.recencyDecayDays shouldBe 7
         copied.eligibilityAttendance shouldBe 0.8
+    }
+
+    @Test
+    fun `RmsWeights data class should support equals and hashCode`() {
+        // Arrange
+        val weights1 = FlpsConfigProperties.RmsWeights(0.45, 0.35, 0.20)
+        val weights2 = FlpsConfigProperties.RmsWeights(0.45, 0.35, 0.20)
+        val weights3 = FlpsConfigProperties.RmsWeights(0.50, 0.30, 0.20)
+
+        // Assert
+        (weights1 == weights2) shouldBe true
+        (weights1 == weights3) shouldBe false
+        weights1.hashCode() shouldBe weights2.hashCode()
+    }
+
+    @Test
+    fun `RmsWeights data class should support toString`() {
+        // Arrange
+        val weights = FlpsConfigProperties.RmsWeights()
+
+        // Act
+        val string = weights.toString()
+
+        // Assert
+        string shouldContain "attendance=0.45"
+        string shouldContain "mechanical=0.35"
+        string shouldContain "preparation=0.2"
+    }
+
+    @Test
+    fun `IpiWeights data class should support equals and hashCode`() {
+        // Arrange
+        val weights1 = FlpsConfigProperties.IpiWeights(0.45, 0.35, 0.20)
+        val weights2 = FlpsConfigProperties.IpiWeights(0.45, 0.35, 0.20)
+        val weights3 = FlpsConfigProperties.IpiWeights(0.50, 0.30, 0.20)
+
+        // Assert
+        (weights1 == weights2) shouldBe true
+        (weights1 == weights3) shouldBe false
+        weights1.hashCode() shouldBe weights2.hashCode()
+    }
+
+    @Test
+    fun `IpiWeights data class should support toString`() {
+        // Arrange
+        val weights = FlpsConfigProperties.IpiWeights()
+
+        // Act
+        val string = weights.toString()
+
+        // Assert
+        string shouldContain "upgradeValue=0.45"
+        string shouldContain "tierBonus=0.35"
+        string shouldContain "roleMultiplier=0.2"
+    }
+
+    @Test
+    fun `RoleMultipliers data class should support equals and hashCode`() {
+        // Arrange
+        val multipliers1 = FlpsConfigProperties.RoleMultipliers(1.2, 1.1, 1.0)
+        val multipliers2 = FlpsConfigProperties.RoleMultipliers(1.2, 1.1, 1.0)
+        val multipliers3 = FlpsConfigProperties.RoleMultipliers(1.5, 1.3, 1.0)
+
+        // Assert
+        (multipliers1 == multipliers2) shouldBe true
+        (multipliers1 == multipliers3) shouldBe false
+        multipliers1.hashCode() shouldBe multipliers2.hashCode()
+    }
+
+    @Test
+    fun `RoleMultipliers data class should support toString`() {
+        // Arrange
+        val multipliers = FlpsConfigProperties.RoleMultipliers()
+
+        // Act
+        val string = multipliers.toString()
+
+        // Assert
+        string shouldContain "tank=1.2"
+        string shouldContain "healer=1.1"
+        string shouldContain "dps=1.0"
+    }
+
+    @Test
+    fun `Thresholds data class should support equals and hashCode`() {
+        // Arrange
+        val thresholds1 = FlpsConfigProperties.Thresholds(0.8, 0.0, 30, 1.0, 0.0, 1.0)
+        val thresholds2 = FlpsConfigProperties.Thresholds(0.8, 0.0, 30, 1.0, 0.0, 1.0)
+        val thresholds3 = FlpsConfigProperties.Thresholds(0.9, 0.5, 14, 0.8, 0.2, 0.9)
+
+        // Assert
+        (thresholds1 == thresholds2) shouldBe true
+        (thresholds1 == thresholds3) shouldBe false
+        thresholds1.hashCode() shouldBe thresholds2.hashCode()
+    }
+
+    @Test
+    fun `Thresholds data class should support toString`() {
+        // Arrange
+        val thresholds = FlpsConfigProperties.Thresholds()
+
+        // Act
+        val string = thresholds.toString()
+
+        // Assert
+        string shouldContain "eligibilityAttendance=0.8"
+        string shouldContain "recencyDecayDays=30"
+    }
+
+    // Tests for setters (used by Spring Boot configuration binding)
+    @Test
+    fun `Thresholds should support property setters`() {
+        // Arrange
+        val thresholds = FlpsConfigProperties.Thresholds()
+
+        // Act
+        thresholds.eligibilityAttendance = 0.9
+        thresholds.eligibilityActivity = 0.5
+        thresholds.recencyDecayDays = 14
+        thresholds.maxAttendanceBonus = 0.8
+        thresholds.minMechanicalScore = 0.2
+        thresholds.maxPreparationScore = 0.9
+
+        // Assert
+        thresholds.eligibilityAttendance shouldBe 0.9
+        thresholds.eligibilityActivity shouldBe 0.5
+        thresholds.recencyDecayDays shouldBe 14
+        thresholds.maxAttendanceBonus shouldBe 0.8
+        thresholds.minMechanicalScore shouldBe 0.2
+        thresholds.maxPreparationScore shouldBe 0.9
+    }
+
+    @Test
+    fun `RmsWeights should support property setters`() {
+        // Arrange
+        val weights = FlpsConfigProperties.RmsWeights()
+
+        // Act
+        weights.attendance = 0.5
+        weights.mechanical = 0.3
+        weights.preparation = 0.2
+
+        // Assert
+        weights.attendance shouldBe 0.5
+        weights.mechanical shouldBe 0.3
+        weights.preparation shouldBe 0.2
+    }
+
+    @Test
+    fun `IpiWeights should support property setters`() {
+        // Arrange
+        val weights = FlpsConfigProperties.IpiWeights()
+
+        // Act
+        weights.upgradeValue = 0.5
+        weights.tierBonus = 0.3
+        weights.roleMultiplier = 0.2
+
+        // Assert
+        weights.upgradeValue shouldBe 0.5
+        weights.tierBonus shouldBe 0.3
+        weights.roleMultiplier shouldBe 0.2
+    }
+
+    @Test
+    fun `RoleMultipliers should support property setters`() {
+        // Arrange
+        val multipliers = FlpsConfigProperties.RoleMultipliers()
+
+        // Act
+        multipliers.tank = 1.5
+        multipliers.healer = 1.3
+        multipliers.dps = 1.0
+
+        // Assert
+        multipliers.tank shouldBe 1.5
+        multipliers.healer shouldBe 1.3
+        multipliers.dps shouldBe 1.0
     }
 }

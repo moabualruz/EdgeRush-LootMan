@@ -231,6 +231,67 @@ class ProfileGeneratorServiceTest : UnitTest() {
     }
 
     @Nested
+    inner class GenerateMinimalProfile {
+        @Test
+        fun `should generate minimal profile with just basic info`() {
+            // Arrange
+            val characterName = "Minimal"
+            val characterClass = "mage"
+            val characterSpec = "fire"
+
+            // Act
+            val profile = generator.generateMinimalProfile(
+                characterName = characterName,
+                characterClass = characterClass,
+                characterSpec = characterSpec
+            )
+
+            // Assert
+            profile shouldContain """$characterClass="$characterName""""
+            profile shouldContain "level=80"
+            profile shouldContain "race=human"
+            profile shouldContain "spec=$characterSpec"
+        }
+
+        @Test
+        fun `should lowercase spec in minimal profile`() {
+            // Act
+            val profile = generator.generateMinimalProfile(
+                characterName = "Test",
+                characterClass = "warrior",
+                characterSpec = "FURY"
+            )
+
+            // Assert
+            profile shouldContain "spec=fury"
+        }
+    }
+
+    @Nested
+    inner class EmptyGearHandling {
+        @Test
+        fun `should exclude gear section when gear set is empty`() {
+            // Arrange
+            val emptyGear = createGearSet(emptyMap())
+
+            // Act
+            val profile = generator.generateProfile(
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                characterClass = "warrior",
+                characterSpec = "fury",
+                characterLevel = 80,
+                characterRace = "human",
+                gear = emptyGear
+            )
+
+            // Assert
+            profile shouldNotContain "# Gear"
+            profile shouldNotContain "head="
+        }
+    }
+
+    @Nested
     inner class ProfileValidation {
         @Test
         fun `generated profile should be valid simc syntax`() {

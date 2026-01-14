@@ -273,6 +273,199 @@ class GuildUseCasesTest : UnitTest() {
             updatedGuild.settings.customBenchmarkRms shouldBe 0.95
             updatedGuild.settings.customBenchmarkIpi shouldBe 0.90
         }
+
+        @Test
+        fun `should fail with invalid region on update`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"))
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = null,
+                region = "INVALID_REGION",
+                syncEnabled = null,
+                syncCronExpression = null,
+                timezone = null,
+                benchmarkMode = null,
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = null
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<IllegalArgumentException>()
+            result.exceptionOrNull()?.message shouldBe "Invalid region: INVALID_REGION"
+
+            verify(exactly = 0) { guildRepository.save(any()) }
+        }
+
+        @Test
+        fun `should fail with invalid benchmark mode on update`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"))
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = null,
+                region = null,
+                syncEnabled = null,
+                syncCronExpression = null,
+                timezone = null,
+                benchmarkMode = "INVALID_MODE",
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = null
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<IllegalArgumentException>()
+            result.exceptionOrNull()?.message shouldBe "Invalid benchmark mode: INVALID_MODE"
+
+            verify(exactly = 0) { guildRepository.save(any()) }
+        }
+
+        @Test
+        fun `should update region`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"), region = Region.US)
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = null,
+                region = "EU",
+                syncEnabled = null,
+                syncCronExpression = null,
+                timezone = null,
+                benchmarkMode = null,
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = null
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+            val savedGuildSlot = slot<Guild>()
+            every { guildRepository.save(capture(savedGuildSlot)) } answers { savedGuildSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedGuild = result.getOrThrow()
+            updatedGuild.region shouldBe Region.EU
+        }
+
+        @Test
+        fun `should update realm`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"), realm = "Old Realm")
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = "New Realm",
+                region = null,
+                syncEnabled = null,
+                syncCronExpression = null,
+                timezone = null,
+                benchmarkMode = null,
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = null
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+            val savedGuildSlot = slot<Guild>()
+            every { guildRepository.save(capture(savedGuildSlot)) } answers { savedGuildSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedGuild = result.getOrThrow()
+            updatedGuild.realm shouldBe "New Realm"
+        }
+
+        @Test
+        fun `should update isActive flag`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"), isActive = true)
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = null,
+                region = null,
+                syncEnabled = null,
+                syncCronExpression = null,
+                timezone = null,
+                benchmarkMode = null,
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = false
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+            val savedGuildSlot = slot<Guild>()
+            every { guildRepository.save(capture(savedGuildSlot)) } answers { savedGuildSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedGuild = result.getOrThrow()
+            updatedGuild.isActive shouldBe false
+        }
+
+        @Test
+        fun `should update sync cron expression and timezone`() {
+            // Given
+            val existingGuild = createGuild(id = GuildId("test-guild"))
+            val command = UpdateGuildCommand(
+                id = "test-guild",
+                name = null,
+                description = null,
+                realm = null,
+                region = null,
+                syncEnabled = null,
+                syncCronExpression = "0 0 6 * * *",
+                timezone = "America/New_York",
+                benchmarkMode = null,
+                customBenchmarkRms = null,
+                customBenchmarkIpi = null,
+                isActive = null
+            )
+
+            every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
+            val savedGuildSlot = slot<Guild>()
+            every { guildRepository.save(capture(savedGuildSlot)) } answers { savedGuildSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedGuild = result.getOrThrow()
+            updatedGuild.settings.syncCronExpression shouldBe "0 0 6 * * *"
+            updatedGuild.settings.timezone shouldBe "America/New_York"
+        }
     }
 
     @Nested
@@ -420,6 +613,19 @@ class GuildUseCasesTest : UnitTest() {
 
             // When
             val result = useCase.execute()
+
+            // Then
+            result.isSuccess shouldBe true
+            result.getOrThrow().size shouldBe 0
+        }
+
+        @Test
+        fun `should return empty list when no active guilds exist`() {
+            // Given
+            every { guildRepository.findAllActive() } returns emptyList()
+
+            // When
+            val result = useCase.executeActiveOnly()
 
             // Then
             result.isSuccess shouldBe true

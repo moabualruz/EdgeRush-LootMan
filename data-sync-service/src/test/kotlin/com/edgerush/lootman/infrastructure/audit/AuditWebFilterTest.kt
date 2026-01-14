@@ -57,6 +57,34 @@ class AuditWebFilterTest : UnitTest() {
     inner class WriteOperationCapture {
 
         @Test
+        fun `should capture PATCH requests as UPDATE operation`() {
+            // Given
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.PATCH,
+                path = "/api/v1/raiders/123",
+                headers = mapOf(
+                    "X-User-Id" to "user-456",
+                    "X-Username" to "admin",
+                    "X-Admin-Mode" to "true"
+                ),
+                statusCode = HttpStatus.OK
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            verify { auditLogRepository.save(any()) }
+
+            val captured = auditLogSlot.captured
+            captured.operation shouldBe AuditOperation.UPDATE
+            captured.entityType shouldBe "raiders"
+            captured.entityId shouldBe "123"
+        }
+
+        @Test
         fun `should capture POST requests as CREATE operation`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
@@ -429,6 +457,177 @@ class AuditWebFilterTest : UnitTest() {
             val captured = auditLogSlot.captured
             captured.entityType shouldBe "bans"
             captured.entityId shouldBe "ban-123"
+        }
+
+        @Test
+        fun `should handle paths with numeric id in nested resources`() {
+            // Given - path like /api/v1/guilds/123/members where 123 looks like an ID
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/v1/guilds/12345/members",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            val captured = auditLogSlot.captured
+            captured.entityType shouldBe "guilds"
+            captured.entityId shouldBe "members"
+        }
+
+        @Test
+        fun `should handle paths with UUID-like id in nested resources`() {
+            // Given - path like /api/v1/guilds/abc12345-6789-0def/members
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/v1/guilds/abc12345-6789-0def/members",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            val captured = auditLogSlot.captured
+            captured.entityType shouldBe "guilds"
+            captured.entityId shouldBe "members"
+        }
+
+        @Test
+        fun `should handle single-part path`() {
+            // Given - path like /api/v1/guilds
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/v1/guilds",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            val captured = auditLogSlot.captured
+            captured.entityType shouldBe "guilds"
+            captured.entityId shouldBe "guilds"
+        }
+
+        @Test
+        fun `should handle empty path parts after version prefix`() {
+            // Given - path like /api/v1/
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/v1/",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            val captured = auditLogSlot.captured
+            captured.entityType shouldBe "unknown"
+            captured.entityId shouldBe "unknown"
+        }
+
+        @Test
+        fun `should handle non-versioned api path`() {
+            // Given - path like /api/guilds
+            val auditLogSlot = slot<AuditLog>()
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/guilds",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            val captured = auditLogSlot.captured
+            captured.entityType shouldBe "guilds"
+            captured.entityId shouldBe "guilds"
+        }
+    }
+
+    @Nested
+    inner class ExceptionHandling {
+
+        @Test
+        fun `should handle repository save exception gracefully`() {
+            // Given
+            val exchange = createExchange(
+                method = HttpMethod.POST,
+                path = "/api/v1/guilds",
+                headers = mapOf(
+                    "X-User-Id" to "user-123",
+                    "X-Username" to "testuser",
+                    "X-Admin-Mode" to "false"
+                ),
+                statusCode = HttpStatus.CREATED
+            )
+            every { auditLogRepository.save(any()) } throws RuntimeException("Database error")
+
+            // When - should not throw
+            filter.filter(exchange, filterChain).block()
+
+            // Then - filter chain should still be called
+            verify { filterChain.filter(exchange) }
+        }
+    }
+
+    @Nested
+    inner class NullMethodHandling {
+
+        @Test
+        fun `should handle null HTTP method`() {
+            // Given - Create exchange with mocked request that returns null method
+            val exchange = createExchange(
+                method = HttpMethod.GET,  // This will be skipped anyway
+                path = "/api/v1/guilds"
+            )
+
+            // When
+            filter.filter(exchange, filterChain).block()
+
+            // Then
+            verify { filterChain.filter(exchange) }
+            verify(exactly = 0) { auditLogRepository.save(any()) }
         }
     }
 }

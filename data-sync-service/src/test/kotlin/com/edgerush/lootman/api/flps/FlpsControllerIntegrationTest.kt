@@ -87,22 +87,3 @@ class FlpsControllerIntegrationTest : IntegrationTest() {
         assert(body.contains("\"flpsScore\"") || body.contains("[]"))
     }
 }
-
-// DTOs for testing
-data class ComprehensiveFlpsReportDto(
-    val raiderId: String,
-    val raiderName: String,
-    val flpsScore: Double,
-    val eligible: Boolean,
-)
-
-data class PerfectScoreBenchmarkDto(
-    val theoretical: Double,
-    val topPerformer: Double,
-)
-
-data class FlpsDataStatusDto(
-    val message: String,
-    val features: List<String>,
-    val endpoints: Map<String, String>,
-)

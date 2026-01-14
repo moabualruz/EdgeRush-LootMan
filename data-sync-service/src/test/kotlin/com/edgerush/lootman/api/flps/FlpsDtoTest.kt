@@ -75,6 +75,54 @@ class FlpsDtoTest : UnitTest() {
             copy.flpsScore shouldBe 0.75
             copy.eligible shouldBe original.eligible
         }
+
+        @Test
+        fun `should have correct equals and hashCode`() {
+            // Given
+            val dto1 = ComprehensiveFlpsReportDto(
+                raiderId = "raider-1",
+                raiderName = "Raider",
+                flpsScore = 0.8,
+                eligible = true,
+            )
+            val dto2 = ComprehensiveFlpsReportDto(
+                raiderId = "raider-1",
+                raiderName = "Raider",
+                flpsScore = 0.8,
+                eligible = true,
+            )
+            val dto3 = ComprehensiveFlpsReportDto(
+                raiderId = "raider-2",
+                raiderName = "Other",
+                flpsScore = 0.5,
+                eligible = false,
+            )
+
+            // Then
+            (dto1 == dto2) shouldBe true
+            dto1.hashCode() shouldBe dto2.hashCode()
+            (dto1 == dto3) shouldBe false
+        }
+
+        @Test
+        fun `should have correct toString`() {
+            // Given
+            val dto = ComprehensiveFlpsReportDto(
+                raiderId = "raider-123",
+                raiderName = "TestRaider",
+                flpsScore = 0.85,
+                eligible = true,
+            )
+
+            // When
+            val str = dto.toString()
+
+            // Then
+            str.contains("raiderId=raider-123") shouldBe true
+            str.contains("raiderName=TestRaider") shouldBe true
+            str.contains("flpsScore=0.85") shouldBe true
+            str.contains("eligible=true") shouldBe true
+        }
     }
 
     @Nested
@@ -132,6 +180,49 @@ class FlpsDtoTest : UnitTest() {
             copy.features shouldBe original.features
             copy.endpoints shouldBe original.endpoints
         }
+
+        @Test
+        fun `should have correct equals and hashCode`() {
+            // Given
+            val dto1 = FlpsDataStatusDto(
+                message = "Status",
+                features = listOf("F1"),
+                endpoints = mapOf("key" to "value"),
+            )
+            val dto2 = FlpsDataStatusDto(
+                message = "Status",
+                features = listOf("F1"),
+                endpoints = mapOf("key" to "value"),
+            )
+            val dto3 = FlpsDataStatusDto(
+                message = "Other",
+                features = emptyList(),
+                endpoints = emptyMap(),
+            )
+
+            // Then
+            (dto1 == dto2) shouldBe true
+            dto1.hashCode() shouldBe dto2.hashCode()
+            (dto1 == dto3) shouldBe false
+        }
+
+        @Test
+        fun `should have correct toString`() {
+            // Given
+            val dto = FlpsDataStatusDto(
+                message = "Test message",
+                features = listOf("Feature1"),
+                endpoints = mapOf("endpoint" to "/api/test"),
+            )
+
+            // When
+            val str = dto.toString()
+
+            // Then
+            str.contains("message=Test message") shouldBe true
+            str.contains("features=") shouldBe true
+            str.contains("endpoints=") shouldBe true
+        }
     }
 
     @Nested
@@ -181,6 +272,44 @@ class FlpsDtoTest : UnitTest() {
             // Then
             copy.theoretical shouldBe original.theoretical
             copy.topPerformer shouldBe 0.88
+        }
+
+        @Test
+        fun `should have correct equals and hashCode`() {
+            // Given
+            val dto1 = PerfectScoreBenchmarkDto(
+                theoretical = 1.0,
+                topPerformer = 0.95,
+            )
+            val dto2 = PerfectScoreBenchmarkDto(
+                theoretical = 1.0,
+                topPerformer = 0.95,
+            )
+            val dto3 = PerfectScoreBenchmarkDto(
+                theoretical = 0.9,
+                topPerformer = 0.8,
+            )
+
+            // Then
+            (dto1 == dto2) shouldBe true
+            dto1.hashCode() shouldBe dto2.hashCode()
+            (dto1 == dto3) shouldBe false
+        }
+
+        @Test
+        fun `should have correct toString`() {
+            // Given
+            val dto = PerfectScoreBenchmarkDto(
+                theoretical = 1.0,
+                topPerformer = 0.95,
+            )
+
+            // When
+            val str = dto.toString()
+
+            // Then
+            str.contains("theoretical=1.0") shouldBe true
+            str.contains("topPerformer=0.95") shouldBe true
         }
     }
 

@@ -288,5 +288,100 @@ class UpgradeValueCalculatorTest : UnitTest() {
             // Assert
             hasData shouldBe false
         }
+
+        @Test
+        fun `should return false when profile exists but profileId is null`() {
+            // Arrange
+            val profile = createProfile()
+
+            every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns null
+
+            // Act
+            val hasData = calculator.hasSimulationData(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm"
+            )
+
+            // Assert
+            hasData shouldBe false
+            verify(exactly = 0) { simulationRepository.findResultsByProfile(any()) }
+        }
+    }
+
+    @Nested
+    inner class ProfileIdNullHandling {
+        @Test
+        fun `should fall back to wishlist when profile exists but profileId is null`() {
+            // Arrange
+            val profile = createProfile()
+            val itemId = ItemId(12345L)
+            val wishlist = mockk<Wishlist>()
+
+            every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns null
+            every { wishlist.getUpgradePercentage(itemId) } returns 60.0
+
+            // Act
+            val uv = calculator.calculateUpgradeValue(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlistFallback = wishlist
+            )
+
+            // Assert
+            uv.value shouldBe 0.6 // Falls back to wishlist
+            verify(exactly = 0) { simulationRepository.findLatestResultForItem(any(), any()) }
+        }
+
+        @Test
+        fun `should return zero when profile exists but profileId is null and no wishlist`() {
+            // Arrange
+            val profile = createProfile()
+            val itemId = ItemId(12345L)
+
+            every { simulationRepository.findProfileByCharacter("guild-123", "Testchar", "TestRealm") } returns profile
+            every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns null
+
+            // Act
+            val uv = calculator.calculateUpgradeValue(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlistFallback = null
+            )
+
+            // Assert
+            uv.value shouldBe 0.0
+        }
+    }
+
+    @Nested
+    inner class WishlistNullPercentage {
+        @Test
+        fun `should return zero upgrade value when wishlist returns null percentage`() {
+            // Arrange
+            val itemId = ItemId(99999L)
+            val wishlist = mockk<Wishlist>()
+
+            every { simulationRepository.findProfileByCharacter(any(), any(), any()) } returns null
+            every { wishlist.getUpgradePercentage(itemId) } returns null
+
+            // Act
+            val uv = calculator.calculateUpgradeValue(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlistFallback = wishlist
+            )
+
+            // Assert
+            uv.value shouldBe 0.0
+        }
     }
 }
