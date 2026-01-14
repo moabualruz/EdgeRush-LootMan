@@ -124,3 +124,37 @@ data class FlpsDataStatusDto(
     val features: List<String>,
     val endpoints: Map<String, String>,
 )
+
+/**
+ * Response DTO for FLPS leaderboard.
+ */
+data class LeaderboardResponse(
+    val guildId: String,
+    val entries: List<LeaderboardEntry>,
+    val total: Int,
+    val limit: Int,
+    val offset: Int,
+    val filters: LeaderboardFilters,
+)
+
+/**
+ * Single entry in the FLPS leaderboard.
+ */
+data class LeaderboardEntry(
+    val rank: Int,
+    val raiderId: Long,
+    val raiderName: String,
+    val characterClass: String,
+    val role: String,
+    val flpsScore: Double,
+    val eligible: Boolean,
+)
+
+/**
+ * Active filters applied to the leaderboard.
+ */
+data class LeaderboardFilters(
+    val role: String?,
+    val characterClass: String?,
+    val eligible: Boolean?,
+)

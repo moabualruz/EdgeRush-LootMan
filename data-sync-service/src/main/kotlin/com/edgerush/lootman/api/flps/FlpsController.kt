@@ -8,9 +8,13 @@ import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.GetFlpsReportQuery
 import com.edgerush.lootman.application.flps.GetFlpsReportUseCase
 import com.edgerush.lootman.domain.shared.GuildId
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -96,6 +100,113 @@ class FlpsController(
     @GetMapping("/api/flps/status")
     fun getStatus(): FlpsDataStatusDto {
         return getStatusInternal()
+    }
+
+    /**
+     * Get FLPS leaderboard for a guild with optional filters.
+     *
+     * Returns a filtered and paginated leaderboard of raiders sorted by FLPS score.
+     * Supports filtering by role, class, and eligibility status.
+     *
+     * @param guildId The guild identifier
+     * @param role Filter by role (dps, healer, tank)
+     * @param characterClass Filter by character class
+     * @param eligible Filter by eligibility status
+     * @param limit Maximum number of results (default 10, max 100)
+     * @param offset Number of results to skip (for pagination)
+     * @return Filtered leaderboard response
+     */
+    @GetMapping("/api/v1/flps/guilds/{guildId}/leaderboard")
+    @Operation(
+        summary = "Get FLPS leaderboard",
+        description = "Returns a filtered and paginated leaderboard of raiders sorted by FLPS score"
+    )
+    fun getLeaderboard(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @Parameter(description = "Filter by role (dps, healer, tank)")
+        @RequestParam(required = false) role: String?,
+        @Parameter(description = "Filter by character class (warrior, mage, etc.)")
+        @RequestParam(required = false, name = "class") characterClass: String?,
+        @Parameter(description = "Filter by eligibility status")
+        @RequestParam(required = false) eligible: Boolean?,
+        @Parameter(description = "Maximum number of results (default 10, max 100)")
+        @RequestParam(required = false, defaultValue = "10") limit: Int,
+        @Parameter(description = "Number of results to skip")
+        @RequestParam(required = false, defaultValue = "0") offset: Int
+    ): LeaderboardResponse {
+        val effectiveLimit = limit.coerceIn(1, 100)
+
+        // Fetch all raider data from database
+        val raiderDataList = flpsDataAssembler.assembleFlpsData(GuildId(guildId))
+        val exampleItemId = com.edgerush.lootman.domain.shared.ItemId(12345L)
+
+        // Calculate FLPS for each raider and create leaderboard entries
+        val allEntries = raiderDataList.map { raiderData ->
+            val acs = componentCalculator.calculateACS(raiderData.attendance)
+            val mas = componentCalculator.calculateMAS()
+            val eps = componentCalculator.calculateEPS(raiderData.gear)
+            val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
+            val tb = componentCalculator.calculateTierBonus(raiderData.gear)
+            val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
+            val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
+
+            val command = CalculateFlpsScoreCommand(
+                guildId = GuildId(guildId),
+                raiderId = raiderData.raider.id,
+                itemId = exampleItemId,
+                acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf
+            )
+
+            val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
+
+            LeaderboardEntry(
+                rank = 0, // Will be set after filtering/sorting
+                raiderId = raiderData.raider.id.value,
+                raiderName = raiderData.raider.characterName,
+                characterClass = raiderData.raider.characterClass.name,
+                role = raiderData.raider.role.name,
+                flpsScore = result.flps.value,
+                eligible = result.eligible
+            )
+        }
+
+        // Apply filters
+        var filtered = allEntries
+
+        role?.let { r ->
+            filtered = filtered.filter { it.role.equals(r, ignoreCase = true) }
+        }
+
+        characterClass?.let { c ->
+            filtered = filtered.filter { it.characterClass.equals(c, ignoreCase = true) }
+        }
+
+        eligible?.let { e ->
+            filtered = filtered.filter { it.eligible == e }
+        }
+
+        // Sort by score descending and assign ranks
+        val sorted = filtered
+            .sortedByDescending { it.flpsScore }
+            .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+
+        // Apply pagination
+        val total = sorted.size
+        val paginated = sorted.drop(offset).take(effectiveLimit)
+
+        return LeaderboardResponse(
+            guildId = guildId,
+            entries = paginated,
+            total = total,
+            limit = effectiveLimit,
+            offset = offset,
+            filters = LeaderboardFilters(
+                role = role,
+                characterClass = characterClass,
+                eligible = eligible
+            )
+        )
     }
 
     /**
