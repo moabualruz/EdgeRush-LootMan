@@ -19,12 +19,12 @@ export interface SimulationStatus {
 
 export const wishlistApi = {
   async getMyWishlist(guildId: string): Promise<WishlistResponse> {
-    const response = await api.get<WishlistResponse>(`/api/v1/wishlist/guilds/${guildId}/me`)
+    const response = await api.get<WishlistResponse>(`/api/v1/wishlists/guilds/${guildId}/me`)
     return response.data
   },
 
   async getWishlist(guildId: string, raiderId: number): Promise<WishlistResponse> {
-    const response = await api.get<WishlistResponse>(`/api/v1/wishlist/guilds/${guildId}/raiders/${raiderId}`)
+    const response = await api.get<WishlistResponse>(`/api/v1/wishlists/raider/${raiderId}`)
     return response.data
   },
 

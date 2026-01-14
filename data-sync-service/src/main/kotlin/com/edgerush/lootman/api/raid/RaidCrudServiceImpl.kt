@@ -123,6 +123,12 @@ class RaidCrudServiceImpl(
     override fun countByTeam(teamId: Long): Long =
         raidRepository.countByTeamId(teamId)
 
+    override fun findUpcomingByGuild(guildId: Long, limit: Int): List<RaidResponse> =
+        raidRepository.findUpcomingByGuildId(guildId, limit).map { RaidResponse.from(it) }
+
+    override fun findPastByGuild(guildId: Long, limit: Int): List<RaidResponse> =
+        raidRepository.findPastByGuildId(guildId, limit).map { RaidResponse.from(it) }
+
     private fun generateRaidId(): Long {
         // Generate a unique ID based on current timestamp
         // In production, this might be handled by the database or a sequence

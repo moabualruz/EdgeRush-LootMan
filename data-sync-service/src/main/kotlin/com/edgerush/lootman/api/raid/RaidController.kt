@@ -160,4 +160,22 @@ class RaidController(
         @Parameter(description = "Team ID")
         @PathVariable teamId: Long,
     ): CountResponse = CountResponse(count = raidService.countByTeam(teamId))
+
+    @Operation(summary = "Get upcoming raids for a guild", description = "Returns upcoming raids for teams in a guild")
+    @GetMapping("/guilds/{guildId}/upcoming")
+    fun findUpcomingByGuild(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: Long,
+        @Parameter(description = "Maximum number of raids to return")
+        @RequestParam(defaultValue = "10") limit: Int,
+    ): List<RaidResponse> = raidService.findUpcomingByGuild(guildId, limit)
+
+    @Operation(summary = "Get past raids for a guild", description = "Returns past raids for teams in a guild")
+    @GetMapping("/guilds/{guildId}/past")
+    fun findPastByGuild(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: Long,
+        @Parameter(description = "Maximum number of raids to return")
+        @RequestParam(defaultValue = "10") limit: Int,
+    ): List<RaidResponse> = raidService.findPastByGuild(guildId, limit)
 }

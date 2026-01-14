@@ -93,4 +93,22 @@ interface RaidRepository {
      * @param raidId The raid ID to delete
      */
     fun delete(raidId: Long)
+
+    /**
+     * Finds upcoming raids (date >= today) for teams associated with a guild.
+     *
+     * @param guildId The guild identifier (from team_metadata)
+     * @param limit The maximum number of records to return
+     * @return List of upcoming raid entities ordered by date ascending
+     */
+    fun findUpcomingByGuildId(guildId: Long, limit: Int): List<RaidEntity>
+
+    /**
+     * Finds past raids (date < today) for teams associated with a guild.
+     *
+     * @param guildId The guild identifier (from team_metadata)
+     * @param limit The maximum number of records to return
+     * @return List of past raid entities ordered by date descending
+     */
+    fun findPastByGuildId(guildId: Long, limit: Int): List<RaidEntity>
 }

@@ -89,7 +89,8 @@
       "Bash(npx vitest --run)",
       "Bash(npm run type-check:*)",
       "Bash(npm run)",
-      "Bash(npx vue-tsc:*)"
+      "Bash(npx vue-tsc:*)",
+      "Bash(gradlew.bat compileKotlin:*)"
     ]
   }
 }

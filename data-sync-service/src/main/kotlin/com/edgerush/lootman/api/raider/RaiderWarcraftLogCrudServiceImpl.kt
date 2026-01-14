@@ -43,4 +43,7 @@ class RaiderWarcraftLogCrudServiceImpl(private val repository: RaiderWarcraftLog
     }
 
     override fun countByRaiderId(raiderId: Long): Long = repository.countByRaiderId(raiderId)
+
+    override fun findByRaiderIdUnpaged(raiderId: Long, limit: Int): List<RaiderWarcraftLogResponse> =
+        repository.findByRaiderId(raiderId, 0, limit).map { RaiderWarcraftLogResponse.from(it) }
 }

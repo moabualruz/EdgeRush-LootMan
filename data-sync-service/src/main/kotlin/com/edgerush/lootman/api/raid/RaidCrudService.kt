@@ -38,4 +38,22 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
      * @return The count of raids for the team
      */
     fun countByTeam(teamId: Long): Long
+
+    /**
+     * Find upcoming raids for a guild.
+     *
+     * @param guildId The guild identifier
+     * @param limit Maximum number of raids to return
+     * @return List of upcoming raids ordered by date ascending
+     */
+    fun findUpcomingByGuild(guildId: Long, limit: Int): List<RaidResponse>
+
+    /**
+     * Find past raids for a guild.
+     *
+     * @param guildId The guild identifier
+     * @param limit Maximum number of raids to return
+     * @return List of past raids ordered by date descending
+     */
+    fun findPastByGuild(guildId: Long, limit: Int): List<RaidResponse>
 }

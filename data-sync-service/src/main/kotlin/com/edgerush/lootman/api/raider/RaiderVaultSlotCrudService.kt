@@ -36,4 +36,12 @@ interface RaiderVaultSlotCrudService : CrudService<Long, CreateRaiderVaultSlotRe
      * @return The count of vault slots for the raider
      */
     fun countByRaider(raiderId: Long): Long
+
+    /**
+     * Find all vault slots by raider without pagination.
+     *
+     * @param raiderId The raider identifier
+     * @return List of all vault slots for the raider
+     */
+    fun findByRaiderUnpaged(raiderId: Long): List<RaiderVaultSlotResponse>
 }

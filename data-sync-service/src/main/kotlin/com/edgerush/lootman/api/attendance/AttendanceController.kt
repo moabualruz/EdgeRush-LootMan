@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.attendance
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.attendance.DeleteAttendanceCommand
 import com.edgerush.lootman.application.attendance.DeleteAttendanceUseCase
 import com.edgerush.lootman.application.attendance.GetAttendanceRecordQuery
@@ -14,9 +16,11 @@ import com.edgerush.lootman.application.attendance.TrackAttendanceCommand
 import com.edgerush.lootman.application.attendance.TrackAttendanceUseCase
 import com.edgerush.lootman.application.attendance.UpdateAttendanceCommand
 import com.edgerush.lootman.application.attendance.UpdateAttendanceUseCase
+import com.edgerush.lootman.domain.shared.GuildId
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -49,7 +53,43 @@ class AttendanceController(
     private val deleteAttendanceUseCase: DeleteAttendanceUseCase,
     private val listRaiderAttendanceUseCase: ListRaiderAttendanceUseCase,
     private val getGuildAttendanceSummaryUseCase: GetGuildAttendanceSummaryUseCase,
+    private val currentUserService: CurrentUserService,
 ) {
+    /**
+     * Get attendance report for the current user.
+     *
+     * Returns attendance statistics for the current user's primary raider
+     * for the last 90 days by default.
+     *
+     * @param guildId The guild's unique identifier
+     * @param authenticatedUser The authenticated user from the JWT token
+     * @return 200 OK with the attendance report
+     */
+    @GetMapping("/guilds/{guildId}/me")
+    fun getMyAttendance(
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal authenticatedUser: AuthenticatedUser,
+    ): AttendanceReportResponse {
+        currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId))
+        val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser)
+
+        val now = LocalDate.now()
+        val startDate = now.minusDays(90)
+
+        val query = GetAttendanceReportQuery(
+            raiderId = raiderId.value,
+            guildId = guildId,
+            startDate = startDate,
+            endDate = now,
+            instance = null,
+            encounter = null,
+        )
+
+        return getAttendanceReportUseCase.execute(query)
+            .map { report -> AttendanceReportResponse.from(report) }
+            .getOrThrow()
+    }
+
     /**
      * Track attendance for a raider.
      *

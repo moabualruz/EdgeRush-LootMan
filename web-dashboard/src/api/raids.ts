@@ -76,17 +76,17 @@ export const raidsApi = {
   },
 
   async getRaidEncounters(raidId: number): Promise<RaidEncounter[]> {
-    const response = await api.get<RaidEncounter[]>(`/api/raid-encounters/raid/${raidId}`)
-    return response.data
+    const response = await api.get<{ content: RaidEncounter[] }>(`/api/v1/raid-encounters/raid/${raidId}`)
+    return response.data.content
   },
 
   async getRaidSignups(raidId: number): Promise<RaidSignup[]> {
-    const response = await api.get<RaidSignup[]>(`/api/raid-signups/raid/${raidId}`)
-    return response.data
+    const response = await api.get<{ content: RaidSignup[] }>(`/api/v1/raid-signups/raid/${raidId}`)
+    return response.data.content
   },
 
   async createSignup(raidId: number, signup: CreateRaidSignup): Promise<RaidSignup> {
-    const response = await api.post<RaidSignup>(`/api/raid-signups`, {
+    const response = await api.post<RaidSignup>(`/api/v1/raid-signups`, {
       raidId,
       ...signup,
     })
@@ -94,11 +94,11 @@ export const raidsApi = {
   },
 
   async updateSignup(signupId: number, update: Partial<CreateRaidSignup>): Promise<RaidSignup> {
-    const response = await api.put<RaidSignup>(`/api/raid-signups/${signupId}`, update)
+    const response = await api.put<RaidSignup>(`/api/v1/raid-signups/${signupId}`, update)
     return response.data
   },
 
   async deleteSignup(signupId: number): Promise<void> {
-    await api.delete(`/api/raid-signups/${signupId}`)
+    await api.delete(`/api/v1/raid-signups/${signupId}`)
   },
 }

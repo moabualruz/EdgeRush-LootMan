@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.gear
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.gear.GearItemCommand
 import com.edgerush.lootman.application.gear.GetCurrentGearQuery
 import com.edgerush.lootman.application.gear.GetCurrentGearUseCase
@@ -7,8 +9,10 @@ import com.edgerush.lootman.application.gear.GetGearByTypeQuery
 import com.edgerush.lootman.application.gear.GetGearByTypeUseCase
 import com.edgerush.lootman.application.gear.SaveGearCommand
 import com.edgerush.lootman.application.gear.SaveGearUseCase
+import com.edgerush.lootman.domain.shared.GuildId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,8 +31,29 @@ import org.springframework.web.bind.annotation.RestController
 class GearController(
     private val getCurrentGearUseCase: GetCurrentGearUseCase,
     private val getGearByTypeUseCase: GetGearByTypeUseCase,
-    private val saveGearUseCase: SaveGearUseCase
+    private val saveGearUseCase: SaveGearUseCase,
+    private val currentUserService: CurrentUserService,
 ) {
+    /**
+     * Get current user's equipped gear.
+     *
+     * @param guildId The guild's unique identifier
+     * @param authenticatedUser The authenticated user from the JWT token
+     * @return 200 OK with the gear set
+     */
+    @GetMapping("/guilds/{guildId}/me")
+    fun getMyGear(
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal authenticatedUser: AuthenticatedUser,
+    ): GearSetResponse {
+        currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId))
+        val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser)
+
+        return getCurrentGearUseCase.execute(GetCurrentGearQuery(raiderId.value))
+            .map { gearSet -> GearSetResponse.from(gearSet) }
+            .getOrThrow()
+    }
+
     /**
      * Get a raider's current equipped gear.
      *

@@ -119,6 +119,38 @@ class JdbcRaidRepository(
         jdbcTemplate.update(sql, raidId)
     }
 
+    override fun findUpcomingByGuildId(guildId: Long, limit: Int): List<RaidEntity> {
+        val sql = """
+            SELECT r.raid_id, r.date, r.start_time, r.end_time, r.instance, r.difficulty,
+                   r.optional, r.status, r.present_size, r.total_size, r.notes,
+                   r.selections_image, r.team_id, r.season_id, r.period_id,
+                   r.created_at, r.updated_at, r.synced_at
+            FROM raids r
+            INNER JOIN team_metadata tm ON r.team_id = tm.team_id
+            WHERE tm.guild_id = ? AND r.date >= CURRENT_DATE
+            ORDER BY r.date ASC, r.start_time ASC
+            LIMIT ?
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, raidRowMapper, guildId, limit)
+    }
+
+    override fun findPastByGuildId(guildId: Long, limit: Int): List<RaidEntity> {
+        val sql = """
+            SELECT r.raid_id, r.date, r.start_time, r.end_time, r.instance, r.difficulty,
+                   r.optional, r.status, r.present_size, r.total_size, r.notes,
+                   r.selections_image, r.team_id, r.season_id, r.period_id,
+                   r.created_at, r.updated_at, r.synced_at
+            FROM raids r
+            INNER JOIN team_metadata tm ON r.team_id = tm.team_id
+            WHERE tm.guild_id = ? AND r.date < CURRENT_DATE
+            ORDER BY r.date DESC, r.start_time DESC
+            LIMIT ?
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, raidRowMapper, guildId, limit)
+    }
+
     private fun insertRaid(raid: RaidEntity) {
         val sql = """
             INSERT INTO raids (

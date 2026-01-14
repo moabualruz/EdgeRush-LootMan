@@ -98,4 +98,10 @@ class RaiderVaultSlotCrudServiceImpl(
     override fun countByRaider(raiderId: Long): Long {
         return repository.countByRaiderId(raiderId)
     }
+
+    override fun findByRaiderUnpaged(raiderId: Long): List<RaiderVaultSlotResponse> {
+        // Get all vault slots for the raider (max 9 slots: 3 raid, 3 m+, 3 pvp)
+        val entities = repository.findByRaiderId(raiderId, 0, 20)
+        return entities.map { RaiderVaultSlotResponse.from(it) }
+    }
 }

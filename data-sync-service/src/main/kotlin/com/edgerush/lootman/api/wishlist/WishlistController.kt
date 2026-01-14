@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.wishlist
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.wishlist.DeleteWishlistCommand
 import com.edgerush.lootman.application.wishlist.DeleteWishlistUseCase
 import com.edgerush.lootman.application.wishlist.GetWishlistQuery
@@ -7,8 +9,10 @@ import com.edgerush.lootman.application.wishlist.GetWishlistUseCase
 import com.edgerush.lootman.application.wishlist.SaveWishlistCommand
 import com.edgerush.lootman.application.wishlist.SaveWishlistUseCase
 import com.edgerush.lootman.application.wishlist.WishlistItemCommand
+import com.edgerush.lootman.domain.shared.GuildId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,8 +32,29 @@ import org.springframework.web.bind.annotation.RestController
 class WishlistController(
     private val getWishlistUseCase: GetWishlistUseCase,
     private val saveWishlistUseCase: SaveWishlistUseCase,
-    private val deleteWishlistUseCase: DeleteWishlistUseCase
+    private val deleteWishlistUseCase: DeleteWishlistUseCase,
+    private val currentUserService: CurrentUserService,
 ) {
+    /**
+     * Get current user's wishlist.
+     *
+     * @param guildId The guild's unique identifier
+     * @param authenticatedUser The authenticated user from the JWT token
+     * @return 200 OK with the wishlist
+     */
+    @GetMapping("/guilds/{guildId}/me")
+    fun getMyWishlist(
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal authenticatedUser: AuthenticatedUser,
+    ): WishlistResponse {
+        currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId))
+        val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser)
+
+        return getWishlistUseCase.execute(GetWishlistQuery(raiderId.value))
+            .map { wishlist -> WishlistResponse.from(wishlist) }
+            .getOrThrow()
+    }
+
     /**
      * Get a raider's wishlist.
      *
