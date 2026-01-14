@@ -1,0 +1,86 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/LoginPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/',
+    component: () => import('@/layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        redirect: '/dashboard',
+      },
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/pages/DashboardPage.vue'),
+      },
+      {
+        path: 'leaderboard',
+        name: 'leaderboard',
+        component: () => import('@/pages/LeaderboardPage.vue'),
+      },
+      {
+        path: 'history',
+        name: 'history',
+        component: () => import('@/pages/LootHistoryPage.vue'),
+      },
+      {
+        path: 'wishlist',
+        name: 'wishlist',
+        component: () => import('@/pages/WishlistPage.vue'),
+      },
+      {
+        path: 'performance',
+        name: 'performance',
+        component: () => import('@/pages/PerformancePage.vue'),
+      },
+      {
+        path: 'admin',
+        name: 'admin',
+        component: () => import('@/pages/AdminPage.vue'),
+        meta: { requiresAdmin: true },
+      },
+    ],
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/dashboard',
+  },
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore()
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+    return
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next('/dashboard')
+    return
+  }
+
+  if (to.path === '/login' && authStore.isAuthenticated) {
+    next('/dashboard')
+    return
+  }
+
+  next()
+})
+
+export default router

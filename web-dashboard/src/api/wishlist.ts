@@ -1,0 +1,40 @@
+import { api } from './client'
+import type { WishlistItem } from '@/types'
+
+export interface WishlistResponse {
+  raiderId: number
+  characterName: string
+  items: WishlistItem[]
+  lastSimulatedAt?: string
+}
+
+export interface SimulationStatus {
+  raiderId: number
+  status: 'IDLE' | 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED'
+  progress?: number
+  lastRunAt?: string
+  nextScheduledAt?: string
+  error?: string
+}
+
+export const wishlistApi = {
+  async getMyWishlist(guildId: string): Promise<WishlistResponse> {
+    const response = await api.get<WishlistResponse>(`/api/v1/wishlist/guilds/${guildId}/me`)
+    return response.data
+  },
+
+  async getWishlist(guildId: string, raiderId: number): Promise<WishlistResponse> {
+    const response = await api.get<WishlistResponse>(`/api/v1/wishlist/guilds/${guildId}/raiders/${raiderId}`)
+    return response.data
+  },
+
+  async getSimulationStatus(guildId: string, raiderId: number): Promise<SimulationStatus> {
+    const response = await api.get<SimulationStatus>(`/api/v1/simulations/guilds/${guildId}/raiders/${raiderId}/status`)
+    return response.data
+  },
+
+  async triggerSimulation(guildId: string, raiderId: number): Promise<SimulationStatus> {
+    const response = await api.post<SimulationStatus>(`/api/v1/simulations/guilds/${guildId}/raiders/${raiderId}/run`)
+    return response.data
+  },
+}
