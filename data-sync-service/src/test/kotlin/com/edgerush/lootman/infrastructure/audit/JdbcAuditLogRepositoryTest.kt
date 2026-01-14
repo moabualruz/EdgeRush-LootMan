@@ -419,6 +419,93 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             result.size shouldBe 1
             result.first().requestId shouldBe null
         }
+
+        @Test
+        fun `should map all operation types correctly`() {
+            // Given - Test different AuditOperation enum values
+            val entityType = "LootAward"
+            val entityId = "award-123"
+
+            // Test UPDATE operation
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
+                    any<RowMapper<AuditLog>>(),
+                    eq(entityType),
+                    eq(entityId)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AuditLog>>()
+                listOf(
+                    rowMapper.mapRow(mockResultSet(1L, operation = AuditOperation.UPDATE), 0),
+                    rowMapper.mapRow(mockResultSet(2L, operation = AuditOperation.DELETE), 0)
+                )
+            }
+
+            // When
+            val result = repository.findByEntity(entityType, entityId)
+
+            // Then
+            result.size shouldBe 2
+            result[0].operation shouldBe AuditOperation.UPDATE
+            result[1].operation shouldBe AuditOperation.DELETE
+        }
+
+        @Test
+        fun `should map isAdminMode correctly when true`() {
+            // Given
+            val entityType = "Guild"
+            val entityId = "guild-admin"
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
+                    any<RowMapper<AuditLog>>(),
+                    eq(entityType),
+                    eq(entityId)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AuditLog>>()
+                listOf(
+                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = true), 0)
+                )
+            }
+
+            // When
+            val result = repository.findByEntity(entityType, entityId)
+
+            // Then
+            result.size shouldBe 1
+            result.first().isAdminMode shouldBe true
+        }
+
+        @Test
+        fun `should map isAdminMode correctly when false`() {
+            // Given
+            val entityType = "Guild"
+            val entityId = "guild-user"
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
+                    any<RowMapper<AuditLog>>(),
+                    eq(entityType),
+                    eq(entityId)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AuditLog>>()
+                listOf(
+                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = false), 0)
+                )
+            }
+
+            // When
+            val result = repository.findByEntity(entityType, entityId)
+
+            // Then
+            result.size shouldBe 1
+            result.first().isAdminMode shouldBe false
+        }
     }
 
     // Helper methods

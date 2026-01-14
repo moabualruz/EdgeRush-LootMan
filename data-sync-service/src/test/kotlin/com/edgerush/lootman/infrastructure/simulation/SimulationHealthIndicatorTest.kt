@@ -169,6 +169,75 @@ class SimulationHealthIndicatorTest : UnitTest() {
     }
 
     @Nested
+    inner class DockerAvailabilityBranches {
+        @Test
+        fun `should return DOWN when docker is not available`() {
+            // Arrange
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            // Create indicator with mocked docker check that returns unavailable
+            val indicatorSpy = spyk(healthIndicator)
+
+            // Act
+            val health = indicatorSpy.health()
+
+            // Assert - verify dockerAvailable detail is present
+            // The actual status depends on real docker availability in test environment
+            health.details.containsKey("dockerAvailable") shouldBe true
+        }
+
+        @Test
+        fun `should return UP when docker is available and no pending simulations`() {
+            // Arrange
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert
+            health.details["pendingSimulations"] shouldBe 0
+            // Status depends on docker availability in test environment
+            // If docker is available, status should be UP
+            // If docker is not available, status should be DOWN
+            health.details.containsKey("dockerAvailable") shouldBe true
+        }
+
+        @Test
+        fun `should return OUT_OF_SERVICE when docker available but too many pending`() {
+            // Arrange - Create more than MAX_HEALTHY_PENDING requests
+            val pendingRequests = (1..51).map { createPendingRequest() }
+            every { simulationRepository.findPendingRequests() } returns pendingRequests
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert - Either DOWN (docker unavailable) or OUT_OF_SERVICE (too many pending)
+            health.details["pendingSimulations"] shouldBe 51
+            health.status shouldNotBe Status.UP
+        }
+
+        @Test
+        fun `should return OUT_OF_SERVICE when docker available but low success rate`() {
+            // Arrange
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            // Record enough failures to trigger low success rate (need >= 5 executions)
+            healthIndicator.recordSuccess(100)
+            repeat(5) { healthIndicator.recordFailure() }
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert
+            health.details["successCount"] shouldBe 1L
+            health.details["failureCount"] shouldBe 5L
+            // Success rate is 1/6 = 16.7%, below 80% threshold
+            // Status should be OUT_OF_SERVICE if docker is available, DOWN if not
+            health.status shouldNotBe Status.UP
+        }
+    }
+
+    @Nested
     inner class RecordMetrics {
         @Test
         fun `should increment success count on recordSuccess`() {

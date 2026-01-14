@@ -671,6 +671,86 @@ class JdbcSimulationRepositoryTest : UnitTest() {
     }
 
     @Nested
+    inner class MapRequestRowNullHandlingTests {
+        private fun setupMockResultSetWithNullCompletedAt(
+            status: String,
+            errorMessage: String? = null
+        ): ResultSet {
+            val now = Instant.now()
+            val rs = mockk<ResultSet>()
+
+            // Profile fields
+            every { rs.getString("guild_id") } returns "guild-123"
+            every { rs.getString("character_name") } returns "TestChar"
+            every { rs.getString("character_realm") } returns "TestRealm"
+            every { rs.getString("profile_content") } returns "warrior=\"TestChar\""
+            every { rs.getTimestamp("profile_created_at") } returns Timestamp.from(now)
+
+            // Request fields
+            every { rs.getLong("id") } returns 42L
+            every { rs.getInt("iterations") } returns 10000
+            every { rs.getInt("fight_length_seconds") } returns 300
+            every { rs.getString("status") } returns status
+            every { rs.getTimestamp("submitted_at") } returns Timestamp.from(now)
+            every { rs.getTimestamp("completed_at") } returns null  // NULL completed_at
+            every { rs.getString("error_message") } returns errorMessage
+
+            return rs
+        }
+
+        @Test
+        fun `should handle null completedAt for PENDING request`() {
+            // Arrange
+            val rs = setupMockResultSetWithNullCompletedAt("PENDING")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.id shouldBe 42L
+            result?.status shouldBe SimulationStatus.PENDING
+            result?.completedAt shouldBe null
+        }
+
+        @Test
+        fun `should handle null completedAt for RUNNING request`() {
+            // Arrange
+            val rs = setupMockResultSetWithNullCompletedAt("RUNNING")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.status shouldBe SimulationStatus.RUNNING
+            result?.completedAt shouldBe null
+        }
+    }
+
+    @Nested
     inner class SaveRequestUpdate {
         @Test
         fun `should update existing request when id is present`() {

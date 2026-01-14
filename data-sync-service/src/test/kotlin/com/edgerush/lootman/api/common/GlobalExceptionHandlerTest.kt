@@ -296,6 +296,55 @@ class GlobalExceptionHandlerTest : UnitTest() {
         response.body?.error shouldBe "Bad Request"
         response.body?.message shouldBe "Invalid request parameters"
     }
+
+    @Nested
+    inner class NullMessageBranchTests {
+
+        @Test
+        fun `handleException should return 500 for exception with null message`() {
+            // Arrange - RuntimeException with explicit null message
+            val exception = RuntimeException(null as String?)
+
+            // Act
+            val response = handler.handleException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+            response.body?.status shouldBe 500
+            response.body?.error shouldBe "Internal Server Error"
+            response.body?.message shouldBe "An unexpected error occurred"
+        }
+
+        @Test
+        fun `handleException should return 400 for MethodArgumentTypeMismatchException with null message`() {
+            // Arrange
+            val exception = MethodArgumentTypeMismatchException(null)
+
+            // Act
+            val response = handler.handleException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.BAD_REQUEST
+            response.body?.status shouldBe 400
+            response.body?.error shouldBe "Bad Request"
+            response.body?.message shouldBe "Invalid request parameters"
+        }
+
+        @Test
+        fun `handleException should return 400 for BindException with null message`() {
+            // Arrange
+            val exception = BindException(null)
+
+            // Act
+            val response = handler.handleException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.BAD_REQUEST
+            response.body?.status shouldBe 400
+            response.body?.error shouldBe "Bad Request"
+            response.body?.message shouldBe "Invalid request parameters"
+        }
+    }
 }
 
 /**
