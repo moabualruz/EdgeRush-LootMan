@@ -8,9 +8,12 @@ const authStore = useAuthStore()
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: 'home' },
   { path: '/leaderboard', label: 'Leaderboard', icon: 'trophy' },
-  { path: '/history', label: 'Loot History', icon: 'history' },
   { path: '/wishlist', label: 'Wishlist', icon: 'list' },
   { path: '/performance', label: 'Performance', icon: 'chart' },
+  { path: '/attendance', label: 'Attendance', icon: 'calendar' },
+  { path: '/raids', label: 'Raids', icon: 'users' },
+  { path: '/gear', label: 'Gear', icon: 'shield' },
+  { path: '/history', label: 'Loot History', icon: 'history' },
 ]
 
 const adminNavItems = [

@@ -34,3 +34,6 @@ keys.txt
 wowaudit/
 build/
 */build/
+
+# Node Modules
+node_modules/
