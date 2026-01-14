@@ -70,7 +70,8 @@
       "Bash(f:/work/dod/looter/gradlew.bat :data-sync-service:test --tests \"*JdbcSimulationRepositoryIntegrationTest*\" --rerun --info)",
       "Bash(cmd /c \"gradlew.bat test jacocoTestReport --tests *.InMemorySimulationRepositoryTest --tests *.SimulationHealthIndicatorTest\")",
       "Bash(cmd /c \"gradlew.bat test jacocoTestReport 2>&1\")",
-      "Bash(\"f:/work/dod/looter/data-sync-service/gradlew.bat\" test jacocoTestReport)"
+      "Bash(\"f:/work/dod/looter/data-sync-service/gradlew.bat\" test jacocoTestReport)",
+      "Bash(dir:*)"
     ]
   }
 }

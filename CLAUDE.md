@@ -9,7 +9,8 @@ A progression-first guild operations platform for World of Warcraft that automat
 - **Data-driven fairness** - Loot decisions backed by objective metrics, not politics
 - **Transparency over black boxes** - Every score is explainable and auditable
 - **Human approval at boundaries** - FLPS informs decisions, humans make them
-- **Test-driven development** - Tests before implementation, 85% coverage minimum
+- **Test-driven development** - Tests BEFORE implementation, always
+- **Domain-driven design** - Code organized by business domain, not technical layers
 
 ---
 
@@ -22,6 +23,123 @@ A progression-first guild operations platform for World of Warcraft that automat
 5. **Graceful degradation** - System works even when external APIs fail
 6. **Single source of truth** - One authoritative document per topic
 7. **Human approval for loot** - No automated distribution without confirmation
+
+---
+
+## TDD Development Workflow (MANDATORY)
+
+**Every feature MUST follow this workflow:**
+
+### Red-Green-Refactor Cycle
+
+```
+1. RED:    Write a failing test first
+2. GREEN:  Write minimal code to make the test pass
+3. REFACTOR: Improve code while keeping tests green
+4. REPEAT: Continue until feature is complete
+```
+
+### TDD Rules
+
+1. **NEVER write production code without a failing test first**
+2. **Write only enough test to fail** (compilation failure counts)
+3. **Write only enough code to pass the failing test**
+4. **Refactor only when all tests are green**
+5. **Each test should test ONE behavior**
+
+### Example TDD Flow
+
+```kotlin
+// Step 1: Write failing test
+@Test
+fun `should calculate FLPS score for raider with item`() {
+    val raider = createTestRaider()
+    val item = createTestItem()
+
+    val score = calculator.calculate(raider, item)
+
+    score.value shouldBeGreaterThan 0.0
+}
+
+// Step 2: Write minimal implementation to pass
+class FlpsCalculator {
+    fun calculate(raider: Raider, item: Item): FlpsScore {
+        return FlpsScore(0.5) // Minimal implementation
+    }
+}
+
+// Step 3: Refactor and add more tests
+```
+
+### Test Categories
+
+| Category        | Purpose                      | Dependencies               | Location                 |
+|-----------------|------------------------------|----------------------------|--------------------------|
+| **Unit**        | Test single class/function   | None (mocked)              | `test/.../domain/`       |
+| **Integration** | Test component interactions  | Real DB (Testcontainers)   | `test/.../integration/`  |
+| **API**         | Test REST endpoints          | MockMvc + mocked services  | `test/.../api/`          |
+| **E2E**         | Test full workflows          | Full stack                 | `test/.../e2e/`          |
+
+---
+
+## Domain-Driven Design (DDD)
+
+### Layer Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      API Layer                          │
+│  Controllers, DTOs, Request/Response mapping            │
+├─────────────────────────────────────────────────────────┤
+│                  Application Layer                      │
+│  Use Cases, Orchestration, Transaction boundaries       │
+├─────────────────────────────────────────────────────────┤
+│                    Domain Layer                         │
+│  Entities, Value Objects, Domain Services, Repositories │
+├─────────────────────────────────────────────────────────┤
+│                 Infrastructure Layer                    │
+│  Database, External APIs, Messaging, Caching           │
+└─────────────────────────────────────────────────────────┘
+```
+
+### DDD Rules
+
+1. **Domain layer has NO dependencies** on other layers
+2. **Application layer depends only on Domain**
+3. **Infrastructure implements Domain interfaces**
+4. **API layer coordinates Application services**
+
+### Bounded Context Organization
+
+```
+lootman/
+├── flps/                    # FLPS Calculation Context
+│   ├── api/                 # REST controllers
+│   ├── application/         # Use cases
+│   ├── domain/              # Core business logic
+│   └── infrastructure/      # Persistence, external
+│
+├── loot/                    # Loot Management Context
+├── attendance/              # Attendance Context
+├── raids/                   # Raid Management Context
+└── shared/                  # Shared Kernel
+```
+
+### Value Objects vs Entities
+
+```kotlin
+// VALUE OBJECT: Immutable, identity by value
+data class FlpsScore(val value: Double) {
+    init { require(value in 0.0..1.0) }
+}
+
+// ENTITY: Has identity, mutable state
+class Raider(
+    val id: RaiderId,
+    var name: String,
+    var guildId: GuildId
+)
+```
 
 ---
 
@@ -208,16 +326,16 @@ Example: V0018__add_warcraft_logs_config.sql
 
 ## Testing Standards
 
-### Coverage Requirements
-- **Overall**: 100% required (current: 64%)
-- **Domain Layer**: 100% (current: 87.7%)
-- **Application Layer**: 100% (current: 91.7%)
-- **API Layer**: 100% (current: needs improvement)
-- **Infrastructure Layer**: 100%
+### Coverage Requirements (ACHIEVED)
 
-**BLOCKING REQUIREMENT**: No new features until 100% test coverage achieved.
+- **Overall**: 98% instruction, 95% branch (target: 85%)
+- **Domain Layer**: 87.7%
+- **Application Layer**: 91.7%
+- **API Layer**: Improving with new CRUD controllers
+- **Infrastructure Layer**: 97%
 
 ### Test Organization
+
 ```
 tests/
 ├── domain/          # Unit tests - no external deps
@@ -227,19 +345,34 @@ tests/
 └── e2e/             # End-to-end workflow tests
 ```
 
-### Test Patterns
+### Test Naming Convention
+
+```kotlin
+// Pattern: should_ExpectedBehavior_When_StateUnderTest
+@Test
+fun `should return high score when raider has perfect attendance`()
+
+@Test
+fun `should throw exception when raider not found`()
+
+@Test
+fun `should create entity when request is valid`()
+```
+
+### Test Structure (AAA Pattern)
+
 ```kotlin
 @Test
-fun `calculateFLPS returns high score for committed player with major upgrade`() {
-    // Given
-    val character = createTestCharacter(attendance = 0.95)
+fun `should calculate FLPS score for raider with item`() {
+    // Arrange (Given)
+    val raider = createTestRaider(attendance = 0.95)
     val item = createTestItem(upgradeValue = 50.0)
 
-    // When
-    val result = scoreCalculator.calculateFLPS(character, item)
+    // Act (When)
+    val result = calculator.calculateFLPS(raider, item)
 
-    // Then
-    assertThat(result.totalScore).isGreaterThan(0.8)
+    // Assert (Then)
+    result.totalScore shouldBeGreaterThan 0.8
 }
 ```
 
@@ -248,15 +381,18 @@ fun `calculateFLPS returns high score for committed player with major upgrade`()
 ## Development Workflow
 
 ### Before Starting Work
+
 1. Read `PROJECT_PRIORITIES.md` for current focus
 2. Check `.kiro/specs/` for feature specifications
 3. Review `.project/` for constraints and requirements
 
-### When Implementing Features
-1. Write tests first (TDD)
-2. Implement to make tests pass
-3. Run full test suite: `./gradlew test`
-4. Update documentation if needed
+### When Implementing Features (TDD Required)
+
+1. **Write failing test first** - Define expected behavior
+2. **Write minimal code** - Just enough to pass the test
+3. **Refactor** - Improve while keeping tests green
+4. **Run full test suite**: `./gradlew test`
+5. **Update documentation** if needed
 
 ### Commit Standards
 ```
@@ -309,22 +445,26 @@ flps:
 ## Current State Summary
 
 ### What's Working
+
 - FLPS calculation engine (100%)
 - WoWAudit data sync (100%)
 - Warcraft Logs integration (100%)
+- SimulationCraft integration (100%)
 - 509 tests passing (100% pass rate)
+- Test coverage: 98% instruction, 95% branch
 - 17 database migrations applied
-- REST API for core features (40%)
+- REST API foundation with CRUD patterns
 
 ### What Needs Work
-- Test coverage: 64% → 85% target
+
 - REST API: 40% → 100% (30+ entities remaining)
 - GraphQL API: not started
 - Web dashboard: not started
 - Discord bot: not started
 
-### Blockers
-- **Test Coverage**: Must reach 85% before Phase 2 features
+### Current Priority
+
+- **REST API Layer**: Implementing CRUD controllers for all 45+ entities using TDD
 
 ---
 

@@ -48,6 +48,7 @@ class PageRequest private constructor(
 
         /**
          * Create a PageRequest with default values.
+         * Size is automatically capped at maxPageSize.
          */
         fun withDefaults(
             page: Int = 0,
@@ -56,7 +57,7 @@ class PageRequest private constructor(
             maxPageSize: Int = DEFAULT_MAX_PAGE_SIZE,
         ): PageRequest = PageRequest(
             page = page,
-            size = size ?: defaultSize,
+            size = minOf(size ?: defaultSize, maxPageSize),
             maxPageSize = maxPageSize,
         )
     }
