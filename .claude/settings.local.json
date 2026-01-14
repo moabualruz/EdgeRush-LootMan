@@ -71,7 +71,12 @@
       "Bash(cmd /c \"gradlew.bat test jacocoTestReport --tests *.InMemorySimulationRepositoryTest --tests *.SimulationHealthIndicatorTest\")",
       "Bash(cmd /c \"gradlew.bat test jacocoTestReport 2>&1\")",
       "Bash(\"f:/work/dod/looter/data-sync-service/gradlew.bat\" test jacocoTestReport)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(wc:*)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.datasync.config.DeprecationHeaderFilterTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.lootman.api.contract.OpenApiContractTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.lootman.api.performance.ApiPerformanceTest\" --no-daemon)"
     ]
   }
 }
