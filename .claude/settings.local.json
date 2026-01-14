@@ -39,7 +39,11 @@
       "Bash(git -C /f/work/dod/looter log --oneline --all)",
       "Bash(git -C /f/work/dod/looter log --pretty=format:\"%h %s\" -n 10)",
       "Bash(git -C /f/work/dod/looter show --name-only --pretty=format:\"%H %s\" e15bf3f)",
-      "Bash(git -C /f/work/dod/looter show --name-only --pretty=format:\"%H %s\" cbc029d)"
+      "Bash(git -C /f/work/dod/looter show --name-only --pretty=format:\"%H %s\" cbc029d)",
+      "Bash(cmd /c \"gradlew.bat test --tests com.edgerush.lootman.api.loot.LootControllerTest\")",
+      "Bash(/f/work/dod/looter/data-sync-service/gradlew.bat test --tests \"com.edgerush.lootman.api.loot.LootControllerTest\")",
+      "Bash(/f/work/dod/looter/gradlew test:*)",
+      "Bash(sort:*)"
     ]
   }
 }

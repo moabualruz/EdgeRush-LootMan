@@ -227,4 +227,97 @@ class AttendanceRecordTest : UnitTest() {
         // Assert - Different instances should have different IDs
         record1.id shouldNotBe record2.id
     }
+
+    @Test
+    fun `should throw exception when instance name is blank`() {
+        // Arrange, Act & Assert
+        shouldThrow<IllegalArgumentException> {
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
+        }.message shouldBe "Instance name cannot be blank"
+    }
+
+    @Test
+    fun `should throw exception when instance name is whitespace only`() {
+        // Arrange, Act & Assert
+        shouldThrow<IllegalArgumentException> {
+            AttendanceRecord.create(
+                raiderId = RaiderId(1L),
+                guildId = GuildId("test-guild"),
+                instance = "   ",
+                encounter = null,
+                startDate = LocalDate.of(2024, 11, 1),
+                endDate = LocalDate.of(2024, 11, 14),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
+        }.message shouldBe "Instance name cannot be blank"
+    }
+
+    @Test
+    fun `should allow same start and end date`() {
+        // Arrange & Act
+        val record = AttendanceRecord.create(
+            raiderId = RaiderId(1L),
+            guildId = GuildId("test-guild"),
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 11, 1),
+            endDate = LocalDate.of(2024, 11, 1),
+            attendedRaids = 1,
+            totalRaids = 1,
+        )
+
+        // Assert
+        record.startDate shouldBe record.endDate
+        record.attendancePercentage shouldBe 1.0
+    }
+
+    @Test
+    fun `should generate valid id on create`() {
+        // Arrange & Act
+        val record = AttendanceRecord.create(
+            raiderId = RaiderId(1L),
+            guildId = GuildId("test-guild"),
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 11, 1),
+            endDate = LocalDate.of(2024, 11, 14),
+            attendedRaids = 8,
+            totalRaids = 10,
+        )
+
+        // Assert
+        record.id.value.isNotBlank() shouldBe true
+        record.id.value.length shouldBe 36 // UUID format
+    }
+
+    @Test
+    fun `should set recordedAt on create`() {
+        // Arrange & Act
+        val beforeCreate = java.time.Instant.now()
+        val record = AttendanceRecord.create(
+            raiderId = RaiderId(1L),
+            guildId = GuildId("test-guild"),
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 11, 1),
+            endDate = LocalDate.of(2024, 11, 14),
+            attendedRaids = 8,
+            totalRaids = 10,
+        )
+        val afterCreate = java.time.Instant.now()
+
+        // Assert - recordedAt should be between before and after create times
+        (record.recordedAt >= beforeCreate) shouldBe true
+        (record.recordedAt <= afterCreate) shouldBe true
+    }
 }

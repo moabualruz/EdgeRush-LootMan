@@ -189,4 +189,79 @@ class AttendanceStatsTest : UnitTest() {
         // Assert - Same values should be equal
         stats1 shouldBe stats2
     }
+
+    @Test
+    fun `should handle zero total raids in calculate`() {
+        // Arrange & Act
+        val stats = AttendanceStats.calculate(
+            attendedRaids = 0,
+            totalRaids = 0
+        )
+
+        // Assert
+        stats.attendancePercentage shouldBe 0.0
+        stats.totalRaids shouldBe 0
+        stats.attendedRaids shouldBe 0
+        stats.missedRaids shouldBe 0
+    }
+
+    @Test
+    fun `should throw exception when calculate attended raids is negative`() {
+        // Arrange, Act & Assert
+        shouldThrow<IllegalArgumentException> {
+            AttendanceStats.calculate(
+                attendedRaids = -1,
+                totalRaids = 10
+            )
+        }
+    }
+
+    @Test
+    fun `should throw exception when calculate total raids is negative`() {
+        // Arrange, Act & Assert
+        shouldThrow<IllegalArgumentException> {
+            AttendanceStats.calculate(
+                attendedRaids = 5,
+                totalRaids = -1
+            )
+        }
+    }
+
+    @Test
+    fun `should handle fractional percentages correctly`() {
+        // Arrange & Act
+        val stats = AttendanceStats.calculate(
+            attendedRaids = 1,
+            totalRaids = 3
+        )
+
+        // Assert - 1/3 = 0.333...
+        stats.attendancePercentage shouldBe (1.0 / 3.0)
+        stats.missedRaids shouldBe 2
+    }
+
+    @Test
+    fun `should accept boundary percentage values`() {
+        // Arrange & Act - Test 0.0 boundary
+        val zeroStats = AttendanceStats.of(
+            attendancePercentage = 0.0,
+            totalRaids = 10,
+            attendedRaids = 0,
+            missedRaids = 10
+        )
+
+        // Assert
+        zeroStats.attendancePercentage shouldBe 0.0
+
+        // Arrange & Act - Test 1.0 boundary
+        val perfectStats = AttendanceStats.of(
+            attendancePercentage = 1.0,
+            totalRaids = 10,
+            attendedRaids = 10,
+            missedRaids = 0
+        )
+
+        // Assert
+        perfectStats.attendancePercentage shouldBe 1.0
+    }
 }

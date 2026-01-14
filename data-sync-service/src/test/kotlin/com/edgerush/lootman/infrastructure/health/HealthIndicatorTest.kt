@@ -76,6 +76,19 @@ class HealthIndicatorTest : UnitTest() {
             // Then
             health.status shouldBe Status.DOWN
             health.details["service"] shouldBe "WarcraftLogs API"
+            health.details["error"] shouldBe "API not reachable"
+        }
+
+        @Test
+        fun `should use default constructor with API available`() {
+            // Given - using default constructor
+            val indicator = WarcraftLogsHealthIndicator()
+
+            // When
+            val health = indicator.health()
+
+            // Then - default is API available = true
+            health.status shouldBe Status.UP
         }
     }
 
@@ -106,6 +119,38 @@ class HealthIndicatorTest : UnitTest() {
             // Then
             health.status shouldBe Status.DOWN
             health.details["service"] shouldBe "WoWAudit API"
+            health.details["error"] shouldBe "API not reachable"
+        }
+
+        @Test
+        fun `should use default constructor with API available`() {
+            // Given - using default constructor
+            val indicator = WoWAuditHealthIndicator()
+
+            // When
+            val health = indicator.health()
+
+            // Then - default is API available = true
+            health.status shouldBe Status.UP
+        }
+    }
+
+    @Nested
+    inner class DatabaseHealthIndicatorErrorHandlingTests {
+
+        @Test
+        fun `should handle exception with null message`() {
+            // Given
+            val jdbcTemplate = mockk<JdbcTemplate>()
+            every { jdbcTemplate.queryForObject("SELECT 1", Int::class.java) } throws RuntimeException(null as String?)
+            val indicator = DatabaseHealthIndicator(jdbcTemplate)
+
+            // When
+            val health = indicator.health()
+
+            // Then
+            health.status shouldBe Status.DOWN
+            health.details["error"] shouldBe "Unknown error"
         }
     }
 }

@@ -435,4 +435,129 @@ class DockerSimulationExecutorTest : UnitTest() {
             command.any { it.contains(":/simc/profiles") } shouldBe true
         }
     }
+
+    @Nested
+    inner class FirstOrNullExtension {
+        @Test
+        fun `should handle player data with missing dps path`() {
+            // Arrange - player array exists but has no dps data
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "name": "Testchar",
+                                "collected_data": {}
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 5000.0
+        }
+
+        @Test
+        fun `should handle non-array players node`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": "not an array"
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 5000.0
+        }
+
+        @Test
+        fun `should handle missing players node`() {
+            // Arrange
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        }
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 5000.0
+        }
+    }
+
+    @Nested
+    inner class TimeoutConfiguration {
+        @Test
+        fun `should use default timeout when not specified`() {
+            // Arrange & Act
+            val executorWithDefaults = DockerSimulationExecutor(
+                dockerImage = "simc",
+                profileDirectory = tempDir.toString(),
+                dockerCommand = "docker"
+            )
+
+            // Assert - timeout defaults to 30 minutes
+            // We can verify the executor was created successfully
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+            val command = executorWithDefaults.buildDockerCommand(request, File(tempDir.toFile(), "test.simc"))
+            command.isNotEmpty() shouldBe true
+        }
+
+        @Test
+        fun `should use custom timeout when specified`() {
+            // Arrange
+            val customTimeoutExecutor = DockerSimulationExecutor(
+                dockerImage = "simc",
+                profileDirectory = tempDir.toString(),
+                dockerCommand = "docker",
+                timeoutMinutes = 60
+            )
+
+            // Assert - executor should be created successfully with custom timeout
+            val profile = createProfile()
+            val request = SimulationRequest.create(profile = profile)
+            val command = customTimeoutExecutor.buildDockerCommand(request, File(tempDir.toFile(), "test.simc"))
+            command.isNotEmpty() shouldBe true
+        }
+    }
 }

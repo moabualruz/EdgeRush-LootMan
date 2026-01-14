@@ -245,5 +245,204 @@ class SimulationControllerTest : UnitTest() {
             response.body?.pendingSimulations shouldBe 0
             response.body?.endpoints shouldNotBe null
         }
+
+        @Test
+        fun `should return pending count in status`() {
+            // Arrange
+            val profile = createTestProfile()
+            val requests = listOf(
+                createTestRequest(profile).withId(1L),
+                createTestRequest(profile).withId(2L)
+            )
+            every { simulationRepository.findPendingRequests() } returns requests
+
+            // Act
+            val response = controller.getStatus()
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.OK
+            response.body?.pendingSimulations shouldBe 2
+        }
+    }
+
+    @Nested
+    inner class SimulationRequestDtoMapping {
+        @Test
+        fun `should map all fields from SimulationRequest`() {
+            // Arrange
+            val profile = createTestProfile(
+                guildId = "guild-456",
+                characterName = "MapTestChar",
+                characterRealm = "MapRealm"
+            )
+            val request = createTestRequest(profile).withId(99L)
+
+            // Act
+            val dto = SimulationRequestDto.from(request)
+
+            // Assert
+            dto.id shouldBe 99L
+            dto.characterName shouldBe "MapTestChar"
+            dto.characterRealm shouldBe "MapRealm"
+            dto.guildId shouldBe "guild-456"
+            dto.status shouldBe SimulationStatus.PENDING
+            dto.submittedAt shouldNotBe null
+            dto.completedAt shouldBe null
+            dto.errorMessage shouldBe null
+            dto.resultCount shouldBe 0
+        }
+
+        @Test
+        fun `should map completed request with results`() {
+            // Arrange
+            val profile = createTestProfile()
+            val results = listOf(
+                SimulationResult.create(
+                    itemId = 1L,
+                    itemName = "Item1",
+                    slot = "head",
+                    dpsGain = 100.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now()
+                ),
+                SimulationResult.create(
+                    itemId = 2L,
+                    itemName = "Item2",
+                    slot = "neck",
+                    dpsGain = 200.0,
+                    percentGain = 2.0,
+                    simulatedAt = Instant.now()
+                )
+            )
+            val request = createTestRequest(profile)
+                .withId(100L)
+                .markRunning()
+                .markCompleted(results)
+
+            // Act
+            val dto = SimulationRequestDto.from(request)
+
+            // Assert
+            dto.status shouldBe SimulationStatus.COMPLETED
+            dto.completedAt shouldNotBe null
+            dto.resultCount shouldBe 2
+        }
+
+        @Test
+        fun `should map failed request with error message`() {
+            // Arrange
+            val profile = createTestProfile()
+            val request = createTestRequest(profile)
+                .withId(101L)
+                .markRunning()
+                .markFailed("Simulation timeout")
+
+            // Act
+            val dto = SimulationRequestDto.from(request)
+
+            // Assert
+            dto.status shouldBe SimulationStatus.FAILED
+            dto.errorMessage shouldBe "Simulation timeout"
+        }
+    }
+
+    @Nested
+    inner class SimulationResultDtoMapping {
+        @Test
+        fun `should map all fields from SimulationResult`() {
+            // Arrange
+            val result = SimulationResult.create(
+                itemId = 12345L,
+                itemName = "Awesome Sword",
+                slot = "main_hand",
+                dpsGain = 5000.0,
+                percentGain = 3.5,
+                simulatedAt = Instant.now()
+            )
+
+            // Act
+            val dto = SimulationResultDto.from(result)
+
+            // Assert
+            dto.itemId shouldBe 12345L
+            dto.itemName shouldBe "Awesome Sword"
+            dto.slot shouldBe "main_hand"
+            dto.dpsGain shouldBe 5000.0
+            dto.percentGain shouldBe 3.5
+            dto.isUpgrade shouldBe true
+            dto.normalizedValue shouldBe result.normalizedUpgradeValue()
+            dto.simulatedAt shouldNotBe null
+        }
+
+        @Test
+        fun `should identify non-upgrade when dps gain is negative`() {
+            // Arrange
+            val result = SimulationResult.create(
+                itemId = 99999L,
+                itemName = "Downgrade Helm",
+                slot = "head",
+                dpsGain = -500.0,
+                percentGain = -0.5,
+                simulatedAt = Instant.now()
+            )
+
+            // Act
+            val dto = SimulationResultDto.from(result)
+
+            // Assert
+            dto.isUpgrade shouldBe false
+        }
+    }
+
+    @Nested
+    inner class SubmitSimulationRequestDefaults {
+        @Test
+        fun `should use custom values when provided`() {
+            // Arrange
+            val profile = createTestProfile()
+            val request = createTestRequest(profile)
+            every {
+                simulationService.submitSimulation(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "mage",
+                    characterSpec = "fire",
+                    characterLevel = 70,
+                    characterRace = "dwarf",
+                    iterations = 5000,
+                    fightLengthSeconds = 180
+                )
+            } returns request
+
+            val submitRequest = SubmitSimulationRequest(
+                characterRealm = "TestRealm",
+                characterClass = "mage",
+                characterSpec = "fire",
+                characterLevel = 70,
+                characterRace = "dwarf",
+                iterations = 5000,
+                fightLengthSeconds = 180
+            )
+
+            // Act
+            val response = controller.submitSimulation("guild-123", "Testchar", submitRequest)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.ACCEPTED
+            verify {
+                simulationService.submitSimulation(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "mage",
+                    characterSpec = "fire",
+                    characterLevel = 70,
+                    characterRace = "dwarf",
+                    iterations = 5000,
+                    fightLengthSeconds = 180
+                )
+            }
+        }
     }
 }

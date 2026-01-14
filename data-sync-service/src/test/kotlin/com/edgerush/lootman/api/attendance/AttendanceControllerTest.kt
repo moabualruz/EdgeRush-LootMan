@@ -450,4 +450,323 @@ class AttendanceControllerTest : UnitTest() {
             e.message shouldBe "Cannot query encounter attendance without specifying an instance"
         }
     }
+
+    @Test
+    fun `getAttendanceRecord should return record when found`() {
+        // Given
+        val recordId = "record-123"
+        val record = AttendanceRecord.create(
+            raiderId = RaiderId(123L),
+            guildId = GuildId("guild-456"),
+            instance = "Nerub-ar Palace",
+            encounter = null,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
+            attendedRaids = 8,
+            totalRaids = 10,
+        )
+
+        every { getAttendanceRecordUseCase.execute(any()) } returns Result.success(record)
+
+        // When
+        val response = controller.getAttendanceRecord(recordId)
+
+        // Then
+        response.raiderId shouldBe 123L
+        response.guildId shouldBe "guild-456"
+        response.instance shouldBe "Nerub-ar Palace"
+        response.attendedRaids shouldBe 8
+        response.totalRaids shouldBe 10
+
+        verify(exactly = 1) { getAttendanceRecordUseCase.execute(any()) }
+    }
+
+    @Test
+    fun `getAttendanceRecord should throw exception when not found`() {
+        // Given
+        val recordId = "non-existent-record"
+
+        every { getAttendanceRecordUseCase.execute(any()) } returns Result.failure(
+            NoSuchElementException("Attendance record not found: $recordId")
+        )
+
+        // When/Then
+        try {
+            controller.getAttendanceRecord(recordId)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: NoSuchElementException) {
+            e.message shouldBe "Attendance record not found: $recordId"
+        }
+    }
+
+    @Test
+    fun `updateAttendanceRecord should return updated record`() {
+        // Given
+        val recordId = "record-123"
+        val request = UpdateAttendanceRequest(
+            instance = "Updated Instance",
+            attendedRaids = 9,
+            totalRaids = 10,
+        )
+
+        val updatedRecord = AttendanceRecord.create(
+            raiderId = RaiderId(123L),
+            guildId = GuildId("guild-456"),
+            instance = "Updated Instance",
+            encounter = null,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 31),
+            attendedRaids = 9,
+            totalRaids = 10,
+        )
+
+        every { updateAttendanceUseCase.execute(any()) } returns Result.success(updatedRecord)
+
+        // When
+        val response = controller.updateAttendanceRecord(recordId, request)
+
+        // Then
+        response.instance shouldBe "Updated Instance"
+        response.attendedRaids shouldBe 9
+        response.attendancePercentage shouldBe 0.9
+
+        verify(exactly = 1) { updateAttendanceUseCase.execute(any()) }
+    }
+
+    @Test
+    fun `updateAttendanceRecord should throw exception when not found`() {
+        // Given
+        val recordId = "non-existent-record"
+        val request = UpdateAttendanceRequest(instance = "Updated Instance")
+
+        every { updateAttendanceUseCase.execute(any()) } returns Result.failure(
+            NoSuchElementException("Attendance record not found: $recordId")
+        )
+
+        // When/Then
+        try {
+            controller.updateAttendanceRecord(recordId, request)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: NoSuchElementException) {
+            e.message shouldBe "Attendance record not found: $recordId"
+        }
+    }
+
+    @Test
+    fun `deleteAttendanceRecord should return NO_CONTENT when successful`() {
+        // Given
+        val recordId = "record-123"
+
+        every { deleteAttendanceUseCase.execute(any()) } returns Result.success(Unit)
+
+        // When
+        val response = controller.deleteAttendanceRecord(recordId)
+
+        // Then
+        response.statusCode shouldBe HttpStatus.NO_CONTENT
+
+        verify(exactly = 1) { deleteAttendanceUseCase.execute(any()) }
+    }
+
+    @Test
+    fun `deleteAttendanceRecord should throw exception when not found`() {
+        // Given
+        val recordId = "non-existent-record"
+
+        every { deleteAttendanceUseCase.execute(any()) } returns Result.failure(
+            NoSuchElementException("Attendance record not found: $recordId")
+        )
+
+        // When/Then
+        try {
+            controller.deleteAttendanceRecord(recordId)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: NoSuchElementException) {
+            e.message shouldBe "Attendance record not found: $recordId"
+        }
+    }
+
+    @Test
+    fun `getRaiderAttendanceHistory should return history with records`() {
+        // Given
+        val raiderId = 123L
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        val records = listOf(
+            AttendanceRecord.create(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                instance = "Instance 1",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 15),
+                attendedRaids = 8,
+                totalRaids = 10,
+            ),
+            AttendanceRecord.create(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                instance = "Instance 2",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 16),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 9,
+                totalRaids = 10,
+            ),
+        )
+
+        every { listRaiderAttendanceUseCase.execute(any()) } returns Result.success(records)
+
+        // When
+        val response = controller.getRaiderAttendanceHistory(raiderId, guildId, startDate, endDate)
+
+        // Then
+        response.raiderId shouldBe raiderId
+        response.guildId shouldBe guildId
+        response.startDate shouldBe startDate
+        response.endDate shouldBe endDate
+        response.totalRecords shouldBe 2
+        response.records.size shouldBe 2
+
+        verify(exactly = 1) { listRaiderAttendanceUseCase.execute(any()) }
+    }
+
+    @Test
+    fun `getRaiderAttendanceHistory should return empty history`() {
+        // Given
+        val raiderId = 123L
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        every { listRaiderAttendanceUseCase.execute(any()) } returns Result.success(emptyList())
+
+        // When
+        val response = controller.getRaiderAttendanceHistory(raiderId, guildId, startDate, endDate)
+
+        // Then
+        response.totalRecords shouldBe 0
+        response.records shouldBe emptyList()
+    }
+
+    @Test
+    fun `getRaiderAttendanceHistory should throw exception when use case fails`() {
+        // Given
+        val raiderId = 123L
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        every { listRaiderAttendanceUseCase.execute(any()) } returns Result.failure(
+            IllegalArgumentException("Invalid date range")
+        )
+
+        // When/Then
+        try {
+            controller.getRaiderAttendanceHistory(raiderId, guildId, startDate, endDate)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: IllegalArgumentException) {
+            e.message shouldBe "Invalid date range"
+        }
+    }
+
+    @Test
+    fun `getGuildAttendanceSummary should return summary with raider summaries`() {
+        // Given
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        val summary = com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
+            guildId = guildId,
+            startDate = startDate,
+            endDate = endDate,
+            totalRecords = 10,
+            uniqueRaiders = 5,
+            overallAttendancePercentage = 0.85,
+            raiderSummaries = listOf(
+                com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
+                    raiderId = 123L,
+                    totalRecords = 2,
+                    totalAttendedRaids = 18,
+                    totalRaids = 20,
+                    averageAttendancePercentage = 0.9,
+                ),
+                com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
+                    raiderId = 456L,
+                    totalRecords = 2,
+                    totalAttendedRaids = 16,
+                    totalRaids = 20,
+                    averageAttendancePercentage = 0.8,
+                ),
+            ),
+        )
+
+        every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
+
+        // When
+        val response = controller.getGuildAttendanceSummary(guildId, startDate, endDate)
+
+        // Then
+        response.guildId shouldBe guildId
+        response.startDate shouldBe startDate
+        response.endDate shouldBe endDate
+        response.totalRecords shouldBe 10
+        response.uniqueRaiders shouldBe 5
+        response.overallAttendancePercentage shouldBe 0.85
+        response.raiderSummaries.size shouldBe 2
+
+        verify(exactly = 1) { getGuildAttendanceSummaryUseCase.execute(any()) }
+    }
+
+    @Test
+    fun `getGuildAttendanceSummary should return empty summary`() {
+        // Given
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        val summary = com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
+            guildId = guildId,
+            startDate = startDate,
+            endDate = endDate,
+            totalRecords = 0,
+            uniqueRaiders = 0,
+            overallAttendancePercentage = 0.0,
+            raiderSummaries = emptyList(),
+        )
+
+        every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
+
+        // When
+        val response = controller.getGuildAttendanceSummary(guildId, startDate, endDate)
+
+        // Then
+        response.totalRecords shouldBe 0
+        response.uniqueRaiders shouldBe 0
+        response.overallAttendancePercentage shouldBe 0.0
+        response.raiderSummaries shouldBe emptyList()
+    }
+
+    @Test
+    fun `getGuildAttendanceSummary should throw exception when use case fails`() {
+        // Given
+        val guildId = "guild-456"
+        val startDate = LocalDate.of(2024, 1, 1)
+        val endDate = LocalDate.of(2024, 1, 31)
+
+        every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.failure(
+            IllegalArgumentException("Invalid date range")
+        )
+
+        // When/Then
+        try {
+            controller.getGuildAttendanceSummary(guildId, startDate, endDate)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: IllegalArgumentException) {
+            e.message shouldBe "Invalid date range"
+        }
+    }
 }

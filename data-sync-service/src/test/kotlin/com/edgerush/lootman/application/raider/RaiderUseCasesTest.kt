@@ -240,6 +240,153 @@ class RaiderUseCasesTest : UnitTest() {
             updatedRaider.characterName shouldBe "TestChar" // Unchanged
             updatedRaider.rank shouldBe "Raider" // Unchanged
         }
+
+        @Test
+        fun `should update character class`() {
+            // Given
+            val existingRaider = createRaider(
+                id = RaiderId(1L),
+                characterClass = CharacterClass.WARRIOR
+            )
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                characterClass = "PALADIN"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+            val savedRaiderSlot = slot<Raider>()
+            every { raiderRepository.save(capture(savedRaiderSlot)) } answers { savedRaiderSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedRaider = result.getOrThrow()
+            updatedRaider.characterClass shouldBe CharacterClass.PALADIN
+        }
+
+        @Test
+        fun `should update realm`() {
+            // Given
+            val existingRaider = createRaider(
+                id = RaiderId(1L),
+                realm = "OldRealm"
+            )
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                realm = "NewRealm"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+            val savedRaiderSlot = slot<Raider>()
+            every { raiderRepository.save(capture(savedRaiderSlot)) } answers { savedRaiderSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedRaider = result.getOrThrow()
+            updatedRaider.realm shouldBe "NewRealm"
+        }
+
+        @Test
+        fun `should update all fields at once`() {
+            // Given
+            val existingRaider = createRaider(
+                id = RaiderId(1L),
+                characterName = "OldName",
+                realm = "OldRealm",
+                characterClass = CharacterClass.WARRIOR,
+                role = Role.DPS,
+                rank = "Member",
+                status = RaiderStatus.ACTIVE
+            )
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                characterName = "NewName",
+                realm = "NewRealm",
+                characterClass = "MAGE",
+                role = "HEALER",
+                rank = "Officer",
+                status = "INACTIVE"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+            val savedRaiderSlot = slot<Raider>()
+            every { raiderRepository.save(capture(savedRaiderSlot)) } answers { savedRaiderSlot.captured }
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            val updatedRaider = result.getOrThrow()
+            updatedRaider.characterName shouldBe "NewName"
+            updatedRaider.realm shouldBe "NewRealm"
+            updatedRaider.characterClass shouldBe CharacterClass.MAGE
+            updatedRaider.role shouldBe Role.HEALER
+            updatedRaider.rank shouldBe "Officer"
+            updatedRaider.status shouldBe RaiderStatus.INACTIVE
+        }
+
+        @Test
+        fun `should fail with invalid role`() {
+            // Given
+            val existingRaider = createRaider(id = RaiderId(1L))
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                role = "INVALID_ROLE"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<IllegalArgumentException>()
+        }
+
+        @Test
+        fun `should fail with invalid status`() {
+            // Given
+            val existingRaider = createRaider(id = RaiderId(1L))
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                status = "INVALID_STATUS"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<IllegalArgumentException>()
+        }
+
+        @Test
+        fun `should fail with invalid character class`() {
+            // Given
+            val existingRaider = createRaider(id = RaiderId(1L))
+            val command = UpdateRaiderCommand(
+                id = 1L,
+                characterClass = "INVALID_CLASS"
+            )
+
+            every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isFailure shouldBe true
+            result.exceptionOrNull().shouldBeInstanceOf<IllegalArgumentException>()
+        }
     }
 
     @Nested
@@ -378,6 +525,104 @@ class RaiderUseCasesTest : UnitTest() {
             // Then
             result.isSuccess shouldBe true
             result.getOrThrow().size shouldBe 0
+        }
+
+        @Test
+        fun `should return paginated raiders for guild`() {
+            // Given
+            val raiders = listOf(
+                createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                createRaider(id = RaiderId(4L), characterName = "Raider4")
+            )
+            val query = ListRaidersByGuildPaginatedQuery(
+                guildId = "test-guild",
+                offset = 2L,
+                limit = 2
+            )
+
+            every { raiderRepository.findByGuildId(GuildId("test-guild"), 2L, 2) } returns raiders
+            every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 10L
+
+            // When
+            val result = useCase.executeByGuildPaginated(query)
+
+            // Then
+            result.isSuccess shouldBe true
+            val paginatedResult = result.getOrThrow()
+            paginatedResult.raiders.size shouldBe 2
+            paginatedResult.totalCount shouldBe 10L
+            paginatedResult.raiders[0].characterName shouldBe "Raider3"
+            paginatedResult.raiders[1].characterName shouldBe "Raider4"
+        }
+
+        @Test
+        fun `should return empty paginated list when offset exceeds total`() {
+            // Given
+            val query = ListRaidersByGuildPaginatedQuery(
+                guildId = "test-guild",
+                offset = 100L,
+                limit = 10
+            )
+
+            every { raiderRepository.findByGuildId(GuildId("test-guild"), 100L, 10) } returns emptyList()
+            every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 5L
+
+            // When
+            val result = useCase.executeByGuildPaginated(query)
+
+            // Then
+            result.isSuccess shouldBe true
+            val paginatedResult = result.getOrThrow()
+            paginatedResult.raiders.size shouldBe 0
+            paginatedResult.totalCount shouldBe 5L
+        }
+
+        @Test
+        fun `should return first page of paginated raiders`() {
+            // Given
+            val raiders = listOf(
+                createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                createRaider(id = RaiderId(2L), characterName = "Raider2")
+            )
+            val query = ListRaidersByGuildPaginatedQuery(
+                guildId = "test-guild",
+                offset = 0L,
+                limit = 2
+            )
+
+            every { raiderRepository.findByGuildId(GuildId("test-guild"), 0L, 2) } returns raiders
+            every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 10L
+
+            // When
+            val result = useCase.executeByGuildPaginated(query)
+
+            // Then
+            result.isSuccess shouldBe true
+            val paginatedResult = result.getOrThrow()
+            paginatedResult.raiders.size shouldBe 2
+            paginatedResult.totalCount shouldBe 10L
+        }
+
+        @Test
+        fun `should handle paginated query for guild with no raiders`() {
+            // Given
+            val query = ListRaidersByGuildPaginatedQuery(
+                guildId = "empty-guild",
+                offset = 0L,
+                limit = 10
+            )
+
+            every { raiderRepository.findByGuildId(GuildId("empty-guild"), 0L, 10) } returns emptyList()
+            every { raiderRepository.countByGuildId(GuildId("empty-guild")) } returns 0L
+
+            // When
+            val result = useCase.executeByGuildPaginated(query)
+
+            // Then
+            result.isSuccess shouldBe true
+            val paginatedResult = result.getOrThrow()
+            paginatedResult.raiders.size shouldBe 0
+            paginatedResult.totalCount shouldBe 0L
         }
     }
 

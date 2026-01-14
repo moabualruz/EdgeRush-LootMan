@@ -1,7 +1,16 @@
 package com.edgerush.lootman.api.common
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.domain.loot.model.LootBan
+import com.edgerush.lootman.domain.shared.GuildId
+import com.edgerush.lootman.domain.shared.GuildNotFoundException
+import com.edgerush.lootman.domain.shared.ItemId
+import com.edgerush.lootman.domain.shared.ItemNotFoundException
+import com.edgerush.lootman.domain.shared.LootBanActiveException
+import com.edgerush.lootman.domain.shared.RaiderId
+import com.edgerush.lootman.domain.shared.RaiderNotFoundException
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
@@ -12,6 +21,101 @@ import org.springframework.http.HttpStatus
  */
 class GlobalExceptionHandlerTest : UnitTest() {
     private val handler = GlobalExceptionHandler()
+
+    @Nested
+    inner class DomainExceptionHandlerTests {
+
+        @Test
+        fun `handleRaiderNotFoundException should return 404 Not Found`() {
+            // Arrange
+            val exception = RaiderNotFoundException(RaiderId(123L))
+
+            // Act
+            val response = handler.handleRaiderNotFoundException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.NOT_FOUND
+            response.body?.status shouldBe 404
+            response.body?.error shouldBe "Not Found"
+            response.body?.message shouldBe "Raider not found: 123"
+        }
+
+        @Test
+        fun `handleGuildNotFoundException should return 404 Not Found`() {
+            // Arrange
+            val exception = GuildNotFoundException(GuildId("guild-456"))
+
+            // Act
+            val response = handler.handleGuildNotFoundException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.NOT_FOUND
+            response.body?.status shouldBe 404
+            response.body?.error shouldBe "Not Found"
+            response.body?.message shouldBe "Guild not found: guild-456"
+        }
+
+        @Test
+        fun `handleItemNotFoundException should return 404 Not Found`() {
+            // Arrange
+            val exception = ItemNotFoundException(ItemId(99999L))
+
+            // Act
+            val response = handler.handleItemNotFoundException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.NOT_FOUND
+            response.body?.status shouldBe 404
+            response.body?.error shouldBe "Not Found"
+            response.body?.message shouldBe "Item not found: 99999"
+        }
+
+        @Test
+        fun `handleLootBanActiveException should return 409 Conflict`() {
+            // Arrange
+            val ban1 = LootBan.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                reason = "Test ban 1",
+                expiresAt = null
+            )
+            val ban2 = LootBan.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                reason = "Test ban 2",
+                expiresAt = null
+            )
+            val exception = LootBanActiveException(RaiderId(123L), listOf(ban1, ban2))
+
+            // Act
+            val response = handler.handleLootBanActiveException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.CONFLICT
+            response.body?.status shouldBe 409
+            response.body?.error shouldBe "Conflict"
+            response.body?.message shouldBe "Raider 123 has 2 active loot ban(s)"
+        }
+
+        @Test
+        fun `handleLootBanActiveException should handle single ban`() {
+            // Arrange
+            val ban = LootBan.create(
+                raiderId = RaiderId(456L),
+                guildId = GuildId("guild-789"),
+                reason = "Single ban",
+                expiresAt = null
+            )
+            val exception = LootBanActiveException(RaiderId(456L), listOf(ban))
+
+            // Act
+            val response = handler.handleLootBanActiveException(exception)
+
+            // Assert
+            response.statusCode shouldBe HttpStatus.CONFLICT
+            response.body?.message shouldBe "Raider 456 has 1 active loot ban(s)"
+        }
+    }
 
     @Test
     fun `handleIllegalArgumentException should return 400 Bad Request with message`() {

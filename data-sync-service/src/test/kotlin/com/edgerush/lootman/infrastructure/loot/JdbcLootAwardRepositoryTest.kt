@@ -218,6 +218,257 @@ class JdbcLootAwardRepositoryTest : UnitTest() {
     }
 
     @Nested
+    inner class FindByGuildIdPaginatedTests {
+
+        @Test
+        fun `should return paginated awards for guild`() {
+            // Given
+            val guildId = GuildId("test-guild")
+            val offset = 10L
+            val limit = 5
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("LIMIT") && it.contains("OFFSET") },
+                    any<RowMapper<LootAward>>(),
+                    eq(guildId.value),
+                    eq(limit),
+                    eq(offset)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(
+                    rowMapper.mapRow(mockResultSet("award-11", now, guildId = guildId.value), 0),
+                    rowMapper.mapRow(mockResultSet("award-12", now, guildId = guildId.value), 1)
+                )
+            }
+
+            // When
+            val result = repository.findByGuildId(guildId, offset, limit)
+
+            // Then
+            result.size shouldBe 2
+            result[0].id.value shouldBe "award-11"
+            result[1].id.value shouldBe "award-12"
+        }
+
+        @Test
+        fun `should return empty list when no awards in page`() {
+            // Given
+            val guildId = GuildId("test-guild")
+            val offset = 1000L
+            val limit = 10
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("LIMIT") && it.contains("OFFSET") },
+                    any<RowMapper<LootAward>>(),
+                    eq(guildId.value),
+                    eq(limit),
+                    eq(offset)
+                )
+            } returns emptyList()
+
+            // When
+            val result = repository.findByGuildId(guildId, offset, limit)
+
+            // Then
+            result shouldBe emptyList()
+        }
+    }
+
+    @Nested
+    inner class CountByGuildIdTests {
+
+        @Test
+        fun `should return count of awards for guild`() {
+            // Given
+            val guildId = GuildId("test-guild")
+
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> { it.contains("COUNT") },
+                    Long::class.java,
+                    eq(guildId.value)
+                )
+            } returns 42L
+
+            // When
+            val result = repository.countByGuildId(guildId)
+
+            // Then
+            result shouldBe 42L
+        }
+
+        @Test
+        fun `should return zero when no awards for guild`() {
+            // Given
+            val guildId = GuildId("empty-guild")
+
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> { it.contains("COUNT") },
+                    Long::class.java,
+                    eq(guildId.value)
+                )
+            } returns 0L
+
+            // When
+            val result = repository.countByGuildId(guildId)
+
+            // Then
+            result shouldBe 0L
+        }
+
+        @Test
+        fun `should return zero when query returns null`() {
+            // Given
+            val guildId = GuildId("null-guild")
+
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> { it.contains("COUNT") },
+                    Long::class.java,
+                    eq(guildId.value)
+                )
+            } returns null
+
+            // When
+            val result = repository.countByGuildId(guildId)
+
+            // Then
+            result shouldBe 0L
+        }
+    }
+
+    @Nested
+    inner class RowMapperEdgeCases {
+
+        @Test
+        fun `should default to MYTHIC when tier is invalid`() {
+            // Given
+            val awardId = LootAwardId("invalid-tier-award")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<LootAward>>(),
+                    eq(awardId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(rowMapper.mapRow(mockResultSet(awardId.value, now, tier = "INVALID_TIER"), 0))
+            }
+
+            // When
+            val result = repository.findById(awardId)
+
+            // Then
+            result?.tier shouldBe LootTier.MYTHIC
+        }
+
+        @Test
+        fun `should default to MYTHIC when tier is null`() {
+            // Given
+            val awardId = LootAwardId("null-tier-award")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<LootAward>>(),
+                    eq(awardId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(rowMapper.mapRow(mockResultSet(awardId.value, now, tier = null), 0))
+            }
+
+            // When
+            val result = repository.findById(awardId)
+
+            // Then
+            result?.tier shouldBe LootTier.MYTHIC
+        }
+
+        @Test
+        fun `should handle lowercase tier values`() {
+            // Given
+            val awardId = LootAwardId("lowercase-tier-award")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<LootAward>>(),
+                    eq(awardId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(rowMapper.mapRow(mockResultSet(awardId.value, now, tier = "heroic"), 0))
+            }
+
+            // When
+            val result = repository.findById(awardId)
+
+            // Then
+            result?.tier shouldBe LootTier.HEROIC
+        }
+
+        @Test
+        fun `should handle REVOKED status`() {
+            // Given
+            val awardId = LootAwardId("revoked-award")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<LootAward>>(),
+                    eq(awardId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(rowMapper.mapRow(mockResultSet(awardId.value, now, status = "REVOKED"), 0))
+            }
+
+            // When
+            val result = repository.findById(awardId)
+
+            // Then
+            // Note: The current implementation doesn't actually restore the revoked state
+            // This test documents the current behavior
+            result shouldNotBe null
+        }
+
+        @Test
+        fun `should handle null status as ACTIVE`() {
+            // Given
+            val awardId = LootAwardId("null-status-award")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<LootAward>>(),
+                    eq(awardId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<LootAward>>()
+                listOf(rowMapper.mapRow(mockResultSet(awardId.value, now, status = null), 0))
+            }
+
+            // When
+            val result = repository.findById(awardId)
+
+            // Then
+            result?.isActive() shouldBe true
+        }
+    }
+
+    @Nested
     inner class SaveTests {
 
         @Test
@@ -306,8 +557,8 @@ class JdbcLootAwardRepositoryTest : UnitTest() {
         raiderId: Long = 100L,
         guildId: String = "test-guild",
         flpsScore: Double = 0.75,
-        tier: String = "MYTHIC",
-        status: String = "ACTIVE"
+        tier: String? = "MYTHIC",
+        status: String? = "ACTIVE"
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("id") } returns id

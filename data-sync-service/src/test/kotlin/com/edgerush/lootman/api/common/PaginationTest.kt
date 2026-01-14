@@ -74,6 +74,86 @@ class PaginationTest : UnitTest() {
             request.size shouldBe 20
             request.offset shouldBe 100
         }
+
+        @Test
+        fun `should allow custom size with withDefaults`() {
+            val request = PageRequest.withDefaults(page = 2, size = 30, defaultSize = 20, maxPageSize = 100)
+
+            request.page shouldBe 2
+            request.size shouldBe 30
+            request.offset shouldBe 60
+        }
+
+        @Test
+        fun `equals should return true for same values`() {
+            val request1 = PageRequest(page = 1, size = 20, maxPageSize = 100)
+            val request2 = PageRequest(page = 1, size = 20, maxPageSize = 100)
+
+            (request1 == request2) shouldBe true
+        }
+
+        @Test
+        fun `equals should return false for different page`() {
+            val request1 = PageRequest(page = 1, size = 20)
+            val request2 = PageRequest(page = 2, size = 20)
+
+            (request1 == request2) shouldBe false
+        }
+
+        @Test
+        fun `equals should return false for different size`() {
+            val request1 = PageRequest(page = 1, size = 20)
+            val request2 = PageRequest(page = 1, size = 30)
+
+            (request1 == request2) shouldBe false
+        }
+
+        @Test
+        fun `equals should return false for different maxPageSize`() {
+            val request1 = PageRequest(page = 1, size = 20, maxPageSize = 100)
+            val request2 = PageRequest(page = 1, size = 20, maxPageSize = 200)
+
+            (request1 == request2) shouldBe false
+        }
+
+        @Test
+        fun `equals should return true for same instance`() {
+            val request = PageRequest(page = 1, size = 20)
+
+            (request == request) shouldBe true
+        }
+
+        @Test
+        fun `equals should return false for different type`() {
+            val request = PageRequest(page = 1, size = 20)
+
+            (request.equals("not a PageRequest")) shouldBe false
+        }
+
+        @Test
+        fun `equals should return false for null`() {
+            val request = PageRequest(page = 1, size = 20)
+
+            (request.equals(null)) shouldBe false
+        }
+
+        @Test
+        fun `hashCode should be same for equal objects`() {
+            val request1 = PageRequest(page = 1, size = 20, maxPageSize = 100)
+            val request2 = PageRequest(page = 1, size = 20, maxPageSize = 100)
+
+            request1.hashCode() shouldBe request2.hashCode()
+        }
+
+        @Test
+        fun `toString should contain page size and maxPageSize`() {
+            val request = PageRequest(page = 2, size = 25, maxPageSize = 100)
+
+            val str = request.toString()
+            str.contains("page=2") shouldBe true
+            str.contains("size=25") shouldBe true
+            str.contains("maxPageSize=100") shouldBe true
+        }
     }
 
     @Nested
@@ -192,6 +272,21 @@ class PaginationTest : UnitTest() {
             mapped.page shouldBe 0
             mapped.size shouldBe 20
             mapped.totalElements shouldBe 3
+        }
+
+        @Test
+        fun `should create empty PagedResponse`() {
+            val pageRequest = PageRequest(page = 0, size = 20)
+
+            val response = PagedResponse.empty<String>(pageRequest)
+
+            response.content shouldBe emptyList()
+            response.page shouldBe 0
+            response.size shouldBe 20
+            response.totalElements shouldBe 0
+            response.totalPages shouldBe 0
+            response.isFirst shouldBe true
+            response.isLast shouldBe true
         }
     }
 
