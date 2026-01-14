@@ -76,7 +76,14 @@
       "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.datasync.config.DeprecationHeaderFilterTest\" --no-daemon)",
       "Bash(\"f:/work/dod/looter/gradlew.bat\" test --no-daemon)",
       "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.lootman.api.contract.OpenApiContractTest\" --no-daemon)",
-      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.lootman.api.performance.ApiPerformanceTest\" --no-daemon)"
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" test --tests \"com.edgerush.lootman.api.performance.ApiPerformanceTest\" --no-daemon)",
+      "Bash(cmd.exe //c \"gradlew.bat test --tests \"\"*.RaiderDataLoaderTest\"\"\")",
+      "Bash(cmd.exe //c \"gradlew.bat :data-sync-service:test --tests \"\"*.RaiderDataLoaderTest\"\"\")",
+      "Bash(/f/work/dod/looter/gradlew.bat :data-sync-service:test --tests \"*.RaiderDataLoaderTest\")",
+      "Bash(/f/work/dod/looter/gradlew.bat :data-sync-service:test --tests \"*.dataloader.*\")",
+      "Bash(/f/work/dod/looter/gradlew.bat :data-sync-service:test --tests \"*.GraphQLExceptionHandlerTest\")",
+      "Bash(/f/work/dod/looter/gradlew.bat :data-sync-service:dependencies --configuration compileClasspath)",
+      "Bash(/f/work/dod/looter/gradlew.bat:*)"
     ]
   }
 }

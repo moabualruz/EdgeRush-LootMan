@@ -41,4 +41,7 @@ class InMemoryRaiderRepository : RaiderRepository {
     override fun delete(id: RaiderId) {
         storage.remove(id)
     }
+
+    override fun findByIds(ids: List<RaiderId>): List<Raider> =
+        ids.mapNotNull { storage[it] }
 }

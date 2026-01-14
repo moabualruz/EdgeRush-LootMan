@@ -67,4 +67,14 @@ interface RaiderRepository {
      * @param id The raider ID to delete
      */
     fun delete(id: RaiderId)
+
+    /**
+     * Finds multiple raiders by their IDs.
+     *
+     * Used for batch loading to prevent N+1 queries.
+     *
+     * @param ids The list of raider IDs to find
+     * @return List of found raiders (may be smaller than input if some IDs don't exist)
+     */
+    fun findByIds(ids: List<RaiderId>): List<Raider>
 }

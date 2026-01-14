@@ -97,6 +97,20 @@ class JdbcRaiderRepository(
         jdbcTemplate.update(sql, id.value)
     }
 
+    override fun findByIds(ids: List<RaiderId>): List<Raider> {
+        if (ids.isEmpty()) return emptyList()
+
+        val placeholders = ids.joinToString(", ") { "?" }
+        val sql = """
+            SELECT id, guild_id, characterName, realm, characterClass, role,
+                   rank, status, joinDate, wowauditId
+            FROM raiders
+            WHERE id IN ($placeholders)
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, raiderRowMapper, *ids.map { it.value }.toTypedArray())
+    }
+
     private fun existsById(id: RaiderId): Boolean {
         val sql = "SELECT COUNT(*) FROM raiders WHERE id = ?"
         val count = jdbcTemplate.queryForObject(sql, Int::class.java, id.value) ?: 0

@@ -90,6 +90,20 @@ class JdbcLootAwardRepository(
         jdbcTemplate.update(sql, id.value)
     }
 
+    override fun findByRaiderIds(raiderIds: List<RaiderId>): List<LootAward> {
+        if (raiderIds.isEmpty()) return emptyList()
+
+        val placeholders = raiderIds.joinToString(", ") { "?" }
+        val sql = """
+            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
+            FROM loot_awards
+            WHERE raider_id IN ($placeholders)
+            ORDER BY awardedAt DESC
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql, lootAwardRowMapper, *raiderIds.map { it.value }.toTypedArray())
+    }
+
     private fun existsById(id: LootAwardId): Boolean {
         val sql = "SELECT COUNT(*) FROM loot_awards WHERE id = ?"
         val count = jdbcTemplate.queryForObject(sql, Int::class.java, id.value) ?: 0

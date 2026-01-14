@@ -38,4 +38,9 @@ class InMemoryLootAwardRepository : LootAwardRepository {
     override fun delete(id: LootAwardId) {
         storage.remove(id)
     }
+
+    override fun findByRaiderIds(raiderIds: List<RaiderId>): List<LootAward> {
+        val raiderIdSet = raiderIds.toSet()
+        return storage.values.filter { it.raiderId in raiderIdSet }
+    }
 }

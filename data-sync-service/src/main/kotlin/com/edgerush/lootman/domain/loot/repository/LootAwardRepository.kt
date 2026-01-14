@@ -28,4 +28,14 @@ interface LootAwardRepository {
     fun save(lootAward: LootAward): LootAward
 
     fun delete(id: LootAwardId)
+
+    /**
+     * Find loot awards for multiple raiders in a single query.
+     *
+     * Used for batch loading to prevent N+1 queries.
+     *
+     * @param raiderIds The list of raider IDs to find awards for
+     * @return List of loot awards for all specified raiders
+     */
+    fun findByRaiderIds(raiderIds: List<RaiderId>): List<LootAward>
 }
