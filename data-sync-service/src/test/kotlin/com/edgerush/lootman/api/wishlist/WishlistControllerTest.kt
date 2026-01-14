@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.wishlist
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.wishlist.DeleteWishlistCommand
 import com.edgerush.lootman.application.wishlist.DeleteWishlistUseCase
 import com.edgerush.lootman.application.wishlist.GetWishlistQuery
@@ -31,6 +32,7 @@ class WishlistControllerTest : UnitTest() {
     private lateinit var getWishlistUseCase: GetWishlistUseCase
     private lateinit var saveWishlistUseCase: SaveWishlistUseCase
     private lateinit var deleteWishlistUseCase: DeleteWishlistUseCase
+    private lateinit var currentUserService: CurrentUserService
     private lateinit var controller: WishlistController
 
     @BeforeEach
@@ -38,10 +40,12 @@ class WishlistControllerTest : UnitTest() {
         getWishlistUseCase = mockk()
         saveWishlistUseCase = mockk()
         deleteWishlistUseCase = mockk()
+        currentUserService = mockk()
         controller = WishlistController(
             getWishlistUseCase,
             saveWishlistUseCase,
-            deleteWishlistUseCase
+            deleteWishlistUseCase,
+            currentUserService,
         )
     }
 

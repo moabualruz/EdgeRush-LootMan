@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.gear
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.gear.GetCurrentGearQuery
 import com.edgerush.lootman.application.gear.GetCurrentGearUseCase
 import com.edgerush.lootman.application.gear.GetGearByTypeQuery
@@ -33,6 +34,7 @@ class GearControllerTest : UnitTest() {
     private lateinit var getCurrentGearUseCase: GetCurrentGearUseCase
     private lateinit var getGearByTypeUseCase: GetGearByTypeUseCase
     private lateinit var saveGearUseCase: SaveGearUseCase
+    private lateinit var currentUserService: CurrentUserService
     private lateinit var controller: GearController
 
     @BeforeEach
@@ -40,10 +42,12 @@ class GearControllerTest : UnitTest() {
         getCurrentGearUseCase = mockk()
         getGearByTypeUseCase = mockk()
         saveGearUseCase = mockk()
+        currentUserService = mockk()
         controller = GearController(
             getCurrentGearUseCase,
             getGearByTypeUseCase,
-            saveGearUseCase
+            saveGearUseCase,
+            currentUserService,
         )
     }
 

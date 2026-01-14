@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.attendance
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.attendance.AttendanceReport
 import com.edgerush.lootman.application.attendance.DeleteAttendanceUseCase
 import com.edgerush.lootman.application.attendance.GetAttendanceRecordUseCase
@@ -39,6 +40,7 @@ class AttendanceControllerTest : UnitTest() {
     private lateinit var deleteAttendanceUseCase: DeleteAttendanceUseCase
     private lateinit var listRaiderAttendanceUseCase: ListRaiderAttendanceUseCase
     private lateinit var getGuildAttendanceSummaryUseCase: GetGuildAttendanceSummaryUseCase
+    private lateinit var currentUserService: CurrentUserService
     private lateinit var controller: AttendanceController
 
     @BeforeEach
@@ -50,6 +52,7 @@ class AttendanceControllerTest : UnitTest() {
         deleteAttendanceUseCase = mockk()
         listRaiderAttendanceUseCase = mockk()
         getGuildAttendanceSummaryUseCase = mockk()
+        currentUserService = mockk()
         controller = AttendanceController(
             trackAttendanceUseCase,
             getAttendanceReportUseCase,
@@ -58,6 +61,7 @@ class AttendanceControllerTest : UnitTest() {
             deleteAttendanceUseCase,
             listRaiderAttendanceUseCase,
             getGuildAttendanceSummaryUseCase,
+            currentUserService,
         )
     }
 
