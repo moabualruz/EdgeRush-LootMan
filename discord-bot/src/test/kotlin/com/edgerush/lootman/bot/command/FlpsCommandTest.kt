@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,7 +69,7 @@ class FlpsCommandTest {
         every { deferAction.queue() } returns Unit
         every { event.hook } returns hook
 
-        val messageAction = mockk<WebhookMessageCreateAction<*>>(relaxed = true)
+        val messageAction = mockk<WebhookMessageCreateAction<Message>>(relaxed = true)
         every { hook.sendMessageEmbeds(capture(embedSlot)) } returns messageAction
 
         coEvery { apiClient.getDiscordUserLink("123456") } returns null
@@ -97,7 +98,7 @@ class FlpsCommandTest {
         every { deferAction.queue() } returns Unit
         every { event.hook } returns hook
 
-        val messageAction = mockk<WebhookMessageCreateAction<*>>(relaxed = true)
+        val messageAction = mockk<WebhookMessageCreateAction<Message>>(relaxed = true)
         every { hook.sendMessageEmbeds(capture(embedSlot)) } returns messageAction
 
         val userLinks = DiscordUserLinkResponse(

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,7 +69,7 @@ class LeaderboardCommandTest {
         every { deferAction.queue() } returns Unit
         every { event.hook } returns hook
 
-        val messageAction = mockk<WebhookMessageCreateAction<*>>(relaxed = true)
+        val messageAction = mockk<WebhookMessageCreateAction<Message>>(relaxed = true)
         every { hook.sendMessageEmbeds(capture(embedSlot)) } returns messageAction
 
         val leaderboard = LeaderboardResponse(
@@ -130,7 +131,7 @@ class LeaderboardCommandTest {
         every { deferAction.queue() } returns Unit
         every { event.hook } returns hook
 
-        val messageAction = mockk<WebhookMessageCreateAction<*>>(relaxed = true)
+        val messageAction = mockk<WebhookMessageCreateAction<Message>>(relaxed = true)
         every { hook.sendMessageEmbeds(capture(embedSlot)) } returns messageAction
 
         val leaderboard = LeaderboardResponse(
