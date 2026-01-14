@@ -430,6 +430,22 @@ class RaiderControllerTest : UnitTest() {
             // Then
             querySlot.captured.limit shouldBe 100  // maxPageSize
         }
+
+        @Test
+        fun `should throw exception when use case fails`() {
+            // Given
+            every { listRaidersUseCase.executeByGuildPaginated(any()) } returns Result.failure(
+                RuntimeException("Database query failed")
+            )
+
+            // When/Then
+            try {
+                controller.getRaidersByGuild("test-guild", page = 0, size = 20)
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: RuntimeException) {
+                e.message shouldBe "Database query failed"
+            }
+        }
     }
 
     @Nested
@@ -457,6 +473,22 @@ class RaiderControllerTest : UnitTest() {
             response.raiders[2].characterName shouldBe "Raider3"
 
             verify(exactly = 1) { listRaidersUseCase.executeByGuild(any()) }
+        }
+
+        @Test
+        fun `should throw exception when use case fails`() {
+            // Given
+            every { listRaidersUseCase.executeByGuild(any()) } returns Result.failure(
+                RuntimeException("Database connection failed")
+            )
+
+            // When/Then
+            try {
+                controller.getAllRaidersByGuild("test-guild")
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: RuntimeException) {
+                e.message shouldBe "Database connection failed"
+            }
         }
     }
 

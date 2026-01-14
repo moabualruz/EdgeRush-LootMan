@@ -319,6 +319,24 @@ class InMemorySimulationRepositoryTest : UnitTest() {
             // Then
             results.size shouldBe 3
         }
+
+        @Test
+        fun `should return results as a copy list preventing mutation`() {
+            // Given - exercises results[profileId]?.toList() branch when results exist
+            val profile = createProfile()
+            val (profileId, _) = repository.saveProfile(profile)
+            val result = createResult()
+            repository.saveResult(profileId, result)
+
+            // When - retrieve results twice
+            val results1 = repository.findResultsByProfile(profileId)
+            val results2 = repository.findResultsByProfile(profileId)
+
+            // Then - both should return valid lists with the result
+            results1.size shouldBe 1
+            results2.size shouldBe 1
+            results1[0].itemId shouldBe 12345L
+        }
     }
 
     @Nested

@@ -66,4 +66,24 @@ class LootAwardTest : UnitTest() {
             }
         exception.message shouldBe "Can only revoke active loot awards"
     }
+
+    @Test
+    fun `LootAwardId should throw exception when value is blank`() {
+        // Act & Assert
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                LootAwardId("")
+            }
+        exception.message shouldBe "LootAward ID cannot be blank"
+    }
+
+    @Test
+    fun `LootAwardId should throw exception when value is whitespace only`() {
+        // Act & Assert
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                LootAwardId("   ")
+            }
+        exception.message shouldBe "LootAward ID cannot be blank"
+    }
 }

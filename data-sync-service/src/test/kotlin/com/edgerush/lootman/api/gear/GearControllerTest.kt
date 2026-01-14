@@ -306,6 +306,35 @@ class GearControllerTest : UnitTest() {
             commandSlot.captured.raiderId shouldBe 42L
             commandSlot.captured.gearSetType shouldBe "BEST"
         }
+
+        @Test
+        fun `should throw exception when use case fails`() {
+            // Given
+            val request = SaveGearRequest(
+                gearSetType = "EQUIPPED",
+                items = listOf(
+                    GearItemRequest(
+                        itemId = 100L,
+                        name = "Invalid Item",
+                        itemLevel = 600,
+                        quality = "EPIC",
+                        slot = "HEAD"
+                    )
+                )
+            )
+
+            every { saveGearUseCase.execute(any()) } returns Result.failure(
+                NoSuchElementException("Raider not found: 999")
+            )
+
+            // When/Then
+            try {
+                controller.updateGear(999L, request)
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: NoSuchElementException) {
+                e.message shouldBe "Raider not found: 999"
+            }
+        }
     }
 
     @Nested

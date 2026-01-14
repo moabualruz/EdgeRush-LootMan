@@ -560,4 +560,280 @@ class DockerSimulationExecutorTest : UnitTest() {
             command.isNotEmpty() shouldBe true
         }
     }
+
+    @Nested
+    inner class ExecuteMethodTests {
+        @Test
+        fun `should return failure when process times out`() {
+            runBlocking {
+                // Arrange - use a command that sleeps longer than timeout
+                // On Windows use "timeout" (or "ping -n"), on Unix use "sleep"
+                val sleepCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                    "cmd"
+                } else {
+                    "sleep"
+                }
+
+                val shortTimeoutExecutor = DockerSimulationExecutor(
+                    dockerImage = "simc",
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = sleepCommand,
+                    timeoutMinutes = 0 // 0 minutes means immediate timeout
+                )
+
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Act
+                val result = shortTimeoutExecutor.execute(request)
+
+                // Assert
+                result.isFailure shouldBe true
+                result.exceptionOrNull()?.message?.contains("timed out") shouldBe true
+            }
+        }
+
+        @Test
+        fun `should return failure when process exits with non-zero code`() {
+            runBlocking {
+                // Arrange - use a command that exits with error
+                val failCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                    "cmd"
+                } else {
+                    "false"
+                }
+
+                val failingExecutor = DockerSimulationExecutor(
+                    dockerImage = "/c exit 1", // For cmd, this becomes: cmd /c exit 1
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = failCommand,
+                    timeoutMinutes = 1
+                )
+
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Act
+                val result = failingExecutor.execute(request)
+
+                // Assert
+                result.isFailure shouldBe true
+                // Either times out or fails with exit code
+                result.exceptionOrNull() shouldBe io.kotest.matchers.types.beInstanceOf<Exception>()
+            }
+        }
+
+        @Test
+        fun `should return failure when output file does not exist`() {
+            runBlocking {
+                // Arrange - use echo which succeeds but doesn't create output file
+                val echoCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                    "cmd"
+                } else {
+                    "echo"
+                }
+
+                val noOutputExecutor = DockerSimulationExecutor(
+                    dockerImage = "/c echo done", // cmd /c echo done
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = echoCommand,
+                    timeoutMinutes = 1
+                )
+
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Act
+                val result = noOutputExecutor.execute(request)
+
+                // Assert
+                result.isFailure shouldBe true
+                result.exceptionOrNull()?.message?.contains("Output file not found") shouldBe true
+            }
+        }
+
+        @Test
+        fun `should return success when simulation completes successfully`() {
+            runBlocking {
+                // Arrange - Create a fake output file before execution
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Write profile file first
+                val profileFile = executor.writeProfileToFile(request)
+
+                // Create the expected output file with valid simulation results
+                val outputFile = File(profileFile.parent, "${profileFile.nameWithoutExtension}_results.json")
+                outputFile.writeText("""
+                    {
+                        "sim": {
+                            "profilesets": {
+                                "results": [
+                                    {
+                                        "name": "head=,id=12345,ilevel=639",
+                                        "mean_pct": 5.0
+                                    }
+                                ]
+                            },
+                            "players": [
+                                {
+                                    "collected_data": {
+                                        "dps": { "mean": 100000.0 }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                """.trimIndent())
+
+                // Use echo to simulate a successful command
+                val echoCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                    "cmd"
+                } else {
+                    "true"
+                }
+
+                val successExecutor = DockerSimulationExecutor(
+                    dockerImage = "/c echo done",
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = echoCommand,
+                    timeoutMinutes = 1
+                )
+
+                // Act
+                val result = successExecutor.execute(request)
+
+                // Assert
+                result.isSuccess shouldBe true
+                result.getOrNull()?.size shouldBe 1
+                result.getOrNull()?.first()?.itemId shouldBe 12345L
+            }
+        }
+
+        @Test
+        fun `should handle exception during execution`() {
+            runBlocking {
+                // Arrange - use a non-existent command to trigger an exception
+                val badExecutor = DockerSimulationExecutor(
+                    dockerImage = "simc",
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = "this_command_does_not_exist_anywhere_12345",
+                    timeoutMinutes = 1
+                )
+
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Act
+                val result = badExecutor.execute(request)
+
+                // Assert
+                result.isFailure shouldBe true
+            }
+        }
+    }
+
+    @Nested
+    inner class ParseSimulationResultsNullBranches {
+        @Test
+        fun `should handle player with null collected_data path`() {
+            // Arrange - player has no collected_data at all
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "name": "Testchar"
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value (100000)
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 5000.0
+        }
+
+        @Test
+        fun `should handle player with null dps path inside collected_data`() {
+            // Arrange - collected_data exists but dps path is missing
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 10.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "name": "Testchar",
+                                "collected_data": {
+                                    "other_field": 123
+                                }
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 10000.0
+        }
+
+        @Test
+        fun `should handle player with null mean inside dps`() {
+            // Arrange - dps exists but mean is missing
+            val jsonContent = """
+                {
+                    "sim": {
+                        "profilesets": {
+                            "results": [
+                                {
+                                    "name": "head=,id=12345,ilevel=639",
+                                    "mean_pct": 5.0
+                                }
+                            ]
+                        },
+                        "players": [
+                            {
+                                "name": "Testchar",
+                                "collected_data": {
+                                    "dps": {
+                                        "median": 100000.0
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            """.trimIndent()
+
+            // Act
+            val results = executor.parseSimulationResults(jsonContent)
+
+            // Assert - should use default dps value since mean is missing
+            results shouldHaveSize 1
+            results[0].dpsGain shouldBe 5000.0
+        }
+    }
 }

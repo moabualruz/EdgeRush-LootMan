@@ -242,6 +242,62 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         }
 
         @Test
+        fun `should return null when start date matches but end date does not match`() {
+            // Given - tests matchesPeriod branch: periodStart matches but periodEnd doesn't
+            val data = createPerformanceData(
+                characterName = "TestRaider",
+                characterRealm = "Area52",
+                periodStart = oneWeekAgo,
+                periodEnd = twoWeeksAgo // Different end date
+            )
+
+            repository.save(guildId, data)
+
+            // When - same start date, different end date
+            val result = repository.findByCharacterAndPeriod(
+                "TestRaider",
+                "Area52",
+                guildId,
+                oneWeekAgo,
+                now // Different end date
+            )
+
+            // Then
+            result shouldBe null
+        }
+
+        @Test
+        fun `should return null when guild matches but data reference differs`() {
+            // Given - tests matchesGuild branch: key.startsWith(guildId) is true but value != data
+            // This happens when there's data for the same guild but different raider
+            val data1 = createPerformanceData(
+                raiderId = RaiderId(1L),
+                characterName = "Raider1",
+                characterRealm = "Area52"
+            )
+            val data2 = createPerformanceData(
+                raiderId = RaiderId(2L),
+                characterName = "Raider2",
+                characterRealm = "OtherRealm"
+            )
+
+            repository.save(guildId, data1)
+            repository.save(guildId, data2)
+
+            // When - search for Raider2 but with wrong realm
+            val result = repository.findByCharacterAndPeriod(
+                "Raider2",
+                "Area52", // Wrong realm for Raider2
+                guildId,
+                oneWeekAgo,
+                now
+            )
+
+            // Then
+            result shouldBe null
+        }
+
+        @Test
         fun `should return null when guild does not match for character search`() {
             // Given - tests matchesGuild branch returning false
             val data = createPerformanceData(

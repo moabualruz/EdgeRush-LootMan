@@ -278,6 +278,34 @@ class WishlistControllerTest : UnitTest() {
             // Then
             commandSlot.captured.raiderId shouldBe 42L // Path variable takes precedence
         }
+
+        @Test
+        fun `should throw exception when use case fails`() {
+            // Given
+            val request = SaveWishlistRequest(
+                raiderId = 1L,
+                items = listOf(
+                    WishlistItemRequest(
+                        itemId = 100L,
+                        itemName = "Test Item",
+                        priority = 1,
+                        upgradePercentage = 10.0
+                    )
+                )
+            )
+
+            every { saveWishlistUseCase.execute(any()) } returns Result.failure(
+                NoSuchElementException("Raider not found: 999")
+            )
+
+            // When/Then
+            try {
+                controller.updateWishlist(999L, request)
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: NoSuchElementException) {
+                e.message shouldBe "Raider not found: 999"
+            }
+        }
     }
 
     @Nested

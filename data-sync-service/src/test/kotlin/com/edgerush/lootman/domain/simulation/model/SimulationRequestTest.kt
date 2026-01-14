@@ -177,6 +177,22 @@ class SimulationRequestTest : UnitTest() {
                 request.markRunning()
             }
         }
+
+        @Test
+        fun `should throw exception when transitioning from PENDING to FAILED`() {
+            // Arrange
+            val request = SimulationRequest.create(
+                profile = createValidProfile(),
+                iterations = 10000,
+                fightLengthSeconds = 300
+            )
+
+            // Act & Assert
+            val exception = shouldThrow<IllegalStateException> {
+                request.markFailed("Error message")
+            }
+            exception.message shouldContain "Cannot transition to FAILED from PENDING"
+        }
     }
 
     @Nested

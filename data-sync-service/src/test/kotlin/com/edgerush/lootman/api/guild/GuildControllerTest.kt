@@ -374,6 +374,38 @@ class GuildControllerTest : UnitTest() {
 
             verify(exactly = 1) { listGuildsUseCase.executeActiveOnly() }
         }
+
+        @Test
+        fun `should throw exception when listGuilds use case fails`() {
+            // Given
+            every { listGuildsUseCase.execute() } returns Result.failure(
+                RuntimeException("Database connection failed")
+            )
+
+            // When/Then
+            try {
+                controller.listGuilds()
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: RuntimeException) {
+                e.message shouldBe "Database connection failed"
+            }
+        }
+
+        @Test
+        fun `should throw exception when listActiveGuilds use case fails`() {
+            // Given
+            every { listGuildsUseCase.executeActiveOnly() } returns Result.failure(
+                RuntimeException("Database query failed")
+            )
+
+            // When/Then
+            try {
+                controller.listActiveGuilds()
+                throw AssertionError("Expected exception was not thrown")
+            } catch (e: RuntimeException) {
+                e.message shouldBe "Database query failed"
+            }
+        }
     }
 
     @Nested

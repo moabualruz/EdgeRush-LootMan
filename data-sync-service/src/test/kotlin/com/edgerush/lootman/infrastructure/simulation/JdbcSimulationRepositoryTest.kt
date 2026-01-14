@@ -467,9 +467,182 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             found?.percentGain shouldBe 1.5
         }
 
-        // Note: Tests for mapRequestRow with different SimulationStatus values are covered
-        // by integration tests (JdbcSimulationRepositoryIntegrationTest) which use a real database.
-        // The mapRequestRow function uses a lambda that MockK has difficulty matching in unit tests.
+    }
+
+    @Nested
+    inner class MapRequestRowTests {
+        private fun setupMockResultSetForRequest(
+            status: String,
+            errorMessage: String? = null
+        ): ResultSet {
+            val now = Instant.now()
+            val rs = mockk<ResultSet>()
+
+            // Profile fields
+            every { rs.getString("guild_id") } returns "guild-123"
+            every { rs.getString("character_name") } returns "TestChar"
+            every { rs.getString("character_realm") } returns "TestRealm"
+            every { rs.getString("profile_content") } returns "warrior=\"TestChar\""
+            every { rs.getTimestamp("profile_created_at") } returns Timestamp.from(now)
+
+            // Request fields
+            every { rs.getLong("id") } returns 42L
+            every { rs.getInt("iterations") } returns 10000
+            every { rs.getInt("fight_length_seconds") } returns 300
+            every { rs.getString("status") } returns status
+            every { rs.getTimestamp("submitted_at") } returns Timestamp.from(now)
+            every { rs.getTimestamp("completed_at") } returns Timestamp.from(now)
+            every { rs.getString("error_message") } returns errorMessage
+
+            return rs
+        }
+
+        @Test
+        fun `should map PENDING status correctly`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("PENDING")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.id shouldBe 42L
+            result?.status shouldBe SimulationStatus.PENDING
+        }
+
+        @Test
+        fun `should map RUNNING status correctly`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("RUNNING")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.status shouldBe SimulationStatus.RUNNING
+        }
+
+        @Test
+        fun `should map COMPLETED status correctly`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("COMPLETED")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.status shouldBe SimulationStatus.COMPLETED
+        }
+
+        @Test
+        fun `should map FAILED status with error message`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("FAILED", "Simulation timeout")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.status shouldBe SimulationStatus.FAILED
+            result?.errorMessage shouldBe "Simulation timeout"
+        }
+
+        @Test
+        fun `should default to Unknown error when error message is null for FAILED status`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("FAILED", null)
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val result = repository.findRequestById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.status shouldBe SimulationStatus.FAILED
+            result?.errorMessage shouldBe "Unknown error"
+        }
+
+        @Test
+        fun `should map pending request via findPendingRequests`() {
+            // Arrange
+            val rs = setupMockResultSetForRequest("PENDING")
+            val mapperSlot = slot<RowMapper<SimulationRequest>>()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("simulation_requests") && it.contains("WHERE r.status = ?") },
+                    capture(mapperSlot),
+                    *varargAll { true }
+                )
+            } answers {
+                listOf(mapperSlot.captured.mapRow(rs, 0)!!)
+            }
+
+            // Act
+            val results = repository.findPendingRequests()
+
+            // Assert
+            results shouldHaveSize 1
+            results[0].status shouldBe SimulationStatus.PENDING
+        }
     }
 
     @Nested

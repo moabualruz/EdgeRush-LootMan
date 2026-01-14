@@ -630,4 +630,5 @@ class AuditWebFilterTest : UnitTest() {
             verify(exactly = 0) { auditLogRepository.save(any()) }
         }
     }
+
 }

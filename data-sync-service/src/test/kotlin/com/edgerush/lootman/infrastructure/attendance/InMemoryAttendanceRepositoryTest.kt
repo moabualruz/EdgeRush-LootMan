@@ -355,6 +355,34 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
     }
 
     @Test
+    fun `should exclude record from instance query when raiderId does not match`() {
+        // Arrange - tests filter branch: record.raiderId == raiderId = false (short-circuits)
+        val guildId = GuildId("test-guild")
+        val instance = "Nerub-ar Palace"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = RaiderId(1L),
+                guildId = guildId,
+                instance = instance,
+            )
+        repository.save(record)
+
+        // Act - search with different raiderId
+        val results =
+            repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                RaiderId(999L), // Different raider
+                guildId,
+                instance,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
     fun `should exclude record from instance query when date range does not overlap`() {
         // Arrange
         val raiderId = RaiderId(1L)
@@ -406,6 +434,37 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
             repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
                 raiderId,
                 GuildId("test-guild"),
+                instance,
+                encounter,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from encounter query when raiderId does not match`() {
+        // Arrange - tests filter branch: record.raiderId == raiderId = false (short-circuits)
+        val guildId = GuildId("test-guild")
+        val instance = "Nerub-ar Palace"
+        val encounter = "Queen Ansurek"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = RaiderId(1L),
+                guildId = guildId,
+                instance = instance,
+                encounter = encounter,
+            )
+        repository.save(record)
+
+        // Act - search with different raiderId
+        val results =
+            repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                RaiderId(999L), // Different raider
+                guildId,
                 instance,
                 encounter,
                 LocalDate.of(2024, 11, 1),

@@ -229,6 +229,24 @@ class LootControllerTest : UnitTest() {
     }
 
     @Test
+    fun `getGuildLootHistory should throw exception when use case fails`() {
+        // Given
+        val guildId = "test-guild"
+
+        every { getLootHistoryUseCase.getByGuild(any()) } returns Result.failure(
+            RuntimeException("Database error")
+        )
+
+        // When/Then
+        try {
+            controller.getGuildLootHistory(guildId, false)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: RuntimeException) {
+            e.message shouldBe "Database error"
+        }
+    }
+
+    @Test
     fun `getRaiderLootHistory should return loot history for raider`() {
         // Given
         val raiderId = "456"
@@ -266,6 +284,24 @@ class LootControllerTest : UnitTest() {
         // Then
         querySlot.captured.raiderId shouldBe RaiderId(789L)
         querySlot.captured.activeOnly shouldBe true
+    }
+
+    @Test
+    fun `getRaiderLootHistory should throw exception when use case fails`() {
+        // Given
+        val raiderId = "456"
+
+        every { getLootHistoryUseCase.getByRaider(any()) } returns Result.failure(
+            RuntimeException("Raider lookup failed")
+        )
+
+        // When/Then
+        try {
+            controller.getRaiderLootHistory(raiderId, false)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: RuntimeException) {
+            e.message shouldBe "Raider lookup failed"
+        }
     }
 
     @Test
@@ -327,6 +363,29 @@ class LootControllerTest : UnitTest() {
         response.statusCode shouldBe HttpStatus.CREATED
         response.body?.expiresAt shouldBe null
         response.body?.isActive shouldBe true
+    }
+
+    @Test
+    fun `createBan should throw exception when use case fails`() {
+        // Given
+        val request = CreateLootBanRequest(
+            raiderId = "456",
+            guildId = "guild-789",
+            reason = "Test ban",
+            expiresAt = null,
+        )
+
+        every { manageLootBansUseCase.createBan(any()) } returns Result.failure(
+            RuntimeException("Ban creation failed")
+        )
+
+        // When/Then
+        try {
+            controller.createBan(request)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: RuntimeException) {
+            e.message shouldBe "Ban creation failed"
+        }
     }
 
     @Test
@@ -419,6 +478,25 @@ class LootControllerTest : UnitTest() {
 
         // Then
         response.bans shouldHaveSize 0
+    }
+
+    @Test
+    fun `getActiveBans should throw exception when use case fails`() {
+        // Given
+        val raiderId = "456"
+        val guildId = "guild-789"
+
+        every { manageLootBansUseCase.getActiveBans(any()) } returns Result.failure(
+            RuntimeException("Failed to get active bans")
+        )
+
+        // When/Then
+        try {
+            controller.getActiveBans(raiderId, guildId)
+            throw AssertionError("Expected exception was not thrown")
+        } catch (e: RuntimeException) {
+            e.message shouldBe "Failed to get active bans"
+        }
     }
 
     @Nested
