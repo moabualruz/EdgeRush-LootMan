@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: lootman-discord-bot
+
+discord:
+  bot:
+    token: ${DISCORD_BOT_TOKEN:}
+    application-id: ${DISCORD_APPLICATION_ID:}
+
+  backend:
+    url: ${BACKEND_URL:http://localhost:8080}
+    timeout: 30
+
+  commands:
+    enabled: true
+    admin-role-ids: ${DISCORD_ADMIN_ROLE_IDS:}
+    officer-role-ids: ${DISCORD_OFFICER_ROLE_IDS:}
+
+  guilds:
+    - guild-id: ${LOOTMAN_GUILD_ID:}
+      discord-server-id: ${DISCORD_SERVER_ID:}
+      notification-channels:
+        loot-awards: ${DISCORD_CHANNEL_LOOT_AWARDS:}
+        rdf-expiry: ${DISCORD_CHANNEL_RDF_EXPIRY:}
+        penalties: ${DISCORD_CHANNEL_PENALTIES:}
+
+  notifications:
+    loot-awards:
+      enabled: true
+      include-runner-ups: 3
+    rdf-expiry:
+      enabled: true
+      dm-users: true
+    penalties:
+      enabled: true
+      dm-users: true
+
+logging:
+  level:
+    com.edgerush.lootman.bot: INFO
+    net.dv8tion.jda: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: when-authorized
