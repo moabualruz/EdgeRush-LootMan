@@ -398,6 +398,106 @@ class JdbcSimulationRepositoryTest : UnitTest() {
     }
 
     @Nested
+    inner class RowMapperTests {
+        @Test
+        fun `should invoke profileRowMapper and map fields correctly`() {
+            // Arrange
+            val now = Instant.now()
+            val rs = mockk<ResultSet>()
+            every { rs.getString("guild_id") } returns "guild-123"
+            every { rs.getString("character_name") } returns "TestChar"
+            every { rs.getString("character_realm") } returns "TestRealm"
+            every { rs.getString("profile_content") } returns "warrior=\"TestChar\""
+            every { rs.getTimestamp("created_at") } returns Timestamp.from(now)
+
+            val capturedMapper = slot<RowMapper<SimulationProfile>>()
+            every {
+                jdbcTemplate.query(
+                    match { it.contains("SELECT") && it.contains("WHERE id = ?") },
+                    capture(capturedMapper),
+                    eq(42L)
+                )
+            } answers {
+                listOf(capturedMapper.captured.mapRow(rs, 0))
+            }
+
+            // Act
+            val result = repository.findProfileById(42L)
+
+            // Assert
+            result shouldNotBe null
+            result?.guildId shouldBe "guild-123"
+            result?.characterName shouldBe "TestChar"
+            result?.characterRealm shouldBe "TestRealm"
+        }
+
+        @Test
+        fun `should invoke resultRowMapper and map fields correctly`() {
+            // Arrange
+            val now = Instant.now()
+            val rs = mockk<ResultSet>()
+            every { rs.getLong("item_id") } returns 12345L
+            every { rs.getString("item_name") } returns "Test Item"
+            every { rs.getString("slot") } returns "head"
+            every { rs.getDouble("dps_gain") } returns 1000.0
+            every { rs.getDouble("percent_gain") } returns 1.5
+            every { rs.getTimestamp("simulated_at") } returns Timestamp.from(now)
+
+            val capturedMapper = slot<RowMapper<SimulationResult>>()
+            every {
+                jdbcTemplate.query(
+                    match { it.contains("ORDER BY simulated_at DESC") && it.contains("LIMIT 1") },
+                    capture(capturedMapper),
+                    eq(1L),
+                    eq(12345L)
+                )
+            } answers {
+                listOf(capturedMapper.captured.mapRow(rs, 0))
+            }
+
+            // Act
+            val found = repository.findLatestResultForItem(1L, 12345L)
+
+            // Assert
+            found shouldNotBe null
+            found?.itemId shouldBe 12345L
+            found?.itemName shouldBe "Test Item"
+            found?.slot shouldBe "head"
+            found?.dpsGain shouldBe 1000.0
+            found?.percentGain shouldBe 1.5
+        }
+
+        // Note: Tests for mapRequestRow with different SimulationStatus values are covered
+        // by integration tests (JdbcSimulationRepositoryIntegrationTest) which use a real database.
+        // The mapRequestRow function uses a lambda that MockK has difficulty matching in unit tests.
+    }
+
+    @Nested
+    inner class InsertWithCompletedAt {
+        @Test
+        fun `should insert request with non-null completedAt`() {
+            // Arrange
+            val profile = createProfile()
+            val completedAt = Instant.now()
+            val request = SimulationRequest.create(profile = profile)
+                .markRunning()
+                .markCompleted(emptyList())
+
+            every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
+            every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java)) } returns 1L
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // Act
+            val result = repository.saveRequest(request)
+
+            // Assert
+            result.id shouldNotBe null
+            result.completedAt shouldNotBe null
+            verify { jdbcTemplate.update(match { it.contains("INSERT INTO simulation_requests") }, *anyVararg()) }
+        }
+    }
+
+    @Nested
     inner class SaveRequestUpdate {
         @Test
         fun `should update existing request when id is present`() {

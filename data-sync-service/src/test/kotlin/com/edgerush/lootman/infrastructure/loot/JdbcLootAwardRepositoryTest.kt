@@ -518,6 +518,89 @@ class JdbcLootAwardRepositoryTest : UnitTest() {
                 )
             }
         }
+
+        @Test
+        fun `should handle null count from existsById query`() {
+            // Given - covers the elvis branch when queryForObject returns null
+            val award = createLootAward()
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, award.id.value) } returns null
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(award)
+
+            // Then - null count defaults to 0, so INSERT is called
+            result shouldBe award
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    *anyVararg()
+                )
+            }
+        }
+
+        @Test
+        fun `should insert revoked loot award with REVOKED status`() {
+            // Given - covers the REVOKED branch in insertLootAward
+            val activeAward = createLootAward()
+            val revokedAward = activeAward.revoke("Test revocation")
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, revokedAward.id.value) } returns 0
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(revokedAward)
+
+            // Then
+            result shouldBe revokedAward
+            result.isActive() shouldBe false
+
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    revokedAward.id.value,
+                    revokedAward.itemId.value,
+                    revokedAward.raiderId.value,
+                    revokedAward.guildId.value,
+                    any<Timestamp>(),
+                    revokedAward.flpsScore.value,
+                    revokedAward.tier.name,
+                    "REVOKED" // Status should be REVOKED
+                )
+            }
+        }
+
+        @Test
+        fun `should update revoked loot award with REVOKED status`() {
+            // Given - covers the REVOKED branch in updateLootAward
+            val activeAward = createLootAward()
+            val revokedAward = activeAward.revoke("Test revocation")
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, revokedAward.id.value) } returns 1
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(revokedAward)
+
+            // Then
+            result shouldBe revokedAward
+            result.isActive() shouldBe false
+
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("UPDATE") },
+                    revokedAward.itemId.value,
+                    revokedAward.raiderId.value,
+                    revokedAward.guildId.value,
+                    any<Timestamp>(),
+                    revokedAward.flpsScore.value,
+                    revokedAward.tier.name,
+                    "REVOKED", // Status should be REVOKED
+                    revokedAward.id.value
+                )
+            }
+        }
     }
 
     @Nested

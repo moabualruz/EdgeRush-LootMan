@@ -150,6 +150,37 @@ class JdbcWishlistRepositoryTest : UnitTest() {
         }
 
         @Test
+        fun `should default to Unknown Item when itemName is null`() {
+            // Given - covers the elvis branch when rs.getString("itemName") returns null
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") },
+                    any<RowMapper<WishlistItem>>(),
+                    eq(raiderId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<WishlistItem>>()
+                val rs = mockResultSet(
+                    itemId = 99999L,
+                    itemName = null, // Null item name
+                    priority = 1,
+                    upgradePercentage = 10.0,
+                    specName = null
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderId(raiderId)
+
+            // Then
+            result shouldNotBe null
+            result?.items?.first()?.itemName shouldBe "Unknown Item"
+        }
+
+        @Test
         fun `should return items sorted by priority`() {
             // Given
             val raiderId = RaiderId(100L)
@@ -315,7 +346,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
     private fun mockResultSet(
         itemId: Long = 12345L,
-        itemName: String = "Test Item",
+        itemName: String? = "Test Item",
         priority: Int = 1,
         upgradePercentage: Double = 15.0,
         specName: String? = null

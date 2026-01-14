@@ -382,6 +382,119 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
             result shouldNotBe null
             result?.avoidableDamagePercentage shouldBe 0.0
         }
+
+        @Test
+        fun `should handle non-null avoidable damage percentage`() {
+            // Given - covers the wasNull() = false branch
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("raiders") },
+                    any<RowMapper<RaiderPerformanceData>>(),
+                    eq(raiderId.value),
+                    eq(guildId.value),
+                    any<Timestamp>(),
+                    any<Timestamp>()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
+                val rs = mockk<ResultSet>()
+                every { rs.getLong("raider_id") } returns 100L
+                every { rs.getString("character_name") } returns "TestRaider"
+                every { rs.getString("character_realm") } returns "Area52"
+                every { rs.getInt("total_deaths") } returns 5
+                every { rs.getInt("total_fights") } returns 20
+                every { rs.getDouble("avg_avoidable_damage") } returns 15.5
+                every { rs.wasNull() } returns false // Not null - covers else branch
+                every { rs.getTimestamp("period_start") } returns Timestamp.from(oneWeekAgo)
+                every { rs.getTimestamp("period_end") } returns Timestamp.from(now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderAndPeriod(raiderId, guildId, oneWeekAgo, now)
+
+            // Then
+            result shouldNotBe null
+            result?.avoidableDamagePercentage shouldBe 15.5
+        }
+
+        @Test
+        fun `should use provided period bounds when timestamps are null`() {
+            // Given - covers the null timestamp branches
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("raiders") },
+                    any<RowMapper<RaiderPerformanceData>>(),
+                    eq(raiderId.value),
+                    eq(guildId.value),
+                    any<Timestamp>(),
+                    any<Timestamp>()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
+                val rs = mockk<ResultSet>()
+                every { rs.getLong("raider_id") } returns 100L
+                every { rs.getString("character_name") } returns "TestRaider"
+                every { rs.getString("character_realm") } returns "Area52"
+                every { rs.getInt("total_deaths") } returns 5
+                every { rs.getInt("total_fights") } returns 20
+                every { rs.getDouble("avg_avoidable_damage") } returns 10.0
+                every { rs.wasNull() } returns false
+                every { rs.getTimestamp("period_start") } returns null // Null timestamp - covers elvis branch
+                every { rs.getTimestamp("period_end") } returns null   // Null timestamp - covers elvis branch
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderAndPeriod(raiderId, guildId, oneWeekAgo, now)
+
+            // Then
+            result shouldNotBe null
+            result?.periodStart shouldBe oneWeekAgo // Uses provided periodStart
+            result?.periodEnd shouldBe now          // Uses provided periodEnd
+        }
+
+        @Test
+        fun `should handle null character name and realm`() {
+            // Given - covers the null string branches
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("raiders") },
+                    any<RowMapper<RaiderPerformanceData>>(),
+                    eq(raiderId.value),
+                    eq(guildId.value),
+                    any<Timestamp>(),
+                    any<Timestamp>()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
+                val rs = mockk<ResultSet>()
+                every { rs.getLong("raider_id") } returns 100L
+                every { rs.getString("character_name") } returns null // Null string - covers elvis branch
+                every { rs.getString("character_realm") } returns null // Null string - covers elvis branch
+                every { rs.getInt("total_deaths") } returns 5
+                every { rs.getInt("total_fights") } returns 20
+                every { rs.getDouble("avg_avoidable_damage") } returns 10.0
+                every { rs.wasNull() } returns false
+                every { rs.getTimestamp("period_start") } returns Timestamp.from(oneWeekAgo)
+                every { rs.getTimestamp("period_end") } returns Timestamp.from(now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderAndPeriod(raiderId, guildId, oneWeekAgo, now)
+
+            // Then
+            result shouldNotBe null
+            result?.characterName shouldBe ""  // Default value for null
+            result?.characterRealm shouldBe "" // Default value for null
+        }
     }
 
     // Helper method to create mock ResultSet

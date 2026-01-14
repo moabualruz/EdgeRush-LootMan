@@ -259,6 +259,34 @@ class InMemorySimulationRepositoryTest : UnitTest() {
         }
 
         @Test
+        fun `should return null when results exist for profile but not for requested item`() {
+            // Given - exercises the filter branch when results exist but itemId doesn't match
+            val profile = createProfile()
+            val (profileId, _) = repository.saveProfile(profile)
+            val result = createResult(itemId = 12345L)
+            repository.saveResult(profileId, result)
+
+            // When - search for a different item ID
+            val found = repository.findLatestResultForItem(profileId, 99999L)
+
+            // Then
+            found shouldBe null
+        }
+
+        @Test
+        fun `should return null when profile has no results`() {
+            // Given - exercises the null check on results[profileId]
+            val profile = createProfile()
+            val (profileId, _) = repository.saveProfile(profile)
+
+            // When - profile exists but no results saved
+            val found = repository.findLatestResultForItem(profileId, 12345L)
+
+            // Then
+            found shouldBe null
+        }
+
+        @Test
         fun `should return empty list when no results for profile`() {
             // Given
             val profile = createProfile()

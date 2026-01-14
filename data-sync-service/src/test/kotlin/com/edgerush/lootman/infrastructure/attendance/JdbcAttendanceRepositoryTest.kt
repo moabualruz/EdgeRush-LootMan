@@ -164,6 +164,94 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             result shouldNotBe null
             result?.encounter shouldBe null
         }
+
+        @Test
+        fun `should handle null team_id with default value`() {
+            // Given - tests branch: rs.getString("team_id") ?: "default"
+            val recordId = AttendanceRecordId("null-team-record")
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<AttendanceRecord>>(),
+                    eq(recordId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
+                val rs = mockResultSetWithNullableFields(
+                    id = recordId.value,
+                    teamId = null
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(recordId)
+
+            // Then
+            result shouldNotBe null
+            result?.guildId?.value shouldBe "default"
+        }
+
+        @Test
+        fun `should handle null instance with empty string default`() {
+            // Given - tests branch: rs.getString("instance") ?: ""
+            val recordId = AttendanceRecordId("null-instance-record")
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<AttendanceRecord>>(),
+                    eq(recordId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
+                val rs = mockResultSetWithNullableFields(
+                    id = recordId.value,
+                    instance = null
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(recordId)
+
+            // Then
+            result shouldNotBe null
+            result?.instance shouldBe ""
+        }
+
+        @Test
+        fun `should handle null syncedAt with current time default`() {
+            // Given - tests branch: rs.getTimestamp("syncedAt")?.toInstant() ?: Instant.now()
+            val recordId = AttendanceRecordId("null-synced-record")
+            val testTimeBeforeCall = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    any<RowMapper<AttendanceRecord>>(),
+                    eq(recordId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
+                val rs = mockResultSetWithNullableFields(
+                    id = recordId.value,
+                    syncedAt = null
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(recordId)
+            val testTimeAfterCall = Instant.now()
+
+            // Then
+            result shouldNotBe null
+            // The recordedAt should be set to approximately now
+            result!!.recordedAt.isAfter(testTimeBeforeCall.minusSeconds(1)) shouldBe true
+            result.recordedAt.isBefore(testTimeAfterCall.plusSeconds(1)) shouldBe true
+        }
     }
 
     @Nested
@@ -467,6 +555,32 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         every { rs.getInt("attendedAmount") } returns attendedRaids
         every { rs.getInt("totalAmount") } returns totalRaids
         every { rs.getTimestamp("syncedAt") } returns Timestamp.from(recordedAt)
+        return rs
+    }
+
+    private fun mockResultSetWithNullableFields(
+        id: String,
+        raiderId: Long = 100L,
+        teamId: String? = "test-guild",
+        instance: String? = "Nerub-ar Palace",
+        encounter: String? = "Ulgrax",
+        startDate: LocalDate = oneMonthAgo,
+        endDate: LocalDate = today,
+        attendedRaids: Int = 8,
+        totalRaids: Int = 10,
+        syncedAt: Timestamp? = Timestamp.from(now)
+    ): ResultSet {
+        val rs = mockk<ResultSet>()
+        every { rs.getString("id") } returns id
+        every { rs.getLong("character_id") } returns raiderId
+        every { rs.getString("team_id") } returns teamId
+        every { rs.getString("instance") } returns instance
+        every { rs.getString("encounter") } returns encounter
+        every { rs.getDate("startDate") } returns Date.valueOf(startDate)
+        every { rs.getDate("endDate") } returns Date.valueOf(endDate)
+        every { rs.getInt("attendedAmount") } returns attendedRaids
+        every { rs.getInt("totalAmount") } returns totalRaids
+        every { rs.getTimestamp("syncedAt") } returns syncedAt
         return rs
     }
 

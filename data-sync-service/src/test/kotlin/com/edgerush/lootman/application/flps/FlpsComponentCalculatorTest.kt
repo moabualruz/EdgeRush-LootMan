@@ -1,10 +1,12 @@
 package com.edgerush.lootman.application.flps
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.application.simulation.UpgradeValueCalculator
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
 import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
+import com.edgerush.lootman.domain.flps.model.UpgradeValue
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootAwardId
 import com.edgerush.lootman.domain.loot.model.LootBan
@@ -24,6 +26,10 @@ import com.edgerush.lootman.domain.shared.model.WishlistItem
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.LocalDate
@@ -186,6 +192,26 @@ class FlpsComponentCalculatorTest : UnitTest() {
         // With 0.5 dpa (deaths score ~0.8) and 20% avoidable (damage score ~0.75)
         // Weighted: 0.8 * 0.6 + 0.75 * 0.4 = 0.48 + 0.30 = 0.78
         result.value shouldBe (0.78 plusOrMinus 0.05)
+    }
+
+    @Test
+    fun `calculateMAS should handle deaths per attempt between 0_5 and 1_0`() {
+        // Arrange - 0.75 deaths per attempt (15 deaths in 20 fights)
+        // This tests the dpa <= 1.0 branch specifically
+        val performanceData = createPerformanceData(
+            totalDeaths = 15,
+            totalFights = 20,
+            avoidableDamagePercentage = 10.0,
+        )
+
+        // Act
+        val result = calculator.calculateMAS(performanceData)
+
+        // Assert
+        // dpa = 0.75 -> deathsScore = 0.8 - ((0.75 - 0.5) * 0.6) = 0.8 - 0.15 = 0.65
+        // avoidable = 10% -> avoidableScore = 1.0 - (10 * 0.01) = 0.9
+        // Weighted: 0.65 * 0.6 + 0.9 * 0.4 = 0.39 + 0.36 = 0.75
+        result.value shouldBe (0.75 plusOrMinus 0.05)
     }
 
     @Test
@@ -532,6 +558,210 @@ class FlpsComponentCalculatorTest : UnitTest() {
 
         // Assert
         result.value shouldBe 0.05
+    }
+
+    // ===== UV with Simulation Tests =====
+
+    @Nested
+    inner class CalculateUVWithSimulation {
+        @Test
+        fun `should use simulation calculator when available`() {
+            // Arrange
+            val mockUpgradeValueCalculator = mockk<UpgradeValueCalculator>()
+            val calculatorWithSim = FlpsComponentCalculator(mockUpgradeValueCalculator)
+            val itemId = ItemId(12345)
+            val expectedValue = UpgradeValue.of(0.75)
+
+            every {
+                mockUpgradeValueCalculator.calculateUpgradeValue(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null
+                )
+            } returns expectedValue
+
+            // Act
+            val result = calculatorWithSim.calculateUVWithSimulation(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlist = null
+            )
+
+            // Assert
+            result shouldBe expectedValue
+            verify {
+                mockUpgradeValueCalculator.calculateUpgradeValue(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null
+                )
+            }
+        }
+
+        @Test
+        fun `should pass wishlist to simulation calculator`() {
+            // Arrange
+            val mockUpgradeValueCalculator = mockk<UpgradeValueCalculator>()
+            val calculatorWithSim = FlpsComponentCalculator(mockUpgradeValueCalculator)
+            val itemId = ItemId(12345)
+            val wishlist = Wishlist(
+                raiderId = RaiderId(1),
+                items = listOf(
+                    WishlistItem(
+                        itemId = itemId,
+                        itemName = "Test Item",
+                        priority = 1,
+                        upgradePercentage = 50.0
+                    )
+                )
+            )
+            val expectedValue = UpgradeValue.of(0.85)
+
+            every {
+                mockUpgradeValueCalculator.calculateUpgradeValue(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = wishlist
+                )
+            } returns expectedValue
+
+            // Act
+            val result = calculatorWithSim.calculateUVWithSimulation(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlist = wishlist
+            )
+
+            // Assert
+            result shouldBe expectedValue
+        }
+
+        @Test
+        fun `should fall back to wishlist when simulation calculator is null`() {
+            // Arrange - using default calculator which has null upgradeValueCalculator
+            val itemId = ItemId(12345)
+            val wishlist = Wishlist(
+                raiderId = RaiderId(1),
+                items = listOf(
+                    WishlistItem(
+                        itemId = itemId,
+                        itemName = "Test Item",
+                        priority = 1,
+                        upgradePercentage = 60.0
+                    )
+                )
+            )
+
+            // Act
+            val result = calculator.calculateUVWithSimulation(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlist = wishlist
+            )
+
+            // Assert - should use wishlist fallback (60% = 0.6)
+            result.value shouldBe 0.6
+        }
+
+        @Test
+        fun `should return zero when simulation calculator is null and no wishlist`() {
+            // Arrange - using default calculator which has null upgradeValueCalculator
+            val itemId = ItemId(12345)
+
+            // Act
+            val result = calculator.calculateUVWithSimulation(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm",
+                itemId = itemId,
+                wishlist = null
+            )
+
+            // Assert
+            result.value shouldBe 0.0
+        }
+    }
+
+    // ===== hasSimulationData Tests =====
+
+    @Nested
+    inner class HasSimulationData {
+        @Test
+        fun `should return true when simulation calculator returns true`() {
+            // Arrange
+            val mockUpgradeValueCalculator = mockk<UpgradeValueCalculator>()
+            val calculatorWithSim = FlpsComponentCalculator(mockUpgradeValueCalculator)
+
+            every {
+                mockUpgradeValueCalculator.hasSimulationData(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm"
+                )
+            } returns true
+
+            // Act
+            val result = calculatorWithSim.hasSimulationData(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm"
+            )
+
+            // Assert
+            result shouldBe true
+        }
+
+        @Test
+        fun `should return false when simulation calculator returns false`() {
+            // Arrange
+            val mockUpgradeValueCalculator = mockk<UpgradeValueCalculator>()
+            val calculatorWithSim = FlpsComponentCalculator(mockUpgradeValueCalculator)
+
+            every {
+                mockUpgradeValueCalculator.hasSimulationData(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm"
+                )
+            } returns false
+
+            // Act
+            val result = calculatorWithSim.hasSimulationData(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm"
+            )
+
+            // Assert
+            result shouldBe false
+        }
+
+        @Test
+        fun `should return false when simulation calculator is null`() {
+            // Arrange - using default calculator which has null upgradeValueCalculator
+
+            // Act
+            val result = calculator.hasSimulationData(
+                guildId = "test-guild",
+                characterName = "TestChar",
+                characterRealm = "TestRealm"
+            )
+
+            // Assert
+            result shouldBe false
+        }
     }
 
     // ===== TB (Tier Bonus) Tests =====

@@ -246,6 +246,268 @@ class InMemoryAttendanceRepositoryTest : UnitTest() {
     }
 
     @Test
+    fun `should exclude record when record ends before query start date`() {
+        // Arrange - tests isDateRangeOverlapping branch: recordEnd.isBefore(queryStart) = true
+        val raiderId = RaiderId(1L)
+        val guildId = GuildId("test-guild")
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 10, 1),
+                endDate = LocalDate.of(2024, 10, 15), // Ends before query start
+            )
+        repository.save(record)
+
+        // Act - Query starts Nov 1
+        val results =
+            repository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record when record starts after query end date`() {
+        // Arrange - tests isDateRangeOverlapping branch: recordStart.isAfter(queryEnd) = true
+        val raiderId = RaiderId(1L)
+        val guildId = GuildId("test-guild")
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 12, 1), // Starts after query end
+                endDate = LocalDate.of(2024, 12, 14),
+            )
+        repository.save(record)
+
+        // Act - Query ends Nov 14
+        val results =
+            repository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record when guildId does not match`() {
+        // Arrange - tests filter branch: record.guildId == guildId = false
+        val raiderId = RaiderId(1L)
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = GuildId("other-guild"),
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                GuildId("test-guild"),
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from instance query when guildId does not match`() {
+        // Arrange
+        val raiderId = RaiderId(1L)
+        val instance = "Nerub-ar Palace"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = GuildId("other-guild"),
+                instance = instance,
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                raiderId,
+                GuildId("test-guild"),
+                instance,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from instance query when date range does not overlap`() {
+        // Arrange
+        val raiderId = RaiderId(1L)
+        val guildId = GuildId("test-guild")
+        val instance = "Nerub-ar Palace"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = instance,
+                startDate = LocalDate.of(2024, 10, 1),
+                endDate = LocalDate.of(2024, 10, 15),
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from encounter query when guildId does not match`() {
+        // Arrange
+        val raiderId = RaiderId(1L)
+        val instance = "Nerub-ar Palace"
+        val encounter = "Queen Ansurek"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = GuildId("other-guild"),
+                instance = instance,
+                encounter = encounter,
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                raiderId,
+                GuildId("test-guild"),
+                instance,
+                encounter,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from encounter query when instance does not match`() {
+        // Arrange
+        val raiderId = RaiderId(1L)
+        val guildId = GuildId("test-guild")
+        val encounter = "Queen Ansurek"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = "Amirdrassil",
+                encounter = encounter,
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                raiderId,
+                guildId,
+                "Nerub-ar Palace",
+                encounter,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from encounter query when date range does not overlap`() {
+        // Arrange
+        val raiderId = RaiderId(1L)
+        val guildId = GuildId("test-guild")
+        val instance = "Nerub-ar Palace"
+        val encounter = "Queen Ansurek"
+
+        val record =
+            createAttendanceRecord(
+                raiderId = raiderId,
+                guildId = guildId,
+                instance = instance,
+                encounter = encounter,
+                startDate = LocalDate.of(2024, 12, 1),
+                endDate = LocalDate.of(2024, 12, 14),
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                raiderId,
+                guildId,
+                instance,
+                encounter,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should exclude record from guild query when date range does not overlap`() {
+        // Arrange
+        val guildId = GuildId("test-guild")
+
+        val record =
+            createAttendanceRecord(
+                raiderId = RaiderId(1L),
+                guildId = guildId,
+                startDate = LocalDate.of(2024, 10, 1),
+                endDate = LocalDate.of(2024, 10, 15),
+            )
+        repository.save(record)
+
+        // Act
+        val results =
+            repository.findByGuildIdAndDateRange(
+                guildId,
+                LocalDate.of(2024, 11, 1),
+                LocalDate.of(2024, 11, 14),
+            )
+
+        // Assert
+        results.shouldBeEmpty()
+    }
+
+    @Test
     fun `should update existing record when saving with same id`() {
         // Arrange
         val record = createAttendanceRecord()

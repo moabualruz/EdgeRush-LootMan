@@ -198,4 +198,76 @@ class SimulationHealthIndicatorTest : UnitTest() {
             health.details["failureCount"] shouldBe 2L
         }
     }
+
+    @Nested
+    inner class HealthConditionsBranches {
+        @Test
+        fun `should calculate success rate correctly when there are executions`() {
+            // Arrange - exercises totalExecutions > 0 branch
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            // Record executions to get 50% success rate
+            healthIndicator.recordSuccess(100)
+            healthIndicator.recordSuccess(100)
+            healthIndicator.recordFailure()
+            healthIndicator.recordFailure()
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert
+            health.details["successRate"] shouldBe "50.00%"
+        }
+
+        @Test
+        fun `should calculate success rate as 100 percent when only successes`() {
+            // Arrange
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            healthIndicator.recordSuccess(100)
+            healthIndicator.recordSuccess(200)
+            healthIndicator.recordSuccess(150)
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert
+            health.details["successRate"] shouldBe "100.00%"
+        }
+
+        @Test
+        fun `should calculate success rate as 0 percent when only failures`() {
+            // Arrange
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            healthIndicator.recordFailure()
+            healthIndicator.recordFailure()
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert
+            health.details["successRate"] shouldBe "0.00%"
+        }
+
+        @Test
+        fun `should verify all health detail fields are populated`() {
+            // Arrange - ensure all branches in health() are potentially exercised
+            every { simulationRepository.findPendingRequests() } returns emptyList()
+
+            healthIndicator.recordSuccess(500)
+
+            // Act
+            val health = healthIndicator.health()
+
+            // Assert - all detail fields should be present
+            health.details.containsKey("pendingSimulations") shouldBe true
+            health.details.containsKey("dockerAvailable") shouldBe true
+            health.details.containsKey("successCount") shouldBe true
+            health.details.containsKey("failureCount") shouldBe true
+            health.details.containsKey("successRate") shouldBe true
+            health.details.containsKey("lastExecutionTimeMs") shouldBe true
+            health.details["lastExecutionTimeMs"] shouldBe 500L
+        }
+    }
 }

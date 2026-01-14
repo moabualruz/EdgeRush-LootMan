@@ -417,6 +417,88 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 )
             }
         }
+
+        @Test
+        fun `should insert raider with non-null joinDate`() {
+            // Given - covers the ?.let branch when joinDate is not null in insertRaider
+            val joinDate = LocalDateTime.of(2024, 6, 15, 10, 30)
+            val raider = createRaider(id = RaiderId(10L), joinDate = joinDate)
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, raider.id.value) } returns 0
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(raider)
+
+            // Then
+            result shouldBe raider
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    raider.guildId.value,
+                    raider.characterName,
+                    raider.realm,
+                    raider.characterClass.name,
+                    raider.role.name,
+                    raider.rank,
+                    raider.status.name,
+                    match<Timestamp> { it.toLocalDateTime() == joinDate },
+                    raider.wowauditId
+                )
+            }
+        }
+
+        @Test
+        fun `should update raider with non-null joinDate`() {
+            // Given - covers the ?.let branch when joinDate is not null in updateRaider
+            val joinDate = LocalDateTime.of(2024, 8, 20, 14, 45)
+            val raider = createRaider(id = RaiderId(20L), joinDate = joinDate)
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, raider.id.value) } returns 1
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(raider)
+
+            // Then
+            result shouldBe raider
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("UPDATE") },
+                    raider.guildId.value,
+                    raider.characterName,
+                    raider.realm,
+                    raider.characterClass.name,
+                    raider.role.name,
+                    raider.rank,
+                    raider.status.name,
+                    match<Timestamp> { it.toLocalDateTime() == joinDate },
+                    raider.wowauditId,
+                    raider.id.value
+                )
+            }
+        }
+
+        @Test
+        fun `should insert new raider when existsById returns null`() {
+            // Given - covers the elvis branch when queryForObject returns null
+            val raider = createRaider(id = RaiderId(30L))
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, raider.id.value) } returns null
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(raider)
+
+            // Then
+            result shouldBe raider
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    *anyVararg()
+                )
+            }
+        }
     }
 
     @Nested

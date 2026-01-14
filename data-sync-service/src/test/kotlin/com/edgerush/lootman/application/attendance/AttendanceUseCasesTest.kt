@@ -165,6 +165,105 @@ class AttendanceUseCasesTest : UnitTest() {
             savedRecordSlot.captured.attendedRaids shouldBe 5
             savedRecordSlot.captured.totalRaids shouldBe 10
         }
+
+        @Test
+        fun `should update encounter when provided`() {
+            // Given
+            val recordId = "record-enc"
+            val existingRecord = createAttendanceRecord(recordId, encounter = "OldEncounter")
+            every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns existingRecord
+            every { attendanceRepository.delete(AttendanceRecordId(recordId)) } returns Unit
+
+            val savedRecordSlot = slot<AttendanceRecord>()
+            every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
+
+            val command = UpdateAttendanceCommand(
+                recordId = recordId,
+                encounter = "NewEncounter"
+            )
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            savedRecordSlot.captured.encounter shouldBe "NewEncounter"
+        }
+
+        @Test
+        fun `should update startDate when provided`() {
+            // Given - existing record has startDate=2024-01-01, endDate=2024-01-07
+            // Update to an earlier startDate (allowed as long as startDate <= endDate)
+            val recordId = "record-start"
+            val existingRecord = createAttendanceRecord(recordId)
+            every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns existingRecord
+            every { attendanceRepository.delete(AttendanceRecordId(recordId)) } returns Unit
+
+            val savedRecordSlot = slot<AttendanceRecord>()
+            every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
+
+            val newStartDate = LocalDate.of(2023, 12, 1) // Earlier start date
+            val command = UpdateAttendanceCommand(
+                recordId = recordId,
+                startDate = newStartDate
+            )
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            savedRecordSlot.captured.startDate shouldBe newStartDate
+        }
+
+        @Test
+        fun `should update endDate when provided`() {
+            // Given
+            val recordId = "record-end"
+            val existingRecord = createAttendanceRecord(recordId)
+            every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns existingRecord
+            every { attendanceRepository.delete(AttendanceRecordId(recordId)) } returns Unit
+
+            val savedRecordSlot = slot<AttendanceRecord>()
+            every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
+
+            val newEndDate = LocalDate.of(2025, 12, 31)
+            val command = UpdateAttendanceCommand(
+                recordId = recordId,
+                endDate = newEndDate
+            )
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            savedRecordSlot.captured.endDate shouldBe newEndDate
+        }
+
+        @Test
+        fun `should update totalRaids when provided`() {
+            // Given
+            val recordId = "record-total"
+            val existingRecord = createAttendanceRecord(recordId, totalRaids = 10)
+            every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns existingRecord
+            every { attendanceRepository.delete(AttendanceRecordId(recordId)) } returns Unit
+
+            val savedRecordSlot = slot<AttendanceRecord>()
+            every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
+
+            val command = UpdateAttendanceCommand(
+                recordId = recordId,
+                totalRaids = 20
+            )
+
+            // When
+            val result = useCase.execute(command)
+
+            // Then
+            result.isSuccess shouldBe true
+            savedRecordSlot.captured.totalRaids shouldBe 20
+        }
     }
 
     @Nested
@@ -375,6 +474,10 @@ class AttendanceUseCasesTest : UnitTest() {
             raider2Summary.totalRaids shouldBe 10
             raider2Summary.averageAttendancePercentage shouldBe 0.5
         }
+
+        // Note: The branch `if (totalRaids > 0) ... else 0.0` at line 105 is unreachable
+        // because AttendanceRecord.create() requires totalRaids > 0 (domain constraint).
+        // This is dead code that cannot be covered by tests with valid domain objects.
     }
 
     // Helper method

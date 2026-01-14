@@ -220,6 +220,114 @@ class JdbcGearRepositoryTest : UnitTest() {
             trinketItem?.enchant shouldBe null
             trinketItem?.sockets shouldBe 0
         }
+
+        @Test
+        fun `should default to HEAD slot when slot name is unknown`() {
+            // Given - covers the elvis branch when firstOrNull returns null
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") },
+                    any<RowMapper<GearItem>>(),
+                    eq(raiderId.value),
+                    any()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<GearItem>>()
+                val rs = mockResultSet(
+                    slot = "UNKNOWN_SLOT",
+                    itemId = 99999L,
+                    name = "Mystery Item",
+                    itemLevel = 619,
+                    quality = 4,
+                    enchant = null,
+                    sockets = 0
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
+
+            // Then
+            result shouldNotBe null
+            val headItem = result?.items?.get(EquipmentSlot.HEAD)
+            headItem shouldNotBe null
+            headItem?.slot shouldBe EquipmentSlot.HEAD
+        }
+
+        @Test
+        fun `should default to EPIC quality when quality integer is invalid`() {
+            // Given - covers the elvis branch when ItemQuality.fromInt returns null
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") },
+                    any<RowMapper<GearItem>>(),
+                    eq(raiderId.value),
+                    any()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<GearItem>>()
+                val rs = mockResultSet(
+                    slot = "HEAD",
+                    itemId = 88888L,
+                    name = "Strange Item",
+                    itemLevel = 619,
+                    quality = 99, // Invalid quality value
+                    enchant = null,
+                    sockets = 0
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
+
+            // Then
+            result shouldNotBe null
+            val headItem = result?.items?.get(EquipmentSlot.HEAD)
+            headItem shouldNotBe null
+            headItem?.quality shouldBe ItemQuality.EPIC
+        }
+
+        @Test
+        fun `should default to Unknown Item when name is null`() {
+            // Given - covers the elvis branch when rs.getString("name") returns null
+            val raiderId = RaiderId(100L)
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") },
+                    any<RowMapper<GearItem>>(),
+                    eq(raiderId.value),
+                    any()
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<GearItem>>()
+                val rs = mockResultSet(
+                    slot = "HEAD",
+                    itemId = 77777L,
+                    name = null, // Null name
+                    itemLevel = 619,
+                    quality = 4,
+                    enchant = null,
+                    sockets = 0
+                )
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
+
+            // Then
+            result shouldNotBe null
+            val headItem = result?.items?.get(EquipmentSlot.HEAD)
+            headItem shouldNotBe null
+            headItem?.name shouldBe "Unknown Item"
+        }
     }
 
     @Nested
@@ -303,7 +411,7 @@ class JdbcGearRepositoryTest : UnitTest() {
     private fun mockResultSet(
         slot: String = "HEAD",
         itemId: Long = 12345L,
-        name: String = "Test Item",
+        name: String? = "Test Item",
         itemLevel: Int = 619,
         quality: Int = 4,
         enchant: String? = null,

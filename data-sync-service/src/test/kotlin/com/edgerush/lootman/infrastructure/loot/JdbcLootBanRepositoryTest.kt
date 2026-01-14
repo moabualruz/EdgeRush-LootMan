@@ -274,6 +274,85 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 )
             }
         }
+
+        @Test
+        fun `should handle null count from existsById query`() {
+            // Given - covers the elvis branch when queryForObject returns null
+            val ban = createLootBan()
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, ban.id.value) } returns null
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(ban)
+
+            // Then - null count defaults to 0, so INSERT is called
+            result shouldBe ban
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    *anyVararg()
+                )
+            }
+        }
+
+        @Test
+        fun `should insert loot ban with null expiresAt for permanent ban`() {
+            // Given - covers the null case for expiresAt in insertLootBan
+            val permanentBan = createLootBan(expiresAt = null)
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, permanentBan.id.value) } returns 0
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(permanentBan)
+
+            // Then
+            result shouldBe permanentBan
+            result.expiresAt shouldBe null
+
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("INSERT INTO") },
+                    permanentBan.id.value,
+                    permanentBan.raiderId.value.toString(),
+                    permanentBan.guildId.value,
+                    permanentBan.reason,
+                    any<Timestamp>(),
+                    null, // expiresAt should be null
+                    true
+                )
+            }
+        }
+
+        @Test
+        fun `should update loot ban with null expiresAt for permanent ban`() {
+            // Given - covers the null case for expiresAt in updateLootBan
+            val permanentBan = createLootBan(expiresAt = null)
+
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, permanentBan.id.value) } returns 1
+            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+
+            // When
+            val result = repository.save(permanentBan)
+
+            // Then
+            result shouldBe permanentBan
+            result.expiresAt shouldBe null
+
+            verify {
+                jdbcTemplate.update(
+                    match { it.contains("UPDATE") },
+                    permanentBan.raiderId.value.toString(),
+                    permanentBan.guildId.value,
+                    permanentBan.reason,
+                    any<Timestamp>(),
+                    null, // expiresAt should be null
+                    true,
+                    permanentBan.id.value
+                )
+            }
+        }
     }
 
     @Nested

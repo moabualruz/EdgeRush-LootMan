@@ -148,6 +148,109 @@ class JdbcGuildRepositoryTest : UnitTest() {
             result?.createdAt shouldBe createdAt
             result?.updatedAt shouldBe updatedAt
         }
+
+        @Test
+        fun `should handle null sync_cron_expression with default value`() {
+            // Given - tests branch: rs.getString("sync_cron_expression") ?: "0 0 4 * * *"
+            val guildId = GuildId("default-cron-guild")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
+                    any<RowMapper<Guild>>(),
+                    eq(guildId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<Guild>>()
+                val rs = mockResultSetWithNullCronAndTimezone(guildId.value, "Default Cron Guild", now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(guildId)
+
+            // Then
+            result?.settings?.syncCronExpression shouldBe "0 0 4 * * *"
+            result?.settings?.timezone shouldBe "UTC"
+        }
+
+        @Test
+        fun `should handle unknown syncStatus with default NEVER_RUN`() {
+            // Given - tests branch: SyncStatus.fromString returns null
+            val guildId = GuildId("unknown-status-guild")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
+                    any<RowMapper<Guild>>(),
+                    eq(guildId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<Guild>>()
+                val rs = mockResultSetWithUnknownEnums(guildId.value, "Unknown Status Guild", now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(guildId)
+
+            // Then
+            result?.syncStatus shouldBe SyncStatus.NEVER_RUN
+            result?.region shouldBe Region.US
+            result?.settings?.benchmarkMode shouldBe BenchmarkMode.THEORETICAL
+        }
+
+        @Test
+        fun `should handle null region string with default US`() {
+            // Given - tests branch: rs.getString("region") ?: "US"
+            val guildId = GuildId("null-region-guild")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
+                    any<RowMapper<Guild>>(),
+                    eq(guildId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<Guild>>()
+                val rs = mockResultSetWithNullRegion(guildId.value, "Null Region Guild", now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(guildId)
+
+            // Then
+            result?.region shouldBe Region.US
+        }
+
+        @Test
+        fun `should handle null benchmark_mode string with default THEORETICAL`() {
+            // Given - tests branch: rs.getString("benchmark_mode") ?: "THEORETICAL"
+            val guildId = GuildId("null-benchmark-guild")
+            val now = Instant.now()
+
+            every {
+                jdbcTemplate.query(
+                    match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
+                    any<RowMapper<Guild>>(),
+                    eq(guildId.value)
+                )
+            } answers {
+                val rowMapper = secondArg<RowMapper<Guild>>()
+                val rs = mockResultSetWithNullBenchmarkMode(guildId.value, "Null Benchmark Guild", now)
+                listOf(rowMapper.mapRow(rs, 0))
+            }
+
+            // When
+            val result = repository.findById(guildId)
+
+            // Then
+            result?.settings?.benchmarkMode shouldBe BenchmarkMode.THEORETICAL
+        }
     }
 
     @Nested
@@ -433,6 +536,110 @@ class JdbcGuildRepositoryTest : UnitTest() {
         every { rs.getBoolean("is_active") } returns isActive
         every { rs.getTimestamp("created_at") } returns Timestamp.from(createdAt)
         every { rs.getTimestamp("updated_at") } returns Timestamp.from(updatedAt)
+        return rs
+    }
+
+    private fun mockResultSetWithNullCronAndTimezone(
+        guildId: String,
+        name: String,
+        createdAt: Instant
+    ): ResultSet {
+        val rs = mockk<ResultSet>()
+        every { rs.getString("guild_id") } returns guildId
+        every { rs.getString("guild_name") } returns name
+        every { rs.getString("guild_description") } returns null
+        every { rs.getString("realm") } returns null
+        every { rs.getString("region") } returns "US"
+        every { rs.getBoolean("sync_enabled") } returns true
+        every { rs.getString("sync_cron_expression") } returns null // null cron
+        every { rs.getBoolean("sync_run_on_startup") } returns false
+        every { rs.getString("timezone") } returns null // null timezone
+        every { rs.getString("benchmark_mode") } returns "THEORETICAL"
+        every { rs.getDouble("custom_benchmark_rms") } returns 0.0
+        every { rs.wasNull() } returns true
+        every { rs.getDouble("custom_benchmark_ipi") } returns 0.0
+        every { rs.getString("last_sync_status") } returns null
+        every { rs.getBoolean("is_active") } returns true
+        every { rs.getTimestamp("created_at") } returns Timestamp.from(createdAt)
+        every { rs.getTimestamp("updated_at") } returns Timestamp.from(createdAt)
+        return rs
+    }
+
+    private fun mockResultSetWithUnknownEnums(
+        guildId: String,
+        name: String,
+        createdAt: Instant
+    ): ResultSet {
+        val rs = mockk<ResultSet>()
+        every { rs.getString("guild_id") } returns guildId
+        every { rs.getString("guild_name") } returns name
+        every { rs.getString("guild_description") } returns null
+        every { rs.getString("realm") } returns null
+        every { rs.getString("region") } returns "UNKNOWN_REGION" // invalid region
+        every { rs.getBoolean("sync_enabled") } returns true
+        every { rs.getString("sync_cron_expression") } returns "0 0 4 * * *"
+        every { rs.getBoolean("sync_run_on_startup") } returns false
+        every { rs.getString("timezone") } returns "UTC"
+        every { rs.getString("benchmark_mode") } returns "UNKNOWN_MODE" // invalid benchmark mode
+        every { rs.getDouble("custom_benchmark_rms") } returns 0.0
+        every { rs.wasNull() } returns true
+        every { rs.getDouble("custom_benchmark_ipi") } returns 0.0
+        every { rs.getString("last_sync_status") } returns "UNKNOWN_STATUS" // invalid sync status
+        every { rs.getBoolean("is_active") } returns true
+        every { rs.getTimestamp("created_at") } returns Timestamp.from(createdAt)
+        every { rs.getTimestamp("updated_at") } returns Timestamp.from(createdAt)
+        return rs
+    }
+
+    private fun mockResultSetWithNullRegion(
+        guildId: String,
+        name: String,
+        createdAt: Instant
+    ): ResultSet {
+        val rs = mockk<ResultSet>()
+        every { rs.getString("guild_id") } returns guildId
+        every { rs.getString("guild_name") } returns name
+        every { rs.getString("guild_description") } returns null
+        every { rs.getString("realm") } returns null
+        every { rs.getString("region") } returns null // null region
+        every { rs.getBoolean("sync_enabled") } returns true
+        every { rs.getString("sync_cron_expression") } returns "0 0 4 * * *"
+        every { rs.getBoolean("sync_run_on_startup") } returns false
+        every { rs.getString("timezone") } returns "UTC"
+        every { rs.getString("benchmark_mode") } returns "THEORETICAL"
+        every { rs.getDouble("custom_benchmark_rms") } returns 0.0
+        every { rs.wasNull() } returns true
+        every { rs.getDouble("custom_benchmark_ipi") } returns 0.0
+        every { rs.getString("last_sync_status") } returns null
+        every { rs.getBoolean("is_active") } returns true
+        every { rs.getTimestamp("created_at") } returns Timestamp.from(createdAt)
+        every { rs.getTimestamp("updated_at") } returns Timestamp.from(createdAt)
+        return rs
+    }
+
+    private fun mockResultSetWithNullBenchmarkMode(
+        guildId: String,
+        name: String,
+        createdAt: Instant
+    ): ResultSet {
+        val rs = mockk<ResultSet>()
+        every { rs.getString("guild_id") } returns guildId
+        every { rs.getString("guild_name") } returns name
+        every { rs.getString("guild_description") } returns null
+        every { rs.getString("realm") } returns null
+        every { rs.getString("region") } returns "US"
+        every { rs.getBoolean("sync_enabled") } returns true
+        every { rs.getString("sync_cron_expression") } returns "0 0 4 * * *"
+        every { rs.getBoolean("sync_run_on_startup") } returns false
+        every { rs.getString("timezone") } returns "UTC"
+        every { rs.getString("benchmark_mode") } returns null // null benchmark mode
+        every { rs.getDouble("custom_benchmark_rms") } returns 0.0
+        every { rs.wasNull() } returns true
+        every { rs.getDouble("custom_benchmark_ipi") } returns 0.0
+        every { rs.getString("last_sync_status") } returns null
+        every { rs.getBoolean("is_active") } returns true
+        every { rs.getTimestamp("created_at") } returns Timestamp.from(createdAt)
+        every { rs.getTimestamp("updated_at") } returns Timestamp.from(createdAt)
         return rs
     }
 

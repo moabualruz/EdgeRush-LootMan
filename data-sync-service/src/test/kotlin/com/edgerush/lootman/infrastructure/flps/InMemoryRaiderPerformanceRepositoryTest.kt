@@ -169,6 +169,100 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
             // Then
             result shouldBe null
         }
+
+        @Test
+        fun `should return null when character name does not match`() {
+            // Given - tests filter branch: data.characterName == characterName = false
+            val data = createPerformanceData(
+                characterName = "OtherRaider",
+                characterRealm = "Area52"
+            )
+
+            repository.save(guildId, data)
+
+            // When
+            val result = repository.findByCharacterAndPeriod(
+                "DifferentName",
+                "Area52",
+                guildId,
+                oneWeekAgo,
+                now
+            )
+
+            // Then
+            result shouldBe null
+        }
+
+        @Test
+        fun `should return null when character realm does not match`() {
+            // Given - tests filter branch: data.characterRealm == characterRealm = false
+            val data = createPerformanceData(
+                characterName = "TestRaider",
+                characterRealm = "Area52"
+            )
+
+            repository.save(guildId, data)
+
+            // When
+            val result = repository.findByCharacterAndPeriod(
+                "TestRaider",
+                "DifferentRealm",
+                guildId,
+                oneWeekAgo,
+                now
+            )
+
+            // Then
+            result shouldBe null
+        }
+
+        @Test
+        fun `should return null when period does not match for character search`() {
+            // Given - tests matchesPeriod branch returning false
+            val data = createPerformanceData(
+                characterName = "TestRaider",
+                characterRealm = "Area52",
+                periodStart = twoWeeksAgo,
+                periodEnd = oneWeekAgo
+            )
+
+            repository.save(guildId, data)
+
+            // When - different period
+            val result = repository.findByCharacterAndPeriod(
+                "TestRaider",
+                "Area52",
+                guildId,
+                oneWeekAgo,
+                now
+            )
+
+            // Then
+            result shouldBe null
+        }
+
+        @Test
+        fun `should return null when guild does not match for character search`() {
+            // Given - tests matchesGuild branch returning false
+            val data = createPerformanceData(
+                characterName = "TestRaider",
+                characterRealm = "Area52"
+            )
+
+            repository.save(GuildId("other-guild"), data)
+
+            // When - different guild
+            val result = repository.findByCharacterAndPeriod(
+                "TestRaider",
+                "Area52",
+                guildId,
+                oneWeekAgo,
+                now
+            )
+
+            // Then
+            result shouldBe null
+        }
     }
 
     @Nested
