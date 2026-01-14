@@ -37,6 +37,10 @@ dependencies {
     // Prometheus Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
 
+    // GraphQL
+    implementation("com.expediagroup:graphql-kotlin-spring-server:8.2.1")
+    implementation("com.expediagroup:graphql-kotlin-hooks-provider:8.2.1")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

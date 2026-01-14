@@ -83,6 +83,15 @@ jwt:
   expiration-ms: 86400000  # 24 hours
   issuer: edgerush-lootman
 
+# GraphQL Configuration
+graphql:
+  packages:
+    - "com.edgerush.lootman.api.graphql"
+  playground:
+    enabled: ${GRAPHQL_PLAYGROUND_ENABLED:true}
+  introspection:
+    enabled: ${GRAPHQL_INTROSPECTION_ENABLED:true}
+
 # OpenAPI Configuration
 springdoc:
   api-docs:

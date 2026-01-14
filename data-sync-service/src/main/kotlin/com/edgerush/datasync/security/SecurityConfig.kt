@@ -32,6 +32,8 @@ class SecurityConfig(
                     // Public endpoints
                     .pathMatchers("/actuator/health", "/actuator/metrics", "/actuator/info").permitAll()
                     .pathMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll()
+                    // GraphQL endpoints (playground always public, queries handled by resolvers)
+                    .pathMatchers("/playground", "/graphql", "/subscriptions").permitAll()
                     // Admin mode bypasses all auth
                     .apply {
                         if (adminModeConfig.isEnabled()) {
