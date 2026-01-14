@@ -45,6 +45,7 @@ class FlpsControllerTest : UnitTest() {
     private lateinit var getFlpsReportUseCase: GetFlpsReportUseCase
     private lateinit var flpsDataAssembler: FlpsDataAssemblerService
     private lateinit var componentCalculator: FlpsComponentCalculator
+    private lateinit var configPreviewService: FlpsConfigPreviewService
     private lateinit var controller: FlpsController
 
     @BeforeEach
@@ -53,11 +54,13 @@ class FlpsControllerTest : UnitTest() {
         getFlpsReportUseCase = mockk()
         flpsDataAssembler = mockk()
         componentCalculator = mockk()
+        configPreviewService = mockk()
         controller = FlpsController(
             calculateFlpsScoreUseCase,
             getFlpsReportUseCase,
             flpsDataAssembler,
             componentCalculator,
+            configPreviewService,
         )
     }
 

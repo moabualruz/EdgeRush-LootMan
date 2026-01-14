@@ -7,12 +7,16 @@ import com.edgerush.lootman.application.flps.FlpsComponentCalculator
 import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.GetFlpsReportQuery
 import com.edgerush.lootman.application.flps.GetFlpsReportUseCase
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import com.edgerush.lootman.domain.shared.GuildId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -35,6 +39,7 @@ class FlpsController(
     private val getFlpsReportUseCase: GetFlpsReportUseCase,
     private val flpsDataAssembler: FlpsDataAssemblerService,
     private val componentCalculator: FlpsComponentCalculator,
+    private val configPreviewService: FlpsConfigPreviewService,
 ) {
     /**
      * Get comprehensive FLPS report for a guild (legacy endpoint).
@@ -233,6 +238,56 @@ class FlpsController(
                     "System Status" to "/api/v1/flps/status",
                 ),
         )
+    }
+
+    /**
+     * Get current FLPS configuration for a guild.
+     *
+     * @param guildId The guild identifier
+     * @return Current configuration summary
+     */
+    @GetMapping("/api/v1/flps/guilds/{guildId}/config")
+    @Operation(
+        summary = "Get current FLPS configuration",
+        description = "Returns the current FLPS configuration settings for a guild"
+    )
+    fun getCurrentConfig(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+    ): FlpsConfigSummary {
+        return configPreviewService.getCurrentConfig(guildId)
+    }
+
+    /**
+     * Preview the impact of FLPS configuration changes.
+     *
+     * This endpoint allows guild administrators to see how configuration changes
+     * would affect raiders' FLPS scores before applying them. It returns a
+     * detailed impact analysis including:
+     * - Current vs proposed configuration
+     * - Per-raider score changes
+     * - Eligibility changes
+     * - Ranking changes
+     *
+     * @param guildId The guild identifier
+     * @param request The proposed configuration changes
+     * @return Preview response with impact analysis
+     */
+    @PostMapping("/api/v1/flps/guilds/{guildId}/config/preview")
+    @Operation(
+        summary = "Preview configuration changes",
+        description = "Shows how proposed configuration changes would affect FLPS scores without applying them"
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Preview generated successfully"),
+        ApiResponse(responseCode = "400", description = "Invalid configuration values"),
+    )
+    fun previewConfigChanges(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @RequestBody request: ConfigPreviewRequest,
+    ): ConfigPreviewResponse {
+        return configPreviewService.previewConfigChanges(guildId, request)
     }
 
     /**
