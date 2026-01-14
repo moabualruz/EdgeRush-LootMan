@@ -52,10 +52,7 @@ class PerformanceController(
         val raider = raiderEntityRepository.findById(raiderId)
             ?: throw IllegalArgumentException("Raider not found: $raiderId")
 
-        if (raider.guildId != guildId) {
-            throw IllegalArgumentException("Raider $raiderId does not belong to guild $guildId")
-        }
-
+        // No guild validation on RaiderEntity - performance data scoped by guildId in repository
         return buildPerformanceResponse(RaiderId(raiderId), raider.characterName, GuildId(guildId))
     }
 

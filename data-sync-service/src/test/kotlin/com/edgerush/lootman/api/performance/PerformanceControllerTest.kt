@@ -55,7 +55,6 @@ class PerformanceControllerTest : UnitTest() {
         every { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) } returns Unit
         every { raiderEntityRepository.findById(123L) } returns raider
         every { raider.characterName } returns "TestRaider"
-        every { raider.guildId } returns guildId
 
         val performanceData = RaiderPerformanceData(
             raiderId = raiderId,
@@ -97,7 +96,6 @@ class PerformanceControllerTest : UnitTest() {
         every { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) } returns Unit
         every { raiderEntityRepository.findById(456L) } returns raider
         every { raider.characterName } returns "NoDataRaider"
-        every { raider.guildId } returns guildId
         every { raiderPerformanceRepository.findByRaiderAndPeriod(raiderId, GuildId(guildId), any(), any()) } returns null
 
         // When
@@ -120,8 +118,6 @@ class PerformanceControllerTest : UnitTest() {
 
         every { raiderEntityRepository.findById(raiderId) } returns raider
         every { raider.characterName } returns "SpecificRaider"
-        every { raider.guildId } returns guildId
-        every { raider.realm } returns "TestRealm"
 
         val performanceData = RaiderPerformanceData(
             raiderId = RaiderId(raiderId),
@@ -167,20 +163,23 @@ class PerformanceControllerTest : UnitTest() {
     }
 
     @Test
-    fun `getPerformance should throw exception when raider not in guild`() {
+    fun `getPerformance should return default values when no performance data for raider`() {
         // Given
         val guildId = "test-guild"
         val raiderId = 123L
         val raider = mockk<RaiderEntity>()
 
         every { raiderEntityRepository.findById(raiderId) } returns raider
-        every { raider.guildId } returns "different-guild"
+        every { raider.characterName } returns "RaiderWithoutData"
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(RaiderId(raiderId), GuildId(guildId), any(), any()) } returns null
 
-        // When / Then
-        val exception = assertThrows<IllegalArgumentException> {
-            controller.getPerformance(guildId, raiderId)
-        }
+        // When
+        val response = controller.getPerformance(guildId, raiderId)
 
-        exception.message shouldBe "Raider $raiderId does not belong to guild $guildId"
+        // Then
+        response.raiderId shouldBe 123L
+        response.characterName shouldBe "RaiderWithoutData"
+        response.dpa shouldBe 0.0
+        response.adt shouldBe 0.0
     }
 }

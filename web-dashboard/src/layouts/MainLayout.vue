@@ -18,6 +18,9 @@ const navItems = [
 
 const adminNavItems = [
   { path: '/admin', label: 'Admin Panel', icon: 'settings' },
+  { path: '/admin/applications', label: 'Applications', icon: 'clipboard' },
+  { path: '/admin/discord', label: 'Discord', icon: 'message' },
+  { path: '/admin/sync', label: 'Sync History', icon: 'sync' },
 ]
 
 function handleLogout() {

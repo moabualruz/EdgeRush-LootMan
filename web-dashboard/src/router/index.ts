@@ -69,6 +69,24 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/AdminPage.vue'),
         meta: { requiresAdmin: true },
       },
+      {
+        path: 'admin/applications',
+        name: 'applications',
+        component: () => import('@/pages/ApplicationsPage.vue'),
+        meta: { requiresAdmin: true },
+      },
+      {
+        path: 'admin/discord',
+        name: 'discord-config',
+        component: () => import('@/pages/DiscordConfigPage.vue'),
+        meta: { requiresAdmin: true },
+      },
+      {
+        path: 'admin/sync',
+        name: 'sync-history',
+        component: () => import('@/pages/SyncHistoryPage.vue'),
+        meta: { requiresAdmin: true },
+      },
     ],
   },
   {

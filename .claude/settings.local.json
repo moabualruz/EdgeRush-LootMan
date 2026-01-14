@@ -86,7 +86,10 @@
       "Bash(/f/work/dod/looter/gradlew.bat:*)",
       "Bash(npm test:*)",
       "Bash(npm install:*)",
-      "Bash(npx vitest --run)"
+      "Bash(npx vitest --run)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run)",
+      "Bash(npx vue-tsc:*)"
     ]
   }
 }
