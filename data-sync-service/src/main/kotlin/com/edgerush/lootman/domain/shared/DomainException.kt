@@ -28,3 +28,51 @@ class ItemNotFoundException(val itemId: ItemId) :
  */
 class LootBanActiveException(val raiderId: RaiderId, val bans: List<com.edgerush.lootman.domain.loot.model.LootBan>) :
     DomainException("Raider ${raiderId.value} has ${bans.size} active loot ban(s)")
+
+/**
+ * Exception thrown when a Discord user link is not found.
+ */
+class DiscordUserLinkNotFoundException(val linkId: Long) :
+    DomainException("Discord user link not found: $linkId")
+
+/**
+ * Exception thrown when a Discord user link already exists.
+ */
+class DiscordUserLinkAlreadyExistsException(val discordUserId: String, val raiderId: Long) :
+    DomainException("Discord user $discordUserId is already linked to raider $raiderId")
+
+/**
+ * Exception thrown when a user is not found.
+ */
+class UserNotFoundException(val userId: Long) :
+    DomainException("User not found: $userId")
+
+/**
+ * Exception thrown when a user is not found by Discord ID.
+ */
+class UserNotFoundByDiscordIdException(val discordId: String) :
+    DomainException("User not found with Discord ID: $discordId")
+
+/**
+ * Exception thrown when a user is not found by Battle.net ID.
+ */
+class UserNotFoundByBattlenetIdException(val battlenetId: String) :
+    DomainException("User not found with Battle.net ID: $battlenetId")
+
+/**
+ * Exception thrown when authentication fails.
+ */
+class AuthenticationFailedException(message: String) :
+    DomainException(message)
+
+/**
+ * Exception thrown when a refresh token is invalid.
+ */
+class InvalidRefreshTokenException(message: String = "Invalid or expired refresh token") :
+    DomainException(message)
+
+/**
+ * Exception thrown when OAuth2 authentication fails.
+ */
+class OAuth2AuthenticationException(val provider: String, message: String) :
+    DomainException("$provider OAuth2 error: $message")

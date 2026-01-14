@@ -414,12 +414,28 @@ class DomainExceptionTest : UnitTest() {
                     is GuildNotFoundException -> "guild"
                     is ItemNotFoundException -> "item"
                     is LootBanActiveException -> "loot_ban"
+                    is DiscordUserLinkNotFoundException -> "discord_link_not_found"
+                    is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
+                    is UserNotFoundException -> "user_not_found"
+                    is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
+                    is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
+                    is AuthenticationFailedException -> "auth_failed"
+                    is InvalidRefreshTokenException -> "invalid_refresh_token"
+                    is OAuth2AuthenticationException -> "oauth2_error"
                 }
                 result shouldBe when (exception) {
                     is RaiderNotFoundException -> "raider"
                     is GuildNotFoundException -> "guild"
                     is ItemNotFoundException -> "item"
                     is LootBanActiveException -> "loot_ban"
+                    is DiscordUserLinkNotFoundException -> "discord_link_not_found"
+                    is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
+                    is UserNotFoundException -> "user_not_found"
+                    is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
+                    is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
+                    is AuthenticationFailedException -> "auth_failed"
+                    is InvalidRefreshTokenException -> "invalid_refresh_token"
+                    is OAuth2AuthenticationException -> "oauth2_error"
                 }
             }
         }
