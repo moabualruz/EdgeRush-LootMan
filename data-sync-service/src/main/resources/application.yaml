@@ -91,6 +91,10 @@ graphql:
     enabled: ${GRAPHQL_PLAYGROUND_ENABLED:true}
   introspection:
     enabled: ${GRAPHQL_INTROSPECTION_ENABLED:true}
+  subscriptions:
+    websocket:
+      enabled: true
+      keep-alive-interval: 15000
 
 # OpenAPI Configuration
 springdoc:
