@@ -90,7 +90,8 @@
       "Bash(npm run type-check:*)",
       "Bash(npm run)",
       "Bash(npx vue-tsc:*)",
-      "Bash(gradlew.bat compileKotlin:*)"
+      "Bash(gradlew.bat compileKotlin:*)",
+      "Bash(npm run test:*)"
     ]
   }
 }
