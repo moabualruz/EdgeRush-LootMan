@@ -1,10 +1,9 @@
 package com.edgerush.lootman.api.graphql.subscription
 
 import com.expediagroup.graphql.server.operations.Subscription
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Sinks
 import java.time.Instant
 
 /**
@@ -12,6 +11,8 @@ import java.time.Instant
  *
  * Provides real-time updates for penalty-related events via WebSocket subscriptions.
  * Clients can subscribe to penalty and loot ban events for specific guilds.
+ *
+ * Uses Reactor Flux (Publisher) for compatibility with graphql-kotlin-spring-server.
  */
 @Component
 class PenaltySubscriptionResolver(
@@ -21,9 +22,9 @@ class PenaltySubscriptionResolver(
      * Subscribe to penalty applied events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of penalty applied events
+     * @return Flux of penalty applied events
      */
-    fun penaltyApplied(guildId: String): Flow<PenaltyAppliedEvent> {
+    fun penaltyApplied(guildId: String): Flux<PenaltyAppliedEvent> {
         return penaltyEventPublisher.penaltyAppliedEvents
             .filter { it.guildId == guildId }
     }
@@ -32,9 +33,9 @@ class PenaltySubscriptionResolver(
      * Subscribe to penalty removed events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of penalty removed events
+     * @return Flux of penalty removed events
      */
-    fun penaltyRemoved(guildId: String): Flow<PenaltyRemovedEvent> {
+    fun penaltyRemoved(guildId: String): Flux<PenaltyRemovedEvent> {
         return penaltyEventPublisher.penaltyRemovedEvents
             .filter { it.guildId == guildId }
     }
@@ -43,9 +44,9 @@ class PenaltySubscriptionResolver(
      * Subscribe to loot ban applied events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of loot ban applied events
+     * @return Flux of loot ban applied events
      */
-    fun lootBanApplied(guildId: String): Flow<LootBanAppliedEvent> {
+    fun lootBanApplied(guildId: String): Flux<LootBanAppliedEvent> {
         return penaltyEventPublisher.lootBanAppliedEvents
             .filter { it.guildId == guildId }
     }
@@ -54,9 +55,9 @@ class PenaltySubscriptionResolver(
      * Subscribe to loot ban lifted events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of loot ban lifted events
+     * @return Flux of loot ban lifted events
      */
-    fun lootBanLifted(guildId: String): Flow<LootBanLiftedEvent> {
+    fun lootBanLifted(guildId: String): Flux<LootBanLiftedEvent> {
         return penaltyEventPublisher.lootBanLiftedEvents
             .filter { it.guildId == guildId }
     }
@@ -68,30 +69,32 @@ class PenaltySubscriptionResolver(
  * This component manages the event streams for penalty subscriptions.
  * Other services can publish events through this component, and
  * subscribers will receive them via GraphQL subscriptions.
+ *
+ * Uses Reactor Sinks for thread-safe event publishing.
  */
 @Component
 class PenaltyEventPublisher {
-    private val _penaltyAppliedEvents = MutableSharedFlow<PenaltyAppliedEvent>(replay = 0)
-    private val _penaltyRemovedEvents = MutableSharedFlow<PenaltyRemovedEvent>(replay = 0)
-    private val _lootBanAppliedEvents = MutableSharedFlow<LootBanAppliedEvent>(replay = 0)
-    private val _lootBanLiftedEvents = MutableSharedFlow<LootBanLiftedEvent>(replay = 0)
+    private val _penaltyAppliedEvents = Sinks.many().multicast().onBackpressureBuffer<PenaltyAppliedEvent>()
+    private val _penaltyRemovedEvents = Sinks.many().multicast().onBackpressureBuffer<PenaltyRemovedEvent>()
+    private val _lootBanAppliedEvents = Sinks.many().multicast().onBackpressureBuffer<LootBanAppliedEvent>()
+    private val _lootBanLiftedEvents = Sinks.many().multicast().onBackpressureBuffer<LootBanLiftedEvent>()
 
-    val penaltyAppliedEvents: Flow<PenaltyAppliedEvent> = _penaltyAppliedEvents
-    val penaltyRemovedEvents: Flow<PenaltyRemovedEvent> = _penaltyRemovedEvents
-    val lootBanAppliedEvents: Flow<LootBanAppliedEvent> = _lootBanAppliedEvents
-    val lootBanLiftedEvents: Flow<LootBanLiftedEvent> = _lootBanLiftedEvents
+    val penaltyAppliedEvents: Flux<PenaltyAppliedEvent> = _penaltyAppliedEvents.asFlux()
+    val penaltyRemovedEvents: Flux<PenaltyRemovedEvent> = _penaltyRemovedEvents.asFlux()
+    val lootBanAppliedEvents: Flux<LootBanAppliedEvent> = _lootBanAppliedEvents.asFlux()
+    val lootBanLiftedEvents: Flux<LootBanLiftedEvent> = _lootBanLiftedEvents.asFlux()
 
     /**
      * Publish a penalty applied event.
      */
-    suspend fun publishPenaltyApplied(event: PenaltyAppliedEvent) {
-        _penaltyAppliedEvents.emit(event)
+    fun publishPenaltyApplied(event: PenaltyAppliedEvent) {
+        _penaltyAppliedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a penalty applied event using individual parameters.
      */
-    suspend fun publishPenaltyApplied(
+    fun publishPenaltyApplied(
         guildId: String,
         raiderId: String,
         penaltyId: String,
@@ -99,7 +102,7 @@ class PenaltyEventPublisher {
         reason: String,
         points: Int,
     ) {
-        _penaltyAppliedEvents.emit(
+        _penaltyAppliedEvents.tryEmitNext(
             PenaltyAppliedEvent(
                 guildId = guildId,
                 raiderId = raiderId,
@@ -115,19 +118,19 @@ class PenaltyEventPublisher {
     /**
      * Publish a penalty removed event.
      */
-    suspend fun publishPenaltyRemoved(event: PenaltyRemovedEvent) {
-        _penaltyRemovedEvents.emit(event)
+    fun publishPenaltyRemoved(event: PenaltyRemovedEvent) {
+        _penaltyRemovedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a penalty removed event using individual parameters.
      */
-    suspend fun publishPenaltyRemoved(
+    fun publishPenaltyRemoved(
         guildId: String,
         raiderId: String,
         penaltyId: String,
     ) {
-        _penaltyRemovedEvents.emit(
+        _penaltyRemovedEvents.tryEmitNext(
             PenaltyRemovedEvent(
                 guildId = guildId,
                 raiderId = raiderId,
@@ -140,21 +143,21 @@ class PenaltyEventPublisher {
     /**
      * Publish a loot ban applied event.
      */
-    suspend fun publishLootBanApplied(event: LootBanAppliedEvent) {
-        _lootBanAppliedEvents.emit(event)
+    fun publishLootBanApplied(event: LootBanAppliedEvent) {
+        _lootBanAppliedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a loot ban applied event using individual parameters.
      */
-    suspend fun publishLootBanApplied(
+    fun publishLootBanApplied(
         guildId: String,
         raiderId: String,
         banId: String,
         reason: String,
         expiresAt: Instant?,
     ) {
-        _lootBanAppliedEvents.emit(
+        _lootBanAppliedEvents.tryEmitNext(
             LootBanAppliedEvent(
                 guildId = guildId,
                 raiderId = raiderId,
@@ -169,19 +172,19 @@ class PenaltyEventPublisher {
     /**
      * Publish a loot ban lifted event.
      */
-    suspend fun publishLootBanLifted(event: LootBanLiftedEvent) {
-        _lootBanLiftedEvents.emit(event)
+    fun publishLootBanLifted(event: LootBanLiftedEvent) {
+        _lootBanLiftedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a loot ban lifted event using individual parameters.
      */
-    suspend fun publishLootBanLifted(
+    fun publishLootBanLifted(
         guildId: String,
         raiderId: String,
         banId: String,
     ) {
-        _lootBanLiftedEvents.emit(
+        _lootBanLiftedEvents.tryEmitNext(
             LootBanLiftedEvent(
                 guildId = guildId,
                 raiderId = raiderId,

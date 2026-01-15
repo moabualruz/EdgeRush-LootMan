@@ -5,12 +5,15 @@ import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.model.UserRefreshToken
 import com.edgerush.lootman.domain.auth.repository.RefreshTokenRepository
 import com.edgerush.lootman.domain.auth.repository.UserRepository
+import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import com.edgerush.lootman.domain.shared.InvalidRefreshTokenException
+import com.edgerush.lootman.domain.shared.UserAlreadyExistsException
 import com.edgerush.lootman.domain.shared.UserNotFoundException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.security.MessageDigest
@@ -32,6 +35,7 @@ class AuthenticationService(
 ) {
     private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
     private val secureRandom = SecureRandom()
+    private val passwordEncoder = BCryptPasswordEncoder()
 
     private val jwtKey: SecretKey by lazy {
         val secret =
@@ -125,6 +129,151 @@ class AuthenticationService(
                 )
 
         return generateTokens(user)
+    }
+
+    // ============= Local Authentication =============
+
+    /**
+     * Registers a new user with local credentials (username/password).
+     *
+     * @param username The desired username
+     * @param email The user's email address
+     * @param password The plain text password (will be hashed)
+     * @return TokenResponse with access and refresh tokens
+     * @throws UserAlreadyExistsException if username or email is already taken
+     */
+    fun registerLocal(
+        username: String,
+        email: String,
+        password: String,
+    ): TokenResponse {
+        // Validate username uniqueness
+        if (userRepository.existsByUsername(username)) {
+            throw UserAlreadyExistsException("username", username)
+        }
+
+        // Validate email uniqueness
+        if (userRepository.existsByEmail(email)) {
+            throw UserAlreadyExistsException("email", email)
+        }
+
+        // Hash the password
+        val passwordHash = passwordEncoder.encode(password)
+
+        // Create and save the user
+        val user =
+            userRepository.save(
+                User.fromLocal(
+                    username = username,
+                    email = email,
+                    passwordHash = passwordHash,
+                ).recordLogin(),
+            )
+
+        logger.info("New local user registered: ${user.username} (id=${user.id?.value})")
+        return generateTokens(user)
+    }
+
+    /**
+     * Authenticates a user with local credentials (username or email + password).
+     *
+     * @param usernameOrEmail The username or email address
+     * @param password The plain text password
+     * @return TokenResponse with access and refresh tokens
+     * @throws InvalidCredentialsException if credentials are invalid
+     */
+    fun loginLocal(
+        usernameOrEmail: String,
+        password: String,
+    ): TokenResponse {
+        // Find user by username or email
+        val user =
+            userRepository.findByUsername(usernameOrEmail)
+                ?: userRepository.findByEmail(usernameOrEmail)
+                ?: throw InvalidCredentialsException()
+
+        // Verify password
+        if (!user.hasPassword() || !passwordEncoder.matches(password, user.passwordHash)) {
+            throw InvalidCredentialsException()
+        }
+
+        // Update last login and return tokens
+        val updatedUser = userRepository.save(user.recordLogin())
+        logger.info("Local user logged in: ${updatedUser.username} (id=${updatedUser.id?.value})")
+        return generateTokens(updatedUser)
+    }
+
+    // ============= Account Linking =============
+
+    /**
+     * Links a Discord account to an existing user.
+     *
+     * @param userId The ID of the user to link
+     * @param code The OAuth2 authorization code from Discord
+     * @return Updated user profile
+     * @throws UserNotFoundException if user doesn't exist
+     * @throws UserAlreadyExistsException if Discord account is already linked to another user
+     */
+    fun linkDiscordAccount(
+        userId: UserId,
+        code: String,
+    ): UserProfileResponse {
+        val user =
+            userRepository.findById(userId)
+                ?: throw UserNotFoundException(userId.value)
+
+        val discordUser = oauth2Service.exchangeDiscordCode(code)
+
+        // Check if this Discord ID is already linked to another user
+        val existingUser = userRepository.findByDiscordId(discordUser.id)
+        if (existingUser != null && existingUser.id != userId) {
+            throw UserAlreadyExistsException("discordId", discordUser.id)
+        }
+
+        // Link Discord and update profile
+        val updatedUser =
+            userRepository.save(
+                user
+                    .linkDiscord(discordUser.id)
+                    .updateProfile(
+                        avatarUrl = discordUser.avatarUrl ?: user.avatarUrl,
+                    ),
+            )
+
+        logger.info("Discord account linked for user ${userId.value}: ${discordUser.id}")
+        return UserProfileResponse.from(updatedUser)
+    }
+
+    /**
+     * Links a Battle.net account to an existing user.
+     *
+     * @param userId The ID of the user to link
+     * @param code The OAuth2 authorization code from Battle.net
+     * @return Updated user profile
+     * @throws UserNotFoundException if user doesn't exist
+     * @throws UserAlreadyExistsException if Battle.net account is already linked to another user
+     */
+    fun linkBattlenetAccount(
+        userId: UserId,
+        code: String,
+    ): UserProfileResponse {
+        val user =
+            userRepository.findById(userId)
+                ?: throw UserNotFoundException(userId.value)
+
+        val battlenetUser = oauth2Service.exchangeBattlenetCode(code)
+
+        // Check if this Battle.net ID is already linked to another user
+        val existingUser = userRepository.findByBattlenetId(battlenetUser.sub)
+        if (existingUser != null && existingUser.id != userId) {
+            throw UserAlreadyExistsException("battlenetId", battlenetUser.sub)
+        }
+
+        // Link Battle.net account
+        val updatedUser = userRepository.save(user.linkBattlenet(battlenetUser.sub))
+
+        logger.info("Battle.net account linked for user ${userId.value}: ${battlenetUser.sub}")
+        return UserProfileResponse.from(updatedUser)
     }
 
     // ============= Token Management =============

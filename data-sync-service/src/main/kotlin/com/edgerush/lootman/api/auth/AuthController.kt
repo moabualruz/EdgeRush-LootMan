@@ -16,10 +16,45 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authentication", description = "OAuth2 authentication and token management")
+@Tag(name = "Authentication", description = "Authentication and token management")
 class AuthController(
     private val authenticationService: AuthenticationService,
 ) {
+    // ============= Local Authentication =============
+
+    @PostMapping("/register")
+    @Operation(
+        summary = "Register new user",
+        description = "Creates a new user account with username, email, and password",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Registration successful, tokens returned"),
+        ApiResponse(responseCode = "400", description = "Invalid input"),
+        ApiResponse(responseCode = "409", description = "Username or email already exists"),
+    )
+    fun register(
+        @RequestBody request: RegisterRequest,
+    ): ResponseEntity<TokenResponse> {
+        val tokens = authenticationService.registerLocal(request.username, request.email, request.password)
+        return ResponseEntity.ok(tokens)
+    }
+
+    @PostMapping("/login")
+    @Operation(
+        summary = "Login with credentials",
+        description = "Authenticates a user with username/email and password",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Login successful, tokens returned"),
+        ApiResponse(responseCode = "401", description = "Invalid credentials"),
+    )
+    fun login(
+        @RequestBody request: LoginRequest,
+    ): ResponseEntity<TokenResponse> {
+        val tokens = authenticationService.loginLocal(request.usernameOrEmail, request.password)
+        return ResponseEntity.ok(tokens)
+    }
+
     // ============= Discord OAuth2 =============
 
     @GetMapping("/discord/url")
@@ -143,6 +178,54 @@ class AuthController(
             authenticationService.validateToken(token)
                 ?: throw IllegalArgumentException("Invalid token")
         return authenticationService.logout(userId)
+    }
+
+    // ============= Account Linking =============
+
+    @PostMapping("/link/discord")
+    @Operation(
+        summary = "Link Discord account",
+        description = "Links a Discord account to the currently authenticated user",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Discord account linked successfully"),
+        ApiResponse(responseCode = "400", description = "Invalid authorization code"),
+        ApiResponse(responseCode = "401", description = "Not authenticated"),
+        ApiResponse(responseCode = "409", description = "Discord account already linked to another user"),
+    )
+    fun linkDiscord(
+        @Parameter(description = "JWT access token", required = true)
+        @RequestHeader("Authorization") authorization: String,
+        @RequestBody request: LinkAccountRequest,
+    ): UserProfileResponse {
+        val token = extractBearerToken(authorization)
+        val userId =
+            authenticationService.validateToken(token)
+                ?: throw IllegalArgumentException("Invalid token")
+        return authenticationService.linkDiscordAccount(userId, request.code)
+    }
+
+    @PostMapping("/link/battlenet")
+    @Operation(
+        summary = "Link Battle.net account",
+        description = "Links a Battle.net account to the currently authenticated user",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Battle.net account linked successfully"),
+        ApiResponse(responseCode = "400", description = "Invalid authorization code"),
+        ApiResponse(responseCode = "401", description = "Not authenticated"),
+        ApiResponse(responseCode = "409", description = "Battle.net account already linked to another user"),
+    )
+    fun linkBattlenet(
+        @Parameter(description = "JWT access token", required = true)
+        @RequestHeader("Authorization") authorization: String,
+        @RequestBody request: LinkAccountRequest,
+    ): UserProfileResponse {
+        val token = extractBearerToken(authorization)
+        val userId =
+            authenticationService.validateToken(token)
+                ?: throw IllegalArgumentException("Invalid token")
+        return authenticationService.linkBattlenetAccount(userId, request.code)
     }
 
     // ============= Helper Methods =============

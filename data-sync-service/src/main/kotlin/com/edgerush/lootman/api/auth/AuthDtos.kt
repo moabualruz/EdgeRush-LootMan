@@ -99,3 +99,27 @@ data class BattlenetUserInfo(
     val id: Long,
     val battletag: String,
 )
+
+/**
+ * Request to register a new local user.
+ */
+data class RegisterRequest(
+    val username: String,
+    val email: String,
+    val password: String,
+)
+
+/**
+ * Request to login with local credentials.
+ */
+data class LoginRequest(
+    val usernameOrEmail: String,
+    val password: String,
+)
+
+/**
+ * Request to link an OAuth account to the current user.
+ */
+data class LinkAccountRequest(
+    val code: String,
+)

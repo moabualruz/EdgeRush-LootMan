@@ -5,13 +5,13 @@ import com.edgerush.lootman.domain.loot.model.LootAwardId
 import com.edgerush.lootman.domain.loot.repository.LootAwardRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * In-memory implementation of LootAwardRepository.
+ *
+ * Used for testing without database dependency.
  */
-@Repository
 class InMemoryLootAwardRepository : LootAwardRepository {
     private val storage = ConcurrentHashMap<LootAwardId, LootAward>()
 

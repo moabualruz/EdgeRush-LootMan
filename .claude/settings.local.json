@@ -114,7 +114,12 @@
       "Bash(cargo build:*)",
       "Bash(npm run build:*)",
       "Bash(npx vite build)",
-      "Bash(npx playwright test:*)"
+      "Bash(npx playwright test:*)",
+      "Bash(docker --version:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker compose:*)"
     ]
   }
 }

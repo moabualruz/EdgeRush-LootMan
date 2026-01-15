@@ -3,10 +3,9 @@ package com.edgerush.lootman.api.graphql.subscription
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootTier
 import com.expediagroup.graphql.server.operations.Subscription
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Sinks
 import java.time.Instant
 
 /**
@@ -14,6 +13,8 @@ import java.time.Instant
  *
  * Provides real-time updates for loot-related events via WebSocket subscriptions.
  * Clients can subscribe to loot awarded and revoked events for specific guilds.
+ *
+ * Uses Reactor Flux (Publisher) for compatibility with graphql-kotlin-spring-server.
  */
 @Component
 class LootSubscriptionResolver(
@@ -23,9 +24,9 @@ class LootSubscriptionResolver(
      * Subscribe to loot awarded events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of loot awarded events
+     * @return Flux of loot awarded events
      */
-    fun lootAwarded(guildId: String): Flow<LootAwardedEvent> {
+    fun lootAwarded(guildId: String): Flux<LootAwardedEvent> {
         return lootEventPublisher.lootAwardedEvents
             .filter { it.guildId == guildId }
     }
@@ -34,9 +35,9 @@ class LootSubscriptionResolver(
      * Subscribe to loot revoked events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of loot revoked events
+     * @return Flux of loot revoked events
      */
-    fun lootRevoked(guildId: String): Flow<LootRevokedEvent> {
+    fun lootRevoked(guildId: String): Flux<LootRevokedEvent> {
         return lootEventPublisher.lootRevokedEvents
             .filter { it.guildId == guildId }
     }
@@ -48,22 +49,24 @@ class LootSubscriptionResolver(
  * This component manages the event streams for loot subscriptions.
  * Other services can publish events through this component, and
  * subscribers will receive them via GraphQL subscriptions.
+ *
+ * Uses Reactor Sinks for thread-safe event publishing.
  */
 @Component
 class LootEventPublisher {
-    private val _lootAwardedEvents = MutableSharedFlow<LootAwardedEvent>(replay = 0)
-    private val _lootRevokedEvents = MutableSharedFlow<LootRevokedEvent>(replay = 0)
+    private val _lootAwardedEvents = Sinks.many().multicast().onBackpressureBuffer<LootAwardedEvent>()
+    private val _lootRevokedEvents = Sinks.many().multicast().onBackpressureBuffer<LootRevokedEvent>()
 
-    val lootAwardedEvents: Flow<LootAwardedEvent> = _lootAwardedEvents
-    val lootRevokedEvents: Flow<LootRevokedEvent> = _lootRevokedEvents
+    val lootAwardedEvents: Flux<LootAwardedEvent> = _lootAwardedEvents.asFlux()
+    val lootRevokedEvents: Flux<LootRevokedEvent> = _lootRevokedEvents.asFlux()
 
     /**
      * Publish a loot awarded event.
      *
      * @param award The loot award that was created
      */
-    suspend fun publishLootAwarded(award: LootAward) {
-        _lootAwardedEvents.emit(award.toLootAwardedEvent())
+    fun publishLootAwarded(award: LootAward) {
+        _lootAwardedEvents.tryEmitNext(award.toLootAwardedEvent())
     }
 
     /**
@@ -72,11 +75,11 @@ class LootEventPublisher {
      * @param guildId The guild ID where the revocation occurred
      * @param awardId The ID of the revoked award
      */
-    suspend fun publishLootRevoked(
+    fun publishLootRevoked(
         guildId: String,
         awardId: String,
     ) {
-        _lootRevokedEvents.emit(
+        _lootRevokedEvents.tryEmitNext(
             LootRevokedEvent(
                 guildId = guildId,
                 awardId = awardId,

@@ -76,3 +76,15 @@ class InvalidRefreshTokenException(message: String = "Invalid or expired refresh
  */
 class OAuth2AuthenticationException(val provider: String, message: String) :
     DomainException("$provider OAuth2 error: $message")
+
+/**
+ * Exception thrown when user credentials are invalid.
+ */
+class InvalidCredentialsException(message: String = "Invalid username or password") :
+    DomainException(message)
+
+/**
+ * Exception thrown when attempting to create a user that already exists.
+ */
+class UserAlreadyExistsException(val field: String, val value: String) :
+    DomainException("User with $field '$value' already exists")

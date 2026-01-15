@@ -16,10 +16,14 @@ import org.springframework.web.bind.annotation.RestController
  * REST controller for current user ("me") operations.
  *
  * Provides unified endpoints for retrieving personal data for the
- * authenticated user's primary linked character.
+ * authenticated user's primary linked character under /api/v1/me/.
+ *
+ * Note: Some resources also have /me endpoints under their resource controllers
+ * (e.g., /api/v1/attendance/guilds/{guildId}/me). This controller provides an
+ * alternative unified access point under /api/v1/me/.
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/me")
 @Tag(name = "Me", description = "Current user data endpoints")
 class MeController(
     private val currentUserService: CurrentUserService,

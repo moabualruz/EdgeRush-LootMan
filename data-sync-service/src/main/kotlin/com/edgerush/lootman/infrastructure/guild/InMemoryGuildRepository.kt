@@ -3,7 +3,6 @@ package com.edgerush.lootman.infrastructure.guild
 import com.edgerush.lootman.domain.guild.model.Guild
 import com.edgerush.lootman.domain.guild.repository.GuildRepository
 import com.edgerush.lootman.domain.shared.GuildId
-import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -11,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Useful for testing and development without database dependency.
  */
-@Repository
 class InMemoryGuildRepository : GuildRepository {
     private val guilds = ConcurrentHashMap<String, Guild>()
 

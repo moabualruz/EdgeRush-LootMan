@@ -3,11 +3,20 @@ package com.edgerush.datasync.config
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
+import org.springframework.http.client.SimpleClientHttpRequestFactory
+import org.springframework.web.client.RestTemplate
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class WebClientConfig {
+    @Bean
+    fun restTemplate(): RestTemplate {
+        val factory = SimpleClientHttpRequestFactory()
+        factory.setConnectTimeout(10_000)
+        factory.setReadTimeout(30_000)
+        return RestTemplate(factory)
+    }
     @Bean
     fun wowauditWebClient(
         builder: WebClient.Builder,

@@ -25,14 +25,16 @@ ALTER TABLE applications
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
 
 -- Set default values for existing rows
+-- Note: V0019 renamed applied_at -> appliedAt and synced_at -> syncedAt
 UPDATE applications
-SET created_at = COALESCE(applied_at, synced_at),
-    updated_at = COALESCE(applied_at, synced_at)
+SET created_at = COALESCE("appliedAt", "syncedAt"),
+    updated_at = COALESCE("appliedAt", "syncedAt")
 WHERE created_at IS NULL;
 
 -- Create indexes for common queries
+-- Note: V0019 renamed discord_id -> discordId
 CREATE INDEX IF NOT EXISTS idx_applications_guild_id ON applications(guild_id);
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
-CREATE INDEX IF NOT EXISTS idx_applications_discord_id ON applications(discord_id);
+CREATE INDEX IF NOT EXISTS idx_applications_discord_id ON applications("discordId");
 CREATE INDEX IF NOT EXISTS idx_applications_battletag ON applications(battletag);
 CREATE INDEX IF NOT EXISTS idx_applications_created_at ON applications(created_at);

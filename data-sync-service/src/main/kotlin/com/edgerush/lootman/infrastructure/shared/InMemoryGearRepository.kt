@@ -4,7 +4,6 @@ import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.GearSet
 import com.edgerush.lootman.domain.shared.model.GearSetType
 import com.edgerush.lootman.domain.shared.repository.GearRepository
-import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -13,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap
  * Uses ConcurrentHashMap for thread-safe operations.
  * Storage key is a composite of RaiderId and GearSetType.
  */
-@Repository
 class InMemoryGearRepository : GearRepository {
     private val storage = ConcurrentHashMap<GearKey, GearSet>()
 

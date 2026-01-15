@@ -24,7 +24,7 @@ class JdbcUserRepository(
     override fun findById(id: UserId): User? {
         val sql =
             """
-            SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE id = ?
             """.trimIndent()
@@ -35,7 +35,7 @@ class JdbcUserRepository(
     override fun findByDiscordId(discordId: String): User? {
         val sql =
             """
-            SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE discord_id = ?
             """.trimIndent()
@@ -46,7 +46,7 @@ class JdbcUserRepository(
     override fun findByBattlenetId(battlenetId: String): User? {
         val sql =
             """
-            SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE battlenet_id = ?
             """.trimIndent()
@@ -57,13 +57,47 @@ class JdbcUserRepository(
     override fun findByGuildId(guildId: GuildId): List<User> {
         val sql =
             """
-            SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE guild_id = ?
             ORDER BY username ASC
             """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value)
+    }
+
+    override fun findByUsername(username: String): User? {
+        val sql =
+            """
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
+            FROM users
+            WHERE LOWER(username) = LOWER(?)
+            """.trimIndent()
+
+        return jdbcTemplate.query(sql, rowMapper, username).firstOrNull()
+    }
+
+    override fun findByEmail(email: String): User? {
+        val sql =
+            """
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
+            FROM users
+            WHERE LOWER(email) = LOWER(?)
+            """.trimIndent()
+
+        return jdbcTemplate.query(sql, rowMapper, email).firstOrNull()
+    }
+
+    override fun existsByUsername(username: String): Boolean {
+        val sql = "SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER(?)"
+        val count = jdbcTemplate.queryForObject(sql, Long::class.java, username)
+        return (count ?: 0) > 0
+    }
+
+    override fun existsByEmail(email: String): Boolean {
+        val sql = "SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?)"
+        val count = jdbcTemplate.queryForObject(sql, Long::class.java, email)
+        return (count ?: 0) > 0
     }
 
     override fun save(user: User): User {
@@ -77,8 +111,8 @@ class JdbcUserRepository(
     private fun insert(user: User): User {
         val sql =
             """
-            INSERT INTO users (discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -89,11 +123,12 @@ class JdbcUserRepository(
             ps.setString(2, user.battlenetId)
             ps.setString(3, user.username)
             ps.setString(4, user.email)
-            ps.setString(5, user.avatarUrl)
-            ps.setString(6, user.role.name)
-            ps.setString(7, user.guildId?.value)
-            ps.setTimestamp(8, Timestamp.from(user.createdAt))
-            ps.setTimestamp(9, user.lastLogin?.let { Timestamp.from(it) })
+            ps.setString(5, user.passwordHash)
+            ps.setString(6, user.avatarUrl)
+            ps.setString(7, user.role.name)
+            ps.setString(8, user.guildId?.value)
+            ps.setTimestamp(9, Timestamp.from(user.createdAt))
+            ps.setTimestamp(10, user.lastLogin?.let { Timestamp.from(it) })
             ps
         }, keyHolder)
 
@@ -108,7 +143,7 @@ class JdbcUserRepository(
         val sql =
             """
             UPDATE users
-            SET discord_id = ?, battlenet_id = ?, username = ?, email = ?, avatar_url = ?, role = ?, guild_id = ?, last_login = ?
+            SET discord_id = ?, battlenet_id = ?, username = ?, email = ?, password_hash = ?, avatar_url = ?, role = ?, guild_id = ?, last_login = ?
             WHERE id = ?
             """.trimIndent()
 
@@ -118,6 +153,7 @@ class JdbcUserRepository(
             user.battlenetId,
             user.username,
             user.email,
+            user.passwordHash,
             user.avatarUrl,
             user.role.name,
             user.guildId?.value,
@@ -151,7 +187,7 @@ class JdbcUserRepository(
     ): List<User> {
         val sql =
             """
-            SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
+            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
             FROM users
             ORDER BY id ASC
             LIMIT ? OFFSET ?
@@ -173,6 +209,7 @@ class JdbcUserRepository(
                 battlenetId = rs.getString("battlenet_id"),
                 username = rs.getString("username"),
                 email = rs.getString("email"),
+                passwordHash = rs.getString("password_hash"),
                 avatarUrl = rs.getString("avatar_url"),
                 role = UserRole.fromString(rs.getString("role")),
                 guildId = rs.getString("guild_id")?.let { GuildId(it) },

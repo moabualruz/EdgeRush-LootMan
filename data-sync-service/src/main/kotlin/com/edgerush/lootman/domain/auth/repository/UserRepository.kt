@@ -72,6 +72,38 @@ interface UserRepository {
     fun existsByBattlenetId(battlenetId: String): Boolean
 
     /**
+     * Finds a user by their username (case-insensitive).
+     *
+     * @param username The username to search for
+     * @return The user if found, null otherwise
+     */
+    fun findByUsername(username: String): User?
+
+    /**
+     * Finds a user by their email address (case-insensitive).
+     *
+     * @param email The email to search for
+     * @return The user if found, null otherwise
+     */
+    fun findByEmail(email: String): User?
+
+    /**
+     * Checks if a user exists with the given username (case-insensitive).
+     *
+     * @param username The username to check
+     * @return true if user exists, false otherwise
+     */
+    fun existsByUsername(username: String): Boolean
+
+    /**
+     * Checks if a user exists with the given email (case-insensitive).
+     *
+     * @param email The email to check
+     * @return true if user exists, false otherwise
+     */
+    fun existsByEmail(email: String): Boolean
+
+    /**
      * Finds all users with pagination.
      *
      * @param offset The number of records to skip

@@ -1,10 +1,9 @@
 package com.edgerush.lootman.api.graphql.subscription
 
 import com.expediagroup.graphql.server.operations.Subscription
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Sinks
 import java.time.Instant
 
 /**
@@ -12,6 +11,8 @@ import java.time.Instant
  *
  * Provides real-time updates for data synchronization events via WebSocket subscriptions.
  * Clients can subscribe to sync completion events for specific guilds.
+ *
+ * Uses Reactor Flux (Publisher) for compatibility with graphql-kotlin-spring-server.
  */
 @Component
 class SyncSubscriptionResolver(
@@ -21,9 +22,9 @@ class SyncSubscriptionResolver(
      * Subscribe to sync completed events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of sync completed events
+     * @return Flux of sync completed events
      */
-    fun syncCompleted(guildId: String): Flow<SyncCompletedEvent> {
+    fun syncCompleted(guildId: String): Flux<SyncCompletedEvent> {
         return syncEventPublisher.syncCompletedEvents
             .filter { it.guildId == guildId }
     }
@@ -32,9 +33,9 @@ class SyncSubscriptionResolver(
      * Subscribe to sync started events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of sync started events
+     * @return Flux of sync started events
      */
-    fun syncStarted(guildId: String): Flow<SyncStartedEvent> {
+    fun syncStarted(guildId: String): Flux<SyncStartedEvent> {
         return syncEventPublisher.syncStartedEvents
             .filter { it.guildId == guildId }
     }
@@ -43,9 +44,9 @@ class SyncSubscriptionResolver(
      * Subscribe to sync failed events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of sync failed events
+     * @return Flux of sync failed events
      */
-    fun syncFailed(guildId: String): Flow<SyncFailedEvent> {
+    fun syncFailed(guildId: String): Flux<SyncFailedEvent> {
         return syncEventPublisher.syncFailedEvents
             .filter { it.guildId == guildId }
     }
@@ -54,9 +55,9 @@ class SyncSubscriptionResolver(
      * Subscribe to sync progress events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of sync progress events
+     * @return Flux of sync progress events
      */
-    fun syncProgress(guildId: String): Flow<SyncProgressEvent> {
+    fun syncProgress(guildId: String): Flux<SyncProgressEvent> {
         return syncEventPublisher.syncProgressEvents
             .filter { it.guildId == guildId }
     }
@@ -68,30 +69,32 @@ class SyncSubscriptionResolver(
  * This component manages the event streams for sync subscriptions.
  * Other services can publish events through this component, and
  * subscribers will receive them via GraphQL subscriptions.
+ *
+ * Uses Reactor Sinks for thread-safe event publishing.
  */
 @Component
 class SyncEventPublisher {
-    private val _syncCompletedEvents = MutableSharedFlow<SyncCompletedEvent>(replay = 0)
-    private val _syncStartedEvents = MutableSharedFlow<SyncStartedEvent>(replay = 0)
-    private val _syncFailedEvents = MutableSharedFlow<SyncFailedEvent>(replay = 0)
-    private val _syncProgressEvents = MutableSharedFlow<SyncProgressEvent>(replay = 0)
+    private val _syncCompletedEvents = Sinks.many().multicast().onBackpressureBuffer<SyncCompletedEvent>()
+    private val _syncStartedEvents = Sinks.many().multicast().onBackpressureBuffer<SyncStartedEvent>()
+    private val _syncFailedEvents = Sinks.many().multicast().onBackpressureBuffer<SyncFailedEvent>()
+    private val _syncProgressEvents = Sinks.many().multicast().onBackpressureBuffer<SyncProgressEvent>()
 
-    val syncCompletedEvents: Flow<SyncCompletedEvent> = _syncCompletedEvents
-    val syncStartedEvents: Flow<SyncStartedEvent> = _syncStartedEvents
-    val syncFailedEvents: Flow<SyncFailedEvent> = _syncFailedEvents
-    val syncProgressEvents: Flow<SyncProgressEvent> = _syncProgressEvents
+    val syncCompletedEvents: Flux<SyncCompletedEvent> = _syncCompletedEvents.asFlux()
+    val syncStartedEvents: Flux<SyncStartedEvent> = _syncStartedEvents.asFlux()
+    val syncFailedEvents: Flux<SyncFailedEvent> = _syncFailedEvents.asFlux()
+    val syncProgressEvents: Flux<SyncProgressEvent> = _syncProgressEvents.asFlux()
 
     /**
      * Publish a sync completed event.
      */
-    suspend fun publishSyncCompleted(event: SyncCompletedEvent) {
-        _syncCompletedEvents.emit(event)
+    fun publishSyncCompleted(event: SyncCompletedEvent) {
+        _syncCompletedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a sync completed event using individual parameters.
      */
-    suspend fun publishSyncCompleted(
+    fun publishSyncCompleted(
         guildId: String,
         syncType: SyncType,
         recordsProcessed: Int,
@@ -99,7 +102,7 @@ class SyncEventPublisher {
         recordsUpdated: Int,
         durationMs: Long,
     ) {
-        _syncCompletedEvents.emit(
+        _syncCompletedEvents.tryEmitNext(
             SyncCompletedEvent(
                 guildId = guildId,
                 syncType = syncType,
@@ -115,18 +118,18 @@ class SyncEventPublisher {
     /**
      * Publish a sync started event.
      */
-    suspend fun publishSyncStarted(event: SyncStartedEvent) {
-        _syncStartedEvents.emit(event)
+    fun publishSyncStarted(event: SyncStartedEvent) {
+        _syncStartedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a sync started event using individual parameters.
      */
-    suspend fun publishSyncStarted(
+    fun publishSyncStarted(
         guildId: String,
         syncType: SyncType,
     ) {
-        _syncStartedEvents.emit(
+        _syncStartedEvents.tryEmitNext(
             SyncStartedEvent(
                 guildId = guildId,
                 syncType = syncType,
@@ -138,20 +141,20 @@ class SyncEventPublisher {
     /**
      * Publish a sync failed event.
      */
-    suspend fun publishSyncFailed(event: SyncFailedEvent) {
-        _syncFailedEvents.emit(event)
+    fun publishSyncFailed(event: SyncFailedEvent) {
+        _syncFailedEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a sync failed event using individual parameters.
      */
-    suspend fun publishSyncFailed(
+    fun publishSyncFailed(
         guildId: String,
         syncType: SyncType,
         errorMessage: String,
         errorCode: String?,
     ) {
-        _syncFailedEvents.emit(
+        _syncFailedEvents.tryEmitNext(
             SyncFailedEvent(
                 guildId = guildId,
                 syncType = syncType,
@@ -165,14 +168,14 @@ class SyncEventPublisher {
     /**
      * Publish a sync progress event.
      */
-    suspend fun publishSyncProgress(event: SyncProgressEvent) {
-        _syncProgressEvents.emit(event)
+    fun publishSyncProgress(event: SyncProgressEvent) {
+        _syncProgressEvents.tryEmitNext(event)
     }
 
     /**
      * Publish a sync progress event using individual parameters.
      */
-    suspend fun publishSyncProgress(
+    fun publishSyncProgress(
         guildId: String,
         syncType: SyncType,
         currentStep: String,
@@ -180,7 +183,7 @@ class SyncEventPublisher {
         totalCount: Int?,
         percentComplete: Int?,
     ) {
-        _syncProgressEvents.emit(
+        _syncProgressEvents.tryEmitNext(
             SyncProgressEvent(
                 guildId = guildId,
                 syncType = syncType,

@@ -5,6 +5,7 @@ import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
+import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -18,6 +19,7 @@ import java.sql.Timestamp
  * using Spring JDBC Template for database access.
  */
 @Repository
+@Primary
 class JdbcSimulationRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : SimulationRepository {

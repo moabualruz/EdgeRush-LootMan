@@ -4,7 +4,6 @@ import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
 import com.edgerush.lootman.domain.flps.repository.RaiderPerformanceRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
@@ -14,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap
  * Stores raider performance data keyed by guild, raider, and period.
  * Useful for testing and development without database dependency.
  */
-@Repository
 class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
     // Storage keyed by composite key: guildId-raiderId-periodStart-periodEnd
     private val storage = ConcurrentHashMap<String, RaiderPerformanceData>()

@@ -7,6 +7,7 @@ import com.edgerush.lootman.domain.flps.repository.IpiWeights
 import com.edgerush.lootman.domain.flps.repository.RmsWeights
 import com.edgerush.lootman.domain.flps.repository.RoleMultipliers
 import com.edgerush.lootman.domain.shared.GuildId
+import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Repository
  * Guild overrides take precedence over defaults.
  */
 @Repository
+@Primary
 class JdbcFlpsModifierRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : FlpsModifierRepository {

@@ -7,15 +7,12 @@ import com.edgerush.lootman.domain.flps.repository.IpiWeights
 import com.edgerush.lootman.domain.flps.repository.RmsWeights
 import com.edgerush.lootman.domain.flps.repository.RoleMultipliers
 import com.edgerush.lootman.domain.shared.GuildId
-import org.springframework.stereotype.Repository
-
 /**
  * In-memory implementation of FlpsModifierRepository.
  *
  * This implementation returns default modifiers for all guilds.
- * In a future iteration, this will be replaced with a database-backed implementation.
+ * Used for testing without database dependency.
  */
-@Repository
 class InMemoryFlpsModifierRepository : FlpsModifierRepository {
     private val defaultModifiers =
         FlpsModifiers(

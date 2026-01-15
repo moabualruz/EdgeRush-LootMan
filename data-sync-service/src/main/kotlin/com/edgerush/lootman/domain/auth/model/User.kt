@@ -6,8 +6,12 @@ import java.time.Instant
 /**
  * User entity representing an authenticated user account.
  *
- * Users authenticate via Discord or Battle.net OAuth2 and can be
- * associated with a guild for access control purposes.
+ * Users can authenticate via:
+ * - Local username/password
+ * - Discord OAuth2
+ * - Battle.net OAuth2
+ *
+ * Users can also link multiple authentication methods to their account.
  */
 data class User(
     val id: UserId? = null,
@@ -15,6 +19,7 @@ data class User(
     val battlenetId: String? = null,
     val username: String,
     val email: String? = null,
+    val passwordHash: String? = null,
     val avatarUrl: String? = null,
     val role: UserRole = UserRole.RAIDER,
     val guildId: GuildId? = null,
@@ -23,10 +28,17 @@ data class User(
 ) {
     init {
         require(username.isNotBlank()) { "Username must not be blank" }
-        require(discordId != null || battlenetId != null) {
-            "User must have either Discord ID or Battle.net ID"
-        }
     }
+
+    /**
+     * Checks if the user has a password set for local authentication.
+     */
+    fun hasPassword(): Boolean = passwordHash != null
+
+    /**
+     * Checks if the user has any linked OAuth accounts.
+     */
+    fun hasOAuthAccount(): Boolean = discordId != null || battlenetId != null
 
     /**
      * Creates a copy with the given ID.
@@ -63,6 +75,14 @@ data class User(
         )
 
     /**
+     * Sets the password hash for local authentication.
+     */
+    fun withPassword(passwordHash: String): User {
+        require(passwordHash.isNotBlank()) { "Password hash must not be blank" }
+        return copy(passwordHash = passwordHash)
+    }
+
+    /**
      * Links a Discord account to this user.
      */
     fun linkDiscord(discordId: String): User {
@@ -89,6 +109,20 @@ data class User(
         }
 
     companion object {
+        /**
+         * Creates a new user with local credentials.
+         */
+        fun fromLocal(
+            username: String,
+            email: String,
+            passwordHash: String,
+        ): User =
+            User(
+                username = username,
+                email = email,
+                passwordHash = passwordHash,
+            )
+
         /**
          * Creates a new user from Discord OAuth2.
          */

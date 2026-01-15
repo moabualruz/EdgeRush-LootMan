@@ -5,7 +5,6 @@ import com.edgerush.lootman.domain.loot.model.LootBanId
 import com.edgerush.lootman.domain.loot.repository.LootBanRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
@@ -15,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap
  * This implementation is suitable for testing and development.
  * For production, use a database-backed implementation.
  */
-@Repository
 class InMemoryLootBanRepository : LootBanRepository {
     private val storage = ConcurrentHashMap<LootBanId, LootBan>()
 

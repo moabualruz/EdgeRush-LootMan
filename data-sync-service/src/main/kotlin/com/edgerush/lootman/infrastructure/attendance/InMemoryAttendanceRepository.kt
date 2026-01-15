@@ -5,7 +5,6 @@ import com.edgerush.lootman.domain.attendance.model.AttendanceRecordId
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap
@@ -16,8 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
  * This implementation stores attendance records in memory using a ConcurrentHashMap
  * for thread-safe operations. Suitable for testing and development.
  */
-@Repository("domainAttendanceRepository")
-@Primary
+@Repository("inMemoryAttendanceRepository")
 class InMemoryAttendanceRepository : AttendanceRepository {
     private val storage = ConcurrentHashMap<AttendanceRecordId, AttendanceRecord>()
 

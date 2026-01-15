@@ -4,7 +4,6 @@ import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.Raider
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
-import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -12,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Uses ConcurrentHashMap for thread-safe operations.
  */
-@Repository
 class InMemoryRaiderRepository : RaiderRepository {
     private val storage = ConcurrentHashMap<RaiderId, Raider>()
 

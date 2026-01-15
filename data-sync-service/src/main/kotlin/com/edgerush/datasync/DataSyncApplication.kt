@@ -1,6 +1,7 @@
 package com.edgerush.datasync
 
 import com.edgerush.datasync.config.SyncProperties
+import com.edgerush.lootman.api.common.PaginationProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -10,8 +11,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @EnableScheduling
-@ConfigurationPropertiesScan
-@EnableConfigurationProperties(SyncProperties::class)
+@ConfigurationPropertiesScan(basePackages = ["com.edgerush.datasync", "com.edgerush.lootman"])
+@EnableConfigurationProperties(SyncProperties::class, PaginationProperties::class)
 @ComponentScan(basePackages = ["com.edgerush.datasync", "com.edgerush.lootman"])
 class DataSyncApplication
 

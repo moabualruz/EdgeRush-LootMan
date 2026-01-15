@@ -1,6 +1,7 @@
 package com.edgerush.datasync.config
 
 import com.edgerush.lootman.api.common.DeprecatedEndpoint
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping
@@ -23,6 +24,7 @@ import reactor.core.publisher.Mono
  */
 @Component
 class DeprecationHeaderFilter(
+    @Qualifier("requestMappingHandlerMapping")
     private val handlerMapping: RequestMappingHandlerMapping,
 ) : WebFilter {
     override fun filter(

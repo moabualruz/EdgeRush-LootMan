@@ -1,10 +1,9 @@
 package com.edgerush.lootman.api.graphql.subscription
 
 import com.expediagroup.graphql.server.operations.Subscription
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Sinks
 import java.time.Instant
 
 /**
@@ -12,6 +11,8 @@ import java.time.Instant
  *
  * Provides real-time updates for FLPS-related events via WebSocket subscriptions.
  * Clients can subscribe to score updates for specific guilds.
+ *
+ * Uses Reactor Flux (Publisher) for compatibility with graphql-kotlin-spring-server.
  */
 @Component
 class FlpsSubscriptionResolver(
@@ -21,9 +22,9 @@ class FlpsSubscriptionResolver(
      * Subscribe to FLPS score updates for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of FLPS score updated events
+     * @return Flux of FLPS score updated events
      */
-    fun flpsScoreUpdated(guildId: String): Flow<FlpsScoreUpdatedEvent> {
+    fun flpsScoreUpdated(guildId: String): Flux<FlpsScoreUpdatedEvent> {
         return flpsEventPublisher.scoreUpdatedEvents
             .filter { it.guildId == guildId }
     }
@@ -32,9 +33,9 @@ class FlpsSubscriptionResolver(
      * Subscribe to RDF expiry events for a guild.
      *
      * @param guildId The guild ID to filter events for
-     * @return Flow of RDF expired events
+     * @return Flux of RDF expired events
      */
-    fun rdfExpired(guildId: String): Flow<RdfExpiredEvent> {
+    fun rdfExpired(guildId: String): Flux<RdfExpiredEvent> {
         return flpsEventPublisher.rdfExpiredEvents
             .filter { it.guildId == guildId }
     }
@@ -46,22 +47,24 @@ class FlpsSubscriptionResolver(
  * This component manages the event streams for FLPS subscriptions.
  * Other services can publish events through this component, and
  * subscribers will receive them via GraphQL subscriptions.
+ *
+ * Uses Reactor Sinks for thread-safe event publishing.
  */
 @Component
 class FlpsEventPublisher {
-    private val _scoreUpdatedEvents = MutableSharedFlow<FlpsScoreUpdatedEvent>(replay = 0)
-    private val _rdfExpiredEvents = MutableSharedFlow<RdfExpiredEvent>(replay = 0)
+    private val _scoreUpdatedEvents = Sinks.many().multicast().onBackpressureBuffer<FlpsScoreUpdatedEvent>()
+    private val _rdfExpiredEvents = Sinks.many().multicast().onBackpressureBuffer<RdfExpiredEvent>()
 
-    val scoreUpdatedEvents: Flow<FlpsScoreUpdatedEvent> = _scoreUpdatedEvents
-    val rdfExpiredEvents: Flow<RdfExpiredEvent> = _rdfExpiredEvents
+    val scoreUpdatedEvents: Flux<FlpsScoreUpdatedEvent> = _scoreUpdatedEvents.asFlux()
+    val rdfExpiredEvents: Flux<RdfExpiredEvent> = _rdfExpiredEvents.asFlux()
 
     /**
      * Publish an FLPS score updated event.
      *
      * @param event The score updated event
      */
-    suspend fun publishScoreUpdated(event: FlpsScoreUpdatedEvent) {
-        _scoreUpdatedEvents.emit(event)
+    fun publishScoreUpdated(event: FlpsScoreUpdatedEvent) {
+        _scoreUpdatedEvents.tryEmitNext(event)
     }
 
     /**
@@ -73,14 +76,14 @@ class FlpsEventPublisher {
      * @param oldScore The previous FLPS score (null if first calculation)
      * @param newScore The new FLPS score
      */
-    suspend fun publishScoreUpdated(
+    fun publishScoreUpdated(
         guildId: String,
         raiderId: String,
         itemId: Long,
         oldScore: Double?,
         newScore: Double,
     ) {
-        _scoreUpdatedEvents.emit(
+        _scoreUpdatedEvents.tryEmitNext(
             FlpsScoreUpdatedEvent(
                 guildId = guildId,
                 raiderId = raiderId,
@@ -97,8 +100,8 @@ class FlpsEventPublisher {
      *
      * @param event The RDF expired event
      */
-    suspend fun publishRdfExpired(event: RdfExpiredEvent) {
-        _rdfExpiredEvents.emit(event)
+    fun publishRdfExpired(event: RdfExpiredEvent) {
+        _rdfExpiredEvents.tryEmitNext(event)
     }
 
     /**
@@ -109,13 +112,13 @@ class FlpsEventPublisher {
      * @param itemId The item ID for which the RDF expired
      * @param expiredRdf The RDF value that expired
      */
-    suspend fun publishRdfExpired(
+    fun publishRdfExpired(
         guildId: String,
         raiderId: String,
         itemId: Long,
         expiredRdf: Double,
     ) {
-        _rdfExpiredEvents.emit(
+        _rdfExpiredEvents.tryEmitNext(
             RdfExpiredEvent(
                 guildId = guildId,
                 raiderId = raiderId,
