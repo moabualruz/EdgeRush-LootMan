@@ -1,5 +1,6 @@
 package com.edgerush.lootman.api.flps
 
+import com.edgerush.datasync.config.CacheConfig
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreCommand
@@ -16,6 +17,7 @@ import com.edgerush.lootman.domain.shared.RaiderId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -153,6 +155,10 @@ class FlpsController(
     @Operation(
         summary = "Get FLPS leaderboard",
         description = "Returns a filtered and paginated leaderboard of raiders sorted by FLPS score"
+    )
+    @Cacheable(
+        value = [CacheConfig.FLPS_LEADERBOARD],
+        key = "#guildId + '-' + #role + '-' + #characterClass + '-' + #eligible + '-' + #limit + '-' + #offset",
     )
     fun getLeaderboard(
         @Parameter(description = "Guild ID")

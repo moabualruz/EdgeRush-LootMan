@@ -40,3 +40,12 @@ node_modules/
 
 # Tauri
 target/
+
+# Playwright
+**/playwright-report/
+**/playwright/.cache/
+**/test-results/
+
+# dist
+dist/
+**/dist

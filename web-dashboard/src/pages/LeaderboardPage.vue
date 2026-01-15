@@ -49,7 +49,8 @@ const isCurrentUser = (characterName: string) => {
 
     <!-- Leaderboard table -->
     <div v-else-if="data" class="card overflow-hidden p-0">
-      <table class="w-full">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[500px]">
         <thead class="bg-gray-700/50">
           <tr>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Rank</th>
@@ -104,6 +105,7 @@ const isCurrentUser = (characterName: string) => {
           </tr>
         </tbody>
       </table>
+      </div>
 
       <!-- Empty state -->
       <div v-if="data.entries.length === 0" class="p-8 text-center text-gray-400">

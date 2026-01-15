@@ -34,6 +34,10 @@ dependencies {
     // Rate Limiting
     implementation("com.google.guava:guava:33.0.0-jre")
 
+    // Caching
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+
     // Prometheus Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
 

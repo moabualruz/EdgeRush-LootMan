@@ -111,7 +111,9 @@
       "Bash(cargo test:*)",
       "Bash(python3:*)",
       "Bash(node:*)",
-      "Bash(cargo build:*)"
+      "Bash(cargo build:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build)"
     ]
   }
 }
