@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { lootApi } from '@/api/loot'
 import ScoreCard from '@/components/ScoreCard.vue'
 import ScoreBreakdown from '@/components/ScoreBreakdown.vue'
+import FlpsVisualization from '@/components/FlpsVisualization.vue'
 import RecentLoot from '@/components/RecentLoot.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
+import SkeletonProfile from '@/components/SkeletonProfile.vue'
 
 const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+
+// View mode for FLPS breakdown
+const detailedView = ref(false)
 
 const { data: flpsData, isLoading: flpsLoading, error: flpsError } = useQuery({
   queryKey: ['myFlps', GUILD_ID],
@@ -32,9 +38,15 @@ const scoreColor = computed(() => {
   <div>
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
-    <!-- Loading state -->
-    <div v-if="flpsLoading" class="flex items-center justify-center py-12">
-      <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+    <!-- Loading state with skeletons -->
+    <div v-if="flpsLoading" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <SkeletonProfile :stats-count="2" />
+        <div class="lg:col-span-2">
+          <SkeletonCard :lines="6" />
+        </div>
+      </div>
+      <SkeletonCard :lines="4" />
     </div>
 
     <!-- Error state -->
@@ -57,12 +69,29 @@ const scoreColor = computed(() => {
           />
         </div>
 
-        <!-- Score Breakdown -->
+        <!-- Score Breakdown with toggle -->
         <div class="card lg:col-span-2">
-          <h2 class="text-lg font-semibold mb-4">Score Breakdown</h2>
-          <ScoreBreakdown :rms="flpsData.rms" :ipi="flpsData.ipi" :rdf="flpsData.rdf" />
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Score Breakdown</h2>
+            <button
+              @click="detailedView = !detailedView"
+              class="text-sm text-primary-400 hover:text-primary-300 transition-colors"
+            >
+              {{ detailedView ? 'Simple View' : 'Detailed View' }}
+            </button>
+          </div>
+          <ScoreBreakdown v-if="!detailedView" :rms="flpsData.rms" :ipi="flpsData.ipi" :rdf="flpsData.rdf" />
         </div>
       </div>
+
+      <!-- Detailed FLPS Visualization -->
+      <FlpsVisualization
+        v-if="detailedView"
+        :flps="flpsData.flps"
+        :rms="flpsData.rms"
+        :ipi="flpsData.ipi"
+        :rdf="flpsData.rdf"
+      />
 
       <!-- Eligibility Warning -->
       <div
@@ -78,7 +107,9 @@ const scoreColor = computed(() => {
       <!-- Recent Loot -->
       <div class="card">
         <h2 class="text-lg font-semibold mb-4">Recent Loot</h2>
-        <div v-if="lootLoading" class="text-gray-400">Loading...</div>
+        <div v-if="lootLoading">
+          <SkeletonCard :lines="3" :show-header="false" />
+        </div>
         <RecentLoot v-else-if="lootData" :awards="lootData.awards" />
         <p v-else class="text-gray-400">No loot history found.</p>
       </div>

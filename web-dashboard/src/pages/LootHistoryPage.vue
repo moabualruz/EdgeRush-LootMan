@@ -1,25 +1,73 @@
 <script setup lang="ts">
+import { computed, toRef } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { lootApi } from '@/api/loot'
 import { formatDate, formatRelativeTime } from '@/utils/date'
+import { useWowhead } from '@/composables/useWowhead'
+import WowheadItem from '@/components/WowheadItem.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
+import { DonutChart, BarChart } from '@/components/charts'
 
 const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
 
 const { data, isLoading, error } = useQuery({
-  queryKey: ['myLootHistory', GUILD_ID, 20],
-  queryFn: () => lootApi.getMyLootHistory(GUILD_ID, 20),
+  queryKey: ['myLootHistory', GUILD_ID, 50],
+  queryFn: () => lootApi.getMyLootHistory(GUILD_ID, 50),
 })
 
+// Initialize Wowhead tooltips
+const dataRef = toRef(() => data.value)
+useWowhead({}, [dataRef])
+
 const formatScore = (score: number) => score.toFixed(3)
+
+// RDF status breakdown for donut chart
+const rdfBreakdown = computed(() => {
+  if (!data.value?.awards) return []
+  const expired = data.value.awards.filter(a => a.rdfExpired).length
+  const active = data.value.awards.filter(a => !a.rdfExpired).length
+  return [
+    { label: 'RDF Expired', value: expired, color: '#22c55e' },
+    { label: 'RDF Active', value: active, color: '#eab308' },
+  ]
+})
+
+// Monthly loot breakdown for bar chart
+const monthlyLoot = computed(() => {
+  if (!data.value?.awards) return []
+  const monthCounts: Record<string, number> = {}
+
+  data.value.awards.forEach(award => {
+    const date = new Date(award.awardedAt)
+    const monthKey = date.toLocaleDateString('en-US', { month: 'short' })
+    monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1
+  })
+
+  return Object.entries(monthCounts)
+    .slice(-6)
+    .map(([label, value]) => ({ label, value }))
+})
+
+// Average FLPS at award
+const averageFlps = computed(() => {
+  if (!data.value?.awards?.length) return 0
+  const sum = data.value.awards.reduce((acc, a) => acc + a.flpsAtAward, 0)
+  return sum / data.value.awards.length
+})
 </script>
 
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-6">Loot History</h1>
 
-    <!-- Loading state -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+    <!-- Loading state with skeletons -->
+    <div v-if="isLoading" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <SkeletonCard :lines="2" />
+        <SkeletonCard :lines="2" />
+        <SkeletonCard :lines="2" />
+      </div>
+      <SkeletonCard :lines="5" />
     </div>
 
     <!-- Error state -->
@@ -28,43 +76,93 @@ const formatScore = (score: number) => score.toFixed(3)
     </div>
 
     <!-- Content -->
-    <div v-else-if="data" class="space-y-4">
+    <div v-else-if="data" class="space-y-6">
       <!-- Empty state -->
       <div v-if="data.awards.length === 0" class="card text-center py-8">
         <p class="text-gray-400">No loot history found.</p>
       </div>
 
-      <!-- Loot items -->
-      <div v-else class="space-y-4">
-        <div
-          v-for="award in data.awards"
-          :key="award.id"
-          class="card flex items-center justify-between"
-        >
-          <div class="flex-1">
-            <h3 class="font-semibold text-primary-400">{{ award.itemName }}</h3>
-            <p class="text-sm text-gray-400">
-              Awarded {{ formatDate(award.awardedAt) }} · FLPS: {{ formatScore(award.flpsAtAward) }}
-            </p>
+      <template v-else>
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-primary-400">{{ data.awards.length }}</div>
+            <div class="text-sm text-gray-400 mt-1">Total Items</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-blue-400">{{ formatScore(averageFlps) }}</div>
+            <div class="text-sm text-gray-400 mt-1">Avg FLPS at Award</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-3xl font-bold text-green-400">
+              {{ data.awards.filter(a => a.rdfExpired).length }}
+            </div>
+            <div class="text-sm text-gray-400 mt-1">RDF Cleared</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- RDF Status Chart -->
+          <div v-if="rdfBreakdown.length > 0" class="card">
+            <h2 class="text-lg font-semibold mb-4">RDF Status</h2>
+            <DonutChart
+              :data="rdfBreakdown"
+              :size="160"
+              center-label="Items"
+            />
           </div>
 
-          <div class="text-right">
+          <!-- Monthly Loot Chart -->
+          <div v-if="monthlyLoot.length > 0" class="card">
+            <h2 class="text-lg font-semibold mb-4">Loot by Month</h2>
+            <BarChart
+              :data="monthlyLoot"
+              :height="180"
+              bar-color="#8b5cf6"
+            />
+          </div>
+        </div>
+
+        <!-- Loot items list -->
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-4">Recent Loot</h2>
+          <div class="space-y-4">
             <div
-              :class="[
-                'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
-                award.rdfExpired
-                  ? 'bg-green-900/50 text-green-400'
-                  : 'bg-yellow-900/50 text-yellow-400'
-              ]"
+              v-for="award in data.awards"
+              :key="award.id"
+              class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors"
             >
-              <span v-if="award.rdfExpired">RDF Expired ✓</span>
-              <span v-else>
-                RDF Active · Expires {{ formatRelativeTime(award.rdfExpiresAt!) }}
-              </span>
+              <div class="flex-1">
+                <WowheadItem
+                  :item-id="award.itemId"
+                  :item-name="award.itemName"
+                  quality="epic"
+                />
+                <p class="text-sm text-gray-400 mt-1">
+                  Awarded {{ formatDate(award.awardedAt) }} · FLPS: {{ formatScore(award.flpsAtAward) }}
+                </p>
+              </div>
+
+              <div class="text-right">
+                <div
+                  :class="[
+                    'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
+                    award.rdfExpired
+                      ? 'bg-green-900/50 text-green-400'
+                      : 'bg-yellow-900/50 text-yellow-400'
+                  ]"
+                >
+                  <span v-if="award.rdfExpired">RDF Expired</span>
+                  <span v-else>
+                    RDF: {{ formatRelativeTime(award.rdfExpiresAt!) }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>

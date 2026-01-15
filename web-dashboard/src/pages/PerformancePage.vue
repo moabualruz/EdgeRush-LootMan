@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { performanceApi, type WarcraftLogsEntry } from '@/api/performance'
+import { performanceApi } from '@/api/performance'
 import { flpsApi } from '@/api/flps'
 import { formatDate, formatRelativeTime } from '@/utils/date'
+import SkeletonCard from '@/components/SkeletonCard.vue'
+import SkeletonTable from '@/components/SkeletonTable.vue'
+import { LineChart, ProgressBar, DonutChart } from '@/components/charts'
 
 const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
 
@@ -26,35 +29,23 @@ const { data: wclReports, isLoading: wclLoading } = useQuery({
   enabled: computed(() => !!flpsData.value?.raiderId),
 })
 
-// Performance trend for chart
-const trendPoints = computed(() => {
+// Performance trend for LineChart component
+const trendChartData = computed(() => {
   if (!performanceData.value?.performanceTrend) return []
-  return performanceData.value.performanceTrend.slice(-30) // Last 30 days
+  return performanceData.value.performanceTrend.slice(-30).map((point, index) => ({
+    x: index % 5 === 0 ? new Date(point.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '',
+    y: point.dpa,
+  }))
 })
 
-// Chart dimensions
-const chartWidth = 600
-const chartHeight = 200
-const chartPadding = { top: 20, right: 20, bottom: 30, left: 50 }
-
-// SVG path for performance trend
-const trendPath = computed(() => {
-  if (trendPoints.value.length < 2) return ''
-
-  const points = trendPoints.value
-  const minDpa = Math.min(...points.map(p => p.dpa))
-  const maxDpa = Math.max(...points.map(p => p.dpa))
-  const range = maxDpa - minDpa || 1
-
-  const xStep = (chartWidth - chartPadding.left - chartPadding.right) / (points.length - 1)
-
-  const pathPoints = points.map((point, index) => {
-    const x = chartPadding.left + index * xStep
-    const y = chartPadding.top + (chartHeight - chartPadding.top - chartPadding.bottom) * (1 - (point.dpa - minDpa) / range)
-    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`
-  })
-
-  return pathPoints.join(' ')
+// RMS breakdown for donut chart
+const rmsBreakdown = computed(() => {
+  if (!flpsData.value?.rms) return []
+  return [
+    { label: 'ACS', value: flpsData.value.rms.acs * 100, color: '#3b82f6' },
+    { label: 'MAS', value: flpsData.value.rms.mas * 100, color: '#22c55e' },
+    { label: 'EPS', value: flpsData.value.rms.eps * 100, color: '#a855f7' },
+  ]
 })
 
 // Helper functions
@@ -109,9 +100,14 @@ function getMasColor(mas: number): string {
       </div>
     </div>
 
-    <!-- Loading state -->
-    <div v-if="perfLoading || flpsLoading" class="flex items-center justify-center py-12">
-      <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+    <!-- Loading state with skeletons -->
+    <div v-if="perfLoading || flpsLoading" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SkeletonCard :lines="4" />
+        <SkeletonCard :lines="4" />
+      </div>
+      <SkeletonCard :lines="3" />
+      <SkeletonTable :rows="5" :columns="6" />
     </div>
 
     <!-- Error state -->
@@ -139,33 +135,24 @@ function getMasColor(mas: number): string {
           <!-- MAS Components -->
           <div class="space-y-4">
             <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-400">Damage Per Active (DPA)</span>
-                <span class="font-medium">{{ formatMetric(performanceData.dpa) }}</span>
-              </div>
-              <div class="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  class="bg-blue-500 h-2 rounded-full"
-                  :style="{ width: `${Math.min(performanceData.dpa / performanceData.specAverage * 100, 100)}%` }"
-                ></div>
-              </div>
+              <ProgressBar
+                :value="performanceData.dpa"
+                :max="performanceData.specAverage * 1.2"
+                label="Damage Per Active (DPA)"
+                :show-percentage="false"
+                color="#3b82f6"
+              />
               <div class="text-xs text-gray-500 mt-1">
                 Spec average: {{ formatMetric(performanceData.specAverage) }}
               </div>
             </div>
 
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-400">Active Damage Time (ADT)</span>
-                <span class="font-medium">{{ (performanceData.adt * 100).toFixed(1) }}%</span>
-              </div>
-              <div class="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  class="bg-green-500 h-2 rounded-full"
-                  :style="{ width: `${performanceData.adt * 100}%` }"
-                ></div>
-              </div>
-            </div>
+            <ProgressBar
+              :value="performanceData.adt * 100"
+              :max="100"
+              label="Active Damage Time (ADT)"
+              color="#22c55e"
+            />
           </div>
         </div>
       </div>
@@ -206,46 +193,19 @@ function getMasColor(mas: number): string {
       </div>
 
       <!-- Performance Trend Chart -->
-      <div v-if="trendPoints.length > 1" class="card">
+      <div v-if="trendChartData.length > 1" class="card">
         <h2 class="text-lg font-semibold mb-4">Performance Trend (Last 30 Days)</h2>
 
-        <div class="overflow-x-auto">
-          <svg :width="chartWidth" :height="chartHeight" class="w-full max-w-full">
-            <!-- Grid lines -->
-            <g class="text-gray-700">
-              <line
-                v-for="i in 5"
-                :key="`h-${i}`"
-                :x1="chartPadding.left"
-                :x2="chartWidth - chartPadding.right"
-                :y1="chartPadding.top + (i - 1) * (chartHeight - chartPadding.top - chartPadding.bottom) / 4"
-                :y2="chartPadding.top + (i - 1) * (chartHeight - chartPadding.top - chartPadding.bottom) / 4"
-                stroke="currentColor"
-                stroke-dasharray="4,4"
-              />
-            </g>
-
-            <!-- Trend line -->
-            <path
-              :d="trendPath"
-              fill="none"
-              stroke="rgb(59, 130, 246)"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-
-            <!-- Data points -->
-            <g v-for="(point, index) in trendPoints" :key="index">
-              <circle
-                :cx="chartPadding.left + index * ((chartWidth - chartPadding.left - chartPadding.right) / (trendPoints.length - 1))"
-                :cy="chartPadding.top + (chartHeight - chartPadding.top - chartPadding.bottom) * (1 - (point.dpa - Math.min(...trendPoints.map(p => p.dpa))) / (Math.max(...trendPoints.map(p => p.dpa)) - Math.min(...trendPoints.map(p => p.dpa)) || 1))"
-                r="4"
-                fill="rgb(59, 130, 246)"
-              />
-            </g>
-          </svg>
-        </div>
+        <LineChart
+          :data="trendChartData"
+          :height="200"
+          :show-area="true"
+          :show-points="true"
+          :show-grid="true"
+          line-color="#3b82f6"
+          area-color="rgba(59, 130, 246, 0.2)"
+          point-color="#60a5fa"
+        />
 
         <div class="text-xs text-gray-500 mt-2 text-center">
           DPA over time
@@ -256,8 +216,8 @@ function getMasColor(mas: number): string {
       <div class="card">
         <h2 class="text-lg font-semibold mb-4">Recent Warcraft Logs Reports</h2>
 
-        <div v-if="wclLoading" class="flex items-center justify-center py-8">
-          <div class="animate-spin w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+        <div v-if="wclLoading" class="py-4">
+          <SkeletonTable :rows="5" :columns="6" :show-header="false" />
         </div>
 
         <div v-else-if="wclReports?.reports?.length" class="overflow-x-auto">

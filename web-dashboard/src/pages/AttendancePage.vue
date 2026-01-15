@@ -3,6 +3,9 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { attendanceApi, type AttendanceStatus, type AttendanceRecord } from '@/api/attendance'
 import { formatDate } from '@/utils/date'
+import SkeletonCard from '@/components/SkeletonCard.vue'
+import SkeletonTable from '@/components/SkeletonTable.vue'
+import { DonutChart, ProgressBar } from '@/components/charts'
 
 const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
 
@@ -13,6 +16,27 @@ const viewMode = ref<'list' | 'calendar'>('list')
 const { data: attendanceData, isLoading, error } = useQuery({
   queryKey: ['myAttendance', GUILD_ID],
   queryFn: () => attendanceApi.getMyAttendance(GUILD_ID),
+})
+
+// Status breakdown for donut chart
+const statusBreakdown = computed(() => {
+  if (!attendanceData.value?.records) return []
+  const counts: Record<string, number> = {}
+  attendanceData.value.records.forEach(r => {
+    counts[r.status] = (counts[r.status] || 0) + 1
+  })
+  const colors: Record<string, string> = {
+    PRESENT: '#22c55e',
+    ABSENT: '#ef4444',
+    LATE: '#eab308',
+    EXCUSED: '#3b82f6',
+    BENCH: '#a855f7',
+  }
+  return Object.entries(counts).map(([status, value]) => ({
+    label: getStatusLabel(status as AttendanceStatus),
+    value,
+    color: colors[status] || '#6b7280',
+  }))
 })
 
 // Calendar state
@@ -138,9 +162,16 @@ function isToday(date: Date): boolean {
       </div>
     </div>
 
-    <!-- Loading state -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+    <!-- Loading state with skeletons -->
+    <div v-if="isLoading" class="space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <SkeletonCard :lines="1" :show-header="false" />
+        <SkeletonCard :lines="1" :show-header="false" />
+        <SkeletonCard :lines="1" :show-header="false" />
+        <SkeletonCard :lines="1" :show-header="false" />
+      </div>
+      <SkeletonCard :lines="3" />
+      <SkeletonTable :rows="5" :columns="4" />
     </div>
 
     <!-- Error state -->
@@ -178,26 +209,32 @@ function isToday(date: Date): boolean {
         </div>
       </div>
 
-      <!-- ACS Breakdown -->
-      <div class="card">
-        <h2 class="text-lg font-semibold mb-4">Attendance Commitment Score (ACS)</h2>
-        <div class="space-y-3">
-          <div>
-            <div class="flex justify-between text-sm mb-1">
-              <span class="text-gray-400">Attendance Rate</span>
-              <span class="font-medium">{{ (attendanceData.attendanceRate * 100).toFixed(1) }}%</span>
-            </div>
-            <div class="w-full bg-gray-700 rounded-full h-2">
-              <div
-                :class="['h-2 rounded-full', attendanceData.attendanceRate >= 0.9 ? 'bg-green-500' : attendanceData.attendanceRate >= 0.75 ? 'bg-yellow-500' : 'bg-red-500']"
-                :style="{ width: `${attendanceData.attendanceRate * 100}%` }"
-              ></div>
+      <!-- ACS Breakdown with Chart -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-4">Attendance Commitment Score (ACS)</h2>
+          <div class="space-y-4">
+            <ProgressBar
+              :value="attendanceData.attendanceRate * 100"
+              :max="100"
+              label="Attendance Rate"
+              :color="attendanceData.attendanceRate >= 0.9 ? '#22c55e' : attendanceData.attendanceRate >= 0.75 ? '#eab308' : '#ef4444'"
+            />
+            <div class="flex justify-between text-sm pt-2">
+              <span class="text-gray-400">Excused absences not counted against you</span>
+              <span class="text-blue-400">{{ attendanceData.excusedRaids }} excused</span>
             </div>
           </div>
-          <div class="flex justify-between text-sm pt-2">
-            <span class="text-gray-400">Excused absences not counted against you</span>
-            <span class="text-blue-400">{{ attendanceData.excusedRaids }} excused</span>
-          </div>
+        </div>
+
+        <!-- Status Breakdown Chart -->
+        <div v-if="statusBreakdown.length > 0" class="card">
+          <h2 class="text-lg font-semibold mb-4">Status Breakdown</h2>
+          <DonutChart
+            :data="statusBreakdown"
+            :size="160"
+            center-label="Records"
+          />
         </div>
       </div>
 
