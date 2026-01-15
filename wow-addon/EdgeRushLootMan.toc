@@ -1,0 +1,56 @@
+## Interface: 110002
+## Version: 1.0.0
+## Title: EdgeRush LootMan
+## Notes: FLPS-based loot distribution and guild management addon. Full loot council with RCLootCouncil compatibility.
+## Author: EdgeRush Team
+## SavedVariables: EdgeRushLootManDB
+## SavedVariablesPerCharacter: EdgeRushLootManCharDB
+## OptionalDeps: RCLootCouncil, Ace3
+## X-Category: Guild
+## X-Website: https://edgerush.gg
+
+# Embedded Libraries
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\AceAddon-3.0\AceAddon-3.0.lua
+Libs\AceConsole-3.0\AceConsole-3.0.lua
+Libs\AceEvent-3.0\AceEvent-3.0.lua
+Libs\AceComm-3.0\AceComm-3.0.lua
+Libs\AceSerializer-3.0\AceSerializer-3.0.lua
+Libs\AceDB-3.0\AceDB-3.0.lua
+Libs\AceGUI-3.0\AceGUI-3.0.lua
+Libs\AceConfig-3.0\AceConfig-3.0.lua
+Libs\AceConfigDialog-3.0\AceConfigDialog-3.0.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+# Core
+Core\Constants.lua
+Core\Utils.lua
+Core\Core.lua
+Core\Comms.lua
+
+# Gear Sync Module
+Modules\GearSync\GearExport.lua
+Modules\GearSync\BagExport.lua
+
+# FLPS Module
+Modules\FLPS\Display.lua
+Modules\FLPS\Leaderboard.lua
+
+# Loot Council Module (Full Featured)
+Modules\LootCouncil\SessionManager.lua
+Modules\LootCouncil\MasterLootFrame.lua
+Modules\LootCouncil\ResponseFrame.lua
+Modules\LootCouncil\LootFrame.lua
+Modules\LootCouncil\VotingFrame.lua
+Modules\LootCouncil\LootHistory.lua
+Modules\LootCouncil\RCLCCompat.lua
+
+# Wishlist Module
+Modules\Wishlist\Display.lua
+
+# UI
+UI\MainFrame.lua
+UI\MinimapButton.lua
+UI\Options.lua
