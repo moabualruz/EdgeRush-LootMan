@@ -32,7 +32,10 @@ interface RaidRepository {
      * @param limit The maximum number of records to return
      * @return List of raid entities
      */
-    fun findAll(offset: Long, limit: Int): List<RaidEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
     /**
      * Counts all raids.
@@ -49,7 +52,11 @@ interface RaidRepository {
      * @param limit The maximum number of records to return
      * @return List of raid entities for the team
      */
-    fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<RaidEntity>
+    fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
     /**
      * Counts raids for a team.
@@ -68,7 +75,12 @@ interface RaidRepository {
      * @param limit The maximum number of records to return
      * @return List of raid entities within the date range
      */
-    fun findByDateRange(startDate: LocalDate, endDate: LocalDate, offset: Long, limit: Int): List<RaidEntity>
+    fun findByDateRange(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
     /**
      * Counts raids within a date range.
@@ -77,7 +89,10 @@ interface RaidRepository {
      * @param endDate The end date (inclusive)
      * @return The count of raids within the date range
      */
-    fun countByDateRange(startDate: LocalDate, endDate: LocalDate): Long
+    fun countByDateRange(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): Long
 
     /**
      * Saves a raid entity.
@@ -101,7 +116,10 @@ interface RaidRepository {
      * @param limit The maximum number of records to return
      * @return List of upcoming raid entities ordered by date ascending
      */
-    fun findUpcomingByGuildId(guildId: Long, limit: Int): List<RaidEntity>
+    fun findUpcomingByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
     /**
      * Finds past raids (date < today) for teams associated with a guild.
@@ -110,5 +128,8 @@ interface RaidRepository {
      * @param limit The maximum number of records to return
      * @return List of past raid entities ordered by date descending
      */
-    fun findPastByGuildId(guildId: Long, limit: Int): List<RaidEntity>
+    fun findPastByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity>
 }

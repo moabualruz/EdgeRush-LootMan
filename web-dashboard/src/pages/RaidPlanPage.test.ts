@@ -55,7 +55,7 @@ describe('RaidPlanPage', () => {
       },
     ],
     visibility: 'GUILD',
-    shareToken: null,
+    shareToken: undefined,
     createdBy: 1,
     createdAt: '2026-01-15T10:00:00Z',
     updatedAt: '2026-01-15T12:00:00Z',
@@ -88,7 +88,7 @@ describe('RaidPlanPage', () => {
     vi.mocked(raidPlanApi.updatePlan).mockResolvedValue(mockPlan)
     vi.mocked(raidPlanApi.addStep).mockResolvedValue({
       ...mockPlan,
-      steps: [...mockPlan.steps, { order: 2, notes: null, markers: [], shapes: [] }],
+      steps: [...mockPlan.steps, { order: 2, notes: undefined, markers: [], shapes: [] }],
     })
   })
 
@@ -193,7 +193,9 @@ describe('RaidPlanPage', () => {
       const timeline = wrapper.findComponent({ name: 'StepTimeline' })
       await timeline.vm.$emit('step-change', 1)
 
-      expect(wrapper.vm.currentStep).toBe(1)
+      // Verify the timeline component received the updated step
+      await wrapper.vm.$nextTick()
+      expect(timeline.props('currentStep')).toBe(1)
     })
   })
 

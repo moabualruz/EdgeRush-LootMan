@@ -20,7 +20,6 @@ import java.time.OffsetDateTime
  * Unit tests for AttendanceStatController.
  */
 class AttendanceStatControllerTest : UnitTest() {
-
     private lateinit var attendanceStatService: AttendanceStatCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: AttendanceStatController
@@ -34,16 +33,16 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createAttendanceStatResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createAttendanceStatResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { attendanceStatService.findAll(any()) } returns expectedResponse
 
             // When
@@ -60,12 +59,13 @@ class AttendanceStatControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<AttendanceStatResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<AttendanceStatResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { attendanceStatService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -78,7 +78,6 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return attendance stat when found`() {
             // Given
@@ -111,37 +110,38 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created attendance stat with 201 status`() {
             // Given
-            val request = CreateAttendanceStatRequest(
-                instance = "Nerub-ar Palace",
-                encounter = "Ulgrax the Devourer",
-                startDate = LocalDate.of(2024, 1, 1),
-                endDate = LocalDate.of(2024, 1, 31),
-                characterId = 100L,
-                characterName = "Testchar",
-                characterRealm = "Silvermoon",
-                characterClass = "Warrior",
-                characterRole = "Tank",
-                characterRegion = "EU",
-                attendedAmountOfRaids = 4,
-                totalAmountOfRaids = 5,
-                attendedPercentage = 0.80,
-                selectedAmountOfEncounters = 8,
-                totalAmountOfEncounters = 10,
-                selectedPercentage = 0.80,
-                teamId = 1L,
-                seasonId = 1L,
-                periodId = 1L,
-            )
+            val request =
+                CreateAttendanceStatRequest(
+                    instance = "Nerub-ar Palace",
+                    encounter = "Ulgrax the Devourer",
+                    startDate = LocalDate.of(2024, 1, 1),
+                    endDate = LocalDate.of(2024, 1, 31),
+                    characterId = 100L,
+                    characterName = "Testchar",
+                    characterRealm = "Silvermoon",
+                    characterClass = "Warrior",
+                    characterRole = "Tank",
+                    characterRegion = "EU",
+                    attendedAmountOfRaids = 4,
+                    totalAmountOfRaids = 5,
+                    attendedPercentage = 0.80,
+                    selectedAmountOfEncounters = 8,
+                    totalAmountOfEncounters = 10,
+                    selectedPercentage = 0.80,
+                    teamId = 1L,
+                    seasonId = 1L,
+                    periodId = 1L,
+                )
 
-            val created = createAttendanceStatResponse(
-                id = 1L,
-                characterName = "Testchar",
-                attendedPercentage = 0.80,
-            )
+            val created =
+                createAttendanceStatResponse(
+                    id = 1L,
+                    characterName = "Testchar",
+                    attendedPercentage = 0.80,
+                )
             every { attendanceStatService.create(request) } returns created
 
             // When
@@ -158,20 +158,21 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated attendance stat`() {
             // Given
-            val request = UpdateAttendanceStatRequest(
-                attendedAmountOfRaids = 5,
-                attendedPercentage = 1.0,
-            )
+            val request =
+                UpdateAttendanceStatRequest(
+                    attendedAmountOfRaids = 5,
+                    attendedPercentage = 1.0,
+                )
 
-            val updated = createAttendanceStatResponse(
-                id = 1L,
-                attendedAmountOfRaids = 5,
-                attendedPercentage = 1.0,
-            )
+            val updated =
+                createAttendanceStatResponse(
+                    id = 1L,
+                    attendedAmountOfRaids = 5,
+                    attendedPercentage = 1.0,
+                )
             every { attendanceStatService.update(1L, request) } returns updated
 
             // When
@@ -203,7 +204,6 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -235,7 +235,6 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when attendance stat exists`() {
             // Given
@@ -264,21 +263,22 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterIdTests {
-
         @Test
         fun `should return attendance stats for a character`() {
             // Given
             val characterId = 100L
-            val stats = listOf(
-                createAttendanceStatResponse(id = 1L, characterId = characterId),
-                createAttendanceStatResponse(id = 2L, characterId = characterId),
-            )
-            val expectedResponse = PagedResponse(
-                content = stats,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val stats =
+                listOf(
+                    createAttendanceStatResponse(id = 1L, characterId = characterId),
+                    createAttendanceStatResponse(id = 2L, characterId = characterId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = stats,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { attendanceStatService.findByCharacterId(characterId, any()) } returns expectedResponse
 
             // When
@@ -292,21 +292,22 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class FindByTeamIdTests {
-
         @Test
         fun `should return attendance stats for a team`() {
             // Given
             val teamId = 1L
-            val stats = listOf(
-                createAttendanceStatResponse(id = 1L, teamId = teamId),
-                createAttendanceStatResponse(id = 2L, teamId = teamId),
-            )
-            val expectedResponse = PagedResponse(
-                content = stats,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val stats =
+                listOf(
+                    createAttendanceStatResponse(id = 1L, teamId = teamId),
+                    createAttendanceStatResponse(id = 2L, teamId = teamId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = stats,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { attendanceStatService.findByTeamId(teamId, any()) } returns expectedResponse
 
             // When
@@ -320,21 +321,22 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class FindBySeasonIdTests {
-
         @Test
         fun `should return attendance stats for a season`() {
             // Given
             val seasonId = 1L
-            val stats = listOf(
-                createAttendanceStatResponse(id = 1L, seasonId = seasonId),
-                createAttendanceStatResponse(id = 2L, seasonId = seasonId),
-            )
-            val expectedResponse = PagedResponse(
-                content = stats,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val stats =
+                listOf(
+                    createAttendanceStatResponse(id = 1L, seasonId = seasonId),
+                    createAttendanceStatResponse(id = 2L, seasonId = seasonId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = stats,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { attendanceStatService.findBySeasonId(seasonId, any()) } returns expectedResponse
 
             // When
@@ -348,7 +350,6 @@ class AttendanceStatControllerTest : UnitTest() {
 
     @Nested
     inner class CountByCharacterIdTests {
-
         @Test
         fun `should return count for character`() {
             // Given
@@ -386,27 +387,28 @@ class AttendanceStatControllerTest : UnitTest() {
         seasonId: Long? = 1L,
         periodId: Long? = 1L,
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): AttendanceStatResponse = AttendanceStatResponse(
-        id = id,
-        instance = instance,
-        encounter = encounter,
-        startDate = startDate,
-        endDate = endDate,
-        characterId = characterId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterClass = characterClass,
-        characterRole = characterRole,
-        characterRegion = characterRegion,
-        attendedAmountOfRaids = attendedAmountOfRaids,
-        totalAmountOfRaids = totalAmountOfRaids,
-        attendedPercentage = attendedPercentage,
-        selectedAmountOfEncounters = selectedAmountOfEncounters,
-        totalAmountOfEncounters = totalAmountOfEncounters,
-        selectedPercentage = selectedPercentage,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        syncedAt = syncedAt,
-    )
+    ): AttendanceStatResponse =
+        AttendanceStatResponse(
+            id = id,
+            instance = instance,
+            encounter = encounter,
+            startDate = startDate,
+            endDate = endDate,
+            characterId = characterId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterClass = characterClass,
+            characterRole = characterRole,
+            characterRegion = characterRegion,
+            attendedAmountOfRaids = attendedAmountOfRaids,
+            totalAmountOfRaids = totalAmountOfRaids,
+            attendedPercentage = attendedPercentage,
+            selectedAmountOfEncounters = selectedAmountOfEncounters,
+            totalAmountOfEncounters = totalAmountOfEncounters,
+            selectedPercentage = selectedPercentage,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            syncedAt = syncedAt,
+        )
 }

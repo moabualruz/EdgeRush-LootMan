@@ -19,9 +19,13 @@ data class PaginationProperties(
      * @param size Optional size, uses defaultPageSize if not provided
      * @return A PageRequest with validated parameters
      */
-    fun createPageRequest(page: Int = 0, size: Int? = null): PageRequest = PageRequest(
-        page = page,
-        size = size ?: defaultPageSize,
-        maxPageSize = maxPageSize,
-    )
+    fun createPageRequest(
+        page: Int = 0,
+        size: Int? = null,
+    ): PageRequest =
+        PageRequest(
+            page = page,
+            size = size ?: defaultPageSize,
+            maxPageSize = maxPageSize,
+        )
 }

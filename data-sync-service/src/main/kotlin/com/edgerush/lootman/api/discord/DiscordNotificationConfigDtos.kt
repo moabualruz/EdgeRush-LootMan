@@ -12,7 +12,7 @@ data class UpsertNotificationConfigRequest(
     val notificationType: String,
     val channelId: String,
     val enabled: Boolean = true,
-    val mentionRoleId: String? = null
+    val mentionRoleId: String? = null,
 )
 
 /**
@@ -21,7 +21,7 @@ data class UpsertNotificationConfigRequest(
 data class UpdateNotificationConfigRequest(
     val channelId: String? = null,
     val enabled: Boolean? = null,
-    val mentionRoleId: String? = null
+    val mentionRoleId: String? = null,
 )
 
 /**
@@ -36,7 +36,7 @@ data class DiscordNotificationConfigResponse(
     val enabled: Boolean,
     val mentionRoleId: String?,
     val createdAt: Instant,
-    val updatedAt: Instant?
+    val updatedAt: Instant?,
 ) {
     companion object {
         fun from(config: DiscordNotificationConfig): DiscordNotificationConfigResponse =
@@ -49,7 +49,7 @@ data class DiscordNotificationConfigResponse(
                 enabled = config.enabled,
                 mentionRoleId = config.mentionRoleId,
                 createdAt = config.createdAt,
-                updatedAt = config.updatedAt
+                updatedAt = config.updatedAt,
             )
     }
 }
@@ -60,7 +60,7 @@ data class DiscordNotificationConfigResponse(
 data class GuildNotificationConfigsResponse(
     val guildId: String,
     val configs: List<DiscordNotificationConfigResponse>,
-    val availableTypes: List<String> = DiscordNotificationType.entries.map { it.name }
+    val availableTypes: List<String> = DiscordNotificationType.entries.map { it.name },
 )
 
 /**
@@ -68,5 +68,5 @@ data class GuildNotificationConfigsResponse(
  */
 data class TestNotificationResponse(
     val success: Boolean,
-    val message: String
+    val message: String,
 )

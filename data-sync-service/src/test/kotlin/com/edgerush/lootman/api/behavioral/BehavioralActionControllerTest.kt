@@ -19,7 +19,6 @@ import java.time.LocalDateTime
  * Unit tests for BehavioralActionController.
  */
 class BehavioralActionControllerTest : UnitTest() {
-
     private lateinit var behavioralActionService: BehavioralActionCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: BehavioralActionController
@@ -33,16 +32,16 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createBehavioralActionResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createBehavioralActionResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { behavioralActionService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class BehavioralActionControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<BehavioralActionResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<BehavioralActionResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { behavioralActionService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return behavioral action when found`() {
             // Given
@@ -110,26 +109,27 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created behavioral action with 201 status`() {
             // Given
-            val request = CreateBehavioralActionRequest(
-                guildId = "my-guild",
-                characterName = "Badplayer",
-                actionType = "DEDUCTION",
-                deductionAmount = 0.5,
-                reason = "Ninja looting",
-                appliedBy = "GuildLeader",
-                expiresAt = LocalDateTime.now().plusDays(30),
-            )
+            val request =
+                CreateBehavioralActionRequest(
+                    guildId = "my-guild",
+                    characterName = "Badplayer",
+                    actionType = "DEDUCTION",
+                    deductionAmount = 0.5,
+                    reason = "Ninja looting",
+                    appliedBy = "GuildLeader",
+                    expiresAt = LocalDateTime.now().plusDays(30),
+                )
 
-            val created = createBehavioralActionResponse(
-                id = 1L,
-                characterName = "Badplayer",
-                actionType = "DEDUCTION",
-                deductionAmount = 0.5,
-            )
+            val created =
+                createBehavioralActionResponse(
+                    id = 1L,
+                    characterName = "Badplayer",
+                    actionType = "DEDUCTION",
+                    deductionAmount = 0.5,
+                )
             every { behavioralActionService.create(request) } returns created
 
             // When
@@ -146,21 +146,23 @@ class BehavioralActionControllerTest : UnitTest() {
         @Test
         fun `should create permanent action when expiresAt is null`() {
             // Given
-            val request = CreateBehavioralActionRequest(
-                guildId = "my-guild",
-                characterName = "Cheater",
-                actionType = "DEDUCTION",
-                deductionAmount = 1.0,
-                reason = "Exploiting",
-                appliedBy = "Admin",
-                expiresAt = null,
-            )
+            val request =
+                CreateBehavioralActionRequest(
+                    guildId = "my-guild",
+                    characterName = "Cheater",
+                    actionType = "DEDUCTION",
+                    deductionAmount = 1.0,
+                    reason = "Exploiting",
+                    appliedBy = "Admin",
+                    expiresAt = null,
+                )
 
-            val created = createBehavioralActionResponse(
-                id = 1L,
-                characterName = "Cheater",
-                expiresAt = null,
-            )
+            val created =
+                createBehavioralActionResponse(
+                    id = 1L,
+                    characterName = "Cheater",
+                    expiresAt = null,
+                )
             every { behavioralActionService.create(request) } returns created
 
             // When
@@ -173,22 +175,24 @@ class BehavioralActionControllerTest : UnitTest() {
         @Test
         fun `should create restoration action`() {
             // Given
-            val request = CreateBehavioralActionRequest(
-                guildId = "my-guild",
-                characterName = "Goodplayer",
-                actionType = "RESTORATION",
-                deductionAmount = 0.0,
-                reason = "Good behavior",
-                appliedBy = "GuildLeader",
-                expiresAt = null,
-            )
+            val request =
+                CreateBehavioralActionRequest(
+                    guildId = "my-guild",
+                    characterName = "Goodplayer",
+                    actionType = "RESTORATION",
+                    deductionAmount = 0.0,
+                    reason = "Good behavior",
+                    appliedBy = "GuildLeader",
+                    expiresAt = null,
+                )
 
-            val created = createBehavioralActionResponse(
-                id = 1L,
-                characterName = "Goodplayer",
-                actionType = "RESTORATION",
-                deductionAmount = 0.0,
-            )
+            val created =
+                createBehavioralActionResponse(
+                    id = 1L,
+                    characterName = "Goodplayer",
+                    actionType = "RESTORATION",
+                    deductionAmount = 0.0,
+                )
             every { behavioralActionService.create(request) } returns created
 
             // When
@@ -202,20 +206,21 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated behavioral action`() {
             // Given
-            val request = UpdateBehavioralActionRequest(
-                reason = "Updated reason",
-                isActive = false,
-            )
+            val request =
+                UpdateBehavioralActionRequest(
+                    reason = "Updated reason",
+                    isActive = false,
+                )
 
-            val updated = createBehavioralActionResponse(
-                id = 1L,
-                reason = "Updated reason",
-                isActive = false,
-            )
+            val updated =
+                createBehavioralActionResponse(
+                    id = 1L,
+                    reason = "Updated reason",
+                    isActive = false,
+                )
             every { behavioralActionService.update(1L, request) } returns updated
 
             // When
@@ -247,7 +252,6 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -279,7 +283,6 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when behavioral action exists`() {
             // Given
@@ -308,21 +311,22 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class FindByGuildTests {
-
         @Test
         fun `should return behavioral actions for a guild`() {
             // Given
             val guildId = "my-guild"
-            val actions = listOf(
-                createBehavioralActionResponse(id = 1L, guildId = guildId),
-                createBehavioralActionResponse(id = 2L, guildId = guildId),
-            )
-            val expectedResponse = PagedResponse(
-                content = actions,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val actions =
+                listOf(
+                    createBehavioralActionResponse(id = 1L, guildId = guildId),
+                    createBehavioralActionResponse(id = 2L, guildId = guildId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = actions,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { behavioralActionService.findByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -336,21 +340,22 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class FindActiveByGuildTests {
-
         @Test
         fun `should return only active behavioral actions for a guild`() {
             // Given
             val guildId = "my-guild"
-            val actions = listOf(
-                createBehavioralActionResponse(id = 1L, guildId = guildId, isActive = true),
-                createBehavioralActionResponse(id = 2L, guildId = guildId, isActive = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = actions,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val actions =
+                listOf(
+                    createBehavioralActionResponse(id = 1L, guildId = guildId, isActive = true),
+                    createBehavioralActionResponse(id = 2L, guildId = guildId, isActive = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = actions,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { behavioralActionService.findActiveByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -364,21 +369,22 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterTests {
-
         @Test
         fun `should return behavioral actions for a character`() {
             // Given
             val guildId = "my-guild"
             val characterName = "Testchar"
-            val actions = listOf(
-                createBehavioralActionResponse(id = 1L, guildId = guildId, characterName = characterName),
-            )
-            val expectedResponse = PagedResponse(
-                content = actions,
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val actions =
+                listOf(
+                    createBehavioralActionResponse(id = 1L, guildId = guildId, characterName = characterName),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = actions,
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { behavioralActionService.findByCharacter(guildId, characterName, any()) } returns expectedResponse
 
             // When
@@ -392,7 +398,6 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class GetTotalDeductionTests {
-
         @Test
         fun `should return total deduction for character`() {
             // Given
@@ -425,7 +430,6 @@ class BehavioralActionControllerTest : UnitTest() {
 
     @Nested
     inner class CountByGuildTests {
-
         @Test
         fun `should return count for guild`() {
             // Given
@@ -452,16 +456,17 @@ class BehavioralActionControllerTest : UnitTest() {
         appliedAt: LocalDateTime = LocalDateTime.now(),
         expiresAt: LocalDateTime? = LocalDateTime.now().plusDays(30),
         isActive: Boolean = true,
-    ): BehavioralActionResponse = BehavioralActionResponse(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        actionType = actionType,
-        deductionAmount = deductionAmount,
-        reason = reason,
-        appliedBy = appliedBy,
-        appliedAt = appliedAt,
-        expiresAt = expiresAt,
-        isActive = isActive,
-    )
+    ): BehavioralActionResponse =
+        BehavioralActionResponse(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            actionType = actionType,
+            deductionAmount = deductionAmount,
+            reason = reason,
+            appliedBy = appliedBy,
+            appliedAt = appliedAt,
+            expiresAt = expiresAt,
+            isActive = isActive,
+        )
 }

@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with loot-award-specific query methods.
  */
 interface LootAwardCrudService : CrudService<Long, CreateLootAwardEntityRequest, UpdateLootAwardEntityRequest, LootAwardEntityResponse> {
-
     /**
      * Find loot awards by raider with pagination.
      *
@@ -18,7 +17,10 @@ interface LootAwardCrudService : CrudService<Long, CreateLootAwardEntityRequest,
      * @param pageRequest Pagination parameters
      * @return Paginated list of loot awards for the raider
      */
-    fun findByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<LootAwardEntityResponse>
+    fun findByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootAwardEntityResponse>
 
     /**
      * Find loot awards by item with pagination.
@@ -27,7 +29,10 @@ interface LootAwardCrudService : CrudService<Long, CreateLootAwardEntityRequest,
      * @param pageRequest Pagination parameters
      * @return Paginated list of loot awards for the item
      */
-    fun findByItem(itemId: Long, pageRequest: PageRequest): PagedResponse<LootAwardEntityResponse>
+    fun findByItem(
+        itemId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootAwardEntityResponse>
 
     /**
      * Find loot awards by tier with pagination.
@@ -36,7 +41,10 @@ interface LootAwardCrudService : CrudService<Long, CreateLootAwardEntityRequest,
      * @param pageRequest Pagination parameters
      * @return Paginated list of loot awards for the tier
      */
-    fun findByTier(tier: String, pageRequest: PageRequest): PagedResponse<LootAwardEntityResponse>
+    fun findByTier(
+        tier: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootAwardEntityResponse>
 
     /**
      * Count loot awards for a raider.

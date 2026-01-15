@@ -10,14 +10,16 @@ import java.sql.Statement
 
 @Repository
 class JdbcRaiderStatisticsRepository(private val jdbcTemplate: JdbcTemplate) : RaiderStatisticsRepository {
-
     override fun findById(id: Long): RaiderStatisticsEntity? =
         jdbcTemplate.query("SELECT * FROM raider_statistics WHERE id = ?", rowMapper, id).firstOrNull()
 
     override fun existsById(id: Long): Boolean =
         (jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_statistics WHERE id = ?", Int::class.java, id) ?: 0) > 0
 
-    override fun findAll(offset: Long, limit: Int): List<RaiderStatisticsEntity> =
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaiderStatisticsEntity> =
         jdbcTemplate.query("SELECT * FROM raider_statistics ORDER BY id LIMIT ? OFFSET ?", rowMapper, limit, offset)
 
     override fun count(): Long = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_statistics", Long::class.java) ?: 0L
@@ -28,19 +30,28 @@ class JdbcRaiderStatisticsRepository(private val jdbcTemplate: JdbcTemplate) : R
     override fun existsByRaiderId(raiderId: Long): Boolean =
         (jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_statistics WHERE raider_id = ?", Int::class.java, raiderId) ?: 0) > 0
 
-    override fun save(entity: RaiderStatisticsEntity): RaiderStatisticsEntity = if (entity.id == null) insert(entity) else { update(entity); entity }
+    override fun save(entity: RaiderStatisticsEntity): RaiderStatisticsEntity =
+        if (entity.id == null) {
+            insert(entity)
+        } else {
+            update(entity)
+            entity
+        }
 
-    override fun delete(id: Long) { jdbcTemplate.update("DELETE FROM raider_statistics WHERE id = ?", id) }
+    override fun delete(id: Long) {
+        jdbcTemplate.update("DELETE FROM raider_statistics WHERE id = ?", id)
+    }
 
     private fun insert(entity: RaiderStatisticsEntity): RaiderStatisticsEntity {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ conn ->
-            val ps = conn.prepareStatement(
-                """INSERT INTO raider_statistics (raider_id, mythic_plus_score, weekly_highest_mplus, season_highest_mplus,
+            val ps =
+                conn.prepareStatement(
+                    """INSERT INTO raider_statistics (raider_id, mythic_plus_score, weekly_highest_mplus, season_highest_mplus,
                    world_quests_total, world_quests_this_week, collectibles_mounts, collectibles_toys,
                    collectibles_unique_pets, collectibles_level_25_pets, honor_level) VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
-                Statement.RETURN_GENERATED_KEYS
-            )
+                    Statement.RETURN_GENERATED_KEYS,
+                )
             ps.setLong(1, entity.raiderId)
             entity.mythicPlusScore?.let { ps.setDouble(2, it) } ?: ps.setNull(2, java.sql.Types.DOUBLE)
             entity.weeklyHighestMplus?.let { ps.setInt(3, it) } ?: ps.setNull(3, java.sql.Types.INTEGER)
@@ -64,20 +75,28 @@ class JdbcRaiderStatisticsRepository(private val jdbcTemplate: JdbcTemplate) : R
                collectibles_unique_pets=?, collectibles_level_25_pets=?, honor_level=? WHERE id=?""",
             entity.raiderId, entity.mythicPlusScore, entity.weeklyHighestMplus, entity.seasonHighestMplus,
             entity.worldQuestsTotal, entity.worldQuestsThisWeek, entity.collectiblesMounts, entity.collectiblesToys,
-            entity.collectiblesUniquePets, entity.collectiblesLevel25Pets, entity.honorLevel, entity.id
+            entity.collectiblesUniquePets, entity.collectiblesLevel25Pets, entity.honorLevel, entity.id,
         )
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        fun getIntOrNull(col: String): Int? { val v = rs.getInt(col); return if (rs.wasNull()) null else v }
-        fun getDoubleOrNull(col: String): Double? { val v = rs.getDouble(col); return if (rs.wasNull()) null else v }
-        RaiderStatisticsEntity(
-            rs.getLong("id"), rs.getLong("raider_id"), getDoubleOrNull("mythic_plus_score"),
-            getIntOrNull("weekly_highest_mplus"), getIntOrNull("season_highest_mplus"),
-            getIntOrNull("world_quests_total"), getIntOrNull("world_quests_this_week"),
-            getIntOrNull("collectibles_mounts"), getIntOrNull("collectibles_toys"),
-            getIntOrNull("collectibles_unique_pets"), getIntOrNull("collectibles_level_25_pets"),
-            getIntOrNull("honor_level")
-        )
-    }
+    private val rowMapper =
+        RowMapper { rs, _ ->
+            fun getIntOrNull(col: String): Int? {
+                val v = rs.getInt(col)
+                return if (rs.wasNull()) null else v
+            }
+
+            fun getDoubleOrNull(col: String): Double? {
+                val v = rs.getDouble(col)
+                return if (rs.wasNull()) null else v
+            }
+            RaiderStatisticsEntity(
+                rs.getLong("id"), rs.getLong("raider_id"), getDoubleOrNull("mythic_plus_score"),
+                getIntOrNull("weekly_highest_mplus"), getIntOrNull("season_highest_mplus"),
+                getIntOrNull("world_quests_total"), getIntOrNull("world_quests_this_week"),
+                getIntOrNull("collectibles_mounts"), getIntOrNull("collectibles_toys"),
+                getIntOrNull("collectibles_unique_pets"), getIntOrNull("collectibles_level_25_pets"),
+                getIntOrNull("honor_level"),
+            )
+        }
 }

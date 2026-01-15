@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.raider
 
+import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.raider.CreateRaiderCommand
 import com.edgerush.lootman.application.raider.CreateRaiderUseCase
 import com.edgerush.lootman.application.raider.DeleteRaiderCommand
@@ -11,8 +13,6 @@ import com.edgerush.lootman.application.raider.ListRaidersByGuildQuery
 import com.edgerush.lootman.application.raider.ListRaidersUseCase
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
-import com.edgerush.lootman.api.common.PagedResponse
-import com.edgerush.lootman.api.common.PaginationProperties
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -38,7 +38,7 @@ class RaiderController(
     private val deleteRaiderUseCase: DeleteRaiderUseCase,
     private val getRaiderUseCase: GetRaiderUseCase,
     private val listRaidersUseCase: ListRaidersUseCase,
-    private val paginationProperties: PaginationProperties
+    private val paginationProperties: PaginationProperties,
 ) {
     /**
      * Create a new raider.
@@ -47,19 +47,22 @@ class RaiderController(
      * @return 201 Created with the created raider
      */
     @PostMapping
-    fun createRaider(@RequestBody request: CreateRaiderRequest): ResponseEntity<RaiderResponse> {
-        val command = CreateRaiderCommand(
-            id = request.id,
-            guildId = request.guildId,
-            characterName = request.characterName,
-            realm = request.realm,
-            characterClass = request.characterClass,
-            role = request.role,
-            rank = request.rank,
-            status = request.status,
-            joinDate = request.joinDate,
-            wowauditId = request.wowauditId
-        )
+    fun createRaider(
+        @RequestBody request: CreateRaiderRequest,
+    ): ResponseEntity<RaiderResponse> {
+        val command =
+            CreateRaiderCommand(
+                id = request.id,
+                guildId = request.guildId,
+                characterName = request.characterName,
+                realm = request.realm,
+                characterClass = request.characterClass,
+                role = request.role,
+                rank = request.rank,
+                status = request.status,
+                joinDate = request.joinDate,
+                wowauditId = request.wowauditId,
+            )
 
         return createRaiderUseCase.execute(command)
             .map { raider ->
@@ -77,7 +80,9 @@ class RaiderController(
      * @return 200 OK with the raider, or 404 if not found
      */
     @GetMapping("/{id}")
-    fun getRaider(@PathVariable id: Long): RaiderResponse {
+    fun getRaider(
+        @PathVariable id: Long,
+    ): RaiderResponse {
         return getRaiderUseCase.execute(GetRaiderQuery(id))
             .map { raider -> RaiderResponse.from(raider) }
             .getOrThrow()
@@ -93,17 +98,18 @@ class RaiderController(
     @PutMapping("/{id}")
     fun updateRaider(
         @PathVariable id: Long,
-        @RequestBody request: UpdateRaiderRequest
+        @RequestBody request: UpdateRaiderRequest,
     ): RaiderResponse {
-        val command = UpdateRaiderCommand(
-            id = id,
-            characterName = request.characterName,
-            realm = request.realm,
-            characterClass = request.characterClass,
-            role = request.role,
-            rank = request.rank,
-            status = request.status
-        )
+        val command =
+            UpdateRaiderCommand(
+                id = id,
+                characterName = request.characterName,
+                realm = request.realm,
+                characterClass = request.characterClass,
+                role = request.role,
+                rank = request.rank,
+                status = request.status,
+            )
 
         return updateRaiderUseCase.execute(command)
             .map { raider -> RaiderResponse.from(raider) }
@@ -117,7 +123,9 @@ class RaiderController(
      * @return 204 No Content on success, or 404 if not found
      */
     @DeleteMapping("/{id}")
-    fun deleteRaider(@PathVariable id: Long): ResponseEntity<Void> {
+    fun deleteRaider(
+        @PathVariable id: Long,
+    ): ResponseEntity<Void> {
         return deleteRaiderUseCase.execute(DeleteRaiderCommand(id))
             .map { ResponseEntity.noContent().build<Void>() }
             .getOrThrow()
@@ -130,7 +138,9 @@ class RaiderController(
      * @return 200 OK with the list of raiders
      */
     @GetMapping("/guild/{guildId}/all")
-    fun getAllRaidersByGuild(@PathVariable guildId: String): RaiderListResponse {
+    fun getAllRaidersByGuild(
+        @PathVariable guildId: String,
+    ): RaiderListResponse {
         return listRaidersUseCase.executeByGuild(ListRaidersByGuildQuery(guildId))
             .map { raiders -> RaiderListResponse.from(raiders) }
             .getOrThrow()
@@ -148,21 +158,22 @@ class RaiderController(
     fun getRaidersByGuild(
         @PathVariable guildId: String,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(required = false) size: Int?
+        @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaiderResponse> {
         val pageRequest = paginationProperties.createPageRequest(page, size)
-        val query = ListRaidersByGuildPaginatedQuery(
-            guildId = guildId,
-            offset = pageRequest.offset,
-            limit = pageRequest.size
-        )
+        val query =
+            ListRaidersByGuildPaginatedQuery(
+                guildId = guildId,
+                offset = pageRequest.offset,
+                limit = pageRequest.size,
+            )
 
         return listRaidersUseCase.executeByGuildPaginated(query)
             .map { result ->
                 PagedResponse.of(
                     content = result.raiders.map { RaiderResponse.from(it) },
                     pageRequest = pageRequest,
-                    totalElements = result.totalCount
+                    totalElements = result.totalCount,
                 )
             }
             .getOrThrow()

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
  * Verifies that custom metrics are properly registered and recorded.
  */
 class MetricsConfigTest : UnitTest() {
-
     private lateinit var meterRegistry: MeterRegistry
     private lateinit var customMetrics: CustomMetrics
 
@@ -27,7 +26,6 @@ class MetricsConfigTest : UnitTest() {
 
     @Nested
     inner class FlpsCalculationMetrics {
-
         @Test
         fun `should record FLPS calculation count`() {
             // Given / When
@@ -67,7 +65,6 @@ class MetricsConfigTest : UnitTest() {
 
     @Nested
     inner class LootAwardMetrics {
-
         @Test
         fun `should record loot award count`() {
             // Given / When
@@ -75,9 +72,10 @@ class MetricsConfigTest : UnitTest() {
             customMetrics.recordLootAward("test-guild", "HEROIC")
 
             // Then
-            val counter = meterRegistry.find("loot.awards.total")
-                .tag("tier", "MYTHIC")
-                .counter()
+            val counter =
+                meterRegistry.find("loot.awards.total")
+                    .tag("tier", "MYTHIC")
+                    .counter()
             counter shouldNotBe null
             counter?.count() shouldBe 1.0
         }
@@ -96,7 +94,6 @@ class MetricsConfigTest : UnitTest() {
 
     @Nested
     inner class AttendanceMetrics {
-
         @Test
         fun `should record attendance tracking`() {
             // Given / When
@@ -122,7 +119,6 @@ class MetricsConfigTest : UnitTest() {
 
     @Nested
     inner class AuditMetrics {
-
         @Test
         fun `should record audit log entries`() {
             // Given / When
@@ -130,15 +126,17 @@ class MetricsConfigTest : UnitTest() {
             customMetrics.recordAuditEntry("UPDATE", "Raider")
 
             // Then
-            val createCounter = meterRegistry.find("audit.entries.total")
-                .tag("operation", "CREATE")
-                .counter()
+            val createCounter =
+                meterRegistry.find("audit.entries.total")
+                    .tag("operation", "CREATE")
+                    .counter()
             createCounter shouldNotBe null
             createCounter?.count() shouldBe 1.0
 
-            val updateCounter = meterRegistry.find("audit.entries.total")
-                .tag("operation", "UPDATE")
-                .counter()
+            val updateCounter =
+                meterRegistry.find("audit.entries.total")
+                    .tag("operation", "UPDATE")
+                    .counter()
             updateCounter shouldNotBe null
             updateCounter?.count() shouldBe 1.0
         }

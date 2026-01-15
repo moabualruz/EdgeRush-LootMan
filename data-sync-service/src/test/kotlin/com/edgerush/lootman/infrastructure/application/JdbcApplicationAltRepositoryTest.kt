@@ -25,7 +25,6 @@ import java.sql.ResultSet
  * The repository operates on the application_alts table.
  */
 class JdbcApplicationAltRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcApplicationAltRepository
 
@@ -37,7 +36,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return application alt when found`() {
             // Given
@@ -47,7 +45,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationAltEntity>>(),
-                    eq(altId)
+                    eq(altId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationAltEntity>>()
@@ -72,7 +70,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationAltEntity>>(),
-                    eq(altId)
+                    eq(altId),
                 )
             } returns emptyList()
 
@@ -92,22 +90,23 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationAltEntity>>(),
-                    eq(altId)
+                    eq(altId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationAltEntity>>()
-                val rs = mockResultSet(
-                    id = altId,
-                    applicationId = 100L,
-                    name = "AltCharacter",
-                    realm = "Illidan",
-                    region = "US",
-                    clazz = "Warrior",
-                    role = "Tank",
-                    level = 70,
-                    faction = "Alliance",
-                    race = "Human"
-                )
+                val rs =
+                    mockResultSet(
+                        id = altId,
+                        applicationId = 100L,
+                        name = "AltCharacter",
+                        realm = "Illidan",
+                        region = "US",
+                        clazz = "Warrior",
+                        role = "Tank",
+                        level = 70,
+                        faction = "Alliance",
+                        race = "Human",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -137,22 +136,23 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationAltEntity>>(),
-                    eq(altId)
+                    eq(altId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationAltEntity>>()
-                val rs = mockResultSet(
-                    id = altId,
-                    applicationId = 100L,
-                    name = null,
-                    realm = null,
-                    region = null,
-                    clazz = null,
-                    role = null,
-                    level = null,
-                    faction = null,
-                    race = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = altId,
+                        applicationId = 100L,
+                        name = null,
+                        realm = null,
+                        region = null,
+                        clazz = null,
+                        role = null,
+                        level = null,
+                        faction = null,
+                        race = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -169,7 +169,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated application alts`() {
             // Given
@@ -181,13 +180,13 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<ApplicationAltEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationAltEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -206,7 +205,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") },
                     any<RowMapper<ApplicationAltEntity>>(),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -220,7 +219,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByApplicationIdTests {
-
         @Test
         fun `should return alts for application`() {
             // Given
@@ -232,13 +230,13 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                     any<RowMapper<ApplicationAltEntity>>(),
                     eq(applicationId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationAltEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, applicationId), 0),
-                    rowMapper.mapRow(mockResultSet(2L, applicationId), 1)
+                    rowMapper.mapRow(mockResultSet(2L, applicationId), 1),
                 )
             }
 
@@ -261,7 +259,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                     any<RowMapper<ApplicationAltEntity>>(),
                     eq(applicationId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -275,14 +273,13 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_alts") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -299,7 +296,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -319,7 +316,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
                     Long::class.java,
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns 3L
 
@@ -333,7 +330,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when application alt exists`() {
             // Given
@@ -343,7 +339,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(altId)
+                    eq(altId),
                 )
             } returns 1
 
@@ -363,7 +359,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(altId)
+                    eq(altId),
                 )
             } returns 0
 
@@ -383,7 +379,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(altId)
+                    eq(altId),
                 )
             } returns null
 
@@ -397,7 +393,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new application alt when id is null`() {
             // Given
@@ -447,7 +442,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -455,7 +450,6 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete application alt by id`() {
             // Given
@@ -464,7 +458,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(altId)
+                    eq(altId),
                 )
             } returns 1
 
@@ -475,7 +469,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    altId
+                    altId,
                 )
             }
         }
@@ -493,7 +487,7 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
         role: String? = "DPS",
         level: Int? = 70,
         faction: String? = "Alliance",
-        race: String? = "Human"
+        race: String? = "Human",
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -520,17 +514,18 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
         role: String? = "DPS",
         level: Int? = 70,
         faction: String? = "Alliance",
-        race: String? = "Human"
-    ): ApplicationAltEntity = ApplicationAltEntity(
-        id = id,
-        applicationId = applicationId,
-        name = name,
-        realm = realm,
-        region = region,
-        clazz = clazz,
-        role = role,
-        level = level,
-        faction = faction,
-        race = race
-    )
+        race: String? = "Human",
+    ): ApplicationAltEntity =
+        ApplicationAltEntity(
+            id = id,
+            applicationId = applicationId,
+            name = name,
+            realm = realm,
+            region = region,
+            clazz = clazz,
+            role = role,
+            level = level,
+            faction = faction,
+            race = race,
+        )
 }

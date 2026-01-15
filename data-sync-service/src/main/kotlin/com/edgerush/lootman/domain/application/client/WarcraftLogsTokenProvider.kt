@@ -31,12 +31,12 @@ class OAuth2WarcraftLogsTokenProvider(
     webClientBuilder: WebClient.Builder,
     private val properties: WarcraftLogsProperties,
 ) : WarcraftLogsTokenProvider {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val webClient: WebClient = webClientBuilder
-        .baseUrl(properties.tokenUrl)
-        .build()
+    private val webClient: WebClient =
+        webClientBuilder
+            .baseUrl(properties.tokenUrl)
+            .build()
 
     private var cachedToken: String? = null
     private var tokenExpiresAt: Instant = Instant.MIN
@@ -61,18 +61,19 @@ class OAuth2WarcraftLogsTokenProvider(
 
         log.debug("Refreshing Warcraft Logs access token")
 
-        val response = webClient
-            .post()
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .body(
-                BodyInserters.fromFormData("grant_type", "client_credentials")
-                    .with("client_id", properties.clientId)
-                    .with("client_secret", properties.clientSecret)
-            )
-            .retrieve()
-            .bodyToMono(TokenResponse::class.java)
-            .block()
-            ?: throw WarcraftLogsAuthException("Failed to obtain access token")
+        val response =
+            webClient
+                .post()
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(
+                    BodyInserters.fromFormData("grant_type", "client_credentials")
+                        .with("client_id", properties.clientId)
+                        .with("client_secret", properties.clientSecret),
+                )
+                .retrieve()
+                .bodyToMono(TokenResponse::class.java)
+                .block()
+                ?: throw WarcraftLogsAuthException("Failed to obtain access token")
 
         cachedToken = response.accessToken
         tokenExpiresAt = Instant.now().plusSeconds(response.expiresIn.toLong())

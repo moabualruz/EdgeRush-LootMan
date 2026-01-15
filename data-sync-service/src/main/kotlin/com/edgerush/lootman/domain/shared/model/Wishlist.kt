@@ -10,31 +10,27 @@ import com.edgerush.lootman.domain.shared.RaiderId
  */
 data class Wishlist(
     val raiderId: RaiderId,
-    val items: List<WishlistItem>
+    val items: List<WishlistItem>,
 ) {
     /**
      * Finds a wishlist item by item ID.
      */
-    fun findItem(itemId: ItemId): WishlistItem? =
-        items.firstOrNull { it.itemId == itemId }
+    fun findItem(itemId: ItemId): WishlistItem? = items.firstOrNull { it.itemId == itemId }
 
     /**
      * Gets the upgrade percentage for a specific item, or null if not on wishlist.
      */
-    fun getUpgradePercentage(itemId: ItemId): Double? =
-        findItem(itemId)?.upgradePercentage
+    fun getUpgradePercentage(itemId: ItemId): Double? = findItem(itemId)?.upgradePercentage
 
     /**
      * Checks if an item is on the wishlist.
      */
-    fun containsItem(itemId: ItemId): Boolean =
-        items.any { it.itemId == itemId }
+    fun containsItem(itemId: ItemId): Boolean = items.any { it.itemId == itemId }
 
     /**
      * Gets items sorted by priority (highest first).
      */
-    fun getItemsByPriority(): List<WishlistItem> =
-        items.sortedByDescending { it.priority }
+    fun getItemsByPriority(): List<WishlistItem> = items.sortedByDescending { it.priority }
 }
 
 /**
@@ -44,8 +40,8 @@ data class WishlistItem(
     val itemId: ItemId,
     val itemName: String,
     val priority: Int,
-    val upgradePercentage: Double,  // From WoWAudit simulation data
-    val specName: String? = null
+    val upgradePercentage: Double, // From WoWAudit simulation data
+    val specName: String? = null,
 ) {
     init {
         require(priority > 0) { "Priority must be positive" }

@@ -18,9 +18,10 @@ data class PlanStep private constructor(
     /**
      * Adds a marker to this step.
      */
-    fun addMarker(marker: PlanMarker): PlanStep = copy(
-        markers = markers + marker,
-    )
+    fun addMarker(marker: PlanMarker): PlanStep =
+        copy(
+            markers = markers + marker,
+        )
 
     /**
      * Removes a marker at the specified index.
@@ -39,9 +40,10 @@ data class PlanStep private constructor(
     /**
      * Adds a shape to this step.
      */
-    fun addShape(shape: PlanShape): PlanStep = copy(
-        shapes = shapes + shape,
-    )
+    fun addShape(shape: PlanShape): PlanStep =
+        copy(
+            shapes = shapes + shape,
+        )
 
     /**
      * Removes a shape at the specified index.
@@ -86,11 +88,12 @@ data class PlanStep private constructor(
             notes: String? = null,
             markers: List<PlanMarker> = emptyList(),
             shapes: List<PlanShape> = emptyList(),
-        ): PlanStep = PlanStep(
-            order = order,
-            notes = notes,
-            markers = markers,
-            shapes = shapes,
-        )
+        ): PlanStep =
+            PlanStep(
+                order = order,
+                notes = notes,
+                markers = markers,
+                shapes = shapes,
+            )
     }
 }

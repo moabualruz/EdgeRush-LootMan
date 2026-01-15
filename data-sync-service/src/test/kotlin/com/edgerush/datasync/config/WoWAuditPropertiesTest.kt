@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test
  * Tests data class behavior and property handling.
  */
 class WoWAuditPropertiesTest : UnitTest() {
-
     @Test
     fun `should create properties with all values`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/US/Illidan/TestGuild/profile",
-            apiKey = "test-api-key-123",
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/US/Illidan/TestGuild/profile",
+                apiKey = "test-api-key-123",
+            )
 
         // Assert
         properties.baseUrl shouldBe "https://api.wowaudit.com"
@@ -29,11 +29,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should allow null guildProfileUri`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = null,
-            apiKey = "test-api-key-123",
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = null,
+                apiKey = "test-api-key-123",
+            )
 
         // Assert
         properties.guildProfileUri shouldBe null
@@ -42,11 +43,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should allow null apiKey`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/US/Illidan/TestGuild/profile",
-            apiKey = null,
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/US/Illidan/TestGuild/profile",
+                apiKey = null,
+            )
 
         // Assert
         properties.apiKey shouldBe null
@@ -55,11 +57,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should allow all optional fields to be null`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://wowaudit.com",
-            guildProfileUri = null,
-            apiKey = null,
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://wowaudit.com",
+                guildProfileUri = null,
+                apiKey = null,
+            )
 
         // Assert
         properties.baseUrl shouldBe "https://wowaudit.com"
@@ -70,11 +73,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should support copy with modifications`() {
         // Arrange
-        val original = WoWAuditProperties(
-            baseUrl = "https://original.com",
-            guildProfileUri = "https://original.com/profile",
-            apiKey = "original-key",
-        )
+        val original =
+            WoWAuditProperties(
+                baseUrl = "https://original.com",
+                guildProfileUri = "https://original.com/profile",
+                apiKey = "original-key",
+            )
 
         // Act
         val copied = original.copy(baseUrl = "https://new.com")
@@ -88,16 +92,18 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should support equality comparison`() {
         // Arrange
-        val properties1 = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/profile",
-            apiKey = "key-123",
-        )
-        val properties2 = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/profile",
-            apiKey = "key-123",
-        )
+        val properties1 =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/profile",
+                apiKey = "key-123",
+            )
+        val properties2 =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/profile",
+                apiKey = "key-123",
+            )
 
         // Assert
         properties1 shouldBe properties2
@@ -106,11 +112,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should work with EU guild profile URIs`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/EU/Kazzak/Elite-Raiders/profile",
-            apiKey = "eu-api-key",
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/EU/Kazzak/Elite-Raiders/profile",
+                apiKey = "eu-api-key",
+            )
 
         // Assert
         properties.guildProfileUri shouldBe "https://wowaudit.com/EU/Kazzak/Elite-Raiders/profile"
@@ -119,11 +126,12 @@ class WoWAuditPropertiesTest : UnitTest() {
     @Test
     fun `should work with guild names containing special characters`() {
         // Arrange & Act
-        val properties = WoWAuditProperties(
-            baseUrl = "https://api.wowaudit.com",
-            guildProfileUri = "https://wowaudit.com/US/Area-52/Test%20Guild/profile",
-            apiKey = "test-key",
-        )
+        val properties =
+            WoWAuditProperties(
+                baseUrl = "https://api.wowaudit.com",
+                guildProfileUri = "https://wowaudit.com/US/Area-52/Test%20Guild/profile",
+                apiKey = "test-key",
+            )
 
         // Assert
         properties.guildProfileUri shouldBe "https://wowaudit.com/US/Area-52/Test%20Guild/profile"

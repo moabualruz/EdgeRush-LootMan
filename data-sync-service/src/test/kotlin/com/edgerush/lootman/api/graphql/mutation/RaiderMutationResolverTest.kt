@@ -28,7 +28,6 @@ import java.time.LocalDateTime
  * Tests the GraphQL mutation resolver for raider operations following TDD principles.
  */
 class RaiderMutationResolverTest : UnitTest() {
-
     @MockK
     private lateinit var createRaiderUseCase: CreateRaiderUseCase
 
@@ -43,28 +42,29 @@ class RaiderMutationResolverTest : UnitTest() {
 
     @Nested
     inner class CreateRaiderMutation {
-
         @Test
         fun `should create raider successfully`() {
             // Arrange
-            val input = CreateRaiderInput(
-                id = "123",
-                guildId = "guild-456",
-                characterName = "Arthas",
-                realm = "Frostmourne",
-                characterClass = "DEATH_KNIGHT",
-                role = "TANK",
-                rank = "Officer",
-                status = "ACTIVE",
-            )
-            val raider = createTestRaider(
-                id = 123L,
-                guildId = "guild-456",
-                name = "Arthas",
-                realm = "Frostmourne",
-                characterClass = CharacterClass.DEATH_KNIGHT,
-                role = Role.TANK,
-            )
+            val input =
+                CreateRaiderInput(
+                    id = "123",
+                    guildId = "guild-456",
+                    characterName = "Arthas",
+                    realm = "Frostmourne",
+                    characterClass = "DEATH_KNIGHT",
+                    role = "TANK",
+                    rank = "Officer",
+                    status = "ACTIVE",
+                )
+            val raider =
+                createTestRaider(
+                    id = 123L,
+                    guildId = "guild-456",
+                    name = "Arthas",
+                    realm = "Frostmourne",
+                    characterClass = CharacterClass.DEATH_KNIGHT,
+                    role = Role.TANK,
+                )
             val commandSlot = slot<CreateRaiderCommand>()
             every { createRaiderUseCase.execute(capture(commandSlot)) } returns Result.success(raider)
 
@@ -85,43 +85,46 @@ class RaiderMutationResolverTest : UnitTest() {
         @Test
         fun `should propagate exception on create failure`() {
             // Arrange
-            val input = CreateRaiderInput(
-                id = "123",
-                guildId = "guild-456",
-                characterName = "Arthas",
-                realm = "Frostmourne",
-                characterClass = "DEATH_KNIGHT",
-                role = "TANK",
-            )
+            val input =
+                CreateRaiderInput(
+                    id = "123",
+                    guildId = "guild-456",
+                    characterName = "Arthas",
+                    realm = "Frostmourne",
+                    characterClass = "DEATH_KNIGHT",
+                    role = "TANK",
+                )
             every { createRaiderUseCase.execute(any()) } returns
                 Result.failure(IllegalArgumentException("Raider already exists"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
-                resolver.createRaider(input)
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+                    resolver.createRaider(input)
+                }
             exception.message shouldBe "Raider already exists"
         }
     }
 
     @Nested
     inner class UpdateRaiderMutation {
-
         @Test
         fun `should update raider successfully`() {
             // Arrange
-            val input = UpdateRaiderInput(
-                id = "123",
-                characterName = "Arthas Menethil",
-                role = "DPS",
-                status = "INACTIVE",
-            )
-            val updatedRaider = createTestRaider(
-                id = 123L,
-                name = "Arthas Menethil",
-                role = Role.DPS,
-                status = RaiderStatus.INACTIVE,
-            )
+            val input =
+                UpdateRaiderInput(
+                    id = "123",
+                    characterName = "Arthas Menethil",
+                    role = "DPS",
+                    status = "INACTIVE",
+                )
+            val updatedRaider =
+                createTestRaider(
+                    id = 123L,
+                    name = "Arthas Menethil",
+                    role = Role.DPS,
+                    status = RaiderStatus.INACTIVE,
+                )
             val commandSlot = slot<UpdateRaiderCommand>()
             every { updateRaiderUseCase.execute(capture(commandSlot)) } returns Result.success(updatedRaider)
 
@@ -141,28 +144,31 @@ class RaiderMutationResolverTest : UnitTest() {
         @Test
         fun `should return error when raider not found`() {
             // Arrange
-            val input = UpdateRaiderInput(
-                id = "999",
-                characterName = "Unknown",
-            )
+            val input =
+                UpdateRaiderInput(
+                    id = "999",
+                    characterName = "Unknown",
+                )
             every { updateRaiderUseCase.execute(any()) } returns
                 Result.failure(NoSuchElementException("Raider not found with id: 999"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<NoSuchElementException> {
-                resolver.updateRaider(input)
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<NoSuchElementException> {
+                    resolver.updateRaider(input)
+                }
             exception.message shouldBe "Raider not found with id: 999"
         }
 
         @Test
         fun `should only update provided fields`() {
             // Arrange
-            val input = UpdateRaiderInput(
-                id = "123",
-                role = "HEALER",
-                // Other fields are null - should not be updated
-            )
+            val input =
+                UpdateRaiderInput(
+                    id = "123",
+                    role = "HEALER",
+                    // Other fields are null - should not be updated
+                )
             val commandSlot = slot<UpdateRaiderCommand>()
             every { updateRaiderUseCase.execute(capture(commandSlot)) } returns
                 Result.success(createTestRaider(id = 123L, role = Role.HEALER))
@@ -183,7 +189,6 @@ class RaiderMutationResolverTest : UnitTest() {
 
     @Nested
     inner class DeleteRaiderMutation {
-
         @Test
         fun `should delete raider successfully`() {
             // Arrange
@@ -205,9 +210,10 @@ class RaiderMutationResolverTest : UnitTest() {
                 Result.failure(NoSuchElementException("Raider not found with id: 999"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<NoSuchElementException> {
-                resolver.deleteRaider(id = "999")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<NoSuchElementException> {
+                    resolver.deleteRaider(id = "999")
+                }
             exception.message shouldBe "Raider not found with id: 999"
         }
     }
@@ -221,16 +227,17 @@ class RaiderMutationResolverTest : UnitTest() {
         characterClass: CharacterClass = CharacterClass.WARRIOR,
         role: Role = Role.DPS,
         status: RaiderStatus = RaiderStatus.ACTIVE,
-    ): Raider = Raider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        characterName = name,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = "Raider",
-        status = status,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        Raider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            characterName = name,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = "Raider",
+            status = status,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 }

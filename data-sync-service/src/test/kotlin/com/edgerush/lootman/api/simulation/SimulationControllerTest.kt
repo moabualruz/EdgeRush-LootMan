@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus
 import java.time.Instant
 
 class SimulationControllerTest : UnitTest() {
-
     private lateinit var simulationService: SimulationService
     private lateinit var simulationRepository: SimulationRepository
     private lateinit var controller: SimulationController
@@ -34,20 +33,20 @@ class SimulationControllerTest : UnitTest() {
     private fun createTestProfile(
         guildId: String = "guild-123",
         characterName: String = "Testchar",
-        characterRealm: String = "TestRealm"
+        characterRealm: String = "TestRealm",
     ): SimulationProfile {
         return SimulationProfile.create(
             guildId = guildId,
             characterName = characterName,
             characterRealm = characterRealm,
             profileContent = """warrior="$characterName"""",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
     private fun createTestRequest(
         profile: SimulationProfile = createTestProfile(),
-        status: SimulationStatus = SimulationStatus.PENDING
+        status: SimulationStatus = SimulationStatus.PENDING,
     ): SimulationRequest {
         return SimulationRequest.create(profile = profile)
     }
@@ -69,15 +68,16 @@ class SimulationControllerTest : UnitTest() {
                     characterLevel = 80,
                     characterRace = "human",
                     iterations = 10000,
-                    fightLengthSeconds = 300
+                    fightLengthSeconds = 300,
                 )
             } returns request
 
-            val submitRequest = SubmitSimulationRequest(
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury"
-            )
+            val submitRequest =
+                SubmitSimulationRequest(
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                )
 
             // Act
             val response = controller.submitSimulation("guild-123", "Testchar", submitRequest)
@@ -98,7 +98,7 @@ class SimulationControllerTest : UnitTest() {
                     characterLevel = 80,
                     characterRace = "human",
                     iterations = 10000,
-                    fightLengthSeconds = 300
+                    fightLengthSeconds = 300,
                 )
             }
         }
@@ -139,16 +139,17 @@ class SimulationControllerTest : UnitTest() {
         @Test
         fun `should return results for character`() {
             // Arrange
-            val results = listOf(
-                SimulationResult.create(
-                    itemId = 12345L,
-                    itemName = "Test Sword",
-                    slot = "main_hand",
-                    dpsGain = 1000.0,
-                    percentGain = 1.5,
-                    simulatedAt = Instant.now()
+            val results =
+                listOf(
+                    SimulationResult.create(
+                        itemId = 12345L,
+                        itemName = "Test Sword",
+                        slot = "main_hand",
+                        dpsGain = 1000.0,
+                        percentGain = 1.5,
+                        simulatedAt = Instant.now(),
+                    ),
                 )
-            )
             every {
                 simulationService.getSimulationResults("guild-123", "Testchar", "TestRealm")
             } returns results
@@ -250,10 +251,11 @@ class SimulationControllerTest : UnitTest() {
         fun `should return pending count in status`() {
             // Arrange
             val profile = createTestProfile()
-            val requests = listOf(
-                createTestRequest(profile).withId(1L),
-                createTestRequest(profile).withId(2L)
-            )
+            val requests =
+                listOf(
+                    createTestRequest(profile).withId(1L),
+                    createTestRequest(profile).withId(2L),
+                )
             every { simulationRepository.findPendingRequests() } returns requests
 
             // Act
@@ -270,11 +272,12 @@ class SimulationControllerTest : UnitTest() {
         @Test
         fun `should map all fields from SimulationRequest`() {
             // Arrange
-            val profile = createTestProfile(
-                guildId = "guild-456",
-                characterName = "MapTestChar",
-                characterRealm = "MapRealm"
-            )
+            val profile =
+                createTestProfile(
+                    guildId = "guild-456",
+                    characterName = "MapTestChar",
+                    characterRealm = "MapRealm",
+                )
             val request = createTestRequest(profile).withId(99L)
 
             // Act
@@ -296,28 +299,30 @@ class SimulationControllerTest : UnitTest() {
         fun `should map completed request with results`() {
             // Arrange
             val profile = createTestProfile()
-            val results = listOf(
-                SimulationResult.create(
-                    itemId = 1L,
-                    itemName = "Item1",
-                    slot = "head",
-                    dpsGain = 100.0,
-                    percentGain = 1.0,
-                    simulatedAt = Instant.now()
-                ),
-                SimulationResult.create(
-                    itemId = 2L,
-                    itemName = "Item2",
-                    slot = "neck",
-                    dpsGain = 200.0,
-                    percentGain = 2.0,
-                    simulatedAt = Instant.now()
+            val results =
+                listOf(
+                    SimulationResult.create(
+                        itemId = 1L,
+                        itemName = "Item1",
+                        slot = "head",
+                        dpsGain = 100.0,
+                        percentGain = 1.0,
+                        simulatedAt = Instant.now(),
+                    ),
+                    SimulationResult.create(
+                        itemId = 2L,
+                        itemName = "Item2",
+                        slot = "neck",
+                        dpsGain = 200.0,
+                        percentGain = 2.0,
+                        simulatedAt = Instant.now(),
+                    ),
                 )
-            )
-            val request = createTestRequest(profile)
-                .withId(100L)
-                .markRunning()
-                .markCompleted(results)
+            val request =
+                createTestRequest(profile)
+                    .withId(100L)
+                    .markRunning()
+                    .markCompleted(results)
 
             // Act
             val dto = SimulationRequestDto.from(request)
@@ -332,10 +337,11 @@ class SimulationControllerTest : UnitTest() {
         fun `should map failed request with error message`() {
             // Arrange
             val profile = createTestProfile()
-            val request = createTestRequest(profile)
-                .withId(101L)
-                .markRunning()
-                .markFailed("Simulation timeout")
+            val request =
+                createTestRequest(profile)
+                    .withId(101L)
+                    .markRunning()
+                    .markFailed("Simulation timeout")
 
             // Act
             val dto = SimulationRequestDto.from(request)
@@ -351,14 +357,15 @@ class SimulationControllerTest : UnitTest() {
         @Test
         fun `should map all fields from SimulationResult`() {
             // Arrange
-            val result = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Awesome Sword",
-                slot = "main_hand",
-                dpsGain = 5000.0,
-                percentGain = 3.5,
-                simulatedAt = Instant.now()
-            )
+            val result =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Awesome Sword",
+                    slot = "main_hand",
+                    dpsGain = 5000.0,
+                    percentGain = 3.5,
+                    simulatedAt = Instant.now(),
+                )
 
             // Act
             val dto = SimulationResultDto.from(result)
@@ -377,14 +384,15 @@ class SimulationControllerTest : UnitTest() {
         @Test
         fun `should identify non-upgrade when dps gain is negative`() {
             // Arrange
-            val result = SimulationResult.create(
-                itemId = 99999L,
-                itemName = "Downgrade Helm",
-                slot = "head",
-                dpsGain = -500.0,
-                percentGain = -0.5,
-                simulatedAt = Instant.now()
-            )
+            val result =
+                SimulationResult.create(
+                    itemId = 99999L,
+                    itemName = "Downgrade Helm",
+                    slot = "head",
+                    dpsGain = -500.0,
+                    percentGain = -0.5,
+                    simulatedAt = Instant.now(),
+                )
 
             // Act
             val dto = SimulationResultDto.from(result)
@@ -411,19 +419,20 @@ class SimulationControllerTest : UnitTest() {
                     characterLevel = 70,
                     characterRace = "dwarf",
                     iterations = 5000,
-                    fightLengthSeconds = 180
+                    fightLengthSeconds = 180,
                 )
             } returns request
 
-            val submitRequest = SubmitSimulationRequest(
-                characterRealm = "TestRealm",
-                characterClass = "mage",
-                characterSpec = "fire",
-                characterLevel = 70,
-                characterRace = "dwarf",
-                iterations = 5000,
-                fightLengthSeconds = 180
-            )
+            val submitRequest =
+                SubmitSimulationRequest(
+                    characterRealm = "TestRealm",
+                    characterClass = "mage",
+                    characterSpec = "fire",
+                    characterLevel = 70,
+                    characterRace = "dwarf",
+                    iterations = 5000,
+                    fightLengthSeconds = 180,
+                )
 
             // Act
             val response = controller.submitSimulation("guild-123", "Testchar", submitRequest)
@@ -440,7 +449,7 @@ class SimulationControllerTest : UnitTest() {
                     characterLevel = 70,
                     characterRace = "dwarf",
                     iterations = 5000,
-                    fightLengthSeconds = 180
+                    fightLengthSeconds = 180,
                 )
             }
         }

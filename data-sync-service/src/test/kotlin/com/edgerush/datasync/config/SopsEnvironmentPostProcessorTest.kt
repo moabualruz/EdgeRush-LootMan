@@ -23,7 +23,6 @@ import java.nio.file.Path
  * with appropriate keys configured.
  */
 class SopsEnvironmentPostProcessorTest : UnitTest() {
-
     private lateinit var processor: SopsEnvironmentPostProcessor
     private lateinit var environment: ConfigurableEnvironment
     private lateinit var application: SpringApplication
@@ -113,23 +112,27 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
 
     @Nested
     inner class YamlFlattening {
-
         private fun invokeFlattenYaml(yamlContent: String): Map<String, Any> {
-            val method = SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
-                "flattenYaml",
-                String::class.java,
-            )
+            val method =
+                SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
+                    "flattenYaml",
+                    String::class.java,
+                )
             method.isAccessible = true
             @Suppress("UNCHECKED_CAST")
             return method.invoke(processor, yamlContent) as Map<String, Any>
         }
 
-        private fun invokeFlattenMap(map: Map<String, Any>, prefix: String): Map<String, Any> {
-            val method = SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
-                "flattenMap",
-                Map::class.java,
-                String::class.java,
-            )
+        private fun invokeFlattenMap(
+            map: Map<String, Any>,
+            prefix: String,
+        ): Map<String, Any> {
+            val method =
+                SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
+                    "flattenMap",
+                    Map::class.java,
+                    String::class.java,
+                )
             method.isAccessible = true
             @Suppress("UNCHECKED_CAST")
             return method.invoke(processor, map, prefix) as Map<String, Any>
@@ -138,10 +141,11 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should flatten simple yaml to properties`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 key1: value1
                 key2: value2
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -154,11 +158,12 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should flatten nested yaml structure`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 wowaudit:
                   api_key: secret123
                   base_url: https://api.wowaudit.com
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -171,12 +176,13 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should flatten deeply nested yaml structure`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 level1:
                   level2:
                     level3:
                       value: deep_value
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -188,13 +194,14 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should handle mixed nesting levels`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 top_level: simple_value
                 nested:
                   child: nested_value
                   deeper:
                     leaf: leaf_value
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -208,10 +215,11 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should handle numeric values`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 port: 8080
                 timeout: 30.5
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -224,10 +232,11 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should handle boolean values`() {
             // Arrange
-            val yaml = """
+            val yaml =
+                """
                 enabled: true
                 disabled: false
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val result = invokeFlattenYaml(yaml)
@@ -264,11 +273,13 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
         @Test
         fun `should handle nested maps recursively`() {
             // Arrange
-            val map = mapOf(
-                "outer" to mapOf(
-                    "inner" to "value",
-                ),
-            )
+            val map =
+                mapOf(
+                    "outer" to
+                        mapOf(
+                            "inner" to "value",
+                        ),
+                )
 
             // Act
             val result = invokeFlattenMap(map, "")
@@ -280,7 +291,6 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
 
     @Nested
     inner class DecryptSecretsHandling {
-
         @Test
         fun `should handle sops command not found gracefully`() {
             // Arrange
@@ -300,7 +310,6 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
 
     @Nested
     inner class ExceptionHandling {
-
         @Test
         fun `should handle exceptions during decryption gracefully`() {
             // Arrange
@@ -320,7 +329,6 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
 
     @Nested
     inner class PropertySourceCreation {
-
         @Test
         fun `should create property source with correct name`() {
             // The property source name should be "sops-secrets"
@@ -328,8 +336,9 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
             // propertySources.get("sops-secrets")
 
             // Verify the constant is used correctly by checking class fields
-            val field = SopsEnvironmentPostProcessor::class.java
-                .getDeclaredField("PROPERTY_SOURCE_NAME")
+            val field =
+                SopsEnvironmentPostProcessor::class.java
+                    .getDeclaredField("PROPERTY_SOURCE_NAME")
             field.isAccessible = true
             val propertySourceName = field.get(null) as String
 
@@ -338,8 +347,9 @@ class SopsEnvironmentPostProcessorTest : UnitTest() {
 
         @Test
         fun `should use default secrets file path constant`() {
-            val field = SopsEnvironmentPostProcessor::class.java
-                .getDeclaredField("DEFAULT_SECRETS_FILE")
+            val field =
+                SopsEnvironmentPostProcessor::class.java
+                    .getDeclaredField("DEFAULT_SECRETS_FILE")
             field.isAccessible = true
             val defaultSecretsFile = field.get(null) as String
 

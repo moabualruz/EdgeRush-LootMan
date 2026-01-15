@@ -19,7 +19,7 @@ data class User(
     val role: UserRole = UserRole.RAIDER,
     val guildId: GuildId? = null,
     val createdAt: Instant = Instant.now(),
-    val lastLogin: Instant? = null
+    val lastLogin: Instant? = null,
 ) {
     init {
         require(username.isNotBlank()) { "Username must not be blank" }
@@ -54,12 +54,13 @@ data class User(
     fun updateProfile(
         username: String? = null,
         email: String? = null,
-        avatarUrl: String? = null
-    ): User = copy(
-        username = username ?: this.username,
-        email = email ?: this.email,
-        avatarUrl = avatarUrl ?: this.avatarUrl
-    )
+        avatarUrl: String? = null,
+    ): User =
+        copy(
+            username = username ?: this.username,
+            email = email ?: this.email,
+            avatarUrl = avatarUrl ?: this.avatarUrl,
+        )
 
     /**
      * Links a Discord account to this user.
@@ -80,11 +81,12 @@ data class User(
     /**
      * Checks if the user has the specified role or higher.
      */
-    fun hasRole(requiredRole: UserRole): Boolean = when (requiredRole) {
-        UserRole.RAIDER -> true
-        UserRole.GUILD_ADMIN -> role == UserRole.GUILD_ADMIN || role == UserRole.SYSTEM_ADMIN
-        UserRole.SYSTEM_ADMIN -> role == UserRole.SYSTEM_ADMIN
-    }
+    fun hasRole(requiredRole: UserRole): Boolean =
+        when (requiredRole) {
+            UserRole.RAIDER -> true
+            UserRole.GUILD_ADMIN -> role == UserRole.GUILD_ADMIN || role == UserRole.SYSTEM_ADMIN
+            UserRole.SYSTEM_ADMIN -> role == UserRole.SYSTEM_ADMIN
+        }
 
     companion object {
         /**
@@ -94,23 +96,25 @@ data class User(
             discordId: String,
             username: String,
             email: String? = null,
-            avatarUrl: String? = null
-        ): User = User(
-            discordId = discordId,
-            username = username,
-            email = email,
-            avatarUrl = avatarUrl
-        )
+            avatarUrl: String? = null,
+        ): User =
+            User(
+                discordId = discordId,
+                username = username,
+                email = email,
+                avatarUrl = avatarUrl,
+            )
 
         /**
          * Creates a new user from Battle.net OAuth2.
          */
         fun fromBattlenet(
             battlenetId: String,
-            username: String
-        ): User = User(
-            battlenetId = battlenetId,
-            username = username
-        )
+            username: String,
+        ): User =
+            User(
+                battlenetId = battlenetId,
+                username = username,
+            )
     }
 }

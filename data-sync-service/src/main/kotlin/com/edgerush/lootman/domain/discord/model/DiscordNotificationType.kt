@@ -27,7 +27,9 @@ enum class DiscordNotificationType {
     /**
      * Notification when a data sync completes.
      */
-    SYNC_COMPLETE;
+    SYNC_COMPLETE,
+
+    ;
 
     companion object {
         fun fromString(value: String): DiscordNotificationType? {

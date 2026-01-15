@@ -55,10 +55,11 @@ class PageRequest private constructor(
             size: Int? = null,
             defaultSize: Int = DEFAULT_PAGE_SIZE,
             maxPageSize: Int = DEFAULT_MAX_PAGE_SIZE,
-        ): PageRequest = PageRequest(
-            page = page,
-            size = minOf(size ?: defaultSize, maxPageSize),
-            maxPageSize = maxPageSize,
-        )
+        ): PageRequest =
+            PageRequest(
+                page = page,
+                size = minOf(size ?: defaultSize, maxPageSize),
+                maxPageSize = maxPageSize,
+            )
     }
 }

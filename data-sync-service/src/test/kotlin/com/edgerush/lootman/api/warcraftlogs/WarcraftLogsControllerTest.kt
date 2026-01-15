@@ -53,11 +53,12 @@ class WarcraftLogsControllerTest : UnitTest() {
         val limit = 20
 
         val raider = createRaiderEntity(raiderId, "TestRaider", "Twisting Nether")
-        val logs = listOf(
-            RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId, difficulty = "Mythic", score = 85),
-            RaiderWarcraftLogResponse(id = 2L, raiderId = raiderId, difficulty = "Heroic", score = 92),
-            RaiderWarcraftLogResponse(id = 3L, raiderId = raiderId, difficulty = "Mythic", score = 78),
-        )
+        val logs =
+            listOf(
+                RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId, difficulty = "Mythic", score = 85),
+                RaiderWarcraftLogResponse(id = 2L, raiderId = raiderId, difficulty = "Heroic", score = 92),
+                RaiderWarcraftLogResponse(id = 3L, raiderId = raiderId, difficulty = "Mythic", score = 78),
+            )
 
         every { raiderRepository.findById(raiderId) } returns raider
         every { warcraftLogService.findByRaiderIdUnpaged(raiderId, limit) } returns logs
@@ -106,9 +107,10 @@ class WarcraftLogsControllerTest : UnitTest() {
         every { raiderRepository.findById(raiderId) } returns null
 
         // When / Then
-        val exception = assertThrows<NoSuchElementException> {
-            controller.getReports(guildId, raiderId, 20)
-        }
+        val exception =
+            assertThrows<NoSuchElementException> {
+                controller.getReports(guildId, raiderId, 20)
+            }
 
         exception.message shouldBe "Raider not found: $raiderId"
         verify(exactly = 1) { raiderRepository.findById(raiderId) }
@@ -142,9 +144,10 @@ class WarcraftLogsControllerTest : UnitTest() {
         val raiderId = 123L
 
         val raider = createRaiderEntity(raiderId, "TestRaider", "Twisting Nether")
-        val logs = listOf(
-            RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId, difficulty = "Mythic", score = null),
-        )
+        val logs =
+            listOf(
+                RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId, difficulty = "Mythic", score = null),
+            )
 
         every { raiderRepository.findById(raiderId) } returns raider
         every { warcraftLogService.findByRaiderIdUnpaged(raiderId, 20) } returns logs
@@ -167,10 +170,11 @@ class WarcraftLogsControllerTest : UnitTest() {
         val limit = 20
 
         val raider = createRaiderEntity(raiderId.value, "TestRaider", "Twisting Nether")
-        val logs = listOf(
-            RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId.value, difficulty = "Mythic", score = 88),
-            RaiderWarcraftLogResponse(id = 2L, raiderId = raiderId.value, difficulty = "Mythic", score = 92),
-        )
+        val logs =
+            listOf(
+                RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId.value, difficulty = "Mythic", score = 88),
+                RaiderWarcraftLogResponse(id = 2L, raiderId = raiderId.value, difficulty = "Mythic", score = 92),
+            )
 
         justRun { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) }
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
@@ -254,9 +258,10 @@ class WarcraftLogsControllerTest : UnitTest() {
         val raiderId = RaiderId(123L)
 
         val raider = createRaiderEntity(raiderId.value, "TestRaider", "Twisting Nether")
-        val logs = listOf(
-            RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId.value, difficulty = "Mythic", score = 85),
-        )
+        val logs =
+            listOf(
+                RaiderWarcraftLogResponse(id = 1L, raiderId = raiderId.value, difficulty = "Mythic", score = 85),
+            )
 
         justRun { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) }
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId

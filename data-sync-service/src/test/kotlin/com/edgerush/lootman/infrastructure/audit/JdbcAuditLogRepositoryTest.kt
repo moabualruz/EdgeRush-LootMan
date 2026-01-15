@@ -5,7 +5,6 @@ import com.edgerush.lootman.domain.audit.model.AuditLog
 import com.edgerush.lootman.domain.audit.model.AuditLogId
 import com.edgerush.lootman.domain.audit.model.AuditOperation
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -27,7 +26,6 @@ import java.time.temporal.ChronoUnit
  * The repository operates on the audit_logs table.
  */
 class JdbcAuditLogRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcAuditLogRepository
 
@@ -43,7 +41,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert audit log entry`() {
             // Given
@@ -63,7 +60,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") && it.contains("audit_logs") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -71,16 +68,17 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         @Test
         fun `should insert with all required fields`() {
             // Given
-            val auditLog = createAuditLog(
-                id = null,
-                operation = AuditOperation.CREATE,
-                entityType = "Guild",
-                entityId = "guild-123",
-                userId = "user-456",
-                username = "testuser",
-                isAdminMode = true,
-                requestId = "req-789"
-            )
+            val auditLog =
+                createAuditLog(
+                    id = null,
+                    operation = AuditOperation.CREATE,
+                    entityType = "Guild",
+                    entityId = "guild-123",
+                    userId = "user-456",
+                    username = "testuser",
+                    isAdminMode = true,
+                    requestId = "req-789",
+                )
 
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
 
@@ -92,13 +90,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                 jdbcTemplate.update(
                     any<String>(),
                     any<Timestamp>(), // timestamp
-                    eq("CREATE"),     // operation
-                    eq("Guild"),      // entity_type
-                    eq("guild-123"),  // entity_id
-                    eq("user-456"),   // user_id
-                    eq("testuser"),   // username
-                    eq(true),         // is_admin_mode
-                    eq("req-789")     // request_id
+                    eq("CREATE"), // operation
+                    eq("Guild"), // entity_type
+                    eq("guild-123"), // entity_id
+                    eq("user-456"), // user_id
+                    eq("testuser"), // username
+                    eq(true), // is_admin_mode
+                    eq("req-789"), // request_id
                 )
             }
         }
@@ -106,10 +104,11 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         @Test
         fun `should handle null requestId`() {
             // Given
-            val auditLog = createAuditLog(
-                id = null,
-                requestId = null
-            )
+            val auditLog =
+                createAuditLog(
+                    id = null,
+                    requestId = null,
+                )
 
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
 
@@ -127,7 +126,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     any<String>(),
                     any<String>(),
                     any<Boolean>(),
-                    isNull() // request_id should be null
+                    isNull(), // request_id should be null
                 )
             }
         }
@@ -135,7 +134,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByEntityTests {
-
         @Test
         fun `should find audit logs by entity type and id`() {
             // Given
@@ -151,13 +149,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, entityType = entityType, entityId = entityId), 0),
-                    rowMapper.mapRow(mockResultSet(2L, entityType = entityType, entityId = entityId), 1)
+                    rowMapper.mapRow(mockResultSet(2L, entityType = entityType, entityId = entityId), 1),
                 )
             }
 
@@ -181,7 +179,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } returns emptyList()
 
@@ -195,7 +193,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByUserIdTests {
-
         @Test
         fun `should find audit logs by user id`() {
             // Given
@@ -205,13 +202,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("user_id = ?") },
                     any<RowMapper<AuditLog>>(),
-                    eq(userId)
+                    eq(userId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, userId = userId), 0),
-                    rowMapper.mapRow(mockResultSet(2L, userId = userId), 1)
+                    rowMapper.mapRow(mockResultSet(2L, userId = userId), 1),
                 )
             }
 
@@ -232,7 +229,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("user_id = ?") },
                     any<RowMapper<AuditLog>>(),
-                    eq(userId)
+                    eq(userId),
                 )
             } returns emptyList()
 
@@ -246,7 +243,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByTimeRangeTests {
-
         @Test
         fun `should find audit logs within time range`() {
             // Given
@@ -262,13 +258,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<AuditLog>>(),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, timestamp = oneHourAgo), 0),
-                    rowMapper.mapRow(mockResultSet(2L, timestamp = now.minus(30, ChronoUnit.MINUTES)), 1)
+                    rowMapper.mapRow(mockResultSet(2L, timestamp = now.minus(30, ChronoUnit.MINUTES)), 1),
                 )
             }
 
@@ -290,7 +286,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("timestamp >= ?") && it.contains("timestamp <= ?") },
                     any<RowMapper<AuditLog>>(),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } returns emptyList()
 
@@ -304,7 +300,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByOperationTests {
-
         @Test
         fun `should find audit logs by operation type`() {
             // Given
@@ -314,13 +309,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("operation = ?") },
                     any<RowMapper<AuditLog>>(),
-                    eq(operation.name)
+                    eq(operation.name),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, operation = operation), 0),
-                    rowMapper.mapRow(mockResultSet(2L, operation = operation), 1)
+                    rowMapper.mapRow(mockResultSet(2L, operation = operation), 1),
                 )
             }
 
@@ -335,7 +330,6 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @Nested
     inner class RowMapperTests {
-
         @Test
         fun `should map all database fields to domain model`() {
             // Given
@@ -354,7 +348,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
@@ -369,9 +363,10 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                             userId = userId,
                             username = username,
                             isAdminMode = isAdminMode,
-                            requestId = requestId
-                        ), 0
-                    )
+                            requestId = requestId,
+                        ),
+                        0,
+                    ),
                 )
             }
 
@@ -403,12 +398,12 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, requestId = null), 0)
+                    rowMapper.mapRow(mockResultSet(1L, requestId = null), 0),
                 )
             }
 
@@ -432,13 +427,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, operation = AuditOperation.UPDATE), 0),
-                    rowMapper.mapRow(mockResultSet(2L, operation = AuditOperation.DELETE), 0)
+                    rowMapper.mapRow(mockResultSet(2L, operation = AuditOperation.DELETE), 0),
                 )
             }
 
@@ -462,12 +457,12 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = true), 0)
+                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = true), 0),
                 )
             }
 
@@ -490,12 +485,12 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
                     any<RowMapper<AuditLog>>(),
                     eq(entityType),
-                    eq(entityId)
+                    eq(entityId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AuditLog>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = false), 0)
+                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = false), 0),
                 )
             }
 
@@ -519,7 +514,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         userId: String = "user-456",
         username: String = "testuser",
         isAdminMode: Boolean = false,
-        requestId: String? = "req-789"
+        requestId: String? = "req-789",
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -543,16 +538,17 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         userId: String = "user-456",
         username: String = "testuser",
         isAdminMode: Boolean = false,
-        requestId: String? = "req-789"
-    ): AuditLog = AuditLog(
-        id = id,
-        timestamp = timestamp,
-        operation = operation,
-        entityType = entityType,
-        entityId = entityId,
-        userId = userId,
-        username = username,
-        isAdminMode = isAdminMode,
-        requestId = requestId
-    )
+        requestId: String? = "req-789",
+    ): AuditLog =
+        AuditLog(
+            id = id,
+            timestamp = timestamp,
+            operation = operation,
+            entityType = entityType,
+            entityId = entityId,
+            userId = userId,
+            username = username,
+            isAdminMode = isAdminMode,
+            requestId = requestId,
+        )
 }

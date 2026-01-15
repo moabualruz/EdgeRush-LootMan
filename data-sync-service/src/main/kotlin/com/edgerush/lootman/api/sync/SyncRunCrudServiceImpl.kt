@@ -16,7 +16,6 @@ import java.time.OffsetDateTime
 class SyncRunCrudServiceImpl(
     private val repository: SyncRunRepository,
 ) : SyncRunCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<SyncRunResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class SyncRunCrudServiceImpl(
     }
 
     override fun findById(id: Long): SyncRunResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Sync run not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Sync run not found with id: $id")
         return SyncRunResponse.from(entity)
     }
 
@@ -41,26 +41,32 @@ class SyncRunCrudServiceImpl(
     }
 
     override fun create(request: CreateSyncRunRequest): SyncRunResponse {
-        val entity = SyncRunEntity(
-            source = request.source,
-            status = request.status,
-            startedAt = OffsetDateTime.now(),
-            completedAt = null,
-            message = request.message,
-        )
+        val entity =
+            SyncRunEntity(
+                source = request.source,
+                status = request.status,
+                startedAt = OffsetDateTime.now(),
+                completedAt = null,
+                message = request.message,
+            )
         val saved = repository.save(entity)
         return SyncRunResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateSyncRunRequest): SyncRunResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Sync run not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateSyncRunRequest,
+    ): SyncRunResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Sync run not found with id: $id")
 
-        val updated = existing.copy(
-            status = request.status ?: existing.status,
-            completedAt = request.completedAt ?: existing.completedAt,
-            message = request.message ?: existing.message,
-        )
+        val updated =
+            existing.copy(
+                status = request.status ?: existing.status,
+                completedAt = request.completedAt ?: existing.completedAt,
+                message = request.message ?: existing.message,
+            )
 
         repository.save(updated)
         return SyncRunResponse.from(updated)
@@ -73,7 +79,10 @@ class SyncRunCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findBySource(source: String, pageRequest: PageRequest): PagedResponse<SyncRunResponse> {
+    override fun findBySource(
+        source: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<SyncRunResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findBySource(source, offset, pageRequest.size)
         val total = repository.countBySource(source)
@@ -86,7 +95,10 @@ class SyncRunCrudServiceImpl(
         )
     }
 
-    override fun findByStatus(status: String, pageRequest: PageRequest): PagedResponse<SyncRunResponse> {
+    override fun findByStatus(
+        status: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<SyncRunResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByStatus(status, offset, pageRequest.size)
         val total = repository.countByStatus(status)

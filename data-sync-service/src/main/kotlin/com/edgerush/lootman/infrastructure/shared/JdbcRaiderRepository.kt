@@ -23,42 +23,48 @@ import java.time.LocalDateTime
  */
 @Repository
 class JdbcRaiderRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : RaiderRepository {
-
     override fun findById(id: RaiderId): Raider? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, characterName, realm, characterClass, role,
                    rank, status, joinDate, wowauditId
             FROM raiders
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, raiderRowMapper, id.value)
         return results.firstOrNull()
     }
 
     override fun findByGuildId(guildId: GuildId): List<Raider> {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, characterName, realm, characterClass, role,
                    rank, status, joinDate, wowauditId
             FROM raiders
             WHERE guild_id = ?
             ORDER BY characterName
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raiderRowMapper, guildId.value)
     }
 
-    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<Raider> {
+        val sql =
+            """
             SELECT id, guild_id, characterName, realm, characterClass, role,
                    rank, status, joinDate, wowauditId
             FROM raiders
             WHERE guild_id = ?
             ORDER BY characterName
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raiderRowMapper, guildId.value, limit, offset)
     }
@@ -68,13 +74,17 @@ class JdbcRaiderRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
     }
 
-    override fun findByCharacterNameAndRealm(characterName: String, realm: String): Raider? {
-        val sql = """
+    override fun findByCharacterNameAndRealm(
+        characterName: String,
+        realm: String,
+    ): Raider? {
+        val sql =
+            """
             SELECT id, guild_id, characterName, realm, characterClass, role,
                    rank, status, joinDate, wowauditId
             FROM raiders
             WHERE characterName = ? AND realm = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, raiderRowMapper, characterName, realm)
         return results.firstOrNull()
@@ -101,12 +111,13 @@ class JdbcRaiderRepository(
         if (ids.isEmpty()) return emptyList()
 
         val placeholders = ids.joinToString(", ") { "?" }
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, characterName, realm, characterClass, role,
                    rank, status, joinDate, wowauditId
             FROM raiders
             WHERE id IN ($placeholders)
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raiderRowMapper, *ids.map { it.value }.toTypedArray())
     }
@@ -118,41 +129,13 @@ class JdbcRaiderRepository(
     }
 
     private fun insertRaider(raider: Raider) {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raiders (
                 guild_id, characterName, realm, characterClass, role,
                 rank, status, joinDate, wowauditId
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
-
-        jdbcTemplate.update(
-            sql,
-            raider.guildId.value,
-            raider.characterName,
-            raider.realm,
-            raider.characterClass.name,
-            raider.role.name,
-            raider.rank,
-            raider.status.name,
-            raider.joinDate?.let { Timestamp.valueOf(it) },
-            raider.wowauditId
-        )
-    }
-
-    private fun updateRaider(raider: Raider) {
-        val sql = """
-            UPDATE raiders SET
-                guild_id = ?,
-                characterName = ?,
-                realm = ?,
-                characterClass = ?,
-                role = ?,
-                rank = ?,
-                status = ?,
-                joinDate = ?,
-                wowauditId = ?
-            WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -165,47 +148,80 @@ class JdbcRaiderRepository(
             raider.status.name,
             raider.joinDate?.let { Timestamp.valueOf(it) },
             raider.wowauditId,
-            raider.id.value
         )
     }
 
-    private val raiderRowMapper = RowMapper { rs, _ ->
-        val wowauditIdValue = rs.getLong("wowauditId")
-        val wowauditId = if (rs.wasNull()) null else wowauditIdValue
+    private fun updateRaider(raider: Raider) {
+        val sql =
+            """
+            UPDATE raiders SET
+                guild_id = ?,
+                characterName = ?,
+                realm = ?,
+                characterClass = ?,
+                role = ?,
+                rank = ?,
+                status = ?,
+                joinDate = ?,
+                wowauditId = ?
+            WHERE id = ?
+            """.trimIndent()
 
-        val joinDateTimestamp = rs.getTimestamp("joinDate")
-        val joinDate: LocalDateTime? = joinDateTimestamp?.toLocalDateTime()
-
-        val classStr = rs.getString("characterClass") ?: "WARRIOR"
-        val characterClass = try {
-            CharacterClass.valueOf(classStr.uppercase().replace(" ", "_"))
-        } catch (e: IllegalArgumentException) {
-            CharacterClass.WARRIOR
-        }
-
-        val roleStr = rs.getString("role") ?: "DPS"
-        val role = try {
-            Role.valueOf(roleStr.uppercase())
-        } catch (e: IllegalArgumentException) {
-            Role.DPS
-        }
-
-        val statusStr = rs.getString("status") ?: "ACTIVE"
-        val status = RaiderStatus.fromString(statusStr) ?: RaiderStatus.ACTIVE
-
-        val guildIdStr = rs.getString("guild_id") ?: "default"
-
-        Raider(
-            id = RaiderId(rs.getLong("id")),
-            guildId = GuildId(guildIdStr),
-            characterName = rs.getString("characterName"),
-            realm = rs.getString("realm"),
-            characterClass = characterClass,
-            role = role,
-            rank = rs.getString("rank"),
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId
+        jdbcTemplate.update(
+            sql,
+            raider.guildId.value,
+            raider.characterName,
+            raider.realm,
+            raider.characterClass.name,
+            raider.role.name,
+            raider.rank,
+            raider.status.name,
+            raider.joinDate?.let { Timestamp.valueOf(it) },
+            raider.wowauditId,
+            raider.id.value,
         )
     }
+
+    private val raiderRowMapper =
+        RowMapper { rs, _ ->
+            val wowauditIdValue = rs.getLong("wowauditId")
+            val wowauditId = if (rs.wasNull()) null else wowauditIdValue
+
+            val joinDateTimestamp = rs.getTimestamp("joinDate")
+            val joinDate: LocalDateTime? = joinDateTimestamp?.toLocalDateTime()
+
+            val classStr = rs.getString("characterClass") ?: "WARRIOR"
+            val characterClass =
+                try {
+                    CharacterClass.valueOf(classStr.uppercase().replace(" ", "_"))
+                } catch (e: IllegalArgumentException) {
+                    CharacterClass.WARRIOR
+                }
+
+            val roleStr = rs.getString("role") ?: "DPS"
+            val role =
+                try {
+                    Role.valueOf(roleStr.uppercase())
+                } catch (e: IllegalArgumentException) {
+                    Role.DPS
+                }
+
+            val statusStr = rs.getString("status") ?: "ACTIVE"
+            val status = RaiderStatus.fromString(statusStr) ?: RaiderStatus.ACTIVE
+
+            val guildIdStr = rs.getString("guild_id") ?: "default"
+
+            Raider(
+                id = RaiderId(rs.getLong("id")),
+                guildId = GuildId(guildIdStr),
+                characterName = rs.getString("characterName"),
+                realm = rs.getString("realm"),
+                characterClass = characterClass,
+                role = role,
+                rank = rs.getString("rank"),
+                status = status,
+                joinDate = joinDate,
+                wowauditId = wowauditId,
+            )
+        }
 }

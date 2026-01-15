@@ -31,19 +31,22 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class JdbcGearRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : GearRepository {
-
     override fun findCurrentGear(raiderId: RaiderId): GearSet? {
         return findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
     }
 
-    override fun findByRaiderIdAndType(raiderId: RaiderId, gearSetType: GearSetType): GearSet? {
-        val sql = """
+    override fun findByRaiderIdAndType(
+        raiderId: RaiderId,
+        gearSetType: GearSetType,
+    ): GearSet? {
+        val sql =
+            """
             SELECT slot, itemId, name, itemLevel, quality, enchant, sockets
             FROM raider_gear_items
             WHERE raiderId = ? AND gearSet = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val items = jdbcTemplate.query(sql, gearItemRowMapper, raiderId.value, gearSetType.name)
 
@@ -55,17 +58,21 @@ class JdbcGearRepository(
         return GearSet(items = itemsMap, gearSetType = gearSetType)
     }
 
-    override fun save(raiderId: RaiderId, gearSet: GearSet): GearSet {
+    override fun save(
+        raiderId: RaiderId,
+        gearSet: GearSet,
+    ): GearSet {
         // Delete existing gear items for this raider and gear set type
         val deleteSql = "DELETE FROM raider_gear_items WHERE raiderId = ? AND gearSet = ?"
         jdbcTemplate.update(deleteSql, raiderId.value, gearSet.gearSetType.name)
 
         // Insert new gear items
-        val insertSql = """
+        val insertSql =
+            """
             INSERT INTO raider_gear_items (
                 raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, sockets, name
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         gearSet.items.forEach { (slot, item) ->
             jdbcTemplate.update(
@@ -78,29 +85,30 @@ class JdbcGearRepository(
                 item.quality.ordinal,
                 item.enchant,
                 item.sockets,
-                item.name
+                item.name,
             )
         }
 
         return gearSet
     }
 
-    private val gearItemRowMapper = RowMapper { rs, _ ->
-        val slotStr = rs.getString("slot")
-        val slot = EquipmentSlot.entries.firstOrNull { it.name == slotStr } ?: EquipmentSlot.HEAD
+    private val gearItemRowMapper =
+        RowMapper { rs, _ ->
+            val slotStr = rs.getString("slot")
+            val slot = EquipmentSlot.entries.firstOrNull { it.name == slotStr } ?: EquipmentSlot.HEAD
 
-        val qualityInt = rs.getInt("quality")
-        val quality = ItemQuality.fromInt(qualityInt) ?: ItemQuality.EPIC
+            val qualityInt = rs.getInt("quality")
+            val quality = ItemQuality.fromInt(qualityInt) ?: ItemQuality.EPIC
 
-        GearItem(
-            itemId = ItemId(rs.getLong("itemId")),
-            name = rs.getString("name") ?: "Unknown Item",
-            itemLevel = rs.getInt("itemLevel"),
-            quality = quality,
-            slot = slot,
-            isTierPiece = false, // Not stored in DB, would need additional logic
-            enchant = rs.getString("enchant"),
-            sockets = rs.getInt("sockets")
-        )
-    }
+            GearItem(
+                itemId = ItemId(rs.getLong("itemId")),
+                name = rs.getString("name") ?: "Unknown Item",
+                itemLevel = rs.getInt("itemLevel"),
+                quality = quality,
+                slot = slot,
+                isTierPiece = false, // Not stored in DB, would need additional logic
+                enchant = rs.getString("enchant"),
+                sockets = rs.getInt("sockets"),
+            )
+        }
 }

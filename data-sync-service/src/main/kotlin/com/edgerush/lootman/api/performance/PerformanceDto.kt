@@ -1,7 +1,5 @@
 package com.edgerush.lootman.api.performance
 
-import java.time.Instant
-
 /**
  * Response DTO for performance metrics.
  * Contains DPA (Deaths Per Attempt) and ADT (Avoidable Damage Taken) metrics.

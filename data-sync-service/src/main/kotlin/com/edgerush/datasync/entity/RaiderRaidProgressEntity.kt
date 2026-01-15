@@ -13,5 +13,5 @@ data class RaiderRaidProgressEntity(
     val raid: String,
     val difficulty: String,
     @Column("bosses_defeated")
-    val bossesDefeated: Int?
+    val bossesDefeated: Int?,
 )

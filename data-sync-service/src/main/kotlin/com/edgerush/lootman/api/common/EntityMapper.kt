@@ -26,7 +26,10 @@ interface EntityMapper<Entity, CreateReq, UpdateReq, Resp> {
      * @param request The update request DTO with new values
      * @return The updated entity (may be the same instance or a copy)
      */
-    fun updateEntity(entity: Entity, request: UpdateReq): Entity
+    fun updateEntity(
+        entity: Entity,
+        request: UpdateReq,
+    ): Entity
 
     /**
      * Convert an entity to a response DTO.
@@ -66,7 +69,10 @@ interface GuildScopedEntityMapper<Entity, CreateReq, UpdateReq, Resp> :
      * @param guildId The guild identifier for the new entity
      * @return A new entity instance with guild association
      */
-    fun toEntityWithGuild(request: CreateReq, guildId: String): Entity
+    fun toEntityWithGuild(
+        request: CreateReq,
+        guildId: String,
+    ): Entity
 }
 
 /**
@@ -88,5 +94,8 @@ interface RaiderScopedEntityMapper<Entity, CreateReq, UpdateReq, Resp> :
      * @param raiderId The raider identifier for the new entity
      * @return A new entity instance with raider association
      */
-    fun toEntityWithRaider(request: CreateReq, raiderId: Long): Entity
+    fun toEntityWithRaider(
+        request: CreateReq,
+        raiderId: Long,
+    ): Entity
 }

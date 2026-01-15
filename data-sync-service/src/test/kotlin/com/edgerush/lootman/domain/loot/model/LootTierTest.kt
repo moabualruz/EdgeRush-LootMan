@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
  * - Tier ordering and comparison
  */
 class LootTierTest : UnitTest() {
-
     @Nested
     inner class TierValuesTests {
         @Test
@@ -44,12 +43,13 @@ class LootTierTest : UnitTest() {
 
         @Test
         fun `should contain all expected tiers`() {
-            LootTier.entries shouldContainExactly listOf(
-                LootTier.MYTHIC,
-                LootTier.HEROIC,
-                LootTier.NORMAL,
-                LootTier.LFR
-            )
+            LootTier.entries shouldContainExactly
+                listOf(
+                    LootTier.MYTHIC,
+                    LootTier.HEROIC,
+                    LootTier.NORMAL,
+                    LootTier.LFR,
+                )
         }
     }
 
@@ -80,12 +80,13 @@ class LootTierTest : UnitTest() {
             val shuffled = listOf(LootTier.LFR, LootTier.MYTHIC, LootTier.NORMAL, LootTier.HEROIC)
             val sorted = shuffled.sortedBy { it.ordinal }
 
-            sorted shouldContainExactly listOf(
-                LootTier.MYTHIC,
-                LootTier.HEROIC,
-                LootTier.NORMAL,
-                LootTier.LFR
-            )
+            sorted shouldContainExactly
+                listOf(
+                    LootTier.MYTHIC,
+                    LootTier.HEROIC,
+                    LootTier.NORMAL,
+                    LootTier.LFR,
+                )
         }
     }
 

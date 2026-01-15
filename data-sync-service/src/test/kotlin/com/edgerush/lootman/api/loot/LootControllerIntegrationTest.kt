@@ -237,31 +237,34 @@ class LootControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should get specific loot award by ID and return 200 OK`() {
         // Given - First create an award
-        val createRequest = AwardLootRequest(
-            itemId = 99001L,
-            raiderId = "test-raider-get-award",
-            guildId = "test-guild-get-award",
-            flpsScore = 0.75,
-            tier = "HEROIC"
-        )
+        val createRequest =
+            AwardLootRequest(
+                itemId = 99001L,
+                raiderId = "test-raider-get-award",
+                guildId = "test-guild-get-award",
+                flpsScore = 0.75,
+                tier = "HEROIC",
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
         val createEntity = HttpEntity(createRequest, headers)
-        val createResponse = restTemplate.postForEntity(
-            "/api/v1/loot/awards",
-            createEntity,
-            LootAwardDto::class.java
-        )
+        val createResponse =
+            restTemplate.postForEntity(
+                "/api/v1/loot/awards",
+                createEntity,
+                LootAwardDto::class.java,
+            )
 
         val awardId = createResponse.body!!.id
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/awards/$awardId",
-            LootAwardDto::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards/$awardId",
+                LootAwardDto::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -277,10 +280,11 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val nonExistentId = "non-existent-award-id"
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/awards/$nonExistentId",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards/$nonExistentId",
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
@@ -289,42 +293,46 @@ class LootControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should revoke loot award and return 204 No Content`() {
         // Given - First create an award
-        val createRequest = AwardLootRequest(
-            itemId = 99002L,
-            raiderId = "test-raider-revoke-award",
-            guildId = "test-guild-revoke-award",
-            flpsScore = 0.80,
-            tier = "MYTHIC"
-        )
+        val createRequest =
+            AwardLootRequest(
+                itemId = 99002L,
+                raiderId = "test-raider-revoke-award",
+                guildId = "test-guild-revoke-award",
+                flpsScore = 0.80,
+                tier = "MYTHIC",
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
         val createEntity = HttpEntity(createRequest, headers)
-        val createResponse = restTemplate.postForEntity(
-            "/api/v1/loot/awards",
-            createEntity,
-            LootAwardDto::class.java
-        )
+        val createResponse =
+            restTemplate.postForEntity(
+                "/api/v1/loot/awards",
+                createEntity,
+                LootAwardDto::class.java,
+            )
 
         val awardId = createResponse.body!!.id
 
         // When
-        val response = restTemplate.exchange(
-            "/api/v1/loot/awards/$awardId",
-            org.springframework.http.HttpMethod.DELETE,
-            null,
-            Void::class.java
-        )
+        val response =
+            restTemplate.exchange(
+                "/api/v1/loot/awards/$awardId",
+                org.springframework.http.HttpMethod.DELETE,
+                null,
+                Void::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
 
         // Verify the award is actually revoked
-        val getResponse = restTemplate.getForEntity(
-            "/api/v1/loot/awards/$awardId",
-            String::class.java
-        )
+        val getResponse =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards/$awardId",
+                String::class.java,
+            )
         assertEquals(HttpStatus.NOT_FOUND, getResponse.statusCode)
     }
 
@@ -334,12 +342,13 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val nonExistentId = "non-existent-revoke-id"
 
         // When
-        val response = restTemplate.exchange(
-            "/api/v1/loot/awards/$nonExistentId",
-            org.springframework.http.HttpMethod.DELETE,
-            null,
-            String::class.java
-        )
+        val response =
+            restTemplate.exchange(
+                "/api/v1/loot/awards/$nonExistentId",
+                org.springframework.http.HttpMethod.DELETE,
+                null,
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
@@ -353,37 +362,40 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val request1 = AwardLootRequest(
-            itemId = 99003L,
-            raiderId = "test-raider-list-1",
-            guildId = guildId,
-            flpsScore = 0.70,
-            tier = "NORMAL"
-        )
+        val request1 =
+            AwardLootRequest(
+                itemId = 99003L,
+                raiderId = "test-raider-list-1",
+                guildId = guildId,
+                flpsScore = 0.70,
+                tier = "NORMAL",
+            )
         restTemplate.postForEntity(
             "/api/v1/loot/awards",
             HttpEntity(request1, headers),
-            LootAwardDto::class.java
+            LootAwardDto::class.java,
         )
 
-        val request2 = AwardLootRequest(
-            itemId = 99004L,
-            raiderId = "test-raider-list-2",
-            guildId = guildId,
-            flpsScore = 0.90,
-            tier = "MYTHIC"
-        )
+        val request2 =
+            AwardLootRequest(
+                itemId = 99004L,
+                raiderId = "test-raider-list-2",
+                guildId = guildId,
+                flpsScore = 0.90,
+                tier = "MYTHIC",
+            )
         restTemplate.postForEntity(
             "/api/v1/loot/awards",
             HttpEntity(request2, headers),
-            LootAwardDto::class.java
+            LootAwardDto::class.java,
         )
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/awards/all?guildId=$guildId",
-            LootAwardsListResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards/all?guildId=$guildId",
+                LootAwardsListResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -401,25 +413,27 @@ class LootControllerIntegrationTest : IntegrationTest() {
         headers.contentType = MediaType.APPLICATION_JSON
 
         for (i in 1..5) {
-            val request = AwardLootRequest(
-                itemId = (99100 + i).toLong(),
-                raiderId = "test-raider-page-$i",
-                guildId = guildId,
-                flpsScore = 0.50 + (i * 0.05),
-                tier = "HEROIC"
-            )
+            val request =
+                AwardLootRequest(
+                    itemId = (99100 + i).toLong(),
+                    raiderId = "test-raider-page-$i",
+                    guildId = guildId,
+                    flpsScore = 0.50 + (i * 0.05),
+                    tier = "HEROIC",
+                )
             restTemplate.postForEntity(
                 "/api/v1/loot/awards",
                 HttpEntity(request, headers),
-                LootAwardDto::class.java
+                LootAwardDto::class.java,
             )
         }
 
         // When - Get first page
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/awards?guildId=$guildId&page=0&size=3",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards?guildId=$guildId&page=0&size=3",
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -432,30 +446,33 @@ class LootControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should get specific loot ban by ID and return 200 OK`() {
         // Given - First create a ban
-        val createRequest = CreateLootBanRequest(
-            raiderId = "test-raider-get-ban",
-            guildId = "test-guild-get-ban",
-            reason = "Test ban for retrieval",
-            expiresAt = Instant.now().plusSeconds(86400 * 7)
-        )
+        val createRequest =
+            CreateLootBanRequest(
+                raiderId = "test-raider-get-ban",
+                guildId = "test-guild-get-ban",
+                reason = "Test ban for retrieval",
+                expiresAt = Instant.now().plusSeconds(86400 * 7),
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
         val createEntity = HttpEntity(createRequest, headers)
-        val createResponse = restTemplate.postForEntity(
-            "/api/v1/loot/bans",
-            createEntity,
-            LootBanDto::class.java
-        )
+        val createResponse =
+            restTemplate.postForEntity(
+                "/api/v1/loot/bans",
+                createEntity,
+                LootBanDto::class.java,
+            )
 
         val banId = createResponse.body!!.id
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/bans/$banId",
-            LootBanDto::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/bans/$banId",
+                LootBanDto::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -471,10 +488,11 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val nonExistentId = "non-existent-ban-id"
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/bans/$nonExistentId",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/bans/$nonExistentId",
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
@@ -483,39 +501,43 @@ class LootControllerIntegrationTest : IntegrationTest() {
     @Test
     fun `should update loot ban and return 200 OK`() {
         // Given - First create a ban
-        val createRequest = CreateLootBanRequest(
-            raiderId = "test-raider-update-ban",
-            guildId = "test-guild-update-ban",
-            reason = "Original reason",
-            expiresAt = Instant.now().plusSeconds(86400)
-        )
+        val createRequest =
+            CreateLootBanRequest(
+                raiderId = "test-raider-update-ban",
+                guildId = "test-guild-update-ban",
+                reason = "Original reason",
+                expiresAt = Instant.now().plusSeconds(86400),
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
         val createEntity = HttpEntity(createRequest, headers)
-        val createResponse = restTemplate.postForEntity(
-            "/api/v1/loot/bans",
-            createEntity,
-            LootBanDto::class.java
-        )
+        val createResponse =
+            restTemplate.postForEntity(
+                "/api/v1/loot/bans",
+                createEntity,
+                LootBanDto::class.java,
+            )
 
         val banId = createResponse.body!!.id
 
         // When - Update the ban
         val newExpiry = Instant.now().plusSeconds(86400 * 14)
-        val updateRequest = UpdateLootBanRequest(
-            reason = "Updated reason",
-            expiresAt = newExpiry
-        )
+        val updateRequest =
+            UpdateLootBanRequest(
+                reason = "Updated reason",
+                expiresAt = newExpiry,
+            )
 
         val updateEntity = HttpEntity(updateRequest, headers)
-        val response = restTemplate.exchange(
-            "/api/v1/loot/bans/$banId",
-            org.springframework.http.HttpMethod.PUT,
-            updateEntity,
-            LootBanDto::class.java
-        )
+        val response =
+            restTemplate.exchange(
+                "/api/v1/loot/bans/$banId",
+                org.springframework.http.HttpMethod.PUT,
+                updateEntity,
+                LootBanDto::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -528,9 +550,10 @@ class LootControllerIntegrationTest : IntegrationTest() {
     fun `should return 404 Not Found when updating non-existent loot ban`() {
         // Given
         val nonExistentId = "non-existent-update-ban-id"
-        val updateRequest = UpdateLootBanRequest(
-            reason = "New reason"
-        )
+        val updateRequest =
+            UpdateLootBanRequest(
+                reason = "New reason",
+            )
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
@@ -538,12 +561,13 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val updateEntity = HttpEntity(updateRequest, headers)
 
         // When
-        val response = restTemplate.exchange(
-            "/api/v1/loot/bans/$nonExistentId",
-            org.springframework.http.HttpMethod.PUT,
-            updateEntity,
-            String::class.java
-        )
+        val response =
+            restTemplate.exchange(
+                "/api/v1/loot/bans/$nonExistentId",
+                org.springframework.http.HttpMethod.PUT,
+                updateEntity,
+                String::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
@@ -555,10 +579,11 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val guildId = "empty-guild-no-awards"
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/awards/all?guildId=$guildId",
-            LootAwardsListResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/awards/all?guildId=$guildId",
+                LootAwardsListResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -573,10 +598,11 @@ class LootControllerIntegrationTest : IntegrationTest() {
         val raiderId = "empty-raider-no-loot"
 
         // When
-        val response = restTemplate.getForEntity(
-            "/api/v1/loot/raiders/$raiderId/history",
-            LootHistoryResponse::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "/api/v1/loot/raiders/$raiderId/history",
+                LootHistoryResponse::class.java,
+            )
 
         // Then
         assertEquals(HttpStatus.OK, response.statusCode)

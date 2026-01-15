@@ -23,7 +23,6 @@ import java.time.ZoneOffset
  * Unit tests for JdbcPeriodSnapshotRepository.
  */
 class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcPeriodSnapshotRepository
 
@@ -37,11 +36,17 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return period snapshot when found`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<PeriodSnapshotEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<PeriodSnapshotEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<PeriodSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id), 0))
             }
@@ -53,14 +58,28 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
         @Test
         fun `should return null when period snapshot not found`() {
             val id = 999L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<PeriodSnapshotEntity>>(), eq(id)) } returns emptyList()
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<PeriodSnapshotEntity>>(), eq(id),
+                )
+            } returns emptyList()
             repository.findById(id) shouldBe null
         }
 
         @Test
         fun `should handle null optional fields`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<PeriodSnapshotEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<PeriodSnapshotEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<PeriodSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id, teamId = null, seasonId = null, periodId = null, currentPeriod = null), 0))
             }
@@ -73,11 +92,17 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByTeamIdTests {
-
         @Test
         fun `should return snapshots for team`() {
             val teamId = 100L
-            every { jdbcTemplate.query(match<String> { it.contains("team_id = ?") }, any<RowMapper<PeriodSnapshotEntity>>(), eq(teamId), any<Int>(), any<Long>()) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("team_id = ?")
+                    },
+                    any<RowMapper<PeriodSnapshotEntity>>(), eq(teamId), any<Int>(), any<Long>(),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<PeriodSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L, teamId = teamId), 0), rowMapper.mapRow(mockResultSet(2L, teamId = teamId), 1))
             }
@@ -88,13 +113,13 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new snapshot when id is null`() {
             val entity = createEntity(id = null)
             val generatedId = 1L
             every { jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>()) } answers {
-                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId)); 1
+                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId))
+                1
             }
             val result = repository.save(entity)
             result.id shouldBe generatedId
@@ -121,7 +146,13 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
         }
     }
 
-    private fun mockResultSet(id: Long, teamId: Long? = 100L, seasonId: Long? = 1L, periodId: Long? = 5L, currentPeriod: Long? = 5L): ResultSet {
+    private fun mockResultSet(
+        id: Long,
+        teamId: Long? = 100L,
+        seasonId: Long? = 1L,
+        periodId: Long? = 5L,
+        currentPeriod: Long? = 5L,
+    ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
         every { rs.getLong("team_id") } returns (teamId ?: 0L)
@@ -129,11 +160,28 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
         every { rs.getLong("period_id") } returns (periodId ?: 0L)
         every { rs.getLong("current_period") } returns (currentPeriod ?: 0L)
         var wasNullCount = 0
-        every { rs.wasNull() } answers { val isNull = when(wasNullCount) { 0 -> teamId == null; 1 -> seasonId == null; 2 -> periodId == null; 3 -> currentPeriod == null; else -> false }; wasNullCount++; isNull }
+        every { rs.wasNull() } answers {
+            val isNull =
+                when (wasNullCount) {
+                    0 -> teamId == null
+                    1 -> seasonId == null
+                    2 -> periodId == null
+                    3 -> currentPeriod == null
+                    else -> false
+                }
+            wasNullCount++
+            isNull
+        }
         every { rs.getTimestamp("fetched_at") } returns Timestamp.from(now.toInstant())
         return rs
     }
 
-    private fun createEntity(id: Long? = 1L, teamId: Long? = 100L, seasonId: Long? = 1L, periodId: Long? = 5L, currentPeriod: Long? = 5L, fetchedAt: OffsetDateTime = now) =
-        PeriodSnapshotEntity(id, teamId, seasonId, periodId, currentPeriod, fetchedAt)
+    private fun createEntity(
+        id: Long? = 1L,
+        teamId: Long? = 100L,
+        seasonId: Long? = 1L,
+        periodId: Long? = 5L,
+        currentPeriod: Long? = 5L,
+        fetchedAt: OffsetDateTime = now,
+    ) = PeriodSnapshotEntity(id, teamId, seasonId, periodId, currentPeriod, fetchedAt)
 }

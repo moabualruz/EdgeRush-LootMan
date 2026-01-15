@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Tests default values and configuration options.
  */
 class RateLimitPropertiesTest : UnitTest() {
-
     @Test
     fun `should have correct default values`() {
         // Arrange & Act
@@ -53,10 +52,11 @@ class RateLimitPropertiesTest : UnitTest() {
     @Test
     fun `should allow both custom rate limits`() {
         // Arrange & Act
-        val properties = RateLimitProperties(
-            readRequestsPerSecond = 200.0,
-            writeRequestsPerSecond = 50.0,
-        )
+        val properties =
+            RateLimitProperties(
+                readRequestsPerSecond = 200.0,
+                writeRequestsPerSecond = 50.0,
+            )
 
         // Assert
         properties.readRequestsPerSecond shouldBe 200.0
@@ -80,16 +80,18 @@ class RateLimitPropertiesTest : UnitTest() {
     @Test
     fun `should support equality comparison`() {
         // Arrange
-        val properties1 = RateLimitProperties(
-            enabled = true,
-            readRequestsPerSecond = 100.0,
-            writeRequestsPerSecond = 20.0,
-        )
-        val properties2 = RateLimitProperties(
-            enabled = true,
-            readRequestsPerSecond = 100.0,
-            writeRequestsPerSecond = 20.0,
-        )
+        val properties1 =
+            RateLimitProperties(
+                enabled = true,
+                readRequestsPerSecond = 100.0,
+                writeRequestsPerSecond = 20.0,
+            )
+        val properties2 =
+            RateLimitProperties(
+                enabled = true,
+                readRequestsPerSecond = 100.0,
+                writeRequestsPerSecond = 20.0,
+            )
 
         // Assert
         properties1 shouldBe properties2
@@ -98,10 +100,11 @@ class RateLimitPropertiesTest : UnitTest() {
     @Test
     fun `should allow very low rate limits`() {
         // Arrange & Act
-        val properties = RateLimitProperties(
-            readRequestsPerSecond = 1.0,
-            writeRequestsPerSecond = 0.5,
-        )
+        val properties =
+            RateLimitProperties(
+                readRequestsPerSecond = 1.0,
+                writeRequestsPerSecond = 0.5,
+            )
 
         // Assert
         properties.readRequestsPerSecond shouldBe 1.0
@@ -111,10 +114,11 @@ class RateLimitPropertiesTest : UnitTest() {
     @Test
     fun `should allow very high rate limits`() {
         // Arrange & Act
-        val properties = RateLimitProperties(
-            readRequestsPerSecond = 10000.0,
-            writeRequestsPerSecond = 1000.0,
-        )
+        val properties =
+            RateLimitProperties(
+                readRequestsPerSecond = 10000.0,
+                writeRequestsPerSecond = 1000.0,
+            )
 
         // Assert
         properties.readRequestsPerSecond shouldBe 10000.0

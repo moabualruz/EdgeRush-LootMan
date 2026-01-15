@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
-import java.time.LocalDateTime
 
 /**
  * Request to create or update a wishlist.
@@ -17,10 +16,9 @@ import java.time.LocalDateTime
 data class SaveWishlistRequest(
     @field:Min(value = 1, message = "Raider ID must be positive")
     val raiderId: Long,
-
     @field:NotEmpty(message = "Wishlist must contain at least one item")
     @field:Valid
-    val items: List<WishlistItemRequest>
+    val items: List<WishlistItemRequest>,
 )
 
 /**
@@ -29,19 +27,15 @@ data class SaveWishlistRequest(
 data class WishlistItemRequest(
     @field:Min(value = 1, message = "Item ID must be positive")
     val itemId: Long,
-
     @field:NotBlank(message = "Item name is required")
     @field:Size(max = 100, message = "Item name cannot exceed 100 characters")
     val itemName: String,
-
     @field:Min(value = 1, message = "Priority must be at least 1")
     val priority: Int,
-
     @field:DecimalMin(value = "0.0", message = "Upgrade percentage must be non-negative")
     @field:DecimalMax(value = "100.0", message = "Upgrade percentage cannot exceed 100%")
     val upgradePercentage: Double,
-
-    val specName: String? = null
+    val specName: String? = null,
 )
 
 /**
@@ -51,7 +45,7 @@ data class WishlistResponse(
     val raiderId: Long,
     val items: List<WishlistItemResponse>,
     val itemCount: Int,
-    val topPriorityItem: WishlistItemResponse?
+    val topPriorityItem: WishlistItemResponse?,
 ) {
     companion object {
         fun from(wishlist: Wishlist): WishlistResponse {
@@ -60,7 +54,7 @@ data class WishlistResponse(
                 raiderId = wishlist.raiderId.value,
                 items = itemResponses,
                 itemCount = itemResponses.size,
-                topPriorityItem = wishlist.getItemsByPriority().firstOrNull()?.let { WishlistItemResponse.from(it) }
+                topPriorityItem = wishlist.getItemsByPriority().firstOrNull()?.let { WishlistItemResponse.from(it) },
             )
         }
     }
@@ -75,16 +69,17 @@ data class WishlistItemResponse(
     val priority: Int,
     val upgradePercentage: Double,
     val normalizedUpgradeValue: Double,
-    val specName: String?
+    val specName: String?,
 ) {
     companion object {
-        fun from(item: WishlistItem): WishlistItemResponse = WishlistItemResponse(
-            itemId = item.itemId.value,
-            itemName = item.itemName,
-            priority = item.priority,
-            upgradePercentage = item.upgradePercentage,
-            normalizedUpgradeValue = item.getNormalizedUpgradeValue(),
-            specName = item.specName
-        )
+        fun from(item: WishlistItem): WishlistItemResponse =
+            WishlistItemResponse(
+                itemId = item.itemId.value,
+                itemName = item.itemName,
+                priority = item.priority,
+                upgradePercentage = item.upgradePercentage,
+                normalizedUpgradeValue = item.getNormalizedUpgradeValue(),
+                specName = item.specName,
+            )
     }
 }

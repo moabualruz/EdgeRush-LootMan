@@ -16,10 +16,11 @@ import org.springframework.http.HttpStatus
  * Tests the abstract controller using a concrete test implementation.
  */
 class BaseCrudControllerTest : UnitTest() {
-
     // Test DTOs
     data class TestCreateRequest(val name: String)
+
     data class TestUpdateRequest(val name: String)
+
     data class TestResponse(val id: Long, val name: String)
 
     // Mock service
@@ -32,9 +33,9 @@ class BaseCrudControllerTest : UnitTest() {
         service: CrudService<Long, TestCreateRequest, TestUpdateRequest, TestResponse>,
         paginationProperties: PaginationProperties,
     ) : BaseCrudController<Long, TestCreateRequest, TestUpdateRequest, TestResponse>(
-        service,
-        paginationProperties,
-    )
+            service,
+            paginationProperties,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -45,16 +46,16 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(TestResponse(1, "Test")),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(TestResponse(1, "Test")),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { mockService.findAll(any()) } returns expectedResponse
 
             // When
@@ -70,12 +71,13 @@ class BaseCrudControllerTest : UnitTest() {
         @Test
         fun `should use custom page size when provided`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(TestResponse(1, "Test")),
-                page = 0,
-                size = 50,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(TestResponse(1, "Test")),
+                    page = 0,
+                    size = 50,
+                    totalElements = 1,
+                )
             every { mockService.findAll(any()) } returns expectedResponse
 
             // When
@@ -92,12 +94,13 @@ class BaseCrudControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = io.mockk.slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<TestResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TestResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { mockService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -111,12 +114,13 @@ class BaseCrudControllerTest : UnitTest() {
         @Test
         fun `should use provided page number`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = emptyList<TestResponse>(),
-                page = 5,
-                size = 20,
-                totalElements = 100,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TestResponse>(),
+                    page = 5,
+                    size = 20,
+                    totalElements = 100,
+                )
             every { mockService.findAll(any()) } returns expectedResponse
 
             // When
@@ -131,7 +135,6 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return entity when found`() {
             // Given
@@ -163,7 +166,6 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created entity with 201 status`() {
             // Given
@@ -183,7 +185,6 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated entity`() {
             // Given
@@ -217,7 +218,6 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -249,7 +249,6 @@ class BaseCrudControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when entity exists`() {
             // Given
@@ -282,7 +281,6 @@ class BaseCrudControllerTest : UnitTest() {
  * Unit tests for ExistsResponse DTO.
  */
 class ExistsResponseTest : UnitTest() {
-
     @Test
     fun `should create ExistsResponse with exists true`() {
         val response = ExistsResponse(exists = true)
@@ -300,7 +298,6 @@ class ExistsResponseTest : UnitTest() {
  * Unit tests for CountResponse DTO.
  */
 class CountResponseTest : UnitTest() {
-
     @Test
     fun `should create CountResponse with count`() {
         val response = CountResponse(count = 42)

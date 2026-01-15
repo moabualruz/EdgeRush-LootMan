@@ -16,7 +16,6 @@ import java.time.OffsetDateTime
 class CharacterHistoryCrudServiceImpl(
     private val repository: CharacterHistoryRepository,
 ) : CharacterHistoryCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<CharacterHistoryResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class CharacterHistoryCrudServiceImpl(
     }
 
     override fun findById(id: Long): CharacterHistoryResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Character history not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Character history not found with id: $id")
         return CharacterHistoryResponse.from(entity)
     }
 
@@ -41,30 +41,36 @@ class CharacterHistoryCrudServiceImpl(
     }
 
     override fun create(request: CreateCharacterHistoryRequest): CharacterHistoryResponse {
-        val entity = CharacterHistoryEntity(
-            characterId = request.characterId,
-            characterName = request.characterName,
-            characterRealm = request.characterRealm,
-            characterRegion = request.characterRegion,
-            teamId = request.teamId,
-            seasonId = request.seasonId,
-            periodId = request.periodId,
-            historyJson = request.historyJson,
-            bestGearJson = request.bestGearJson,
-            syncedAt = OffsetDateTime.now(),
-        )
+        val entity =
+            CharacterHistoryEntity(
+                characterId = request.characterId,
+                characterName = request.characterName,
+                characterRealm = request.characterRealm,
+                characterRegion = request.characterRegion,
+                teamId = request.teamId,
+                seasonId = request.seasonId,
+                periodId = request.periodId,
+                historyJson = request.historyJson,
+                bestGearJson = request.bestGearJson,
+                syncedAt = OffsetDateTime.now(),
+            )
         val saved = repository.save(entity)
         return CharacterHistoryResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateCharacterHistoryRequest): CharacterHistoryResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Character history not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateCharacterHistoryRequest,
+    ): CharacterHistoryResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Character history not found with id: $id")
 
-        val updated = existing.copy(
-            historyJson = request.historyJson ?: existing.historyJson,
-            bestGearJson = request.bestGearJson ?: existing.bestGearJson,
-        )
+        val updated =
+            existing.copy(
+                historyJson = request.historyJson ?: existing.historyJson,
+                bestGearJson = request.bestGearJson ?: existing.bestGearJson,
+            )
 
         repository.save(updated)
         return CharacterHistoryResponse.from(updated)
@@ -77,7 +83,10 @@ class CharacterHistoryCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByCharacterId(characterId: Long, pageRequest: PageRequest): PagedResponse<CharacterHistoryResponse> {
+    override fun findByCharacterId(
+        characterId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<CharacterHistoryResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByCharacterId(characterId, offset, pageRequest.size)
         val total = repository.countByCharacterId(characterId)
@@ -90,7 +99,10 @@ class CharacterHistoryCrudServiceImpl(
         )
     }
 
-    override fun findByTeamId(teamId: Long, pageRequest: PageRequest): PagedResponse<CharacterHistoryResponse> {
+    override fun findByTeamId(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<CharacterHistoryResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByTeamId(teamId, offset, pageRequest.size)
         val total = repository.countByTeamId(teamId)

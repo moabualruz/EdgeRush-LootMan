@@ -21,7 +21,6 @@ class GuildQueryResolver(
     private val getGuildUseCase: GetGuildUseCase,
     private val listGuildsUseCase: ListGuildsUseCase,
 ) : Query {
-
     /**
      * Get a single guild by ID.
      *
@@ -85,21 +84,23 @@ data class GuildSettingsType(
 /**
  * Extension function to convert domain Guild to GraphQL GuildType.
  */
-private fun Guild.toGraphQLType(): GuildType = GuildType(
-    id = this.id.value,
-    name = this.name,
-    description = this.description,
-    realm = this.realm,
-    region = this.region,
-    settings = GuildSettingsType(
-        syncEnabled = this.settings.syncEnabled,
-        syncCronExpression = this.settings.syncCronExpression,
-        timezone = this.settings.timezone,
-        benchmarkMode = this.settings.benchmarkMode,
-        customBenchmarkRms = this.settings.customBenchmarkRms,
-        customBenchmarkIpi = this.settings.customBenchmarkIpi,
-    ),
-    syncStatus = this.syncStatus,
-    isActive = this.isActive,
-    canSync = this.canSync(),
-)
+private fun Guild.toGraphQLType(): GuildType =
+    GuildType(
+        id = this.id.value,
+        name = this.name,
+        description = this.description,
+        realm = this.realm,
+        region = this.region,
+        settings =
+            GuildSettingsType(
+                syncEnabled = this.settings.syncEnabled,
+                syncCronExpression = this.settings.syncCronExpression,
+                timezone = this.settings.timezone,
+                benchmarkMode = this.settings.benchmarkMode,
+                customBenchmarkRms = this.settings.customBenchmarkRms,
+                customBenchmarkIpi = this.settings.customBenchmarkIpi,
+            ),
+        syncStatus = this.syncStatus,
+        isActive = this.isActive,
+        canSync = this.canSync(),
+    )

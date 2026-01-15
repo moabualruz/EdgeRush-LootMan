@@ -1,5 +1,6 @@
 package com.edgerush.lootman.api.performance
 
+import com.edgerush.datasync.entity.RaiderEntity
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.api.auth.CurrentUserService
@@ -8,7 +9,6 @@ import com.edgerush.lootman.domain.flps.repository.RaiderPerformanceRepository
 import com.edgerush.lootman.domain.raider.repository.RaiderEntityRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import com.edgerush.datasync.entity.RaiderEntity
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -35,11 +35,12 @@ class PerformanceControllerTest : UnitTest() {
         currentUserService = mockk()
         raiderPerformanceRepository = mockk()
         raiderEntityRepository = mockk()
-        controller = PerformanceController(
-            currentUserService,
-            raiderPerformanceRepository,
-            raiderEntityRepository,
-        )
+        controller =
+            PerformanceController(
+                currentUserService,
+                raiderPerformanceRepository,
+                raiderEntityRepository,
+            )
     }
 
     @Test
@@ -56,17 +57,18 @@ class PerformanceControllerTest : UnitTest() {
         every { raiderEntityRepository.findById(123L) } returns raider
         every { raider.characterName } returns "TestRaider"
 
-        val performanceData = RaiderPerformanceData(
-            raiderId = raiderId,
-            characterName = "TestRaider",
-            characterRealm = "TestRealm",
-            totalDeaths = 5,
-            totalFights = 10,
-            deathsPerAttempt = 0.5,
-            avoidableDamagePercentage = 15.0,
-            periodStart = Instant.now().minusSeconds(604800),
-            periodEnd = Instant.now(),
-        )
+        val performanceData =
+            RaiderPerformanceData(
+                raiderId = raiderId,
+                characterName = "TestRaider",
+                characterRealm = "TestRealm",
+                totalDeaths = 5,
+                totalFights = 10,
+                deathsPerAttempt = 0.5,
+                avoidableDamagePercentage = 15.0,
+                periodStart = Instant.now().minusSeconds(604800),
+                periodEnd = Instant.now(),
+            )
 
         every { raiderPerformanceRepository.findByRaiderAndPeriod(raiderId, GuildId(guildId), any(), any()) } returns performanceData
 
@@ -119,17 +121,18 @@ class PerformanceControllerTest : UnitTest() {
         every { raiderEntityRepository.findById(raiderId) } returns raider
         every { raider.characterName } returns "SpecificRaider"
 
-        val performanceData = RaiderPerformanceData(
-            raiderId = RaiderId(raiderId),
-            characterName = "SpecificRaider",
-            characterRealm = "TestRealm",
-            totalDeaths = 3,
-            totalFights = 15,
-            deathsPerAttempt = 0.2,
-            avoidableDamagePercentage = 8.0,
-            periodStart = Instant.now().minusSeconds(604800),
-            periodEnd = Instant.now(),
-        )
+        val performanceData =
+            RaiderPerformanceData(
+                raiderId = RaiderId(raiderId),
+                characterName = "SpecificRaider",
+                characterRealm = "TestRealm",
+                totalDeaths = 3,
+                totalFights = 15,
+                deathsPerAttempt = 0.2,
+                avoidableDamagePercentage = 8.0,
+                periodStart = Instant.now().minusSeconds(604800),
+                periodEnd = Instant.now(),
+            )
 
         every { raiderPerformanceRepository.findByRaiderAndPeriod(RaiderId(raiderId), GuildId(guildId), any(), any()) } returns performanceData
 
@@ -155,9 +158,10 @@ class PerformanceControllerTest : UnitTest() {
         every { raiderEntityRepository.findById(raiderId) } returns null
 
         // When / Then
-        val exception = assertThrows<IllegalArgumentException> {
-            controller.getPerformance(guildId, raiderId)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                controller.getPerformance(guildId, raiderId)
+            }
 
         exception.message shouldBe "Raider not found: $raiderId"
     }

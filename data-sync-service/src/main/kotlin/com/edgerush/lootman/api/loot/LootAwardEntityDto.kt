@@ -13,17 +13,13 @@ data class CreateLootAwardEntityRequest(
     @field:NotNull(message = "Raider ID is required")
     @field:Positive(message = "Raider ID must be positive")
     val raiderId: Long,
-
     @field:NotNull(message = "Item ID is required")
     @field:Positive(message = "Item ID must be positive")
     val itemId: Long,
-
     @field:NotBlank(message = "Item name is required")
     val itemName: String,
-
     @field:NotBlank(message = "Tier is required")
     val tier: String,
-
     val flps: Double = 0.0,
     val rdf: Double = 0.0,
     val rclootcouncilId: String? = null,
@@ -77,29 +73,30 @@ data class LootAwardEntityResponse(
     val awardedByName: String?,
 ) {
     companion object {
-        fun from(entity: LootAwardEntity): LootAwardEntityResponse = LootAwardEntityResponse(
-            id = entity.id ?: 0L,
-            raiderId = entity.raiderId,
-            itemId = entity.itemId,
-            itemName = entity.itemName,
-            tier = entity.tier,
-            flps = entity.flps,
-            rdf = entity.rdf,
-            awardedAt = entity.awardedAt,
-            rclootcouncilId = entity.rclootcouncilId,
-            icon = entity.icon,
-            slot = entity.slot,
-            quality = entity.quality,
-            responseTypeId = entity.responseTypeId,
-            responseTypeName = entity.responseTypeName,
-            note = entity.note,
-            wishValue = entity.wishValue,
-            difficulty = entity.difficulty,
-            discarded = entity.discarded,
-            characterId = entity.characterId,
-            awardedByCharacterId = entity.awardedByCharacterId,
-            awardedByName = entity.awardedByName,
-        )
+        fun from(entity: LootAwardEntity): LootAwardEntityResponse =
+            LootAwardEntityResponse(
+                id = entity.id ?: 0L,
+                raiderId = entity.raiderId,
+                itemId = entity.itemId,
+                itemName = entity.itemName,
+                tier = entity.tier,
+                flps = entity.flps,
+                rdf = entity.rdf,
+                awardedAt = entity.awardedAt,
+                rclootcouncilId = entity.rclootcouncilId,
+                icon = entity.icon,
+                slot = entity.slot,
+                quality = entity.quality,
+                responseTypeId = entity.responseTypeId,
+                responseTypeName = entity.responseTypeName,
+                note = entity.note,
+                wishValue = entity.wishValue,
+                difficulty = entity.difficulty,
+                discarded = entity.discarded,
+                characterId = entity.characterId,
+                awardedByCharacterId = entity.awardedByCharacterId,
+                awardedByName = entity.awardedByName,
+            )
     }
 }
 

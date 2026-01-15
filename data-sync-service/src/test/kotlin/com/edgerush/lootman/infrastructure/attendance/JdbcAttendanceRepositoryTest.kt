@@ -29,7 +29,6 @@ import java.time.LocalDate
  * The repository operates on the attendance_stats table.
  */
 class JdbcAttendanceRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcAttendanceRepository
 
@@ -46,7 +45,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return attendance record when found`() {
             // Given
@@ -56,7 +54,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
@@ -81,7 +79,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } returns emptyList()
 
@@ -103,21 +101,22 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                val rs = mockResultSet(
-                    id = recordId.value,
-                    raiderId = 100L,
-                    guildId = "test-guild",
-                    instance = "Vault of the Incarnates",
-                    encounter = "Raszageth",
-                    startDate = startDate,
-                    endDate = endDate,
-                    attendedRaids = 8,
-                    totalRaids = 10
-                )
+                val rs =
+                    mockResultSet(
+                        id = recordId.value,
+                        raiderId = 100L,
+                        guildId = "test-guild",
+                        instance = "Vault of the Incarnates",
+                        encounter = "Raszageth",
+                        startDate = startDate,
+                        endDate = endDate,
+                        attendedRaids = 8,
+                        totalRaids = 10,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -146,14 +145,15 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                val rs = mockResultSet(
-                    id = recordId.value,
-                    encounter = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = recordId.value,
+                        encounter = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -174,14 +174,15 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                val rs = mockResultSetWithNullableFields(
-                    id = recordId.value,
-                    teamId = null
-                )
+                val rs =
+                    mockResultSetWithNullableFields(
+                        id = recordId.value,
+                        teamId = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -202,14 +203,15 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                val rs = mockResultSetWithNullableFields(
-                    id = recordId.value,
-                    instance = null
-                )
+                val rs =
+                    mockResultSetWithNullableFields(
+                        id = recordId.value,
+                        instance = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -231,14 +233,15 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                val rs = mockResultSetWithNullableFields(
-                    id = recordId.value,
-                    syncedAt = null
-                )
+                val rs =
+                    mockResultSetWithNullableFields(
+                        id = recordId.value,
+                        syncedAt = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -256,7 +259,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdAndGuildIdAndDateRangeTests {
-
         @Test
         fun `should return attendance records for raider in date range`() {
             // Given
@@ -276,13 +278,13 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any(),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value), 0),
-                    rowMapper.mapRow(mockResultSet("record-2", raiderId = raiderId.value, guildId = guildId.value), 1)
+                    rowMapper.mapRow(mockResultSet("record-2", raiderId = raiderId.value, guildId = guildId.value), 1),
                 )
             }
 
@@ -308,7 +310,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any(),
-                    any()
+                    any(),
                 )
             } returns emptyList()
 
@@ -322,7 +324,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdAndGuildIdAndInstanceAndDateRangeTests {
-
         @Test
         fun `should return records for specific instance`() {
             // Given
@@ -343,19 +344,24 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     eq(guildId.value),
                     eq(instance),
                     any(),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value, instance = instance), 0)
+                    rowMapper.mapRow(mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value, instance = instance), 0),
                 )
             }
 
             // When
-            val result = repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
-                raiderId, guildId, instance, oneMonthAgo, today
-            )
+            val result =
+                repository.findByRaiderIdAndGuildIdAndInstanceAndDateRange(
+                    raiderId,
+                    guildId,
+                    instance,
+                    oneMonthAgo,
+                    today,
+                )
 
             // Then
             result.size shouldBe 1
@@ -365,7 +371,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdAndGuildIdAndEncounterAndDateRangeTests {
-
         @Test
         fun `should return records for specific encounter`() {
             // Given
@@ -389,22 +394,28 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     eq(instance),
                     eq(encounter),
                     any(),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
                     rowMapper.mapRow(
                         mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value, instance = instance, encounter = encounter),
-                        0
-                    )
+                        0,
+                    ),
                 )
             }
 
             // When
-            val result = repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
-                raiderId, guildId, instance, encounter, oneMonthAgo, today
-            )
+            val result =
+                repository.findByRaiderIdAndGuildIdAndEncounterAndDateRange(
+                    raiderId,
+                    guildId,
+                    instance,
+                    encounter,
+                    oneMonthAgo,
+                    today,
+                )
 
             // Then
             result.size shouldBe 1
@@ -414,7 +425,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdAndDateRangeTests {
-
         @Test
         fun `should return all records for guild in date range`() {
             // Given
@@ -430,14 +440,14 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     any<RowMapper<AttendanceRecord>>(),
                     eq(guildId.value),
                     any(),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet("record-1", raiderId = 100L, guildId = guildId.value), 0),
                     rowMapper.mapRow(mockResultSet("record-2", raiderId = 101L, guildId = guildId.value), 1),
-                    rowMapper.mapRow(mockResultSet("record-3", raiderId = 102L, guildId = guildId.value), 2)
+                    rowMapper.mapRow(mockResultSet("record-3", raiderId = 102L, guildId = guildId.value), 2),
                 )
             }
 
@@ -452,7 +462,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new attendance record when not exists`() {
             // Given
@@ -472,7 +481,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -496,7 +505,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -504,7 +513,6 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete attendance record by id`() {
             // Given
@@ -513,7 +521,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(recordId.value)
+                    eq(recordId.value),
                 )
             } returns 1
 
@@ -524,7 +532,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    recordId.value
+                    recordId.value,
                 )
             }
         }
@@ -542,7 +550,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         endDate: LocalDate = today,
         attendedRaids: Int = 8,
         totalRaids: Int = 10,
-        recordedAt: Instant = now
+        recordedAt: Instant = now,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("id") } returns id
@@ -568,7 +576,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         endDate: LocalDate = today,
         attendedRaids: Int = 8,
         totalRaids: Int = 10,
-        syncedAt: Timestamp? = Timestamp.from(now)
+        syncedAt: Timestamp? = Timestamp.from(now),
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("id") } returns id
@@ -593,18 +601,19 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         startDate: LocalDate = oneMonthAgo,
         endDate: LocalDate = today,
         attendedRaids: Int = 8,
-        totalRaids: Int = 10
-    ): AttendanceRecord = createAttendanceRecordWithId(
-        id = id,
-        raiderId = raiderId,
-        guildId = guildId,
-        instance = instance,
-        encounter = encounter,
-        startDate = startDate,
-        endDate = endDate,
-        attendedRaids = attendedRaids,
-        totalRaids = totalRaids
-    )
+        totalRaids: Int = 10,
+    ): AttendanceRecord =
+        createAttendanceRecordWithId(
+            id = id,
+            raiderId = raiderId,
+            guildId = guildId,
+            instance = instance,
+            encounter = encounter,
+            startDate = startDate,
+            endDate = endDate,
+            attendedRaids = attendedRaids,
+            totalRaids = totalRaids,
+        )
 
     /**
      * Helper to create AttendanceRecord with a specific ID for testing.
@@ -620,21 +629,22 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         startDate: LocalDate,
         endDate: LocalDate,
         attendedRaids: Int,
-        totalRaids: Int
+        totalRaids: Int,
     ): AttendanceRecord {
         // Use the private constructor via reflection for testing
-        val constructor = AttendanceRecord::class.java.getDeclaredConstructor(
-            AttendanceRecordId::class.java,
-            RaiderId::class.java,
-            GuildId::class.java,
-            String::class.java,
-            String::class.java,
-            LocalDate::class.java,
-            LocalDate::class.java,
-            Int::class.java,
-            Int::class.java,
-            Instant::class.java
-        )
+        val constructor =
+            AttendanceRecord::class.java.getDeclaredConstructor(
+                AttendanceRecordId::class.java,
+                RaiderId::class.java,
+                GuildId::class.java,
+                String::class.java,
+                String::class.java,
+                LocalDate::class.java,
+                LocalDate::class.java,
+                Int::class.java,
+                Int::class.java,
+                Instant::class.java,
+            )
         constructor.isAccessible = true
         return constructor.newInstance(
             id,
@@ -646,7 +656,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             endDate,
             attendedRaids,
             totalRaids,
-            Instant.now()
+            Instant.now(),
         )
     }
 }

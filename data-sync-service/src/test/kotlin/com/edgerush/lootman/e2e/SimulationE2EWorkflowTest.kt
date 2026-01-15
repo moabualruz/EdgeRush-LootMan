@@ -8,7 +8,6 @@ import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
@@ -35,7 +34,6 @@ import java.time.Instant
  * with manually inserted simulation results.
  */
 class SimulationE2EWorkflowTest : IntegrationTest() {
-
     @Autowired
     private lateinit var simulationService: SimulationService
 
@@ -50,15 +48,16 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
     private fun createSubmitRequest(
         characterRealm: String = "TestRealm",
         characterClass: String = "warrior",
-        characterSpec: String = "fury"
+        characterSpec: String = "fury",
     ): HttpEntity<String> {
-        val json = """
+        val json =
+            """
             {
                 "characterRealm": "$characterRealm",
                 "characterClass": "$characterClass",
                 "characterSpec": "$characterSpec"
             }
-        """.trimIndent()
+            """.trimIndent()
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(json, headers)
@@ -72,11 +71,12 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             val guildId = "e2e-guild-1"
             val characterName = "E2EChar1"
 
-            val submitResponse = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                createSubmitRequest(),
-                String::class.java
-            )
+            val submitResponse =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
             submitResponse.statusCode shouldBe HttpStatus.ACCEPTED
 
             val submitJson = objectMapper.readTree(submitResponse.body)
@@ -84,20 +84,22 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             requestId shouldNotBe null
 
             // Step 2: Check status via HTTP
-            val statusResponse = restTemplate.getForEntity(
-                "/api/v1/simulation/requests/$requestId",
-                String::class.java
-            )
+            val statusResponse =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/requests/$requestId",
+                    String::class.java,
+                )
             statusResponse.statusCode shouldBe HttpStatus.OK
 
             val statusJson = objectMapper.readTree(statusResponse.body)
             statusJson.get("status").asText() shouldBe SimulationStatus.PENDING.name
 
             // Step 3: Verify in pending list
-            val pendingResponse = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/pending",
-                String::class.java
-            )
+            val pendingResponse =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/pending",
+                    String::class.java,
+                )
             val pendingJson = objectMapper.readTree(pendingResponse.body)
             pendingJson.size() shouldBe 1
         }
@@ -109,17 +111,21 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             val characterName = "E2EFullChar"
             val characterRealm = "TestRealm"
 
-            val submitResponse = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                createSubmitRequest(characterRealm),
-                String::class.java
-            )
+            val submitResponse =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    createSubmitRequest(characterRealm),
+                    String::class.java,
+                )
             submitResponse.statusCode shouldBe HttpStatus.ACCEPTED
 
             // Step 2: Simulate completed simulation by inserting results
-            val profileId = simulationRepository.findProfileIdByCharacter(
-                guildId, characterName, characterRealm
-            )!!
+            val profileId =
+                simulationRepository.findProfileIdByCharacter(
+                    guildId,
+                    characterName,
+                    characterRealm,
+                )!!
 
             simulationRepository.saveResult(
                 profileId,
@@ -129,15 +135,16 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                     slot = "main_hand",
                     dpsGain = 5000.0,
                     percentGain = 5.0,
-                    simulatedAt = Instant.now()
-                )
+                    simulatedAt = Instant.now(),
+                ),
             )
 
             // Step 3: Retrieve results via HTTP
-            val resultsResponse = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
-                String::class.java
-            )
+            val resultsResponse =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
+                    String::class.java,
+                )
             resultsResponse.statusCode shouldBe HttpStatus.OK
 
             val resultsJson = objectMapper.readTree(resultsResponse.body)
@@ -161,12 +168,15 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                 characterName = characterName,
                 characterRealm = characterRealm,
                 characterClass = "warrior",
-                characterSpec = "fury"
+                characterSpec = "fury",
             )
 
-            val profileId = simulationRepository.findProfileIdByCharacter(
-                guildId, characterName, characterRealm
-            )!!
+            val profileId =
+                simulationRepository.findProfileIdByCharacter(
+                    guildId,
+                    characterName,
+                    characterRealm,
+                )!!
 
             // Add simulation result with 5% upgrade
             simulationRepository.saveResult(
@@ -176,22 +186,23 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                     itemName = "FLPS Test Item",
                     slot = "chest",
                     dpsGain = 5000.0,
-                    percentGain = 5.0,  // 5% should normalize to 0.5
-                    simulatedAt = Instant.now()
-                )
+                    percentGain = 5.0, // 5% should normalize to 0.5
+                    simulatedAt = Instant.now(),
+                ),
             )
 
             // When - calculate UV using UpgradeValueCalculator
-            val uv = upgradeValueCalculator.calculateUpgradeValue(
-                guildId = guildId,
-                characterName = characterName,
-                characterRealm = characterRealm,
-                itemId = ItemId(54321L),
-                wishlistFallback = null
-            )
+            val uv =
+                upgradeValueCalculator.calculateUpgradeValue(
+                    guildId = guildId,
+                    characterName = characterName,
+                    characterRealm = characterRealm,
+                    itemId = ItemId(54321L),
+                    wishlistFallback = null,
+                )
 
             // Then
-            uv.value shouldBe 0.5  // 5% / 10% max = 0.5
+            uv.value shouldBe 0.5 // 5% / 10% max = 0.5
         }
 
         @Test
@@ -206,21 +217,27 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                 characterName = characterName,
                 characterRealm = characterRealm,
                 characterClass = "mage",
-                characterSpec = "fire"
+                characterSpec = "fire",
             )
 
             // When - check availability
-            val hasDataBefore = upgradeValueCalculator.hasSimulationData(
-                guildId, characterName, characterRealm
-            )
+            val hasDataBefore =
+                upgradeValueCalculator.hasSimulationData(
+                    guildId,
+                    characterName,
+                    characterRealm,
+                )
 
             // Then - no results yet
             hasDataBefore shouldBe false
 
             // When - add results
-            val profileId = simulationRepository.findProfileIdByCharacter(
-                guildId, characterName, characterRealm
-            )!!
+            val profileId =
+                simulationRepository.findProfileIdByCharacter(
+                    guildId,
+                    characterName,
+                    characterRealm,
+                )!!
             simulationRepository.saveResult(
                 profileId,
                 SimulationResult.create(
@@ -229,13 +246,16 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                     slot = "head",
                     dpsGain = 1000.0,
                     percentGain = 1.0,
-                    simulatedAt = Instant.now()
-                )
+                    simulatedAt = Instant.now(),
+                ),
             )
 
-            val hasDataAfter = upgradeValueCalculator.hasSimulationData(
-                guildId, characterName, characterRealm
-            )
+            val hasDataAfter =
+                upgradeValueCalculator.hasSimulationData(
+                    guildId,
+                    characterName,
+                    characterRealm,
+                )
 
             // Then
             hasDataAfter shouldBe true
@@ -248,34 +268,39 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
         fun `should handle multiple characters in same guild independently`() {
             // Given
             val guildId = "multi-char-guild"
-            val chars = listOf(
-                Triple("Tank1", "warrior", "protection"),
-                Triple("Healer1", "priest", "holy"),
-                Triple("DPS1", "mage", "fire")
-            )
+            val chars =
+                listOf(
+                    Triple("Tank1", "warrior", "protection"),
+                    Triple("Healer1", "priest", "holy"),
+                    Triple("DPS1", "mage", "fire"),
+                )
 
             // When - submit simulations for all characters
             chars.forEach { (name, clazz, spec) ->
                 restTemplate.postForEntity(
                     "/api/v1/simulation/guilds/$guildId/characters/$name",
                     createSubmitRequest(characterClass = clazz, characterSpec = spec),
-                    String::class.java
+                    String::class.java,
                 )
             }
 
             // Then - all should be pending
-            val pendingResponse = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/pending",
-                String::class.java
-            )
+            val pendingResponse =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/pending",
+                    String::class.java,
+                )
             val pendingJson = objectMapper.readTree(pendingResponse.body)
             pendingJson.size() shouldBe 3
 
             // And - each character has separate profile
             chars.forEach { (name, _, _) ->
-                val profile = simulationRepository.findProfileByCharacter(
-                    guildId, name, "TestRealm"
-                )
+                val profile =
+                    simulationRepository.findProfileByCharacter(
+                        guildId,
+                        name,
+                        "TestRealm",
+                    )
                 profile shouldNotBe null
             }
         }
@@ -293,7 +318,7 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
                     characterName = charName,
                     characterRealm = "TestRealm",
                     characterClass = "warrior",
-                    characterSpec = "fury"
+                    characterSpec = "fury",
                 )
             }
 
@@ -303,11 +328,11 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
 
             simulationRepository.saveResult(
                 profile1Id,
-                SimulationResult.create(11111L, "Item1", "head", 1000.0, 1.0, Instant.now())
+                SimulationResult.create(11111L, "Item1", "head", 1000.0, 1.0, Instant.now()),
             )
             simulationRepository.saveResult(
                 profile2Id,
-                SimulationResult.create(22222L, "Item2", "chest", 2000.0, 2.0, Instant.now())
+                SimulationResult.create(22222L, "Item2", "chest", 2000.0, 2.0, Instant.now()),
             )
 
             // When
@@ -330,29 +355,31 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             // Given
             val guild1 = "isolation-guild-A"
             val guild2 = "isolation-guild-B"
-            val characterName = "SharedCharName"  // Same name, different guilds
+            val characterName = "SharedCharName" // Same name, different guilds
 
             // When - submit to both guilds
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guild1/characters/$characterName",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guild2/characters/$characterName",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
 
             // Then - each guild sees only its own pending
-            val pending1 = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guild1/pending",
-                String::class.java
-            )
-            val pending2 = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guild2/pending",
-                String::class.java
-            )
+            val pending1 =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guild1/pending",
+                    String::class.java,
+                )
+            val pending2 =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guild2/pending",
+                    String::class.java,
+                )
 
             val pending1Json = objectMapper.readTree(pending1.body)
             val pending2Json = objectMapper.readTree(pending2.body)
@@ -373,10 +400,11 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             val guildId = "status-workflow-guild"
 
             // Check initial status
-            val initialStatus = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                String::class.java
-            )
+            val initialStatus =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    String::class.java,
+                )
             val initialJson = objectMapper.readTree(initialStatus.body)
             val initialPending = initialJson.get("pendingSimulations").asInt()
 
@@ -384,19 +412,20 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/StatusChar1",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/StatusChar2",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
 
             // Then - status shows increased count
-            val updatedStatus = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                String::class.java
-            )
+            val updatedStatus =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    String::class.java,
+                )
             val updatedJson = objectMapper.readTree(updatedStatus.body)
             val updatedPending = updatedJson.get("pendingSimulations").asInt()
 
@@ -413,38 +442,42 @@ class SimulationE2EWorkflowTest : IntegrationTest() {
             val characterName = "DuplicateChar"
 
             // When - submit twice
-            val response1 = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                createSubmitRequest(),
-                String::class.java
-            )
-            val response2 = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                createSubmitRequest(),
-                String::class.java
-            )
+            val response1 =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
+            val response2 =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
 
             // Then - both succeed
             response1.statusCode shouldBe HttpStatus.ACCEPTED
             response2.statusCode shouldBe HttpStatus.ACCEPTED
 
             // And - profile is reused
-            val profileCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
-                Long::class.java,
-                guildId,
-                characterName
-            )
+            val profileCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
+                    Long::class.java,
+                    guildId,
+                    characterName,
+                )
             profileCount shouldBe 1L
         }
 
         @Test
         fun `should return empty results for nonexistent character without error`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/nonexistent-guild/characters/NonexistentChar/realms/TestRealm/results",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/nonexistent-guild/characters/NonexistentChar/realms/TestRealm/results",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK

@@ -48,21 +48,18 @@ describe('auth store', () => {
 
   it('should return true for isAdmin when user is ADMIN', () => {
     const store = useAuthStore()
-    // @ts-expect-error - directly setting for test
     store.user = { id: 1, username: 'admin', role: 'ADMIN', linkedCharacters: [] }
     expect(store.isAdmin).toBe(true)
   })
 
   it('should return true for isAdmin when user is OFFICER', () => {
     const store = useAuthStore()
-    // @ts-expect-error - directly setting for test
     store.user = { id: 1, username: 'officer', role: 'OFFICER', linkedCharacters: [] }
     expect(store.isAdmin).toBe(true)
   })
 
   it('should return false for isAdmin when user is RAIDER', () => {
     const store = useAuthStore()
-    // @ts-expect-error - directly setting for test
     store.user = { id: 1, username: 'raider', role: 'RAIDER', linkedCharacters: [] }
     expect(store.isAdmin).toBe(false)
   })
@@ -70,7 +67,6 @@ describe('auth store', () => {
   it('should be authenticated when user and token exist', () => {
     const store = useAuthStore()
     store.setToken('test-token')
-    // @ts-expect-error - directly setting for test
     store.user = { id: 1, username: 'test', role: 'RAIDER', linkedCharacters: [] }
 
     expect(store.isAuthenticated).toBe(true)

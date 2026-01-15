@@ -24,7 +24,7 @@ describe('useCanvasEditor', () => {
       },
     ],
     visibility: 'GUILD',
-    shareToken: null,
+    shareToken: undefined,
     createdBy: 1,
     createdAt: '2026-01-15T10:00:00Z',
     updatedAt: '2026-01-15T12:00:00Z',

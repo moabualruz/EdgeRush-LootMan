@@ -2,12 +2,8 @@ package com.edgerush.lootman.api.discord
 
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.api.common.PageRequest
-import com.edgerush.lootman.domain.discord.model.DiscordUserLink
-import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.shared.DiscordUserLinkAlreadyExistsException
 import com.edgerush.lootman.domain.shared.DiscordUserLinkNotFoundException
-import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.infrastructure.discord.InMemoryDiscordUserLinkRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -16,7 +12,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 /**
  * Unit tests for DiscordUserLinkCrudServiceImpl.
@@ -24,7 +19,6 @@ import java.time.Instant
  * Uses InMemoryDiscordUserLinkRepository for fast, isolated tests.
  */
 class DiscordUserLinkCrudServiceImplTest : UnitTest() {
-
     private lateinit var repository: InMemoryDiscordUserLinkRepository
     private lateinit var service: DiscordUserLinkCrudServiceImpl
 
@@ -41,16 +35,16 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class Create {
-
         @Test
         fun `should create a new link`() {
             // Arrange
-            val request = CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = false,
-                linkedBy = "test-user"
-            )
+            val request =
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId1,
+                    isPrimary = false,
+                    linkedBy = "test-user",
+                )
 
             // Act
             val response = service.create(request)
@@ -64,11 +58,12 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
         @Test
         fun `should make first link primary automatically`() {
             // Arrange
-            val request = CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = false
-            )
+            val request =
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId1,
+                    isPrimary = false,
+                )
 
             // Act
             val response = service.create(request)
@@ -81,11 +76,12 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
         fun `should not make second link primary automatically`() {
             // Arrange
             service.create(CreateDiscordUserLinkRequest(discordUserId = discordUserId1, raiderId = raiderId1))
-            val request = CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2,
-                isPrimary = false
-            )
+            val request =
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId2,
+                    isPrimary = false,
+                )
 
             // Act
             val response = service.create(request)
@@ -97,18 +93,23 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
         @Test
         fun `should clear existing primary when creating new primary link`() {
             // Arrange
-            val firstLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = true
-            ))
+            val firstLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId1,
+                        isPrimary = true,
+                    ),
+                )
 
             // Act
-            service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2,
-                isPrimary = true
-            ))
+            service.create(
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId2,
+                    isPrimary = true,
+                ),
+            )
 
             // Assert
             val updatedFirstLink = service.findById(firstLink.id)
@@ -130,14 +131,16 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindById {
-
         @Test
         fun `should find existing link`() {
             // Arrange
-            val created = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1
-            ))
+            val created =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId1,
+                    ),
+                )
 
             // Act
             val found = service.findById(created.id)
@@ -158,7 +161,6 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindAll {
-
         @Test
         fun `should return paginated results`() {
             // Arrange
@@ -191,15 +193,17 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class Update {
-
         @Test
         fun `should update link to primary`() {
             // Arrange
             service.create(CreateDiscordUserLinkRequest(discordUserId = discordUserId1, raiderId = raiderId1))
-            val secondLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2
-            ))
+            val secondLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId2,
+                    ),
+                )
 
             // Act
             val updated = service.update(secondLink.id, UpdateDiscordUserLinkRequest(isPrimary = true))
@@ -211,15 +215,21 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
         @Test
         fun `should clear other primary when updating to primary`() {
             // Arrange
-            val firstLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = true
-            ))
-            val secondLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2
-            ))
+            val firstLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId1,
+                        isPrimary = true,
+                    ),
+                )
+            val secondLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId2,
+                    ),
+                )
 
             // Act
             service.update(secondLink.id, UpdateDiscordUserLinkRequest(isPrimary = true))
@@ -240,14 +250,16 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class Delete {
-
         @Test
         fun `should delete existing link`() {
             // Arrange
-            val created = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1
-            ))
+            val created =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId1,
+                    ),
+                )
 
             // Act
             service.delete(created.id)
@@ -259,15 +271,21 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
         @Test
         fun `should promote another link to primary when deleting primary`() {
             // Arrange
-            val primaryLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = true
-            ))
-            val secondLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2
-            ))
+            val primaryLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId1,
+                        isPrimary = true,
+                    ),
+                )
+            val secondLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId2,
+                    ),
+                )
 
             // Act
             service.delete(primaryLink.id)
@@ -288,7 +306,6 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByDiscordUserId {
-
         @Test
         fun `should find all links for Discord user`() {
             // Arrange
@@ -316,15 +333,16 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindPrimaryByDiscordUserId {
-
         @Test
         fun `should find primary link`() {
             // Arrange
-            service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = true
-            ))
+            service.create(
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId1,
+                    isPrimary = true,
+                ),
+            )
 
             // Act
             val primary = service.findPrimaryByDiscordUserId(discordUserId1)
@@ -345,7 +363,6 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderId {
-
         @Test
         fun `should find all links for raider`() {
             // Arrange
@@ -363,19 +380,23 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class SetPrimary {
-
         @Test
         fun `should set link as primary`() {
             // Arrange
-            service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId1,
-                isPrimary = true
-            ))
-            val secondLink = service.create(CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId1,
-                raiderId = raiderId2
-            ))
+            service.create(
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId1,
+                    raiderId = raiderId1,
+                    isPrimary = true,
+                ),
+            )
+            val secondLink =
+                service.create(
+                    CreateDiscordUserLinkRequest(
+                        discordUserId = discordUserId1,
+                        raiderId = raiderId2,
+                    ),
+                )
 
             // Act
             val updated = service.setPrimary(secondLink.id)
@@ -395,7 +416,6 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class DeleteByDiscordUserId {
-
         @Test
         fun `should delete all links for Discord user`() {
             // Arrange
@@ -415,7 +435,6 @@ class DiscordUserLinkCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class CountByDiscordUserId {
-
         @Test
         fun `should count links for Discord user`() {
             // Arrange

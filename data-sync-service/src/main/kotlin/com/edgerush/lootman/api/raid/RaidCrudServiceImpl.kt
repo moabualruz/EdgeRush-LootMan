@@ -17,7 +17,6 @@ import java.time.OffsetDateTime
 class RaidCrudServiceImpl(
     private val raidRepository: RaidRepository,
 ) : RaidCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<RaidResponse> {
         val raids = raidRepository.findAll(pageRequest.offset, pageRequest.size)
         val total = raidRepository.count()
@@ -29,58 +28,65 @@ class RaidCrudServiceImpl(
     }
 
     override fun findById(id: Long): RaidResponse {
-        val raid = raidRepository.findById(id)
-            ?: throw NoSuchElementException("Raid not found with id: $id")
+        val raid =
+            raidRepository.findById(id)
+                ?: throw NoSuchElementException("Raid not found with id: $id")
         return RaidResponse.from(raid)
     }
 
     override fun create(request: CreateRaidRequest): RaidResponse {
         val now = OffsetDateTime.now()
-        val entity = RaidEntity(
-            raidId = generateRaidId(),
-            date = request.date,
-            startTime = request.startTime,
-            endTime = request.endTime,
-            instance = request.instance,
-            difficulty = request.difficulty,
-            optional = request.optional,
-            status = request.status,
-            presentSize = null,
-            totalSize = request.totalSize,
-            notes = request.notes,
-            selectionsImage = request.selectionsImage,
-            teamId = request.teamId,
-            seasonId = request.seasonId,
-            periodId = request.periodId,
-            createdAt = now,
-            updatedAt = now,
-            syncedAt = now,
-        )
+        val entity =
+            RaidEntity(
+                raidId = generateRaidId(),
+                date = request.date,
+                startTime = request.startTime,
+                endTime = request.endTime,
+                instance = request.instance,
+                difficulty = request.difficulty,
+                optional = request.optional,
+                status = request.status,
+                presentSize = null,
+                totalSize = request.totalSize,
+                notes = request.notes,
+                selectionsImage = request.selectionsImage,
+                teamId = request.teamId,
+                seasonId = request.seasonId,
+                periodId = request.periodId,
+                createdAt = now,
+                updatedAt = now,
+                syncedAt = now,
+            )
         val saved = raidRepository.save(entity)
         return RaidResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateRaidRequest): RaidResponse {
-        val existing = raidRepository.findById(id)
-            ?: throw NoSuchElementException("Raid not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateRaidRequest,
+    ): RaidResponse {
+        val existing =
+            raidRepository.findById(id)
+                ?: throw NoSuchElementException("Raid not found with id: $id")
 
-        val updated = existing.copy(
-            date = request.date ?: existing.date,
-            startTime = request.startTime ?: existing.startTime,
-            endTime = request.endTime ?: existing.endTime,
-            instance = request.instance ?: existing.instance,
-            difficulty = request.difficulty ?: existing.difficulty,
-            optional = request.optional ?: existing.optional,
-            status = request.status ?: existing.status,
-            presentSize = request.presentSize ?: existing.presentSize,
-            totalSize = request.totalSize ?: existing.totalSize,
-            notes = request.notes ?: existing.notes,
-            selectionsImage = request.selectionsImage ?: existing.selectionsImage,
-            teamId = request.teamId ?: existing.teamId,
-            seasonId = request.seasonId ?: existing.seasonId,
-            periodId = request.periodId ?: existing.periodId,
-            updatedAt = OffsetDateTime.now(),
-        )
+        val updated =
+            existing.copy(
+                date = request.date ?: existing.date,
+                startTime = request.startTime ?: existing.startTime,
+                endTime = request.endTime ?: existing.endTime,
+                instance = request.instance ?: existing.instance,
+                difficulty = request.difficulty ?: existing.difficulty,
+                optional = request.optional ?: existing.optional,
+                status = request.status ?: existing.status,
+                presentSize = request.presentSize ?: existing.presentSize,
+                totalSize = request.totalSize ?: existing.totalSize,
+                notes = request.notes ?: existing.notes,
+                selectionsImage = request.selectionsImage ?: existing.selectionsImage,
+                teamId = request.teamId ?: existing.teamId,
+                seasonId = request.seasonId ?: existing.seasonId,
+                periodId = request.periodId ?: existing.periodId,
+                updatedAt = OffsetDateTime.now(),
+            )
 
         val saved = raidRepository.save(updated)
         return RaidResponse.from(saved)
@@ -93,10 +99,12 @@ class RaidCrudServiceImpl(
         raidRepository.delete(id)
     }
 
-    override fun existsById(id: Long): Boolean =
-        raidRepository.existsById(id)
+    override fun existsById(id: Long): Boolean = raidRepository.existsById(id)
 
-    override fun findByTeam(teamId: Long, pageRequest: PageRequest): PagedResponse<RaidResponse> {
+    override fun findByTeam(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidResponse> {
         val raids = raidRepository.findByTeamId(teamId, pageRequest.offset, pageRequest.size)
         val total = raidRepository.countByTeamId(teamId)
         return PagedResponse.of(
@@ -120,14 +128,17 @@ class RaidCrudServiceImpl(
         )
     }
 
-    override fun countByTeam(teamId: Long): Long =
-        raidRepository.countByTeamId(teamId)
+    override fun countByTeam(teamId: Long): Long = raidRepository.countByTeamId(teamId)
 
-    override fun findUpcomingByGuild(guildId: Long, limit: Int): List<RaidResponse> =
-        raidRepository.findUpcomingByGuildId(guildId, limit).map { RaidResponse.from(it) }
+    override fun findUpcomingByGuild(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidResponse> = raidRepository.findUpcomingByGuildId(guildId, limit).map { RaidResponse.from(it) }
 
-    override fun findPastByGuild(guildId: Long, limit: Int): List<RaidResponse> =
-        raidRepository.findPastByGuildId(guildId, limit).map { RaidResponse.from(it) }
+    override fun findPastByGuild(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidResponse> = raidRepository.findPastByGuildId(guildId, limit).map { RaidResponse.from(it) }
 
     private fun generateRaidId(): Long {
         // Generate a unique ID based on current timestamp

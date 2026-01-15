@@ -17,15 +17,15 @@ import java.sql.Statement
 class JdbcRaidSignupRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : RaidSignupRepository {
-
     override fun findById(id: Long): RaidSignupEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, raid_id, character_id, character_name, character_realm,
                    character_region, character_class, character_role, character_guest,
                    status, comment, selected
             FROM raid_signups
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, signupRowMapper, id)
         return results.firstOrNull()
@@ -37,15 +37,19 @@ class JdbcRaidSignupRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<RaidSignupEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity> {
+        val sql =
+            """
             SELECT id, raid_id, character_id, character_name, character_realm,
                    character_region, character_class, character_role, character_guest,
                    status, comment, selected
             FROM raid_signups
             ORDER BY raid_id, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, signupRowMapper, limit, offset)
     }
@@ -55,8 +59,13 @@ class JdbcRaidSignupRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidSignupEntity> {
-        val sql = """
+    override fun findByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity> {
+        val sql =
+            """
             SELECT id, raid_id, character_id, character_name, character_realm,
                    character_region, character_class, character_role, character_guest,
                    status, comment, selected
@@ -64,7 +73,7 @@ class JdbcRaidSignupRepository(
             WHERE raid_id = ?
             ORDER BY character_name, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, signupRowMapper, raidId, limit, offset)
     }
@@ -74,8 +83,13 @@ class JdbcRaidSignupRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, raidId) ?: 0L
     }
 
-    override fun findSelectedByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidSignupEntity> {
-        val sql = """
+    override fun findSelectedByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity> {
+        val sql =
+            """
             SELECT id, raid_id, character_id, character_name, character_realm,
                    character_region, character_class, character_role, character_guest,
                    status, comment, selected
@@ -83,7 +97,7 @@ class JdbcRaidSignupRepository(
             WHERE raid_id = ? AND selected = true
             ORDER BY character_name, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, signupRowMapper, raidId, limit, offset)
     }
@@ -93,8 +107,13 @@ class JdbcRaidSignupRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, raidId) ?: 0L
     }
 
-    override fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<RaidSignupEntity> {
-        val sql = """
+    override fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity> {
+        val sql =
+            """
             SELECT id, raid_id, character_id, character_name, character_realm,
                    character_region, character_class, character_role, character_guest,
                    status, comment, selected
@@ -102,7 +121,7 @@ class JdbcRaidSignupRepository(
             WHERE character_id = ?
             ORDER BY raid_id DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, signupRowMapper, characterId, limit, offset)
     }
@@ -127,13 +146,14 @@ class JdbcRaidSignupRepository(
     }
 
     private fun insertSignup(signup: RaidSignupEntity): RaidSignupEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raid_signups (
                 raid_id, character_id, character_name, character_realm,
                 character_region, character_class, character_role, character_guest,
                 status, comment, selected
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -157,7 +177,8 @@ class JdbcRaidSignupRepository(
     }
 
     private fun updateSignup(signup: RaidSignupEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE raid_signups SET
                 raid_id = ?,
                 character_id = ?,
@@ -171,7 +192,7 @@ class JdbcRaidSignupRepository(
                 comment = ?,
                 selected = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -190,29 +211,30 @@ class JdbcRaidSignupRepository(
         )
     }
 
-    private val signupRowMapper = RowMapper { rs, _ ->
-        val characterIdValue = rs.getLong("character_id")
-        val characterId = if (rs.wasNull()) null else characterIdValue
+    private val signupRowMapper =
+        RowMapper { rs, _ ->
+            val characterIdValue = rs.getLong("character_id")
+            val characterId = if (rs.wasNull()) null else characterIdValue
 
-        val characterGuestValue = rs.getBoolean("character_guest")
-        val characterGuest = if (rs.wasNull()) null else characterGuestValue
+            val characterGuestValue = rs.getBoolean("character_guest")
+            val characterGuest = if (rs.wasNull()) null else characterGuestValue
 
-        val selectedValue = rs.getBoolean("selected")
-        val selected = if (rs.wasNull()) null else selectedValue
+            val selectedValue = rs.getBoolean("selected")
+            val selected = if (rs.wasNull()) null else selectedValue
 
-        RaidSignupEntity(
-            id = rs.getLong("id"),
-            raidId = rs.getLong("raid_id"),
-            characterId = characterId,
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            characterRegion = rs.getString("character_region"),
-            characterClass = rs.getString("character_class"),
-            characterRole = rs.getString("character_role"),
-            characterGuest = characterGuest,
-            status = rs.getString("status"),
-            comment = rs.getString("comment"),
-            selected = selected,
-        )
-    }
+            RaidSignupEntity(
+                id = rs.getLong("id"),
+                raidId = rs.getLong("raid_id"),
+                characterId = characterId,
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                characterRegion = rs.getString("character_region"),
+                characterClass = rs.getString("character_class"),
+                characterRole = rs.getString("character_role"),
+                characterGuest = characterGuest,
+                status = rs.getString("status"),
+                comment = rs.getString("comment"),
+                selected = selected,
+            )
+        }
 }

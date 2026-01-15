@@ -19,7 +19,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
-import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -31,7 +30,6 @@ import java.time.LocalDateTime
  * Each test verifies a single behavior using the Arrange-Act-Assert pattern.
  */
 class RaiderQueryResolverTest : UnitTest() {
-
     @MockK
     private lateinit var getRaiderUseCase: GetRaiderUseCase
 
@@ -43,7 +41,6 @@ class RaiderQueryResolverTest : UnitTest() {
 
     @Nested
     inner class RaiderByIdQuery {
-
         @Test
         fun `should return raider when found by id`() {
             // Arrange
@@ -82,24 +79,25 @@ class RaiderQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database error"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.raider(id = "123")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.raider(id = "123")
+                }
             exception.message shouldBe "Database error"
         }
     }
 
     @Nested
     inner class RaidersByGuildQuery {
-
         @Test
         fun `should return list of raiders for guild`() {
             // Arrange
-            val raiders = listOf(
-                createTestRaider(id = 1L, name = "Raider1"),
-                createTestRaider(id = 2L, name = "Raider2"),
-                createTestRaider(id = 3L, name = "Raider3"),
-            )
+            val raiders =
+                listOf(
+                    createTestRaider(id = 1L, name = "Raider1"),
+                    createTestRaider(id = 2L, name = "Raider2"),
+                    createTestRaider(id = 3L, name = "Raider3"),
+                )
             val querySlot = slot<ListRaidersByGuildQuery>()
             every { listRaidersUseCase.executeByGuild(capture(querySlot)) } returns Result.success(raiders)
 
@@ -133,27 +131,28 @@ class RaiderQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database connection failed"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.raiders(guildId = "test-guild")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.raiders(guildId = "test-guild")
+                }
             exception.message shouldBe "Database connection failed"
         }
     }
 
     @Nested
     inner class RaiderTypeConversion {
-
         @Test
         fun `should correctly convert all raider fields`() {
             // Arrange
-            val raider = createTestRaider(
-                id = 42L,
-                name = "Arthas",
-                realm = "Frostmourne",
-                characterClass = CharacterClass.DEATH_KNIGHT,
-                role = Role.TANK,
-                status = RaiderStatus.ACTIVE,
-            )
+            val raider =
+                createTestRaider(
+                    id = 42L,
+                    name = "Arthas",
+                    realm = "Frostmourne",
+                    characterClass = CharacterClass.DEATH_KNIGHT,
+                    role = Role.TANK,
+                    status = RaiderStatus.ACTIVE,
+                )
             every { getRaiderUseCase.execute(any()) } returns Result.success(raider)
 
             // Act
@@ -195,16 +194,17 @@ class RaiderQueryResolverTest : UnitTest() {
         characterClass: CharacterClass = CharacterClass.WARRIOR,
         role: Role = Role.DPS,
         status: RaiderStatus = RaiderStatus.ACTIVE,
-    ): Raider = Raider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        characterName = name,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = "Raider",
-        status = status,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        Raider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            characterName = name,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = "Raider",
+            status = status,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 }

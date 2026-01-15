@@ -17,7 +17,6 @@ import java.time.Instant
 class PenaltySubscriptionResolver(
     private val penaltyEventPublisher: PenaltyEventPublisher,
 ) : Subscription {
-
     /**
      * Subscribe to penalty applied events for a guild.
      *
@@ -109,7 +108,7 @@ class PenaltyEventPublisher {
                 reason = reason,
                 points = points,
                 appliedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -134,7 +133,7 @@ class PenaltyEventPublisher {
                 raiderId = raiderId,
                 penaltyId = penaltyId,
                 removedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -163,7 +162,7 @@ class PenaltyEventPublisher {
                 reason = reason,
                 expiresAt = expiresAt,
                 appliedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -188,7 +187,7 @@ class PenaltyEventPublisher {
                 raiderId = raiderId,
                 banId = banId,
                 liftedAt = Instant.now(),
-            )
+            ),
         )
     }
 }

@@ -19,46 +19,49 @@ import java.sql.Timestamp
  */
 @Repository
 class JdbcUserRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : UserRepository {
-
     override fun findById(id: UserId): User? {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, id.value).firstOrNull()
     }
 
     override fun findByDiscordId(discordId: String): User? {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE discord_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, discordId).firstOrNull()
     }
 
     override fun findByBattlenetId(battlenetId: String): User? {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE battlenet_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, battlenetId).firstOrNull()
     }
 
     override fun findByGuildId(guildId: GuildId): List<User> {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
             FROM users
             WHERE guild_id = ?
             ORDER BY username ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value)
     }
@@ -72,10 +75,11 @@ class JdbcUserRepository(
     }
 
     private fun insert(user: User): User {
-        val sql = """
+        val sql =
+            """
             INSERT INTO users (discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
 
@@ -93,18 +97,20 @@ class JdbcUserRepository(
             ps
         }, keyHolder)
 
-        val generatedId = keyHolder.keys?.get("id") as? Long
-            ?: throw IllegalStateException("Failed to retrieve generated ID for user")
+        val generatedId =
+            keyHolder.keys?.get("id") as? Long
+                ?: throw IllegalStateException("Failed to retrieve generated ID for user")
 
         return user.withId(UserId(generatedId))
     }
 
     private fun update(user: User): User {
-        val sql = """
+        val sql =
+            """
             UPDATE users
             SET discord_id = ?, battlenet_id = ?, username = ?, email = ?, avatar_url = ?, role = ?, guild_id = ?, last_login = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -116,7 +122,7 @@ class JdbcUserRepository(
             user.role.name,
             user.guildId?.value,
             user.lastLogin?.let { Timestamp.from(it) },
-            user.id!!.value
+            user.id!!.value,
         )
 
         return user
@@ -139,13 +145,17 @@ class JdbcUserRepository(
         return (count ?: 0) > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<User> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<User> {
+        val sql =
+            """
             SELECT id, discord_id, battlenet_id, username, email, avatar_url, role, guild_id, created_at, last_login
             FROM users
             ORDER BY id ASC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, limit, offset)
     }
@@ -155,18 +165,19 @@ class JdbcUserRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        User(
-            id = UserId(rs.getLong("id")),
-            discordId = rs.getString("discord_id"),
-            battlenetId = rs.getString("battlenet_id"),
-            username = rs.getString("username"),
-            email = rs.getString("email"),
-            avatarUrl = rs.getString("avatar_url"),
-            role = UserRole.fromString(rs.getString("role")),
-            guildId = rs.getString("guild_id")?.let { GuildId(it) },
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            lastLogin = rs.getTimestamp("last_login")?.toInstant()
-        )
-    }
+    private val rowMapper =
+        RowMapper { rs, _ ->
+            User(
+                id = UserId(rs.getLong("id")),
+                discordId = rs.getString("discord_id"),
+                battlenetId = rs.getString("battlenet_id"),
+                username = rs.getString("username"),
+                email = rs.getString("email"),
+                avatarUrl = rs.getString("avatar_url"),
+                role = UserRole.fromString(rs.getString("role")),
+                guildId = rs.getString("guild_id")?.let { GuildId(it) },
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                lastLogin = rs.getTimestamp("last_login")?.toInstant(),
+            )
+        }
 }

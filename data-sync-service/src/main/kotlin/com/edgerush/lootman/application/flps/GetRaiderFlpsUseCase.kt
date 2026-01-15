@@ -23,39 +23,42 @@ class GetRaiderFlpsUseCase(
      * @param query The query with raider, guild, and item identifiers
      * @return Result containing the FLPS calculation or error
      */
-    fun execute(query: GetRaiderFlpsQuery): Result<FlpsCalculationResult> = runCatching {
-        // Assemble all raider data from the database
-        val allRaiderData = flpsDataAssembler.assembleFlpsData(query.guildId)
+    fun execute(query: GetRaiderFlpsQuery): Result<FlpsCalculationResult> =
+        runCatching {
+            // Assemble all raider data from the database
+            val allRaiderData = flpsDataAssembler.assembleFlpsData(query.guildId)
 
-        // Find the specific raider
-        val raiderData = allRaiderData.find { it.raider.id == query.raiderId }
-            ?: throw NoSuchElementException("Raider not found with id: ${query.raiderId.value}")
+            // Find the specific raider
+            val raiderData =
+                allRaiderData.find { it.raider.id == query.raiderId }
+                    ?: throw NoSuchElementException("Raider not found with id: ${query.raiderId.value}")
 
-        // Calculate all component scores
-        val acs = componentCalculator.calculateACS(raiderData.attendance)
-        val mas = componentCalculator.calculateMAS()
-        val eps = componentCalculator.calculateEPS(raiderData.gear)
-        val uv = componentCalculator.calculateUV(raiderData.wishlist, query.itemId)
-        val tb = componentCalculator.calculateTierBonus(raiderData.gear)
-        val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
-        val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
+            // Calculate all component scores
+            val acs = componentCalculator.calculateACS(raiderData.attendance)
+            val mas = componentCalculator.calculateMAS()
+            val eps = componentCalculator.calculateEPS(raiderData.gear)
+            val uv = componentCalculator.calculateUV(raiderData.wishlist, query.itemId)
+            val tb = componentCalculator.calculateTierBonus(raiderData.gear)
+            val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
+            val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
 
-        // Create command and calculate FLPS
-        val command = CalculateFlpsScoreCommand(
-            guildId = query.guildId,
-            raiderId = query.raiderId,
-            itemId = query.itemId,
-            acs = acs,
-            mas = mas,
-            eps = eps,
-            uv = uv,
-            tb = tb,
-            rm = rm,
-            rdf = rdf,
-        )
+            // Create command and calculate FLPS
+            val command =
+                CalculateFlpsScoreCommand(
+                    guildId = query.guildId,
+                    raiderId = query.raiderId,
+                    itemId = query.itemId,
+                    acs = acs,
+                    mas = mas,
+                    eps = eps,
+                    uv = uv,
+                    tb = tb,
+                    rm = rm,
+                    rdf = rdf,
+                )
 
-        calculateFlpsScoreUseCase.execute(command).getOrThrow()
-    }
+            calculateFlpsScoreUseCase.execute(command).getOrThrow()
+        }
 }
 
 /**

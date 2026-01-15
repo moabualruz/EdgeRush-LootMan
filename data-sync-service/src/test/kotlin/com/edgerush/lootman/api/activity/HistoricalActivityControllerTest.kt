@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 
 class HistoricalActivityControllerTest : UnitTest() {
-
     private lateinit var service: HistoricalActivityCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: HistoricalActivityController
@@ -108,6 +107,6 @@ class HistoricalActivityControllerTest : UnitTest() {
         teamId: Long? = 1L,
         seasonId: Long? = 1L,
         dataJson: String = "{}",
-        syncedAt: OffsetDateTime = OffsetDateTime.now()
+        syncedAt: OffsetDateTime = OffsetDateTime.now(),
     ) = HistoricalActivityResponse(id, characterId, characterName, characterRealm, periodId, teamId, seasonId, dataJson, syncedAt)
 }

@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the raider_renown table.
  */
 class JdbcRaiderRenownRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderRenownRepository
 
@@ -35,7 +34,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return renown when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
@@ -70,7 +68,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,16 +88,17 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    faction = "The Assembly of the Deeps",
-                    level = 25
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        faction = "The Assembly of the Deeps",
+                        level = 25,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -123,16 +122,17 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    faction = "Council of Dornogal",
-                    level = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        faction = "Council of Dornogal",
+                        level = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -147,7 +147,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated renown`() {
             // Given
@@ -159,13 +158,13 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<RaiderRenownEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -179,7 +178,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return renown for raider`() {
             // Given
@@ -191,13 +189,13 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderRenownEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, raiderId, faction = "The Assembly of the Deeps"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, raiderId, faction = "Council of Dornogal"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, raiderId, faction = "Council of Dornogal"), 1),
                 )
             }
 
@@ -220,7 +218,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderRenownEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -234,14 +232,13 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_renown") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -258,7 +255,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -278,7 +275,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") },
                     Long::class.java,
-                    eq(raiderId)
+                    eq(raiderId),
                 )
             } returns 4L
 
@@ -292,7 +289,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when renown exists`() {
             // Given
@@ -302,7 +298,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -322,7 +318,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -342,7 +338,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -356,7 +352,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new renown when id is null`() {
             // Given
@@ -397,7 +392,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -405,7 +400,6 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete renown by id`() {
             // Given
@@ -414,7 +408,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -425,7 +419,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -437,7 +431,7 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         id: Long,
         raiderId: Long,
         faction: String = "The Assembly of the Deeps",
-        level: Int? = 20
+        level: Int? = 20,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -452,11 +446,12 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         id: Long? = 1L,
         raiderId: Long = 100L,
         faction: String = "The Assembly of the Deeps",
-        level: Int? = 20
-    ): RaiderRenownEntity = RaiderRenownEntity(
-        id = id,
-        raiderId = raiderId,
-        faction = faction,
-        level = level
-    )
+        level: Int? = 20,
+    ): RaiderRenownEntity =
+        RaiderRenownEntity(
+            id = id,
+            raiderId = raiderId,
+            faction = faction,
+            level = level,
+        )
 }

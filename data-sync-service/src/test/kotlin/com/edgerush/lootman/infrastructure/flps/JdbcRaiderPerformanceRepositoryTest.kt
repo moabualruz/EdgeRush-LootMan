@@ -27,7 +27,6 @@ import java.time.temporal.ChronoUnit
  * and warcraft_logs_reports tables.
  */
 class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderPerformanceRepository
 
@@ -43,7 +42,6 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderAndPeriodTests {
-
         @Test
         fun `should return performance data when found`() {
             // Given
@@ -56,20 +54,21 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
-                val rs = mockPerformanceResultSet(
-                    raiderId = 100L,
-                    characterName = "TestRaider",
-                    characterRealm = "Area52",
-                    totalDeaths = 5,
-                    totalFights = 20,
-                    avgAvoidableDamage = 12.5,
-                    periodStart = oneWeekAgo,
-                    periodEnd = now
-                )
+                val rs =
+                    mockPerformanceResultSet(
+                        raiderId = 100L,
+                        characterName = "TestRaider",
+                        characterRealm = "Area52",
+                        totalDeaths = 5,
+                        totalFights = 20,
+                        avgAvoidableDamage = 12.5,
+                        periodStart = oneWeekAgo,
+                        periodEnd = now,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -98,7 +97,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } returns emptyList()
 
@@ -121,14 +120,15 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
-                val rs = mockPerformanceResultSet(
-                    totalDeaths = 10,
-                    totalFights = 40
-                )
+                val rs =
+                    mockPerformanceResultSet(
+                        totalDeaths = 10,
+                        totalFights = 40,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -143,7 +143,6 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterAndPeriodTests {
-
         @Test
         fun `should return performance data when character found`() {
             // Given
@@ -158,27 +157,29 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(characterRealm),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
-                val rs = mockPerformanceResultSet(
-                    characterName = characterName,
-                    characterRealm = characterRealm,
-                    totalDeaths = 3,
-                    totalFights = 15
-                )
+                val rs =
+                    mockPerformanceResultSet(
+                        characterName = characterName,
+                        characterRealm = characterRealm,
+                        totalDeaths = 3,
+                        totalFights = 15,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
             // When
-            val result = repository.findByCharacterAndPeriod(
-                characterName,
-                characterRealm,
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    characterName,
+                    characterRealm,
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldNotBe null
@@ -199,18 +200,19 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     any(),
                     any(),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } returns emptyList()
 
             // When
-            val result = repository.findByCharacterAndPeriod(
-                "NonExistent",
-                "Unknown",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "NonExistent",
+                    "Unknown",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -219,7 +221,6 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllByGuildAndPeriodTests {
-
         @Test
         fun `should return all performance data for guild`() {
             // Given
@@ -229,23 +230,23 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderPerformanceData>>(),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
                 listOf(
                     rowMapper.mapRow(
                         mockPerformanceResultSet(raiderId = 1L, characterName = "Raider1"),
-                        0
+                        0,
                     ),
                     rowMapper.mapRow(
                         mockPerformanceResultSet(raiderId = 2L, characterName = "Raider2"),
-                        1
+                        1,
                     ),
                     rowMapper.mapRow(
                         mockPerformanceResultSet(raiderId = 3L, characterName = "Raider3"),
-                        2
-                    )
+                        2,
+                    ),
                 )
             }
 
@@ -266,7 +267,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderPerformanceData>>(),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } returns emptyList()
 
@@ -286,7 +287,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderPerformanceData>>(),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
@@ -294,10 +295,10 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     rowMapper.mapRow(
                         mockPerformanceResultSet(
                             totalDeaths = 15, // Aggregated from multiple fights
-                            totalFights = 50  // Total fight count
+                            totalFights = 50, // Total fight count
                         ),
-                        0
-                    )
+                        0,
+                    ),
                 )
             }
 
@@ -314,7 +315,6 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class EdgeCaseTests {
-
         @Test
         fun `should handle zero fights gracefully`() {
             // Given
@@ -327,14 +327,15 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
-                val rs = mockPerformanceResultSet(
-                    totalDeaths = 0,
-                    totalFights = 0
-                )
+                val rs =
+                    mockPerformanceResultSet(
+                        totalDeaths = 0,
+                        totalFights = 0,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -358,7 +359,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
@@ -395,7 +396,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
@@ -432,7 +433,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
@@ -445,7 +446,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                 every { rs.getDouble("avg_avoidable_damage") } returns 10.0
                 every { rs.wasNull() } returns false
                 every { rs.getTimestamp("period_start") } returns null // Null timestamp - covers elvis branch
-                every { rs.getTimestamp("period_end") } returns null   // Null timestamp - covers elvis branch
+                every { rs.getTimestamp("period_end") } returns null // Null timestamp - covers elvis branch
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -455,7 +456,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
             // Then
             result shouldNotBe null
             result?.periodStart shouldBe oneWeekAgo // Uses provided periodStart
-            result?.periodEnd shouldBe now          // Uses provided periodEnd
+            result?.periodEnd shouldBe now // Uses provided periodEnd
         }
 
         @Test
@@ -470,7 +471,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
                     eq(raiderId.value),
                     eq(guildId.value),
                     any<Timestamp>(),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPerformanceData>>()
@@ -492,7 +493,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
 
             // Then
             result shouldNotBe null
-            result?.characterName shouldBe ""  // Default value for null
+            result?.characterName shouldBe "" // Default value for null
             result?.characterRealm shouldBe "" // Default value for null
         }
     }
@@ -506,7 +507,7 @@ class JdbcRaiderPerformanceRepositoryTest : UnitTest() {
         totalFights: Int = 20,
         avgAvoidableDamage: Double = 10.0,
         periodStart: Instant = oneWeekAgo,
-        periodEnd: Instant = now
+        periodEnd: Instant = now,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("raider_id") } returns raiderId

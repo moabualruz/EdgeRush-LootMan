@@ -12,7 +12,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
@@ -27,7 +26,6 @@ import reactor.core.publisher.Mono
  * (POST, PUT, DELETE) and logs them to the audit log.
  */
 class AuditWebFilterTest : UnitTest() {
-
     private lateinit var auditLogRepository: AuditLogRepository
     private lateinit var filter: AuditWebFilter
     private lateinit var filterChain: WebFilterChain
@@ -44,7 +42,7 @@ class AuditWebFilterTest : UnitTest() {
         method: HttpMethod,
         path: String,
         headers: Map<String, String> = emptyMap(),
-        statusCode: HttpStatus = HttpStatus.OK
+        statusCode: HttpStatus = HttpStatus.OK,
     ): MockServerWebExchange {
         val requestBuilder = MockServerHttpRequest.method(method, path)
         headers.forEach { (key, value) -> requestBuilder.header(key, value) }
@@ -55,21 +53,22 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class WriteOperationCapture {
-
         @Test
         fun `should capture PATCH requests as UPDATE operation`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.PATCH,
-                path = "/api/v1/raiders/123",
-                headers = mapOf(
-                    "X-User-Id" to "user-456",
-                    "X-Username" to "admin",
-                    "X-Admin-Mode" to "true"
-                ),
-                statusCode = HttpStatus.OK
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.PATCH,
+                    path = "/api/v1/raiders/123",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-456",
+                            "X-Username" to "admin",
+                            "X-Admin-Mode" to "true",
+                        ),
+                    statusCode = HttpStatus.OK,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -88,17 +87,19 @@ class AuditWebFilterTest : UnitTest() {
         fun `should capture POST requests as CREATE operation`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false",
-                    "X-Request-Id" to "req-456"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                            "X-Request-Id" to "req-456",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -121,16 +122,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should capture PUT requests as UPDATE operation`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.PUT,
-                path = "/api/v1/raiders/123",
-                headers = mapOf(
-                    "X-User-Id" to "user-456",
-                    "X-Username" to "admin",
-                    "X-Admin-Mode" to "true"
-                ),
-                statusCode = HttpStatus.OK
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.PUT,
+                    path = "/api/v1/raiders/123",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-456",
+                            "X-Username" to "admin",
+                            "X-Admin-Mode" to "true",
+                        ),
+                    statusCode = HttpStatus.OK,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -150,17 +153,19 @@ class AuditWebFilterTest : UnitTest() {
         fun `should capture DELETE requests as DELETE operation`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.DELETE,
-                path = "/api/v1/loot/awards/abc-123",
-                headers = mapOf(
-                    "X-User-Id" to "user-789",
-                    "X-Username" to "moderator",
-                    "X-Admin-Mode" to "false",
-                    "X-Request-Id" to "req-xyz"
-                ),
-                statusCode = HttpStatus.NO_CONTENT
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.DELETE,
+                    path = "/api/v1/loot/awards/abc-123",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-789",
+                            "X-Username" to "moderator",
+                            "X-Admin-Mode" to "false",
+                            "X-Request-Id" to "req-xyz",
+                        ),
+                    statusCode = HttpStatus.NO_CONTENT,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -178,14 +183,14 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class SkipReadOperations {
-
         @Test
         fun `should not capture GET requests`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.GET,
-                path = "/api/v1/guilds"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.GET,
+                    path = "/api/v1/guilds",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -198,10 +203,11 @@ class AuditWebFilterTest : UnitTest() {
         @Test
         fun `should not capture HEAD requests`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.HEAD,
-                path = "/api/v1/health"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.HEAD,
+                    path = "/api/v1/health",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -214,10 +220,11 @@ class AuditWebFilterTest : UnitTest() {
         @Test
         fun `should not capture OPTIONS requests`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.OPTIONS,
-                path = "/api/v1/guilds"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.OPTIONS,
+                    path = "/api/v1/guilds",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -230,14 +237,14 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class SkipNonApiRequests {
-
         @Test
         fun `should not capture actuator endpoints`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/actuator/health"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/actuator/health",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -250,10 +257,11 @@ class AuditWebFilterTest : UnitTest() {
         @Test
         fun `should not capture non-api paths`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/swagger-ui/index.html"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/swagger-ui/index.html",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -266,15 +274,15 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class SkipFailedRequests {
-
         @Test
         fun `should not capture requests with 4xx response status`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                statusCode = HttpStatus.BAD_REQUEST
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    statusCode = HttpStatus.BAD_REQUEST,
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -287,11 +295,12 @@ class AuditWebFilterTest : UnitTest() {
         @Test
         fun `should not capture requests with 5xx response status`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                statusCode = HttpStatus.INTERNAL_SERVER_ERROR
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    statusCode = HttpStatus.INTERNAL_SERVER_ERROR,
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -304,20 +313,21 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class RequestIdHandling {
-
         @Test
         fun `should handle missing request id`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -333,17 +343,19 @@ class AuditWebFilterTest : UnitTest() {
         fun `should use provided request id`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false",
-                    "X-Request-Id" to "custom-req-id"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                            "X-Request-Id" to "custom-req-id",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -357,16 +369,16 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class DefaultUserHandling {
-
         @Test
         fun `should use default user when headers not provided`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -384,21 +396,22 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class EntityExtraction {
-
         @Test
         fun `should extract entity type from API path`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/attendance/track",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/attendance/track",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -413,16 +426,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should extract entity id from path`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.PUT,
-                path = "/api/v1/guilds/my-guild-id",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.OK
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.PUT,
+                    path = "/api/v1/guilds/my-guild-id",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.OK,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -438,16 +453,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle nested resource paths`() {
             // Given
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.DELETE,
-                path = "/api/v1/loot/bans/ban-123",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.NO_CONTENT
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.DELETE,
+                    path = "/api/v1/loot/bans/ban-123",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.NO_CONTENT,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -463,16 +480,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle paths with numeric id in nested resources`() {
             // Given - path like /api/v1/guilds/123/members where 123 looks like an ID
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds/12345/members",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds/12345/members",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -488,16 +507,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle paths with UUID-like id in nested resources`() {
             // Given - path like /api/v1/guilds/abc12345-6789-0def/members
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds/abc12345-6789-0def/members",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds/abc12345-6789-0def/members",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -513,16 +534,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle single-part path`() {
             // Given - path like /api/v1/guilds
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -538,16 +561,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle empty path parts after version prefix`() {
             // Given - path like /api/v1/
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -563,16 +588,18 @@ class AuditWebFilterTest : UnitTest() {
         fun `should handle non-versioned api path`() {
             // Given - path like /api/guilds
             val auditLogSlot = slot<AuditLog>()
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(capture(auditLogSlot)) } answers { auditLogSlot.captured }
 
             // When
@@ -587,20 +614,21 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class ExceptionHandling {
-
         @Test
         fun `should handle repository save exception gracefully`() {
             // Given
-            val exchange = createExchange(
-                method = HttpMethod.POST,
-                path = "/api/v1/guilds",
-                headers = mapOf(
-                    "X-User-Id" to "user-123",
-                    "X-Username" to "testuser",
-                    "X-Admin-Mode" to "false"
-                ),
-                statusCode = HttpStatus.CREATED
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.POST,
+                    path = "/api/v1/guilds",
+                    headers =
+                        mapOf(
+                            "X-User-Id" to "user-123",
+                            "X-Username" to "testuser",
+                            "X-Admin-Mode" to "false",
+                        ),
+                    statusCode = HttpStatus.CREATED,
+                )
             every { auditLogRepository.save(any()) } throws RuntimeException("Database error")
 
             // When - should not throw
@@ -613,14 +641,14 @@ class AuditWebFilterTest : UnitTest() {
 
     @Nested
     inner class NullMethodHandling {
-
         @Test
         fun `should handle null HTTP method`() {
             // Given - Create exchange with mocked request that returns null method
-            val exchange = createExchange(
-                method = HttpMethod.GET,  // This will be skipped anyway
-                path = "/api/v1/guilds"
-            )
+            val exchange =
+                createExchange(
+                    method = HttpMethod.GET, // This will be skipped anyway
+                    path = "/api/v1/guilds",
+                )
 
             // When
             filter.filter(exchange, filterChain).block()
@@ -630,5 +658,4 @@ class AuditWebFilterTest : UnitTest() {
             verify(exactly = 0) { auditLogRepository.save(any()) }
         }
     }
-
 }

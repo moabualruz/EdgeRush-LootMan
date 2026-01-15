@@ -22,14 +22,14 @@ import java.time.ZoneOffset
 class JdbcTeamRaidDayRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : TeamRaidDayRepository {
-
     override fun findById(id: Long): TeamRaidDayEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, team_id, week_day, start_time, end_time, current_instance,
                    difficulty, active_from, synced_at
             FROM team_raid_days
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, teamRaidDayRowMapper, id)
         return results.firstOrNull()
@@ -41,14 +41,18 @@ class JdbcTeamRaidDayRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<TeamRaidDayEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity> {
+        val sql =
+            """
             SELECT id, team_id, week_day, start_time, end_time, current_instance,
                    difficulty, active_from, synced_at
             FROM team_raid_days
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, teamRaidDayRowMapper, limit, offset)
     }
@@ -58,15 +62,20 @@ class JdbcTeamRaidDayRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<TeamRaidDayEntity> {
-        val sql = """
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity> {
+        val sql =
+            """
             SELECT id, team_id, week_day, start_time, end_time, current_instance,
                    difficulty, active_from, synced_at
             FROM team_raid_days
             WHERE team_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, teamRaidDayRowMapper, teamId, limit, offset)
     }
@@ -91,12 +100,13 @@ class JdbcTeamRaidDayRepository(
     }
 
     private fun insertTeamRaidDay(entity: TeamRaidDayEntity): TeamRaidDayEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO team_raid_days (
                 team_id, week_day, start_time, end_time, current_instance,
                 difficulty, active_from, synced_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -117,12 +127,13 @@ class JdbcTeamRaidDayRepository(
     }
 
     private fun updateTeamRaidDay(entity: TeamRaidDayEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE team_raid_days SET
                 team_id = ?, week_day = ?, start_time = ?, end_time = ?, current_instance = ?,
                 difficulty = ?, active_from = ?, synced_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -138,17 +149,18 @@ class JdbcTeamRaidDayRepository(
         )
     }
 
-    private val teamRaidDayRowMapper = RowMapper { rs, _ ->
-        TeamRaidDayEntity(
-            id = rs.getLong("id"),
-            teamId = rs.getLong("team_id"),
-            weekDay = rs.getString("week_day"),
-            startTime = rs.getTime("start_time")?.toLocalTime(),
-            endTime = rs.getTime("end_time")?.toLocalTime(),
-            currentInstance = rs.getString("current_instance"),
-            difficulty = rs.getString("difficulty"),
-            activeFrom = rs.getDate("active_from")?.toLocalDate(),
-            syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-        )
-    }
+    private val teamRaidDayRowMapper =
+        RowMapper { rs, _ ->
+            TeamRaidDayEntity(
+                id = rs.getLong("id"),
+                teamId = rs.getLong("team_id"),
+                weekDay = rs.getString("week_day"),
+                startTime = rs.getTime("start_time")?.toLocalTime(),
+                endTime = rs.getTime("end_time")?.toLocalTime(),
+                currentInstance = rs.getString("current_instance"),
+                difficulty = rs.getString("difficulty"),
+                activeFrom = rs.getDate("active_from")?.toLocalDate(),
+                syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            )
+        }
 }

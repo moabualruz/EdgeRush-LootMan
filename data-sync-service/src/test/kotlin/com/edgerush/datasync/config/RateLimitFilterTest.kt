@@ -2,18 +2,14 @@ package com.edgerush.datasync.config
 
 import com.edgerush.datasync.security.AdminModeConfig
 import com.edgerush.datasync.test.base.UnitTest
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.web.server.ServerWebExchange
@@ -27,7 +23,6 @@ import reactor.core.publisher.Mono
  * including bypassing for admin mode and disabled states.
  */
 class RateLimitFilterTest : UnitTest() {
-
     @MockK
     private lateinit var adminModeConfig: AdminModeConfig
 
@@ -59,7 +54,6 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class WhenRateLimitingDisabled {
-
         @Test
         fun `should pass through when rate limiting is disabled`() {
             // Arrange
@@ -93,7 +87,6 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class WhenAdminModeEnabled {
-
         @Test
         fun `should pass through when admin mode is enabled`() {
             // Arrange
@@ -128,14 +121,14 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class WriteOperationDetection {
-
         @Test
         fun `should identify POST as write operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 1000.0, // High limit to ensure it passes
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 1000.0, // High limit to ensure it passes
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.POST
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -150,10 +143,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify PUT as write operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.PUT
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -168,10 +162,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify DELETE as write operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.DELETE
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -186,10 +181,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify PATCH as write operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.PATCH
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -204,10 +200,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify GET as read operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.GET
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -222,10 +219,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify HEAD as read operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.HEAD
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -240,10 +238,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should identify OPTIONS as read operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.OPTIONS
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -258,14 +257,14 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class RateLimitExceeded {
-
         @Test
         fun `should complete response when read rate limit exceeded`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 0.001, // Very low limit to ensure it fails on second request
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 0.001, // Very low limit to ensure it fails on second request
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.GET
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -281,10 +280,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should add Retry-After header when rate limit exceeded`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 0.001,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 0.001,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.GET
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -300,10 +300,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should complete response when write rate limit exceeded`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 0.001,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 0.001,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.POST
             val filter = RateLimitFilter(rateLimitProperties, adminModeConfig)
@@ -319,14 +320,14 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class NullMethodHandling {
-
         @Test
         fun `should treat null method as read operation`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 1000.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 1000.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
             every { request.method } returns null
@@ -342,14 +343,14 @@ class RateLimitFilterTest : UnitTest() {
 
     @Nested
     inner class RateLimiterInitialization {
-
         @Test
         fun `should create filter with custom read rate`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                readRequestsPerSecond = 500.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    readRequestsPerSecond = 500.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.GET
 
@@ -364,10 +365,11 @@ class RateLimitFilterTest : UnitTest() {
         @Test
         fun `should create filter with custom write rate`() {
             // Arrange
-            rateLimitProperties = RateLimitProperties(
-                enabled = true,
-                writeRequestsPerSecond = 50.0,
-            )
+            rateLimitProperties =
+                RateLimitProperties(
+                    enabled = true,
+                    writeRequestsPerSecond = 50.0,
+                )
             every { adminModeConfig.isEnabled() } returns false
             every { request.method } returns HttpMethod.POST
 

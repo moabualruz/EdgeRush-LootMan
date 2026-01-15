@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with behavioral-action-specific query methods.
  */
 interface BehavioralActionCrudService : CrudService<Long, CreateBehavioralActionRequest, UpdateBehavioralActionRequest, BehavioralActionResponse> {
-
     /**
      * Find behavioral actions by guild with pagination.
      *
@@ -18,7 +17,10 @@ interface BehavioralActionCrudService : CrudService<Long, CreateBehavioralAction
      * @param pageRequest Pagination parameters
      * @return Paginated list of behavioral actions for the guild
      */
-    fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse>
+    fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse>
 
     /**
      * Find active behavioral actions by guild with pagination.
@@ -27,7 +29,10 @@ interface BehavioralActionCrudService : CrudService<Long, CreateBehavioralAction
      * @param pageRequest Pagination parameters
      * @return Paginated list of active behavioral actions for the guild
      */
-    fun findActiveByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse>
+    fun findActiveByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse>
 
     /**
      * Find behavioral actions by character with pagination.
@@ -37,7 +42,11 @@ interface BehavioralActionCrudService : CrudService<Long, CreateBehavioralAction
      * @param pageRequest Pagination parameters
      * @return Paginated list of behavioral actions for the character
      */
-    fun findByCharacter(guildId: String, characterName: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse>
+    fun findByCharacter(
+        guildId: String,
+        characterName: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse>
 
     /**
      * Get the total deduction amount for a character.
@@ -46,7 +55,10 @@ interface BehavioralActionCrudService : CrudService<Long, CreateBehavioralAction
      * @param characterName The character name
      * @return The total deduction amount (0.0 to 1.0)
      */
-    fun getTotalDeduction(guildId: String, characterName: String): Double
+    fun getTotalDeduction(
+        guildId: String,
+        characterName: String,
+    ): Double
 
     /**
      * Count behavioral actions for a guild.

@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
  * Unit tests for RaiderId value object.
  */
 class RaiderIdTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid raider ID with positive value`() {
             // Arrange & Act
@@ -58,40 +56,43 @@ class RaiderIdTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when value is zero`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(0L)
+                }
             exception.message shouldBe "Raider ID must be positive, got 0"
         }
 
         @Test
         fun `should throw exception when value is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(-1L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(-1L)
+                }
             exception.message shouldBe "Raider ID must be positive, got -1"
         }
 
         @Test
         fun `should throw exception when value is large negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(-999999L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(-999999L)
+                }
             exception.message shouldBe "Raider ID must be positive, got -999999"
         }
 
         @Test
         fun `should throw exception when value is Long MIN_VALUE`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(Long.MIN_VALUE)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(Long.MIN_VALUE)
+                }
             exception.message shouldContain "Raider ID must be positive, got"
             exception.message shouldContain Long.MIN_VALUE.toString()
         }
@@ -102,16 +103,16 @@ class RaiderIdTest : UnitTest() {
             val invalidValue = -42L
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(invalidValue)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(invalidValue)
+                }
             exception.message shouldContain "-42"
         }
     }
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when values are the same`() {
             // Arrange
@@ -155,7 +156,6 @@ class RaiderIdTest : UnitTest() {
 
     @Nested
     inner class DataClassTests {
-
         @Test
         fun `should allow destructuring`() {
             // Arrange
@@ -212,16 +212,16 @@ class RaiderIdTest : UnitTest() {
             val original = RaiderId(42L)
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                original.copy(value = -1L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    original.copy(value = -1L)
+                }
             exception.message shouldBe "Raider ID must be positive, got -1"
         }
     }
 
     @Nested
     inner class BoundaryTests {
-
         @Test
         fun `should handle minimum valid value of 1`() {
             // Arrange & Act
@@ -243,25 +243,26 @@ class RaiderIdTest : UnitTest() {
         @Test
         fun `should reject value at boundary of zero`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(0L)
+                }
             exception.message shouldBe "Raider ID must be positive, got 0"
         }
 
         @Test
         fun `should reject value at boundary of -1`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderId(-1L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderId(-1L)
+                }
             exception.message shouldBe "Raider ID must be positive, got -1"
         }
     }
 
     @Nested
     inner class UsageTests {
-
         @Test
         fun `should work as map key`() {
             // Arrange
@@ -306,13 +307,14 @@ class RaiderIdTest : UnitTest() {
         @Test
         fun `should filter list of raider IDs`() {
             // Arrange
-            val raiderIds = listOf(
-                RaiderId(1L),
-                RaiderId(2L),
-                RaiderId(3L),
-                RaiderId(4L),
-                RaiderId(5L)
-            )
+            val raiderIds =
+                listOf(
+                    RaiderId(1L),
+                    RaiderId(2L),
+                    RaiderId(3L),
+                    RaiderId(4L),
+                    RaiderId(5L),
+                )
 
             // Act
             val filtered = raiderIds.filter { it.value > 2L }
@@ -325,7 +327,6 @@ class RaiderIdTest : UnitTest() {
 
     @Nested
     inner class InteroperabilityTests {
-
         @Test
         fun `should be distinct from ItemId with same numeric value`() {
             // Arrange

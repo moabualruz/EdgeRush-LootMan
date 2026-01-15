@@ -5,6 +5,10 @@ import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.api.common.PagedResponse
 
 interface RaiderCrestCountCrudService : CrudService<Long, CreateRaiderCrestCountRequest, UpdateRaiderCrestCountRequest, RaiderCrestCountResponse> {
-    fun findByRaiderId(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderCrestCountResponse>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderCrestCountResponse>
+
     fun countByRaiderId(raiderId: Long): Long
 }

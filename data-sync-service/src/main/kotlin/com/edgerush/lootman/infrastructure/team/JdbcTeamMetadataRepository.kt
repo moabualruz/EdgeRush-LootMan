@@ -18,15 +18,15 @@ import java.time.ZoneOffset
 class JdbcTeamMetadataRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : TeamMetadataRepository {
-
     override fun findById(teamId: Long): TeamMetadataEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT team_id, guild_id, guild_name, name, region, realm, url,
                    last_refreshed_blizzard, last_refreshed_percentiles, last_refreshed_mythic_plus,
                    wishlist_updated_at, synced_at
             FROM team_metadata
             WHERE team_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, teamMetadataRowMapper, teamId)
         return results.firstOrNull()
@@ -38,15 +38,19 @@ class JdbcTeamMetadataRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<TeamMetadataEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity> {
+        val sql =
+            """
             SELECT team_id, guild_id, guild_name, name, region, realm, url,
                    last_refreshed_blizzard, last_refreshed_percentiles, last_refreshed_mythic_plus,
                    wishlist_updated_at, synced_at
             FROM team_metadata
             ORDER BY synced_at DESC, team_id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, teamMetadataRowMapper, limit, offset)
     }
@@ -56,8 +60,13 @@ class JdbcTeamMetadataRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByGuildId(guildId: Long, offset: Long, limit: Int): List<TeamMetadataEntity> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity> {
+        val sql =
+            """
             SELECT team_id, guild_id, guild_name, name, region, realm, url,
                    last_refreshed_blizzard, last_refreshed_percentiles, last_refreshed_mythic_plus,
                    wishlist_updated_at, synced_at
@@ -65,7 +74,7 @@ class JdbcTeamMetadataRepository(
             WHERE guild_id = ?
             ORDER BY synced_at DESC, team_id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, teamMetadataRowMapper, guildId, limit, offset)
     }
@@ -75,8 +84,13 @@ class JdbcTeamMetadataRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId) ?: 0L
     }
 
-    override fun findByRegion(region: String, offset: Long, limit: Int): List<TeamMetadataEntity> {
-        val sql = """
+    override fun findByRegion(
+        region: String,
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity> {
+        val sql =
+            """
             SELECT team_id, guild_id, guild_name, name, region, realm, url,
                    last_refreshed_blizzard, last_refreshed_percentiles, last_refreshed_mythic_plus,
                    wishlist_updated_at, synced_at
@@ -84,7 +98,7 @@ class JdbcTeamMetadataRepository(
             WHERE region = ?
             ORDER BY synced_at DESC, team_id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, teamMetadataRowMapper, region, limit, offset)
     }
@@ -109,13 +123,14 @@ class JdbcTeamMetadataRepository(
     }
 
     private fun insertTeamMetadata(entity: TeamMetadataEntity): TeamMetadataEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO team_metadata (
                 team_id, guild_id, guild_name, name, region, realm, url,
                 last_refreshed_blizzard, last_refreshed_percentiles, last_refreshed_mythic_plus,
                 wishlist_updated_at, synced_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -137,13 +152,14 @@ class JdbcTeamMetadataRepository(
     }
 
     private fun updateTeamMetadata(entity: TeamMetadataEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE team_metadata SET
                 guild_id = ?, guild_name = ?, name = ?, region = ?, realm = ?, url = ?,
                 last_refreshed_blizzard = ?, last_refreshed_percentiles = ?, last_refreshed_mythic_plus = ?,
                 wishlist_updated_at = ?, synced_at = ?
             WHERE team_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -162,23 +178,24 @@ class JdbcTeamMetadataRepository(
         )
     }
 
-    private val teamMetadataRowMapper = RowMapper { rs, _ ->
-        val guildIdValue = rs.getLong("guild_id")
-        val guildId = if (rs.wasNull()) null else guildIdValue
+    private val teamMetadataRowMapper =
+        RowMapper { rs, _ ->
+            val guildIdValue = rs.getLong("guild_id")
+            val guildId = if (rs.wasNull()) null else guildIdValue
 
-        TeamMetadataEntity(
-            teamId = rs.getLong("team_id"),
-            guildId = guildId,
-            guildName = rs.getString("guild_name"),
-            name = rs.getString("name"),
-            region = rs.getString("region"),
-            realm = rs.getString("realm"),
-            url = rs.getString("url"),
-            lastRefreshedBlizzard = rs.getTimestamp("last_refreshed_blizzard")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            lastRefreshedPercentiles = rs.getTimestamp("last_refreshed_percentiles")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            lastRefreshedMythicPlus = rs.getTimestamp("last_refreshed_mythic_plus")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            wishlistUpdatedAt = rs.getTimestamp("wishlist_updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-        )
-    }
+            TeamMetadataEntity(
+                teamId = rs.getLong("team_id"),
+                guildId = guildId,
+                guildName = rs.getString("guild_name"),
+                name = rs.getString("name"),
+                region = rs.getString("region"),
+                realm = rs.getString("realm"),
+                url = rs.getString("url"),
+                lastRefreshedBlizzard = rs.getTimestamp("last_refreshed_blizzard")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                lastRefreshedPercentiles = rs.getTimestamp("last_refreshed_percentiles")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                lastRefreshedMythicPlus = rs.getTimestamp("last_refreshed_mythic_plus")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                wishlistUpdatedAt = rs.getTimestamp("wishlist_updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            )
+        }
 }

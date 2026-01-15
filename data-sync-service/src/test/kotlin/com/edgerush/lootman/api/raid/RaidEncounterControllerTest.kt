@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus
  * Tests controller methods directly without Spring context.
  */
 class RaidEncounterControllerTest : UnitTest() {
-
     private lateinit var encounterService: RaidEncounterCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaidEncounterController
@@ -34,16 +33,16 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createEncounterResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createEncounterResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { encounterService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class RaidEncounterControllerTest : UnitTest() {
         @Test
         fun `should use custom page size when provided`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createEncounterResponse()),
-                page = 0,
-                size = 50,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createEncounterResponse()),
+                    page = 0,
+                    size = 50,
+                    totalElements = 1,
+                )
             every { encounterService.findAll(any()) } returns expectedResponse
 
             // When
@@ -81,12 +81,13 @@ class RaidEncounterControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<RaidEncounterResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<RaidEncounterResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { encounterService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -99,7 +100,6 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return encounter when found`() {
             // Given
@@ -132,25 +132,26 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created encounter with 201 status`() {
             // Given
-            val request = CreateRaidEncounterRequest(
-                raidId = 1L,
-                encounterId = 2902L,
-                name = "Queen Ansurek",
-                enabled = true,
-                extra = false,
-                notes = "Final boss",
-            )
+            val request =
+                CreateRaidEncounterRequest(
+                    raidId = 1L,
+                    encounterId = 2902L,
+                    name = "Queen Ansurek",
+                    enabled = true,
+                    extra = false,
+                    notes = "Final boss",
+                )
 
-            val created = createEncounterResponse(
-                id = 1L,
-                raidId = 1L,
-                encounterId = 2902L,
-                name = "Queen Ansurek",
-            )
+            val created =
+                createEncounterResponse(
+                    id = 1L,
+                    raidId = 1L,
+                    encounterId = 2902L,
+                    name = "Queen Ansurek",
+                )
             every { encounterService.create(request) } returns created
 
             // When
@@ -167,13 +168,14 @@ class RaidEncounterControllerTest : UnitTest() {
         fun `should pass correct request to service`() {
             // Given
             val requestSlot = slot<CreateRaidEncounterRequest>()
-            val request = CreateRaidEncounterRequest(
-                raidId = 5L,
-                encounterId = 2901L,
-                name = "Nexus-Princess Ky'veza",
-                enabled = true,
-                extra = false,
-            )
+            val request =
+                CreateRaidEncounterRequest(
+                    raidId = 5L,
+                    encounterId = 2901L,
+                    name = "Nexus-Princess Ky'veza",
+                    enabled = true,
+                    extra = false,
+                )
 
             val created = createEncounterResponse(id = 42L)
             every { encounterService.create(capture(requestSlot)) } returns created
@@ -192,20 +194,21 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated encounter`() {
             // Given
-            val request = UpdateRaidEncounterRequest(
-                enabled = false,
-                notes = "Skipping this week",
-            )
+            val request =
+                UpdateRaidEncounterRequest(
+                    enabled = false,
+                    notes = "Skipping this week",
+                )
 
-            val updated = createEncounterResponse(
-                id = 1L,
-                enabled = false,
-                notes = "Skipping this week",
-            )
+            val updated =
+                createEncounterResponse(
+                    id = 1L,
+                    enabled = false,
+                    notes = "Skipping this week",
+                )
             every { encounterService.update(1L, request) } returns updated
 
             // When
@@ -237,7 +240,6 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -269,7 +271,6 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when encounter exists`() {
             // Given
@@ -298,21 +299,22 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaidTests {
-
         @Test
         fun `should return encounters for a raid with pagination`() {
             // Given
             val raidId = 1L
-            val encounters = listOf(
-                createEncounterResponse(id = 1L, raidId = raidId, name = "Ulgrax"),
-                createEncounterResponse(id = 2L, raidId = raidId, name = "Bloodbound Horror"),
-            )
-            val expectedResponse = PagedResponse(
-                content = encounters,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val encounters =
+                listOf(
+                    createEncounterResponse(id = 1L, raidId = raidId, name = "Ulgrax"),
+                    createEncounterResponse(id = 2L, raidId = raidId, name = "Bloodbound Horror"),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = encounters,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { encounterService.findByRaid(raidId, any()) } returns expectedResponse
 
             // When
@@ -329,12 +331,13 @@ class RaidEncounterControllerTest : UnitTest() {
         @Test
         fun `should return empty response when raid has no encounters`() {
             // Given
-            val expectedResponse = PagedResponse<RaidEncounterResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<RaidEncounterResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { encounterService.findByRaid(999L, any()) } returns expectedResponse
 
             // When
@@ -348,7 +351,6 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class CountByRaidTests {
-
         @Test
         fun `should return count for raid`() {
             // Given
@@ -378,21 +380,22 @@ class RaidEncounterControllerTest : UnitTest() {
 
     @Nested
     inner class FindEnabledByRaidTests {
-
         @Test
         fun `should return only enabled encounters for a raid`() {
             // Given
             val raidId = 1L
-            val encounters = listOf(
-                createEncounterResponse(id = 1L, raidId = raidId, enabled = true),
-                createEncounterResponse(id = 2L, raidId = raidId, enabled = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = encounters,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val encounters =
+                listOf(
+                    createEncounterResponse(id = 1L, raidId = raidId, enabled = true),
+                    createEncounterResponse(id = 2L, raidId = raidId, enabled = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = encounters,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { encounterService.findEnabledByRaid(raidId, any()) } returns expectedResponse
 
             // When
@@ -412,13 +415,14 @@ class RaidEncounterControllerTest : UnitTest() {
         enabled: Boolean? = true,
         extra: Boolean? = false,
         notes: String? = null,
-    ): RaidEncounterResponse = RaidEncounterResponse(
-        id = id,
-        raidId = raidId,
-        encounterId = encounterId,
-        name = name,
-        enabled = enabled,
-        extra = extra,
-        notes = notes,
-    )
+    ): RaidEncounterResponse =
+        RaidEncounterResponse(
+            id = id,
+            raidId = raidId,
+            encounterId = encounterId,
+            name = name,
+            enabled = enabled,
+            extra = extra,
+            notes = notes,
+        )
 }

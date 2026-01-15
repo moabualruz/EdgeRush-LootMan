@@ -34,10 +34,11 @@ data class RaidPlan private constructor(
      * Adds a new step to the plan.
      */
     fun addStep(notes: String? = null): RaidPlan {
-        val newStep = PlanStep.create(
-            order = steps.size,
-            notes = notes,
-        )
+        val newStep =
+            PlanStep.create(
+                order = steps.size,
+                notes = notes,
+            )
         return copy(
             steps = steps + newStep,
             updatedAt = Instant.now(),
@@ -48,13 +49,15 @@ data class RaidPlan private constructor(
      * Removes a step by its order and re-orders remaining steps.
      */
     fun removeStep(order: Int): RaidPlan {
-        val step = steps.find { it.order == order }
-            ?: throw IllegalArgumentException("Step with order $order does not exist")
+        val step =
+            steps.find { it.order == order }
+                ?: throw IllegalArgumentException("Step with order $order does not exist")
 
         val remainingSteps = steps.filter { it.order != order }
-        val reorderedSteps = remainingSteps.mapIndexed { index, s ->
-            s.withOrder(index)
-        }
+        val reorderedSteps =
+            remainingSteps.mapIndexed { index, s ->
+                s.withOrder(index)
+            }
 
         return copy(
             steps = reorderedSteps,
@@ -65,7 +68,10 @@ data class RaidPlan private constructor(
     /**
      * Updates a step's notes by its order.
      */
-    fun updateStep(order: Int, notes: String?): RaidPlan {
+    fun updateStep(
+        order: Int,
+        notes: String?,
+    ): RaidPlan {
         val stepIndex = steps.indexOfFirst { it.order == order }
         if (stepIndex == -1) {
             throw IllegalArgumentException("Step with order $order does not exist")
@@ -83,26 +89,29 @@ data class RaidPlan private constructor(
     /**
      * Generates a new share token for this plan.
      */
-    fun generateShareToken(): RaidPlan = copy(
-        shareToken = UUID.randomUUID().toString().replace("-", ""),
-        updatedAt = Instant.now(),
-    )
+    fun generateShareToken(): RaidPlan =
+        copy(
+            shareToken = UUID.randomUUID().toString().replace("-", ""),
+            updatedAt = Instant.now(),
+        )
 
     /**
      * Revokes the share token.
      */
-    fun revokeShareToken(): RaidPlan = copy(
-        shareToken = null,
-        updatedAt = Instant.now(),
-    )
+    fun revokeShareToken(): RaidPlan =
+        copy(
+            shareToken = null,
+            updatedAt = Instant.now(),
+        )
 
     /**
      * Changes the visibility of this plan.
      */
-    fun changeVisibility(visibility: PlanVisibility): RaidPlan = copy(
-        visibility = visibility,
-        updatedAt = Instant.now(),
-    )
+    fun changeVisibility(visibility: PlanVisibility): RaidPlan =
+        copy(
+            visibility = visibility,
+            updatedAt = Instant.now(),
+        )
 
     companion object {
         /**
@@ -147,18 +156,19 @@ data class RaidPlan private constructor(
             createdBy: Long,
             createdAt: Instant,
             updatedAt: Instant,
-        ): RaidPlan = RaidPlan(
-            id = id,
-            guildId = guildId,
-            encounterId = encounterId,
-            encounterName = encounterName,
-            name = name,
-            steps = steps,
-            visibility = visibility,
-            shareToken = shareToken,
-            createdBy = createdBy,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
+        ): RaidPlan =
+            RaidPlan(
+                id = id,
+                guildId = guildId,
+                encounterId = encounterId,
+                encounterName = encounterName,
+                name = name,
+                steps = steps,
+                visibility = visibility,
+                shareToken = shareToken,
+                createdBy = createdBy,
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+            )
     }
 }

@@ -11,7 +11,6 @@ data class CreateRaidEncounterRequest(
     @field:NotNull(message = "Raid ID is required")
     @field:Positive(message = "Raid ID must be positive")
     val raidId: Long,
-
     val encounterId: Long? = null,
     val name: String? = null,
     val enabled: Boolean? = true,
@@ -43,14 +42,15 @@ data class RaidEncounterResponse(
     val notes: String?,
 ) {
     companion object {
-        fun from(entity: RaidEncounterEntity): RaidEncounterResponse = RaidEncounterResponse(
-            id = entity.id ?: 0L,
-            raidId = entity.raidId,
-            encounterId = entity.encounterId,
-            name = entity.name,
-            enabled = entity.enabled,
-            extra = entity.extra,
-            notes = entity.notes,
-        )
+        fun from(entity: RaidEncounterEntity): RaidEncounterResponse =
+            RaidEncounterResponse(
+                id = entity.id ?: 0L,
+                raidId = entity.raidId,
+                encounterId = entity.encounterId,
+                name = entity.name,
+                enabled = entity.enabled,
+                extra = entity.extra,
+                notes = entity.notes,
+            )
     }
 }

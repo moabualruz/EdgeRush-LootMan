@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the raider_raid_progress table.
  */
 class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderRaidProgressRepository
 
@@ -35,7 +34,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return raid progress when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRaidProgressEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRaidProgressEntity>>()
@@ -70,7 +68,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRaidProgressEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,17 +88,18 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRaidProgressEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRaidProgressEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    raid = "Nerub-ar Palace",
-                    difficulty = "Mythic",
-                    bossesDefeated = 8
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        raid = "Nerub-ar Palace",
+                        difficulty = "Mythic",
+                        bossesDefeated = 8,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -125,17 +124,18 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderRaidProgressEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRaidProgressEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    raid = "Nerub-ar Palace",
-                    difficulty = "Heroic",
-                    bossesDefeated = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        raid = "Nerub-ar Palace",
+                        difficulty = "Heroic",
+                        bossesDefeated = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -150,7 +150,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated raid progress`() {
             // Given
@@ -162,13 +161,13 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<RaiderRaidProgressEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRaidProgressEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -182,7 +181,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return raid progress for raider`() {
             // Given
@@ -194,13 +192,13 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderRaidProgressEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderRaidProgressEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, raiderId, difficulty = "Heroic"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, raiderId, difficulty = "Mythic"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, raiderId, difficulty = "Mythic"), 1),
                 )
             }
 
@@ -223,7 +221,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderRaidProgressEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -237,14 +235,13 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_raid_progress") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -261,7 +258,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -281,7 +278,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") },
                     Long::class.java,
-                    eq(raiderId)
+                    eq(raiderId),
                 )
             } returns 4L
 
@@ -295,7 +292,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when raid progress exists`() {
             // Given
@@ -305,7 +301,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -325,7 +321,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -345,7 +341,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -359,7 +355,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new raid progress when id is null`() {
             // Given
@@ -400,7 +395,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -408,7 +403,6 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete raid progress by id`() {
             // Given
@@ -417,7 +411,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -428,7 +422,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -441,7 +435,7 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
         raiderId: Long,
         raid: String = "Nerub-ar Palace",
         difficulty: String = "Heroic",
-        bossesDefeated: Int? = 8
+        bossesDefeated: Int? = 8,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -458,12 +452,13 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
         raiderId: Long = 100L,
         raid: String = "Nerub-ar Palace",
         difficulty: String = "Heroic",
-        bossesDefeated: Int? = 8
-    ): RaiderRaidProgressEntity = RaiderRaidProgressEntity(
-        id = id,
-        raiderId = raiderId,
-        raid = raid,
-        difficulty = difficulty,
-        bossesDefeated = bossesDefeated
-    )
+        bossesDefeated: Int? = 8,
+    ): RaiderRaidProgressEntity =
+        RaiderRaidProgressEntity(
+            id = id,
+            raiderId = raiderId,
+            raid = raid,
+            difficulty = difficulty,
+            bossesDefeated = bossesDefeated,
+        )
 }

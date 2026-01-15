@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus
  * Tests controller methods directly without Spring context.
  */
 class RaidSignupControllerTest : UnitTest() {
-
     private lateinit var signupService: RaidSignupCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaidSignupController
@@ -34,16 +33,16 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createSignupResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createSignupResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { signupService.findAll(any()) } returns expectedResponse
 
             // When
@@ -60,12 +59,13 @@ class RaidSignupControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<RaidSignupResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<RaidSignupResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { signupService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -78,7 +78,6 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return signup when found`() {
             // Given
@@ -111,26 +110,27 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created signup with 201 status`() {
             // Given
-            val request = CreateRaidSignupRequest(
-                raidId = 1L,
-                characterId = 42L,
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "WARRIOR",
-                characterRole = "DPS",
-                status = "ACCEPTED",
-                selected = true,
-            )
+            val request =
+                CreateRaidSignupRequest(
+                    raidId = 1L,
+                    characterId = 42L,
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "WARRIOR",
+                    characterRole = "DPS",
+                    status = "ACCEPTED",
+                    selected = true,
+                )
 
-            val created = createSignupResponse(
-                id = 1L,
-                raidId = 1L,
-                characterName = "Testchar",
-            )
+            val created =
+                createSignupResponse(
+                    id = 1L,
+                    raidId = 1L,
+                    characterName = "Testchar",
+                )
             every { signupService.create(request) } returns created
 
             // When
@@ -146,20 +146,21 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated signup`() {
             // Given
-            val request = UpdateRaidSignupRequest(
-                status = "DECLINED",
-                comment = "Cannot attend",
-            )
+            val request =
+                UpdateRaidSignupRequest(
+                    status = "DECLINED",
+                    comment = "Cannot attend",
+                )
 
-            val updated = createSignupResponse(
-                id = 1L,
-                status = "DECLINED",
-                comment = "Cannot attend",
-            )
+            val updated =
+                createSignupResponse(
+                    id = 1L,
+                    status = "DECLINED",
+                    comment = "Cannot attend",
+                )
             every { signupService.update(1L, request) } returns updated
 
             // When
@@ -191,7 +192,6 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -223,7 +223,6 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when signup exists`() {
             // Given
@@ -252,21 +251,22 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaidTests {
-
         @Test
         fun `should return signups for a raid with pagination`() {
             // Given
             val raidId = 1L
-            val signups = listOf(
-                createSignupResponse(id = 1L, raidId = raidId, characterName = "Player1"),
-                createSignupResponse(id = 2L, raidId = raidId, characterName = "Player2"),
-            )
-            val expectedResponse = PagedResponse(
-                content = signups,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val signups =
+                listOf(
+                    createSignupResponse(id = 1L, raidId = raidId, characterName = "Player1"),
+                    createSignupResponse(id = 2L, raidId = raidId, characterName = "Player2"),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = signups,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { signupService.findByRaid(raidId, any()) } returns expectedResponse
 
             // When
@@ -283,12 +283,13 @@ class RaidSignupControllerTest : UnitTest() {
         @Test
         fun `should return empty response when raid has no signups`() {
             // Given
-            val expectedResponse = PagedResponse<RaidSignupResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<RaidSignupResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { signupService.findByRaid(999L, any()) } returns expectedResponse
 
             // When
@@ -302,21 +303,22 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class FindSelectedByRaidTests {
-
         @Test
         fun `should return only selected signups for a raid`() {
             // Given
             val raidId = 1L
-            val signups = listOf(
-                createSignupResponse(id = 1L, raidId = raidId, selected = true),
-                createSignupResponse(id = 2L, raidId = raidId, selected = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = signups,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val signups =
+                listOf(
+                    createSignupResponse(id = 1L, raidId = raidId, selected = true),
+                    createSignupResponse(id = 2L, raidId = raidId, selected = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = signups,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { signupService.findSelectedByRaid(raidId, any()) } returns expectedResponse
 
             // When
@@ -330,7 +332,6 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class CountByRaidTests {
-
         @Test
         fun `should return count for raid`() {
             // Given
@@ -360,21 +361,22 @@ class RaidSignupControllerTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterTests {
-
         @Test
         fun `should return signups for a character`() {
             // Given
             val characterId = 42L
-            val signups = listOf(
-                createSignupResponse(id = 1L, characterId = characterId, raidId = 1L),
-                createSignupResponse(id = 2L, characterId = characterId, raidId = 2L),
-            )
-            val expectedResponse = PagedResponse(
-                content = signups,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val signups =
+                listOf(
+                    createSignupResponse(id = 1L, characterId = characterId, raidId = 1L),
+                    createSignupResponse(id = 2L, characterId = characterId, raidId = 2L),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = signups,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { signupService.findByCharacter(characterId, any()) } returns expectedResponse
 
             // When
@@ -399,18 +401,19 @@ class RaidSignupControllerTest : UnitTest() {
         status: String? = "ACCEPTED",
         comment: String? = null,
         selected: Boolean? = true,
-    ): RaidSignupResponse = RaidSignupResponse(
-        id = id,
-        raidId = raidId,
-        characterId = characterId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterRegion = characterRegion,
-        characterClass = characterClass,
-        characterRole = characterRole,
-        characterGuest = characterGuest,
-        status = status,
-        comment = comment,
-        selected = selected,
-    )
+    ): RaidSignupResponse =
+        RaidSignupResponse(
+            id = id,
+            raidId = raidId,
+            characterId = characterId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterRegion = characterRegion,
+            characterClass = characterClass,
+            characterRole = characterRole,
+            characterGuest = characterGuest,
+            status = status,
+            comment = comment,
+            selected = selected,
+        )
 }

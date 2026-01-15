@@ -15,20 +15,19 @@ import java.time.Instant
  * Unit tests for RaidPlan aggregate root.
  */
 class RaidPlanTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid raid plan with required fields`() {
             // Arrange & Act
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Phase 1 Positions",
-                createdBy = 1L,
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Phase 1 Positions",
+                    createdBy = 1L,
+                )
 
             // Assert
             plan.id shouldNotBe null
@@ -44,14 +43,15 @@ class RaidPlanTest : UnitTest() {
         @Test
         fun `should create raid plan with private visibility`() {
             // Arrange & Act
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "My Private Plan",
-                createdBy = 1L,
-                visibility = PlanVisibility.PRIVATE,
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "My Private Plan",
+                    createdBy = 1L,
+                    visibility = PlanVisibility.PRIVATE,
+                )
 
             // Assert
             plan.visibility shouldBe PlanVisibility.PRIVATE
@@ -60,14 +60,15 @@ class RaidPlanTest : UnitTest() {
         @Test
         fun `should create raid plan with public visibility`() {
             // Arrange & Act
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Community Strategy",
-                createdBy = 1L,
-                visibility = PlanVisibility.PUBLIC,
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Community Strategy",
+                    createdBy = 1L,
+                    visibility = PlanVisibility.PUBLIC,
+                )
 
             // Assert
             plan.visibility shouldBe PlanVisibility.PUBLIC
@@ -76,20 +77,22 @@ class RaidPlanTest : UnitTest() {
         @Test
         fun `should generate unique IDs for different plans`() {
             // Arrange & Act
-            val plan1 = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Plan 1",
-                createdBy = 1L,
-            )
-            val plan2 = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Plan 2",
-                createdBy = 1L,
-            )
+            val plan1 =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Plan 1",
+                    createdBy = 1L,
+                )
+            val plan2 =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Plan 2",
+                    createdBy = 1L,
+                )
 
             // Assert
             plan1.id shouldNotBe plan2.id
@@ -101,13 +104,14 @@ class RaidPlanTest : UnitTest() {
             val before = Instant.now()
 
             // Act
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Test Plan",
-                createdBy = 1L,
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Test Plan",
+                    createdBy = 1L,
+                )
 
             // Assert
             val after = Instant.now()
@@ -119,86 +123,89 @@ class RaidPlanTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when name is blank`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaidPlan.create(
-                    guildId = GuildId("test-guild"),
-                    encounterId = 2902,
-                    encounterName = "Queen Ansurek",
-                    name = "",
-                    createdBy = 1L,
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaidPlan.create(
+                        guildId = GuildId("test-guild"),
+                        encounterId = 2902,
+                        encounterName = "Queen Ansurek",
+                        name = "",
+                        createdBy = 1L,
+                    )
+                }
             exception.message shouldBe "Plan name cannot be blank"
         }
 
         @Test
         fun `should throw exception when name is only whitespace`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaidPlan.create(
-                    guildId = GuildId("test-guild"),
-                    encounterId = 2902,
-                    encounterName = "Queen Ansurek",
-                    name = "   ",
-                    createdBy = 1L,
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaidPlan.create(
+                        guildId = GuildId("test-guild"),
+                        encounterId = 2902,
+                        encounterName = "Queen Ansurek",
+                        name = "   ",
+                        createdBy = 1L,
+                    )
+                }
             exception.message shouldBe "Plan name cannot be blank"
         }
 
         @Test
         fun `should throw exception when encounter name is blank`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaidPlan.create(
-                    guildId = GuildId("test-guild"),
-                    encounterId = 2902,
-                    encounterName = "",
-                    name = "Test Plan",
-                    createdBy = 1L,
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaidPlan.create(
+                        guildId = GuildId("test-guild"),
+                        encounterId = 2902,
+                        encounterName = "",
+                        name = "Test Plan",
+                        createdBy = 1L,
+                    )
+                }
             exception.message shouldBe "Encounter name cannot be blank"
         }
 
         @Test
         fun `should throw exception when encounter ID is not positive`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaidPlan.create(
-                    guildId = GuildId("test-guild"),
-                    encounterId = 0,
-                    encounterName = "Queen Ansurek",
-                    name = "Test Plan",
-                    createdBy = 1L,
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaidPlan.create(
+                        guildId = GuildId("test-guild"),
+                        encounterId = 0,
+                        encounterName = "Queen Ansurek",
+                        name = "Test Plan",
+                        createdBy = 1L,
+                    )
+                }
             exception.message shouldBe "Encounter ID must be positive"
         }
 
         @Test
         fun `should throw exception when createdBy is not positive`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaidPlan.create(
-                    guildId = GuildId("test-guild"),
-                    encounterId = 2902,
-                    encounterName = "Queen Ansurek",
-                    name = "Test Plan",
-                    createdBy = 0L,
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaidPlan.create(
+                        guildId = GuildId("test-guild"),
+                        encounterId = 2902,
+                        encounterName = "Queen Ansurek",
+                        name = "Test Plan",
+                        createdBy = 0L,
+                    )
+                }
             exception.message shouldBe "Created by user ID must be positive"
         }
     }
 
     @Nested
     inner class StepManagementTests {
-
         @Test
         fun `should add step to plan`() {
             // Arrange
@@ -219,10 +226,11 @@ class RaidPlanTest : UnitTest() {
             val plan = createTestPlan()
 
             // Act
-            val updatedPlan = plan
-                .addStep(notes = "Phase 1")
-                .addStep(notes = "Phase 2")
-                .addStep(notes = "Phase 3")
+            val updatedPlan =
+                plan
+                    .addStep(notes = "Phase 1")
+                    .addStep(notes = "Phase 2")
+                    .addStep(notes = "Phase 3")
 
             // Assert
             updatedPlan.steps shouldHaveSize 3
@@ -237,10 +245,11 @@ class RaidPlanTest : UnitTest() {
         @Test
         fun `should remove step by order`() {
             // Arrange
-            val plan = createTestPlan()
-                .addStep(notes = "Phase 1")
-                .addStep(notes = "Phase 2")
-                .addStep(notes = "Phase 3")
+            val plan =
+                createTestPlan()
+                    .addStep(notes = "Phase 1")
+                    .addStep(notes = "Phase 2")
+                    .addStep(notes = "Phase 3")
 
             // Act
             val updatedPlan = plan.removeStep(1)
@@ -260,17 +269,19 @@ class RaidPlanTest : UnitTest() {
             val plan = createTestPlan().addStep(notes = "Phase 1")
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                plan.removeStep(5)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    plan.removeStep(5)
+                }
             exception.message shouldBe "Step with order 5 does not exist"
         }
 
         @Test
         fun `should update step notes`() {
             // Arrange
-            val plan = createTestPlan()
-                .addStep(notes = "Initial notes")
+            val plan =
+                createTestPlan()
+                    .addStep(notes = "Initial notes")
 
             // Act
             val updatedPlan = plan.updateStep(0, notes = "Updated notes")
@@ -282,7 +293,6 @@ class RaidPlanTest : UnitTest() {
 
     @Nested
     inner class ShareTokenTests {
-
         @Test
         fun `should generate share token`() {
             // Arrange
@@ -311,7 +321,6 @@ class RaidPlanTest : UnitTest() {
 
     @Nested
     inner class VisibilityTests {
-
         @Test
         fun `should change visibility to public`() {
             // Arrange
@@ -337,11 +346,12 @@ class RaidPlanTest : UnitTest() {
         }
     }
 
-    private fun createTestPlan(): RaidPlan = RaidPlan.create(
-        guildId = GuildId("test-guild"),
-        encounterId = 2902,
-        encounterName = "Queen Ansurek",
-        name = "Test Plan",
-        createdBy = 1L,
-    )
+    private fun createTestPlan(): RaidPlan =
+        RaidPlan.create(
+            guildId = GuildId("test-guild"),
+            encounterId = 2902,
+            encounterName = "Queen Ansurek",
+            name = "Test Plan",
+            createdBy = 1L,
+        )
 }

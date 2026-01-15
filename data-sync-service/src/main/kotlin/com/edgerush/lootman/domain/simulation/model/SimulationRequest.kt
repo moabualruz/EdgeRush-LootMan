@@ -17,7 +17,7 @@ data class SimulationRequest private constructor(
     val submittedAt: Instant,
     val completedAt: Instant?,
     val results: List<SimulationResult>,
-    val errorMessage: String?
+    val errorMessage: String?,
 ) {
     val isPending: Boolean get() = status == SimulationStatus.PENDING
     val isRunning: Boolean get() = status == SimulationStatus.RUNNING
@@ -55,7 +55,7 @@ data class SimulationRequest private constructor(
         return copy(
             status = SimulationStatus.COMPLETED,
             completedAt = Instant.now(),
-            results = results
+            results = results,
         )
     }
 
@@ -73,7 +73,7 @@ data class SimulationRequest private constructor(
             status = SimulationStatus.FAILED,
             completedAt = Instant.now(),
             errorMessage = errorMessage,
-            results = emptyList()
+            results = emptyList(),
         )
     }
 
@@ -93,7 +93,7 @@ data class SimulationRequest private constructor(
         fun create(
             profile: SimulationProfile,
             iterations: Int = DEFAULT_ITERATIONS,
-            fightLengthSeconds: Int = DEFAULT_FIGHT_LENGTH_SECONDS
+            fightLengthSeconds: Int = DEFAULT_FIGHT_LENGTH_SECONDS,
         ): SimulationRequest {
             require(iterations > 0) { "iterations must be greater than 0" }
             require(fightLengthSeconds > 0) { "fightLengthSeconds must be greater than 0" }
@@ -106,7 +106,7 @@ data class SimulationRequest private constructor(
                 submittedAt = Instant.now(),
                 completedAt = null,
                 results = emptyList(),
-                errorMessage = null
+                errorMessage = null,
             )
         }
     }

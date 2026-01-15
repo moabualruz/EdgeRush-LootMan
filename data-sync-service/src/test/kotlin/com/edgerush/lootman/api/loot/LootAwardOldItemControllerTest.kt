@@ -89,6 +89,6 @@ class LootAwardOldItemControllerTest : UnitTest() {
         id: Long = 1L,
         lootAwardId: Long = 1L,
         itemId: Long? = 12345L,
-        bonusId: String? = "567"
+        bonusId: String? = "567",
     ) = LootAwardOldItemResponse(id, lootAwardId, itemId, bonusId)
 }

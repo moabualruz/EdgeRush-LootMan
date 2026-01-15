@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for UserCharacterMappingService.
  */
 class UserCharacterMappingServiceTest : UnitTest() {
-
     private lateinit var repository: InMemoryUserCharacterMappingRepository
     private lateinit var service: UserCharacterMappingService
 
@@ -31,7 +30,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class LinkCharacter {
-
         @Test
         fun `should link character to user`() {
             // Given
@@ -87,7 +85,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class UnlinkCharacter {
-
         @Test
         fun `should unlink character`() {
             // Given
@@ -137,7 +134,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class SetPrimaryCharacter {
-
         @Test
         fun `should set character as primary`() {
             // Given
@@ -166,7 +162,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class GetCharacters {
-
         @Test
         fun `should return all characters for user`() {
             // Given
@@ -197,7 +192,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class GetPrimaryCharacter {
-
         @Test
         fun `should return primary character`() {
             // Given
@@ -223,7 +217,6 @@ class UserCharacterMappingServiceTest : UnitTest() {
 
     @Nested
     inner class GetCharacterCount {
-
         @Test
         fun `should return correct count`() {
             // Given

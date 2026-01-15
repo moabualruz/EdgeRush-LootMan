@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the raider_pvp_bracket_stats table.
  */
 class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderPvpBracketRepository
 
@@ -35,7 +34,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return pvp bracket when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderPvpBracketEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPvpBracketEntity>>()
@@ -70,7 +68,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderPvpBracketEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,19 +88,20 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderPvpBracketEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPvpBracketEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    bracket = "2v2",
-                    rating = 1800,
-                    seasonPlayed = 50,
-                    weekPlayed = 10,
-                    maxRating = 2000
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        bracket = "2v2",
+                        rating = 1800,
+                        seasonPlayed = 50,
+                        weekPlayed = 10,
+                        maxRating = 2000,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -129,19 +128,20 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderPvpBracketEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPvpBracketEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    bracket = "3v3",
-                    rating = null,
-                    seasonPlayed = null,
-                    weekPlayed = null,
-                    maxRating = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        bracket = "3v3",
+                        rating = null,
+                        seasonPlayed = null,
+                        weekPlayed = null,
+                        maxRating = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -159,7 +159,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated pvp brackets`() {
             // Given
@@ -171,13 +170,13 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<RaiderPvpBracketEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPvpBracketEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -191,7 +190,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return pvp brackets for raider`() {
             // Given
@@ -203,13 +201,13 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderPvpBracketEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderPvpBracketEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, raiderId, bracket = "2v2"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, raiderId, bracket = "3v3"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, raiderId, bracket = "3v3"), 1),
                 )
             }
 
@@ -232,7 +230,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderPvpBracketEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -246,14 +244,13 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_pvp_bracket_stats") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -270,7 +267,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -290,7 +287,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") },
                     Long::class.java,
-                    eq(raiderId)
+                    eq(raiderId),
                 )
             } returns 3L
 
@@ -304,7 +301,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when pvp bracket exists`() {
             // Given
@@ -314,7 +310,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -334,7 +330,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -354,7 +350,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -368,7 +364,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new pvp bracket when id is null`() {
             // Given
@@ -409,7 +404,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -417,7 +412,6 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete pvp bracket by id`() {
             // Given
@@ -426,7 +420,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -437,7 +431,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -452,7 +446,7 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
         rating: Int? = 1500,
         seasonPlayed: Int? = 30,
         weekPlayed: Int? = 5,
-        maxRating: Int? = 1700
+        maxRating: Int? = 1700,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -465,13 +459,14 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
         // Handle wasNull() for multiple nullable int fields
         var wasNullCalled = 0
         every { rs.wasNull() } answers {
-            val result = when (wasNullCalled) {
-                0 -> rating == null
-                1 -> seasonPlayed == null
-                2 -> weekPlayed == null
-                3 -> maxRating == null
-                else -> false
-            }
+            val result =
+                when (wasNullCalled) {
+                    0 -> rating == null
+                    1 -> seasonPlayed == null
+                    2 -> weekPlayed == null
+                    3 -> maxRating == null
+                    else -> false
+                }
             wasNullCalled++
             result
         }
@@ -485,14 +480,15 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
         rating: Int? = 1500,
         seasonPlayed: Int? = 30,
         weekPlayed: Int? = 5,
-        maxRating: Int? = 1700
-    ): RaiderPvpBracketEntity = RaiderPvpBracketEntity(
-        id = id,
-        raiderId = raiderId,
-        bracket = bracket,
-        rating = rating,
-        seasonPlayed = seasonPlayed,
-        weekPlayed = weekPlayed,
-        maxRating = maxRating
-    )
+        maxRating: Int? = 1700,
+    ): RaiderPvpBracketEntity =
+        RaiderPvpBracketEntity(
+            id = id,
+            raiderId = raiderId,
+            bracket = bracket,
+            rating = rating,
+            seasonPlayed = seasonPlayed,
+            weekPlayed = weekPlayed,
+            maxRating = maxRating,
+        )
 }

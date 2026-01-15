@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus
  * Unit tests for RaiderVaultSlotController.
  */
 class RaiderVaultSlotControllerTest : UnitTest() {
-
     private lateinit var vaultSlotService: RaiderVaultSlotCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaiderVaultSlotController
@@ -32,16 +31,16 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createVaultSlotResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createVaultSlotResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { vaultSlotService.findAll(any()) } returns expectedResponse
 
             // When
@@ -58,12 +57,13 @@ class RaiderVaultSlotControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<RaiderVaultSlotResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<RaiderVaultSlotResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { vaultSlotService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -76,7 +76,6 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return vault slot when found`() {
             // Given
@@ -109,22 +108,23 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created vault slot with 201 status`() {
             // Given
-            val request = CreateRaiderVaultSlotRequest(
-                raiderId = 1L,
-                slot = "RAID_1",
-                unlocked = true,
-            )
+            val request =
+                CreateRaiderVaultSlotRequest(
+                    raiderId = 1L,
+                    slot = "RAID_1",
+                    unlocked = true,
+                )
 
-            val created = createVaultSlotResponse(
-                id = 1L,
-                raiderId = 1L,
-                slot = "RAID_1",
-                unlocked = true,
-            )
+            val created =
+                createVaultSlotResponse(
+                    id = 1L,
+                    raiderId = 1L,
+                    slot = "RAID_1",
+                    unlocked = true,
+                )
             every { vaultSlotService.create(request) } returns created
 
             // When
@@ -141,18 +141,19 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated vault slot`() {
             // Given
-            val request = UpdateRaiderVaultSlotRequest(
-                unlocked = false,
-            )
+            val request =
+                UpdateRaiderVaultSlotRequest(
+                    unlocked = false,
+                )
 
-            val updated = createVaultSlotResponse(
-                id = 1L,
-                unlocked = false,
-            )
+            val updated =
+                createVaultSlotResponse(
+                    id = 1L,
+                    unlocked = false,
+                )
             every { vaultSlotService.update(1L, request) } returns updated
 
             // When
@@ -183,7 +184,6 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -201,7 +201,6 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when vault slot exists`() {
             // Given
@@ -230,22 +229,23 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderTests {
-
         @Test
         fun `should return vault slots for a raider`() {
             // Given
             val raiderId = 1L
-            val slots = listOf(
-                createVaultSlotResponse(id = 1L, raiderId = raiderId, slot = "RAID_1"),
-                createVaultSlotResponse(id = 2L, raiderId = raiderId, slot = "RAID_2"),
-                createVaultSlotResponse(id = 3L, raiderId = raiderId, slot = "RAID_3"),
-            )
-            val expectedResponse = PagedResponse(
-                content = slots,
-                page = 0,
-                size = 20,
-                totalElements = 3,
-            )
+            val slots =
+                listOf(
+                    createVaultSlotResponse(id = 1L, raiderId = raiderId, slot = "RAID_1"),
+                    createVaultSlotResponse(id = 2L, raiderId = raiderId, slot = "RAID_2"),
+                    createVaultSlotResponse(id = 3L, raiderId = raiderId, slot = "RAID_3"),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = slots,
+                    page = 0,
+                    size = 20,
+                    totalElements = 3,
+                )
             every { vaultSlotService.findByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -259,21 +259,22 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class FindUnlockedByRaiderTests {
-
         @Test
         fun `should return only unlocked vault slots for a raider`() {
             // Given
             val raiderId = 1L
-            val slots = listOf(
-                createVaultSlotResponse(id = 1L, raiderId = raiderId, slot = "RAID_1", unlocked = true),
-                createVaultSlotResponse(id = 2L, raiderId = raiderId, slot = "RAID_2", unlocked = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = slots,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val slots =
+                listOf(
+                    createVaultSlotResponse(id = 1L, raiderId = raiderId, slot = "RAID_1", unlocked = true),
+                    createVaultSlotResponse(id = 2L, raiderId = raiderId, slot = "RAID_2", unlocked = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = slots,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { vaultSlotService.findUnlockedByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -287,7 +288,6 @@ class RaiderVaultSlotControllerTest : UnitTest() {
 
     @Nested
     inner class CountByRaiderTests {
-
         @Test
         fun `should return count for raider`() {
             // Given
@@ -308,10 +308,11 @@ class RaiderVaultSlotControllerTest : UnitTest() {
         raiderId: Long = 1L,
         slot: String = "RAID_1",
         unlocked: Boolean? = true,
-    ): RaiderVaultSlotResponse = RaiderVaultSlotResponse(
-        id = id,
-        raiderId = raiderId,
-        slot = slot,
-        unlocked = unlocked,
-    )
+    ): RaiderVaultSlotResponse =
+        RaiderVaultSlotResponse(
+            id = id,
+            raiderId = raiderId,
+            slot = slot,
+            unlocked = unlocked,
+        )
 }

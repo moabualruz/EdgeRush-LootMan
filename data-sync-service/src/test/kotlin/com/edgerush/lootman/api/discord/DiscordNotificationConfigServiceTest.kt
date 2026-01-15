@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for DiscordNotificationConfigService.
  */
 class DiscordNotificationConfigServiceTest : UnitTest() {
-
     private lateinit var repository: DiscordNotificationConfigRepository
     private lateinit var service: DiscordNotificationConfigService
 
@@ -35,13 +34,13 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class GetConfigsForGuild {
-
         @Test
         fun `should return all configs for guild`() {
-            val configs = listOf(
-                createConfig(DiscordNotificationType.LOOT_AWARD),
-                createConfig(DiscordNotificationType.PENALTY),
-            )
+            val configs =
+                listOf(
+                    createConfig(DiscordNotificationType.LOOT_AWARD),
+                    createConfig(DiscordNotificationType.PENALTY),
+                )
             every { repository.findByGuildId(guildIdObj) } returns configs
 
             val result = service.getConfigsForGuild(guildId)
@@ -63,7 +62,6 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class GetConfigByType {
-
         @Test
         fun `should return config for type`() {
             val config = createConfig(DiscordNotificationType.LOOT_AWARD)
@@ -94,16 +92,16 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class UpsertConfig {
-
         @Test
         fun `should create new config when none exists`() {
-            val request = UpsertNotificationConfigRequest(
-                discordServerId = "server-123",
-                notificationType = "LOOT_AWARD",
-                channelId = "channel-456",
-                enabled = true,
-                mentionRoleId = null,
-            )
+            val request =
+                UpsertNotificationConfigRequest(
+                    discordServerId = "server-123",
+                    notificationType = "LOOT_AWARD",
+                    channelId = "channel-456",
+                    enabled = true,
+                    mentionRoleId = null,
+                )
             every { repository.findByGuildIdAndType(guildIdObj, DiscordNotificationType.LOOT_AWARD) } returns null
             every { repository.save(any()) } answers {
                 firstArg<DiscordNotificationConfig>().copy(id = DiscordNotificationConfigId(1L))
@@ -119,13 +117,14 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
         @Test
         fun `should update existing config`() {
             val existingConfig = createConfig(DiscordNotificationType.LOOT_AWARD)
-            val request = UpsertNotificationConfigRequest(
-                discordServerId = "server-123",
-                notificationType = "LOOT_AWARD",
-                channelId = "new-channel-789",
-                enabled = false,
-                mentionRoleId = "role-123",
-            )
+            val request =
+                UpsertNotificationConfigRequest(
+                    discordServerId = "server-123",
+                    notificationType = "LOOT_AWARD",
+                    channelId = "new-channel-789",
+                    enabled = false,
+                    mentionRoleId = "role-123",
+                )
             every { repository.findByGuildIdAndType(guildIdObj, DiscordNotificationType.LOOT_AWARD) } returns existingConfig
             every { repository.save(any()) } answers { firstArg() }
 
@@ -138,11 +137,12 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
         @Test
         fun `should throw for invalid notification type in request`() {
-            val request = UpsertNotificationConfigRequest(
-                discordServerId = "server-123",
-                notificationType = "INVALID",
-                channelId = "channel-456",
-            )
+            val request =
+                UpsertNotificationConfigRequest(
+                    discordServerId = "server-123",
+                    notificationType = "INVALID",
+                    channelId = "channel-456",
+                )
 
             shouldThrow<InvalidNotificationTypeException> {
                 service.upsertConfig(guildId, request)
@@ -152,15 +152,15 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class UpdateConfig {
-
         @Test
         fun `should update config`() {
             val configId = 1L
             val existingConfig = createConfig(DiscordNotificationType.LOOT_AWARD)
-            val request = UpdateNotificationConfigRequest(
-                channelId = "new-channel",
-                enabled = false,
-            )
+            val request =
+                UpdateNotificationConfigRequest(
+                    channelId = "new-channel",
+                    enabled = false,
+                )
             every { repository.findById(DiscordNotificationConfigId(configId)) } returns existingConfig
             every { repository.save(any()) } answers { firstArg() }
 
@@ -183,13 +183,14 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
         @Test
         fun `should throw when config belongs to different guild`() {
             val configId = 1L
-            val otherGuildConfig = DiscordNotificationConfig(
-                id = DiscordNotificationConfigId(configId),
-                guildId = GuildId("other-guild"),
-                discordServerId = "server-123",
-                notificationType = DiscordNotificationType.LOOT_AWARD,
-                channelId = "channel-456",
-            )
+            val otherGuildConfig =
+                DiscordNotificationConfig(
+                    id = DiscordNotificationConfigId(configId),
+                    guildId = GuildId("other-guild"),
+                    discordServerId = "server-123",
+                    notificationType = DiscordNotificationType.LOOT_AWARD,
+                    channelId = "channel-456",
+                )
             every { repository.findById(DiscordNotificationConfigId(configId)) } returns otherGuildConfig
 
             shouldThrow<NotificationConfigNotFoundException> {
@@ -200,7 +201,6 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class DeleteConfig {
-
         @Test
         fun `should delete config`() {
             val configId = 1L
@@ -226,7 +226,6 @@ class DiscordNotificationConfigServiceTest : UnitTest() {
 
     @Nested
     inner class TestNotification {
-
         @Test
         fun `should return success when config exists`() {
             val config = createConfig(DiscordNotificationType.LOOT_AWARD)

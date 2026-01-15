@@ -4,7 +4,6 @@ import com.edgerush.datasync.test.base.UnitTest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.string.shouldNotBeBlank
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -18,26 +17,25 @@ import java.time.Instant
  * - Factory method behavior
  */
 class AuditLogTest : UnitTest() {
-
     private val now = Instant.now()
 
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create audit log with valid data`() {
             // Given / When
-            val auditLog = AuditLog(
-                id = AuditLogId(1L),
-                timestamp = now,
-                operation = AuditOperation.CREATE,
-                entityType = "Guild",
-                entityId = "guild-123",
-                userId = "user-456",
-                username = "testuser",
-                isAdminMode = false,
-                requestId = "req-789"
-            )
+            val auditLog =
+                AuditLog(
+                    id = AuditLogId(1L),
+                    timestamp = now,
+                    operation = AuditOperation.CREATE,
+                    entityType = "Guild",
+                    entityId = "guild-123",
+                    userId = "user-456",
+                    username = "testuser",
+                    isAdminMode = false,
+                    requestId = "req-789",
+                )
 
             // Then
             auditLog.id?.value shouldBe 1L
@@ -54,17 +52,18 @@ class AuditLogTest : UnitTest() {
         @Test
         fun `should create audit log without id for new entries`() {
             // Given / When
-            val auditLog = AuditLog(
-                id = null,
-                timestamp = now,
-                operation = AuditOperation.UPDATE,
-                entityType = "Raider",
-                entityId = "raider-100",
-                userId = "admin-1",
-                username = "admin",
-                isAdminMode = true,
-                requestId = null
-            )
+            val auditLog =
+                AuditLog(
+                    id = null,
+                    timestamp = now,
+                    operation = AuditOperation.UPDATE,
+                    entityType = "Raider",
+                    entityId = "raider-100",
+                    userId = "admin-1",
+                    username = "admin",
+                    isAdminMode = true,
+                    requestId = null,
+                )
 
             // Then
             auditLog.id shouldBe null
@@ -76,17 +75,18 @@ class AuditLogTest : UnitTest() {
         @Test
         fun `should create audit log with null requestId`() {
             // Given / When
-            val auditLog = AuditLog(
-                id = AuditLogId(1L),
-                timestamp = now,
-                operation = AuditOperation.DELETE,
-                entityType = "LootAward",
-                entityId = "award-123",
-                userId = "user-1",
-                username = "user",
-                isAdminMode = false,
-                requestId = null
-            )
+            val auditLog =
+                AuditLog(
+                    id = AuditLogId(1L),
+                    timestamp = now,
+                    operation = AuditOperation.DELETE,
+                    entityType = "LootAward",
+                    entityId = "award-123",
+                    userId = "user-1",
+                    username = "user",
+                    isAdminMode = false,
+                    requestId = null,
+                )
 
             // Then
             auditLog.requestId shouldBe null
@@ -95,19 +95,19 @@ class AuditLogTest : UnitTest() {
 
     @Nested
     inner class FactoryMethodTests {
-
         @Test
         fun `should create audit log entry using factory method`() {
             // Given / When
-            val auditLog = AuditLog.create(
-                operation = AuditOperation.CREATE,
-                entityType = "Guild",
-                entityId = "guild-123",
-                userId = "user-456",
-                username = "testuser",
-                isAdminMode = false,
-                requestId = "req-789"
-            )
+            val auditLog =
+                AuditLog.create(
+                    operation = AuditOperation.CREATE,
+                    entityType = "Guild",
+                    entityId = "guild-123",
+                    userId = "user-456",
+                    username = "testuser",
+                    isAdminMode = false,
+                    requestId = "req-789",
+                )
 
             // Then
             auditLog.id shouldBe null // New entry, no ID yet
@@ -123,15 +123,16 @@ class AuditLogTest : UnitTest() {
             val before = Instant.now()
 
             // When
-            val auditLog = AuditLog.create(
-                operation = AuditOperation.UPDATE,
-                entityType = "Raider",
-                entityId = "raider-1",
-                userId = "user-1",
-                username = "user",
-                isAdminMode = false,
-                requestId = null
-            )
+            val auditLog =
+                AuditLog.create(
+                    operation = AuditOperation.UPDATE,
+                    entityType = "Raider",
+                    entityId = "raider-1",
+                    userId = "user-1",
+                    username = "user",
+                    isAdminMode = false,
+                    requestId = null,
+                )
 
             val after = Instant.now()
 
@@ -151,7 +152,7 @@ class AuditLogTest : UnitTest() {
                     userId = "user-1",
                     username = "user",
                     isAdminMode = false,
-                    requestId = null
+                    requestId = null,
                 )
             }
         }
@@ -167,7 +168,7 @@ class AuditLogTest : UnitTest() {
                     userId = "user-1",
                     username = "user",
                     isAdminMode = false,
-                    requestId = null
+                    requestId = null,
                 )
             }
         }
@@ -183,7 +184,7 @@ class AuditLogTest : UnitTest() {
                     userId = "",
                     username = "user",
                     isAdminMode = false,
-                    requestId = null
+                    requestId = null,
                 )
             }
         }
@@ -199,7 +200,7 @@ class AuditLogTest : UnitTest() {
                     userId = "user-1",
                     username = "   ",
                     isAdminMode = false,
-                    requestId = null
+                    requestId = null,
                 )
             }
         }
@@ -207,7 +208,6 @@ class AuditLogTest : UnitTest() {
 
     @Nested
     inner class AuditOperationTests {
-
         @Test
         fun `should have CREATE operation`() {
             AuditOperation.CREATE.name shouldBe "CREATE"
@@ -231,7 +231,6 @@ class AuditLogTest : UnitTest() {
 
     @Nested
     inner class AuditLogIdTests {
-
         @Test
         fun `should create audit log id with valid value`() {
             val id = AuditLogId(123L)

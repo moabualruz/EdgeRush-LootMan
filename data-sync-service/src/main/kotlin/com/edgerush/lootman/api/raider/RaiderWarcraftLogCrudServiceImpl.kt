@@ -8,15 +8,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class RaiderWarcraftLogCrudServiceImpl(private val repository: RaiderWarcraftLogRepository) : RaiderWarcraftLogCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<RaiderWarcraftLogResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
-        return PagedResponse(repository.findAll(offset, pageRequest.size).map { RaiderWarcraftLogResponse.from(it) },
-            pageRequest.page, pageRequest.size, repository.count())
+        return PagedResponse(
+            repository.findAll(offset, pageRequest.size).map { RaiderWarcraftLogResponse.from(it) },
+            pageRequest.page,
+            pageRequest.size,
+            repository.count(),
+        )
     }
 
-    override fun findById(id: Long): RaiderWarcraftLogResponse = repository.findById(id)?.let { RaiderWarcraftLogResponse.from(it) }
-        ?: throw NoSuchElementException("RaiderWarcraftLog not found with id: $id")
+    override fun findById(id: Long): RaiderWarcraftLogResponse =
+        repository.findById(id)?.let { RaiderWarcraftLogResponse.from(it) }
+            ?: throw NoSuchElementException("RaiderWarcraftLog not found with id: $id")
 
     override fun existsById(id: Long): Boolean = repository.existsById(id)
 
@@ -25,7 +29,10 @@ class RaiderWarcraftLogCrudServiceImpl(private val repository: RaiderWarcraftLog
         return RaiderWarcraftLogResponse.from(repository.save(entity))
     }
 
-    override fun update(id: Long, request: UpdateRaiderWarcraftLogRequest): RaiderWarcraftLogResponse {
+    override fun update(
+        id: Long,
+        request: UpdateRaiderWarcraftLogRequest,
+    ): RaiderWarcraftLogResponse {
         val existing = repository.findById(id) ?: throw NoSuchElementException("RaiderWarcraftLog not found with id: $id")
         val updated = existing.copy(score = request.score ?: existing.score)
         return RaiderWarcraftLogResponse.from(repository.save(updated))
@@ -36,14 +43,23 @@ class RaiderWarcraftLogCrudServiceImpl(private val repository: RaiderWarcraftLog
         repository.delete(id)
     }
 
-    override fun findByRaiderId(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderWarcraftLogResponse> {
+    override fun findByRaiderId(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderWarcraftLogResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
-        return PagedResponse(repository.findByRaiderId(raiderId, offset, pageRequest.size).map { RaiderWarcraftLogResponse.from(it) },
-            pageRequest.page, pageRequest.size, repository.countByRaiderId(raiderId))
+        return PagedResponse(
+            repository.findByRaiderId(raiderId, offset, pageRequest.size).map { RaiderWarcraftLogResponse.from(it) },
+            pageRequest.page,
+            pageRequest.size,
+            repository.countByRaiderId(raiderId),
+        )
     }
 
     override fun countByRaiderId(raiderId: Long): Long = repository.countByRaiderId(raiderId)
 
-    override fun findByRaiderIdUnpaged(raiderId: Long, limit: Int): List<RaiderWarcraftLogResponse> =
-        repository.findByRaiderId(raiderId, 0, limit).map { RaiderWarcraftLogResponse.from(it) }
+    override fun findByRaiderIdUnpaged(
+        raiderId: Long,
+        limit: Int,
+    ): List<RaiderWarcraftLogResponse> = repository.findByRaiderId(raiderId, 0, limit).map { RaiderWarcraftLogResponse.from(it) }
 }

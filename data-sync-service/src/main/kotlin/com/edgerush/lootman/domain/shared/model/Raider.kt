@@ -20,7 +20,7 @@ data class Raider(
     val rank: String?,
     val status: RaiderStatus,
     val joinDate: LocalDateTime?,
-    val wowauditId: Long?
+    val wowauditId: Long?,
 ) {
     init {
         require(characterName.isNotBlank()) { "Character name cannot be blank" }
@@ -54,11 +54,11 @@ enum class CharacterClass {
     ROGUE,
     SHAMAN,
     WARLOCK,
-    WARRIOR;
+    WARRIOR,
+    ;
 
     companion object {
-        fun fromString(value: String): CharacterClass =
-            entries.first { it.name.replace("_", " ").equals(value, ignoreCase = true) }
+        fun fromString(value: String): CharacterClass = entries.first { it.name.replace("_", " ").equals(value, ignoreCase = true) }
     }
 }
 
@@ -68,11 +68,11 @@ enum class CharacterClass {
 enum class Role {
     TANK,
     HEALER,
-    DPS;
+    DPS,
+    ;
 
     companion object {
-        fun fromString(value: String): Role =
-            entries.first { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): Role = entries.first { it.name.equals(value, ignoreCase = true) }
     }
 }
 
@@ -80,14 +80,14 @@ enum class Role {
  * Status of a raider in the guild.
  */
 enum class RaiderStatus {
-    ACTIVE,      // Currently raiding
-    INACTIVE,    // Not currently raiding but still in guild
-    BENCHED,     // On bench, available but not main roster
-    TRIAL,       // Trial period
-    ALUMNI;      // Former member
+    ACTIVE, // Currently raiding
+    INACTIVE, // Not currently raiding but still in guild
+    BENCHED, // On bench, available but not main roster
+    TRIAL, // Trial period
+    ALUMNI, // Former member
+    ;
 
     companion object {
-        fun fromString(value: String): RaiderStatus? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): RaiderStatus? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }

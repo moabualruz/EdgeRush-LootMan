@@ -14,9 +14,10 @@ import org.junit.jupiter.api.extension.ExtensionContext
 class SopsAvailableCondition : ExecutionCondition {
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult {
         return try {
-            val process = ProcessBuilder("sops", "--version")
-                .redirectErrorStream(true)
-                .start()
+            val process =
+                ProcessBuilder("sops", "--version")
+                    .redirectErrorStream(true)
+                    .start()
             val exitCode = process.waitFor()
 
             if (exitCode == 0) {

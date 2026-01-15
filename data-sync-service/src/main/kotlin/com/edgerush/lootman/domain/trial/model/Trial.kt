@@ -77,27 +77,28 @@ data class Trial private constructor(
             promotedAt: Instant?,
             createdAt: Instant,
             lastUpdated: Instant,
-        ): Trial = Trial(
-            id = id,
-            applicationId = applicationId,
-            raiderId = raiderId,
-            guildId = guildId,
-            status = status,
-            startDate = startDate,
-            endDate = endDate,
-            expectedEndDate = expectedEndDate,
-            raidsAttended = raidsAttended,
-            raidsRequired = raidsRequired,
-            attendanceRate = attendanceRate,
-            averagePerformance = averagePerformance,
-            deathsPerRaid = deathsPerRaid,
-            outcome = outcome,
-            outcomeReason = outcomeReason,
-            promotedBy = promotedBy,
-            promotedAt = promotedAt,
-            createdAt = createdAt,
-            lastUpdated = lastUpdated,
-        )
+        ): Trial =
+            Trial(
+                id = id,
+                applicationId = applicationId,
+                raiderId = raiderId,
+                guildId = guildId,
+                status = status,
+                startDate = startDate,
+                endDate = endDate,
+                expectedEndDate = expectedEndDate,
+                raidsAttended = raidsAttended,
+                raidsRequired = raidsRequired,
+                attendanceRate = attendanceRate,
+                averagePerformance = averagePerformance,
+                deathsPerRaid = deathsPerRaid,
+                outcome = outcome,
+                outcomeReason = outcomeReason,
+                promotedBy = promotedBy,
+                promotedAt = promotedAt,
+                createdAt = createdAt,
+                lastUpdated = lastUpdated,
+            )
 
         /**
          * Creates a new Trial with ACTIVE status.
@@ -163,7 +164,10 @@ data class Trial private constructor(
     /**
      * Promotes the trial raider to full member.
      */
-    fun promote(promoterId: String, reason: String): Trial {
+    fun promote(
+        promoterId: String,
+        reason: String,
+    ): Trial {
         check(status == TrialStatus.ACTIVE || status == TrialStatus.EXTENDED) {
             "Can only promote active or extended trials"
         }
@@ -183,7 +187,11 @@ data class Trial private constructor(
     /**
      * Extends the trial period for additional evaluation.
      */
-    fun extend(extenderId: String, additionalRaids: Int, reason: String): Trial {
+    fun extend(
+        extenderId: String,
+        additionalRaids: Int,
+        reason: String,
+    ): Trial {
         check(status == TrialStatus.ACTIVE || status == TrialStatus.EXTENDED) {
             "Can only extend active or already extended trials"
         }
@@ -204,7 +212,11 @@ data class Trial private constructor(
     /**
      * Ends the trial with a non-promotion outcome.
      */
-    fun endTrial(officerId: String, outcome: TrialOutcome, reason: String): Trial {
+    fun endTrial(
+        officerId: String,
+        outcome: TrialOutcome,
+        reason: String,
+    ): Trial {
         check(status == TrialStatus.ACTIVE || status == TrialStatus.EXTENDED) {
             "Can only end active or extended trials"
         }

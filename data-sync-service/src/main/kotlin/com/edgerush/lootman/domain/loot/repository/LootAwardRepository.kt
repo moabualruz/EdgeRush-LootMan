@@ -18,7 +18,11 @@ interface LootAwardRepository {
     /**
      * Find loot awards by guild ID with pagination.
      */
-    fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<LootAward>
+    fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<LootAward>
 
     /**
      * Count loot awards by guild ID.

@@ -90,6 +90,6 @@ class LootAwardWishDataControllerTest : UnitTest() {
         lootAwardId: Long = 1L,
         specName: String? = "Fire",
         specIcon: String? = "spell_fire_fireball",
-        value: Int? = 5
+        value: Int? = 5,
     ) = LootAwardWishDataResponse(id, lootAwardId, specName, specIcon, value)
 }

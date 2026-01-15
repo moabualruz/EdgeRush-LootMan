@@ -27,7 +27,6 @@ import java.time.Instant
  * The repository works with the domain Application model for enhanced recruitment.
  */
 class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcEnhancedApplicationRepository
 
@@ -43,7 +42,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return application when found`() {
             // Given
@@ -51,7 +49,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("enhanced_application_id = ?") },
                     any<RowMapper<Application>>(),
-                    eq(testApplicationId.value)
+                    eq(testApplicationId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -74,7 +72,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("enhanced_application_id = ?") },
                     any<RowMapper<Application>>(),
-                    any<String>()
+                    any<String>(),
                 )
             } returns emptyList()
 
@@ -88,7 +86,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return applications for guild`() {
             // Given
@@ -98,13 +95,13 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     any<RowMapper<Application>>(),
                     eq(testGuildId.value),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(), 0),
-                    rowMapper.mapRow(mockResultSet(applicationId = "app-uuid-456"), 1)
+                    rowMapper.mapRow(mockResultSet(applicationId = "app-uuid-456"), 1),
                 )
             }
 
@@ -124,7 +121,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     any<RowMapper<Application>>(),
                     any<String>(),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -144,7 +141,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     any<RowMapper<Application>>(),
                     eq(testGuildId.value),
                     eq(10),
-                    eq(20L)
+                    eq(20L),
                 )
             } returns emptyList()
 
@@ -158,7 +155,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     any<RowMapper<Application>>(),
                     testGuildId.value,
                     10,
-                    20L
+                    20L,
                 )
             }
         }
@@ -166,7 +163,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdAndStatusTests {
-
         @Test
         fun `should return applications with matching status`() {
             // Given
@@ -177,7 +173,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     eq(testGuildId.value),
                     eq("PENDING"),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -194,7 +190,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdAndDiscordIdTests {
-
         @Test
         fun `should return application when found by discord id`() {
             // Given
@@ -205,7 +200,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("guild_id = ?") && it.contains("discord_id = ?") },
                     any<RowMapper<Application>>(),
                     eq(testGuildId.value),
-                    eq(discordId)
+                    eq(discordId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -228,7 +223,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("discord_id = ?") },
                     any<RowMapper<Application>>(),
                     any<String>(),
-                    any<String>()
+                    any<String>(),
                 )
             } returns emptyList()
 
@@ -242,7 +237,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdAndBattleNetIdTests {
-
         @Test
         fun `should return application when found by battle net id`() {
             // Given
@@ -253,7 +247,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("guild_id = ?") && it.contains("battle_net_id = ?") },
                     any<RowMapper<Application>>(),
                     eq(testGuildId.value),
-                    eq(battleNetId)
+                    eq(battleNetId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -271,7 +265,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountByGuildIdTests {
-
         @Test
         fun `should return count of applications for guild`() {
             // Given
@@ -279,7 +272,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("guild_id = ?") },
                     Long::class.java,
-                    eq(testGuildId.value)
+                    eq(testGuildId.value),
                 )
             } returns 42L
 
@@ -297,7 +290,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
                     Long::class.java,
-                    any<String>()
+                    any<String>(),
                 )
             } returns null
 
@@ -311,7 +304,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountByGuildIdAndStatusTests {
-
         @Test
         fun `should return count of applications for guild and status`() {
             // Given
@@ -320,7 +312,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("COUNT(*)") && it.contains("guild_id = ?") && it.contains("status = ?") },
                     Long::class.java,
                     eq(testGuildId.value),
-                    eq("PENDING")
+                    eq("PENDING"),
                 )
             } returns 15L
 
@@ -334,7 +326,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when application exists`() {
             // Given
@@ -342,7 +333,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("enhanced_application_id = ?") },
                     Int::class.java,
-                    eq(testApplicationId.value)
+                    eq(testApplicationId.value),
                 )
             } returns 1
 
@@ -360,7 +351,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
                     Int::class.java,
-                    any<String>()
+                    any<String>(),
                 )
             } returns 0
 
@@ -374,7 +365,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new application when not exists`() {
             // Given
@@ -449,7 +439,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                             sql.contains("created_at") &&
                             sql.contains("updated_at")
                     },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -457,14 +447,13 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteByIdTests {
-
         @Test
         fun `should delete application by id`() {
             // Given
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(testApplicationId.value)
+                    eq(testApplicationId.value),
                 )
             } returns 1
 
@@ -475,7 +464,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("enhanced_application_id = ?") },
-                    testApplicationId.value
+                    testApplicationId.value,
                 )
             }
         }
@@ -483,7 +472,6 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class RowMappingTests {
-
         @Test
         fun `should map all database fields to domain model`() {
             // Given
@@ -497,7 +485,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     any<String>(),
                     any<RowMapper<Application>>(),
-                    any<String>()
+                    any<String>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -508,10 +496,10 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                             characterClass = characterClass,
                             itemLevel = itemLevel,
                             raiderIOScore = raiderIOScore,
-                            bestParseAverage = bestParseAverage
+                            bestParseAverage = bestParseAverage,
                         ),
-                        0
-                    )
+                        0,
+                    ),
                 )
             }
 
@@ -534,7 +522,7 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     any<String>(),
                     any<RowMapper<Application>>(),
-                    any<String>()
+                    any<String>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
@@ -544,10 +532,10 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                             raiderIOScore = null,
                             bestParseAverage = null,
                             reviewedBy = null,
-                            reviewedAt = null
+                            reviewedAt = null,
                         ),
-                        0
-                    )
+                        0,
+                    ),
                 )
             }
 
@@ -569,15 +557,15 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     any<String>(),
                     any<RowMapper<Application>>(),
-                    any<String>()
+                    any<String>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Application>>()
                 listOf(
                     rowMapper.mapRow(
                         mockResultSet(raidDaysAvailable = "[\"Tuesday\",\"Wednesday\",\"Thursday\"]"),
-                        0
-                    )
+                        0,
+                    ),
                 )
             }
 
@@ -662,24 +650,25 @@ class JdbcEnhancedApplicationRepositoryTest : UnitTest() {
         return rs
     }
 
-    private fun createTestApplication(): Application = Application.create(
-        guildId = testGuildId,
-        battleNetId = "Player#1234",
-        discordId = "123456789012345678",
-        email = "player@example.com",
-        characterName = "Arthas",
-        characterRealm = "Illidan",
-        characterClass = "Death Knight",
-        specialization = "Frost",
-        itemLevel = 489.5,
-        raiderIOScore = 2850.0,
-        bestParseAverage = 85.5,
-        age = 28,
-        location = "United States",
-        timezone = "America/New_York",
-        raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
-        previousGuilds = "Previous Guild 1, Previous Guild 2",
-        reasonForLeaving = "Guild disbanded",
-        whyThisGuild = "Looking for a competitive mythic raiding guild",
-    )
+    private fun createTestApplication(): Application =
+        Application.create(
+            guildId = testGuildId,
+            battleNetId = "Player#1234",
+            discordId = "123456789012345678",
+            email = "player@example.com",
+            characterName = "Arthas",
+            characterRealm = "Illidan",
+            characterClass = "Death Knight",
+            specialization = "Frost",
+            itemLevel = 489.5,
+            raiderIOScore = 2850.0,
+            bestParseAverage = 85.5,
+            age = 28,
+            location = "United States",
+            timezone = "America/New_York",
+            raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
+            previousGuilds = "Previous Guild 1, Previous Guild 2",
+            reasonForLeaving = "Guild disbanded",
+            whyThisGuild = "Looking for a competitive mythic raiding guild",
+        )
 }

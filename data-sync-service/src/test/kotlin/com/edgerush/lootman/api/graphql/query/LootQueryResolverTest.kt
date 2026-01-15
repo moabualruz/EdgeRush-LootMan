@@ -27,7 +27,6 @@ import java.time.Instant
  * Tests the GraphQL query resolver for loot operations following TDD principles.
  */
 class LootQueryResolverTest : UnitTest() {
-
     @MockK
     private lateinit var getLootHistoryUseCase: GetLootHistoryUseCase
 
@@ -36,15 +35,15 @@ class LootQueryResolverTest : UnitTest() {
 
     @Nested
     inner class LootAwardsByGuildQuery {
-
         @Test
         fun `should return loot awards for guild`() {
             // Arrange
-            val awards = listOf(
-                createTestLootAward(id = "award-1", raiderId = 1L, itemId = 100L),
-                createTestLootAward(id = "award-2", raiderId = 2L, itemId = 200L),
-                createTestLootAward(id = "award-3", raiderId = 3L, itemId = 300L),
-            )
+            val awards =
+                listOf(
+                    createTestLootAward(id = "award-1", raiderId = 1L, itemId = 100L),
+                    createTestLootAward(id = "award-2", raiderId = 2L, itemId = 200L),
+                    createTestLootAward(id = "award-3", raiderId = 3L, itemId = 300L),
+                )
             val querySlot = slot<GetLootHistoryByGuildQuery>()
             every { getLootHistoryUseCase.getByGuild(capture(querySlot)) } returns Result.success(awards)
 
@@ -74,9 +73,10 @@ class LootQueryResolverTest : UnitTest() {
         @Test
         fun `should filter active awards only when requested`() {
             // Arrange
-            val awards = listOf(
-                createTestLootAward(id = "award-1"),
-            )
+            val awards =
+                listOf(
+                    createTestLootAward(id = "award-1"),
+                )
             val querySlot = slot<GetLootHistoryByGuildQuery>()
             every { getLootHistoryUseCase.getByGuild(capture(querySlot)) } returns Result.success(awards)
 
@@ -94,23 +94,24 @@ class LootQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database connection failed"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.lootAwards(guildId = "guild-123")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.lootAwards(guildId = "guild-123")
+                }
             exception.message shouldBe "Database connection failed"
         }
     }
 
     @Nested
     inner class LootHistoryByRaiderQuery {
-
         @Test
         fun `should return loot history for raider`() {
             // Arrange
-            val awards = listOf(
-                createTestLootAward(id = "award-1", itemId = 100L, tier = LootTier.MYTHIC),
-                createTestLootAward(id = "award-2", itemId = 200L, tier = LootTier.HEROIC),
-            )
+            val awards =
+                listOf(
+                    createTestLootAward(id = "award-1", itemId = 100L, tier = LootTier.MYTHIC),
+                    createTestLootAward(id = "award-2", itemId = 200L, tier = LootTier.HEROIC),
+                )
             val querySlot = slot<GetLootHistoryByRaiderQuery>()
             every { getLootHistoryUseCase.getByRaider(capture(querySlot)) } returns Result.success(awards)
 
@@ -156,29 +157,30 @@ class LootQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database error"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.lootHistory(raiderId = "42")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.lootHistory(raiderId = "42")
+                }
             exception.message shouldBe "Database error"
         }
     }
 
     @Nested
     inner class LootAwardTypeConversion {
-
         @Test
         fun `should correctly convert all loot award fields`() {
             // Arrange
             val awardedAt = Instant.parse("2026-01-14T10:30:00Z")
-            val award = createTestLootAward(
-                id = "award-42",
-                raiderId = 123L,
-                itemId = 456L,
-                guildId = "guild-789",
-                tier = LootTier.MYTHIC,
-                flpsScore = 0.85,
-                awardedAt = awardedAt,
-            )
+            val award =
+                createTestLootAward(
+                    id = "award-42",
+                    raiderId = 123L,
+                    itemId = 456L,
+                    guildId = "guild-789",
+                    tier = LootTier.MYTHIC,
+                    flpsScore = 0.85,
+                    awardedAt = awardedAt,
+                )
             every { getLootHistoryUseCase.getByGuild(any()) } returns Result.success(listOf(award))
 
             // Act
@@ -199,12 +201,13 @@ class LootQueryResolverTest : UnitTest() {
         @Test
         fun `should include all tier types`() {
             // Arrange
-            val awards = listOf(
-                createTestLootAward(id = "1", tier = LootTier.MYTHIC),
-                createTestLootAward(id = "2", tier = LootTier.HEROIC),
-                createTestLootAward(id = "3", tier = LootTier.NORMAL),
-                createTestLootAward(id = "4", tier = LootTier.LFR),
-            )
+            val awards =
+                listOf(
+                    createTestLootAward(id = "1", tier = LootTier.MYTHIC),
+                    createTestLootAward(id = "2", tier = LootTier.HEROIC),
+                    createTestLootAward(id = "3", tier = LootTier.NORMAL),
+                    createTestLootAward(id = "4", tier = LootTier.LFR),
+                )
             every { getLootHistoryUseCase.getByGuild(any()) } returns Result.success(awards)
 
             // Act
@@ -212,12 +215,13 @@ class LootQueryResolverTest : UnitTest() {
 
             // Assert
             result shouldHaveSize 4
-            result.map { it.tier } shouldBe listOf(
-                LootTier.MYTHIC,
-                LootTier.HEROIC,
-                LootTier.NORMAL,
-                LootTier.LFR,
-            )
+            result.map { it.tier } shouldBe
+                listOf(
+                    LootTier.MYTHIC,
+                    LootTier.HEROIC,
+                    LootTier.NORMAL,
+                    LootTier.LFR,
+                )
         }
     }
 
@@ -230,13 +234,14 @@ class LootQueryResolverTest : UnitTest() {
         tier: LootTier = LootTier.MYTHIC,
         flpsScore: Double = 0.75,
         awardedAt: Instant = Instant.now(),
-    ): LootAward = LootAward(
-        id = LootAwardId(id),
-        raiderId = RaiderId(raiderId),
-        itemId = ItemId(itemId),
-        guildId = GuildId(guildId),
-        tier = tier,
-        flpsScore = FlpsScore.of(flpsScore),
-        awardedAt = awardedAt,
-    )
+    ): LootAward =
+        LootAward(
+            id = LootAwardId(id),
+            raiderId = RaiderId(raiderId),
+            itemId = ItemId(itemId),
+            guildId = GuildId(guildId),
+            tier = tier,
+            flpsScore = FlpsScore.of(flpsScore),
+            awardedAt = awardedAt,
+        )
 }

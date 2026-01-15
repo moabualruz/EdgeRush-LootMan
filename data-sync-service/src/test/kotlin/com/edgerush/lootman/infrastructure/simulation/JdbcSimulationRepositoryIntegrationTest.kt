@@ -11,7 +11,6 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +27,6 @@ import java.time.Instant
  * - Transaction behavior
  */
 class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
-
     @Autowired
     private lateinit var jdbcSimulationRepository: JdbcSimulationRepository
 
@@ -38,21 +36,21 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
     private fun createProfile(
         guildId: String = "guild-123",
         characterName: String = "Testchar",
-        characterRealm: String = "TestRealm"
+        characterRealm: String = "TestRealm",
     ): SimulationProfile {
         return SimulationProfile.create(
             guildId = guildId,
             characterName = characterName,
             characterRealm = characterRealm,
             profileContent = """warrior="$characterName"""",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
     private fun createResult(
         itemId: Long = 12345L,
         dpsGain: Double = 5000.0,
-        percentGain: Double = 5.0
+        percentGain: Double = 5.0,
     ): SimulationResult {
         return SimulationResult.create(
             itemId = itemId,
@@ -60,7 +58,7 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
             slot = "head",
             dpsGain = dpsGain,
             percentGain = percentGain,
-            simulatedAt = Instant.now()
+            simulatedAt = Instant.now(),
         )
     }
 
@@ -87,11 +85,12 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
         @Test
         fun `should find profile by character`() {
             // Given
-            val profile = createProfile(
-                guildId = "find-guild",
-                characterName = "FindChar",
-                characterRealm = "FindRealm"
-            )
+            val profile =
+                createProfile(
+                    guildId = "find-guild",
+                    characterName = "FindChar",
+                    characterRealm = "FindRealm",
+                )
             repository.saveProfile(profile)
 
             // When
@@ -105,11 +104,12 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
         @Test
         fun `should find profile ID by character`() {
             // Given
-            val profile = createProfile(
-                guildId = "id-guild",
-                characterName = "IdChar",
-                characterRealm = "IdRealm"
-            )
+            val profile =
+                createProfile(
+                    guildId = "id-guild",
+                    characterName = "IdChar",
+                    characterRealm = "IdRealm",
+                )
             val (savedId, _) = repository.saveProfile(profile)
 
             // When
@@ -143,13 +143,14 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
             val profile1 = createProfile(characterName = "UpdateChar")
             repository.saveProfile(profile1)
 
-            val profile2 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "UpdateChar",
-                characterRealm = "TestRealm",
-                profileContent = """warrior="UpdateChar" # Updated content""",
-                createdAt = Instant.now()
-            )
+            val profile2 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "UpdateChar",
+                    characterRealm = "TestRealm",
+                    profileContent = """warrior="UpdateChar" # Updated content""",
+                    createdAt = Instant.now(),
+                )
 
             // When
             val (id2, _) = repository.saveProfile(profile2)
@@ -304,11 +305,12 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
             // Given
             val profile = createProfile(characterName = "PendingViaFind")
             repository.saveProfile(profile)
-            val request = SimulationRequest.create(
-                profile = profile,
-                iterations = 5000,
-                fightLengthSeconds = 180
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = profile,
+                    iterations = 5000,
+                    fightLengthSeconds = 180,
+                )
             repository.saveRequest(request)
 
             // When
@@ -381,22 +383,24 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
             val profile = createProfile(characterName = "LatestChar")
             val (profileId, _) = repository.saveProfile(profile)
 
-            val oldResult = SimulationResult.create(
-                itemId = 22222L,
-                itemName = "Old Item",
-                slot = "head",
-                dpsGain = 500.0,
-                percentGain = 0.5,
-                simulatedAt = Instant.now().minusSeconds(3600)
-            )
-            val newResult = SimulationResult.create(
-                itemId = 22222L,
-                itemName = "New Item",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
+            val oldResult =
+                SimulationResult.create(
+                    itemId = 22222L,
+                    itemName = "Old Item",
+                    slot = "head",
+                    dpsGain = 500.0,
+                    percentGain = 0.5,
+                    simulatedAt = Instant.now().minusSeconds(3600),
+                )
+            val newResult =
+                SimulationResult.create(
+                    itemId = 22222L,
+                    itemName = "New Item",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
 
             // When
             repository.saveResult(profileId, oldResult)
@@ -446,17 +450,19 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
         @Test
         fun `should handle special characters in profile content`() {
             // Given
-            val profile = SimulationProfile.create(
-                guildId = "special-guild",
-                characterName = "SpecialChar",
-                characterRealm = "TestRealm",
-                profileContent = """
-                    warrior="SpecialChar"
-                    # Comment with "quotes" and 'apostrophes'
-                    # Special chars: <>&'"
-                """.trimIndent(),
-                createdAt = Instant.now()
-            )
+            val profile =
+                SimulationProfile.create(
+                    guildId = "special-guild",
+                    characterName = "SpecialChar",
+                    characterRealm = "TestRealm",
+                    profileContent =
+                        """
+                        warrior="SpecialChar"
+                        # Comment with "quotes" and 'apostrophes'
+                        # Special chars: <>&'"
+                        """.trimIndent(),
+                    createdAt = Instant.now(),
+                )
 
             // When
             val (savedId, _) = repository.saveProfile(profile)
@@ -469,10 +475,11 @@ class JdbcSimulationRepositoryIntegrationTest : IntegrationTest() {
         @Test
         fun `should handle unicode characters in names`() {
             // Given
-            val profile = createProfile(
-                characterName = "Тестчар",  // Cyrillic
-                characterRealm = "Тествод"
-            )
+            val profile =
+                createProfile(
+                    characterName = "Тестчар", // Cyrillic
+                    characterRealm = "Тествод",
+                )
 
             // When
             val (savedId, _) = repository.saveProfile(profile)

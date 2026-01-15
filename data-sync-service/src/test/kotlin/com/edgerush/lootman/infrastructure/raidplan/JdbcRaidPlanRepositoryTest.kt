@@ -22,7 +22,6 @@ import java.time.Instant
  * Unit tests for JdbcRaidPlanRepository.
  */
 class JdbcRaidPlanRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaidPlanRepository
 
@@ -34,7 +33,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return null when plan not found`() {
             // Given
@@ -42,7 +40,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT * FROM raid_plans WHERE id = ?") },
                     any<RowMapper<RaidPlan>>(),
-                    eq("non-existent-id")
+                    eq("non-existent-id"),
                 )
             } returns emptyList()
 
@@ -63,7 +61,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT * FROM raid_plans WHERE id = ?") },
                     any<RowMapper<RaidPlan>>(),
-                    eq(planId)
+                    eq(planId),
                 )
             } answers {
                 val mapper = secondArg<RowMapper<RaidPlan>>()
@@ -74,7 +72,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT * FROM raid_plan_steps") },
                     any<RowMapper<Pair<Long, PlanStep>>>(),
-                    eq(planId)
+                    eq(planId),
                 )
             } returns emptyList()
 
@@ -91,7 +89,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return empty list when no plans for guild`() {
             // Given
@@ -101,7 +98,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT * FROM raid_plans WHERE guild_id = ?") && it.contains("ORDER BY") },
                     any<RowMapper<RaidPlan>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns emptyList()
 
@@ -115,7 +112,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountByGuildIdTests {
-
         @Test
         fun `should return count of plans for guild`() {
             // Given
@@ -125,7 +121,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("SELECT COUNT(*)") },
                     Long::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 5L
 
@@ -139,23 +135,23 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new plan when it does not exist`() {
             // Given
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Test Plan",
-                createdBy = 1L
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Test Plan",
+                    createdBy = 1L,
+                )
 
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("SELECT COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(plan.id)
+                    eq(plan.id),
                 )
             } returns 0
 
@@ -167,7 +163,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
             verify(exactly = 1) {
                 jdbcTemplate.update(
                     match<String> { it.contains("INSERT INTO raid_plans") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -175,19 +171,20 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
         @Test
         fun `should update existing plan`() {
             // Given
-            val plan = RaidPlan.create(
-                guildId = GuildId("test-guild"),
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Test Plan",
-                createdBy = 1L
-            )
+            val plan =
+                RaidPlan.create(
+                    guildId = GuildId("test-guild"),
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Test Plan",
+                    createdBy = 1L,
+                )
 
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("SELECT COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(plan.id)
+                    eq(plan.id),
                 )
             } returns 1
 
@@ -199,7 +196,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
             verify(exactly = 1) {
                 jdbcTemplate.update(
                     match<String> { it.contains("UPDATE raid_plans") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -207,7 +204,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete plan by id`() {
             // Given
@@ -220,7 +216,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
             verify(exactly = 1) {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE FROM raid_plans WHERE id = ?") },
-                    eq(planId)
+                    eq(planId),
                 )
             }
         }
@@ -228,7 +224,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when plan exists`() {
             // Given
@@ -238,7 +233,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("SELECT COUNT(*)") },
                     Int::class.java,
-                    eq(planId)
+                    eq(planId),
                 )
             } returns 1
 
@@ -258,7 +253,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("SELECT COUNT(*)") },
                     Int::class.java,
-                    eq(planId)
+                    eq(planId),
                 )
             } returns 0
 
@@ -272,7 +267,6 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByShareTokenTests {
-
         @Test
         fun `should return null when share token not found`() {
             // Given
@@ -280,7 +274,7 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("share_token = ?") },
                     any<RowMapper<RaidPlan>>(),
-                    eq("invalid-token")
+                    eq("invalid-token"),
                 )
             } returns emptyList()
 
@@ -298,17 +292,18 @@ class JdbcRaidPlanRepositoryTest : UnitTest() {
         encounterId: Int,
         encounterName: String,
         name: String,
-        createdAt: Instant
-    ): ResultSet = mockk {
-        every { getString("id") } returns id
-        every { getString("guild_id") } returns guildId
-        every { getInt("encounter_id") } returns encounterId
-        every { getString("encounter_name") } returns encounterName
-        every { getString("name") } returns name
-        every { getString("visibility") } returns "GUILD"
-        every { getString("share_token") } returns null
-        every { getLong("created_by") } returns 1L
-        every { getTimestamp("created_at") } returns Timestamp.from(createdAt)
-        every { getTimestamp("updated_at") } returns Timestamp.from(createdAt)
-    }
+        createdAt: Instant,
+    ): ResultSet =
+        mockk {
+            every { getString("id") } returns id
+            every { getString("guild_id") } returns guildId
+            every { getInt("encounter_id") } returns encounterId
+            every { getString("encounter_name") } returns encounterName
+            every { getString("name") } returns name
+            every { getString("visibility") } returns "GUILD"
+            every { getString("share_token") } returns null
+            every { getLong("created_by") } returns 1L
+            every { getTimestamp("created_at") } returns Timestamp.from(createdAt)
+            every { getTimestamp("updated_at") } returns Timestamp.from(createdAt)
+        }
 }

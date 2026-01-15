@@ -57,12 +57,13 @@ abstract class BaseCrudController<ID : Any, CreateReq, UpdateReq, Resp>(
         @RequestParam(required = false)
         size: Int?,
     ): PagedResponse<Resp> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return service.findAll(pageRequest)
     }
 
@@ -230,7 +231,6 @@ abstract class GuildScopedCrudController<ID : Any, CreateReq, UpdateReq, Resp>(
     private val guildScopedService: GuildScopedCrudService<ID, CreateReq, UpdateReq, Resp>,
     paginationProperties: PaginationProperties,
 ) : BaseCrudController<ID, CreateReq, UpdateReq, Resp>(guildScopedService, paginationProperties) {
-
     /**
      * Get all entities for a specific guild with pagination.
      *
@@ -266,12 +266,13 @@ abstract class GuildScopedCrudController<ID : Any, CreateReq, UpdateReq, Resp>(
         size: Int?,
         paginationProperties: PaginationProperties,
     ): PagedResponse<Resp> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return guildScopedService.findByGuild(guildId, pageRequest)
     }
 
@@ -299,7 +300,6 @@ abstract class RaiderScopedCrudController<ID : Any, CreateReq, UpdateReq, Resp>(
     private val raiderScopedService: RaiderScopedCrudService<ID, CreateReq, UpdateReq, Resp>,
     paginationProperties: PaginationProperties,
 ) : BaseCrudController<ID, CreateReq, UpdateReq, Resp>(raiderScopedService, paginationProperties) {
-
     /**
      * Get all entities for a specific raider with pagination.
      *
@@ -335,12 +335,13 @@ abstract class RaiderScopedCrudController<ID : Any, CreateReq, UpdateReq, Resp>(
         size: Int?,
         paginationProperties: PaginationProperties,
     ): PagedResponse<Resp> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return raiderScopedService.findByRaider(raiderId, pageRequest)
     }
 

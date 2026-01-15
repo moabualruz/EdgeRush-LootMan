@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.raider
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.raider.CreateRaiderCommand
 import com.edgerush.lootman.application.raider.CreateRaiderUseCase
 import com.edgerush.lootman.application.raider.DeleteRaiderCommand
@@ -8,12 +9,10 @@ import com.edgerush.lootman.application.raider.DeleteRaiderUseCase
 import com.edgerush.lootman.application.raider.GetRaiderQuery
 import com.edgerush.lootman.application.raider.GetRaiderUseCase
 import com.edgerush.lootman.application.raider.ListRaidersByGuildPaginatedQuery
-import com.edgerush.lootman.application.raider.ListRaidersByGuildQuery
 import com.edgerush.lootman.application.raider.ListRaidersUseCase
 import com.edgerush.lootman.application.raider.PaginatedRaiders
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
-import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -54,14 +53,15 @@ class RaiderControllerTest : UnitTest() {
         getRaiderUseCase = mockk()
         listRaidersUseCase = mockk()
         paginationProperties = PaginationProperties(defaultPageSize = 20, maxPageSize = 100)
-        controller = RaiderController(
-            createRaiderUseCase,
-            updateRaiderUseCase,
-            deleteRaiderUseCase,
-            getRaiderUseCase,
-            listRaidersUseCase,
-            paginationProperties
-        )
+        controller =
+            RaiderController(
+                createRaiderUseCase,
+                updateRaiderUseCase,
+                deleteRaiderUseCase,
+                getRaiderUseCase,
+                listRaidersUseCase,
+                paginationProperties,
+            )
     }
 
     @Nested
@@ -69,16 +69,17 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should return CREATED status with raider response`() {
             // Given
-            val request = CreateRaiderRequest(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "Testchar",
-                realm = "TestRealm",
-                characterClass = "WARRIOR",
-                role = "DPS",
-                rank = "Raider",
-                status = "ACTIVE"
-            )
+            val request =
+                CreateRaiderRequest(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "Testchar",
+                    realm = "TestRealm",
+                    characterClass = "WARRIOR",
+                    role = "DPS",
+                    rank = "Raider",
+                    status = "ACTIVE",
+                )
 
             val raider = createRaider(id = RaiderId(1L))
 
@@ -101,24 +102,26 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = CreateRaiderRequest(
-                id = 42L,
-                guildId = "my-guild",
-                characterName = "MyChar",
-                realm = "MyRealm",
-                characterClass = "MAGE",
-                role = "DPS",
-                rank = "Officer",
-                status = "ACTIVE"
-            )
+            val request =
+                CreateRaiderRequest(
+                    id = 42L,
+                    guildId = "my-guild",
+                    characterName = "MyChar",
+                    realm = "MyRealm",
+                    characterClass = "MAGE",
+                    role = "DPS",
+                    rank = "Officer",
+                    status = "ACTIVE",
+                )
 
             val commandSlot = slot<CreateRaiderCommand>()
-            val raider = createRaider(
-                id = RaiderId(42L),
-                characterName = "MyChar",
-                realm = "MyRealm",
-                characterClass = CharacterClass.MAGE
-            )
+            val raider =
+                createRaider(
+                    id = RaiderId(42L),
+                    characterName = "MyChar",
+                    realm = "MyRealm",
+                    characterClass = CharacterClass.MAGE,
+                )
 
             every { createRaiderUseCase.execute(capture(commandSlot)) } returns Result.success(raider)
 
@@ -138,18 +141,20 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = CreateRaiderRequest(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "",
-                realm = "TestRealm",
-                characterClass = "WARRIOR",
-                role = "DPS"
-            )
+            val request =
+                CreateRaiderRequest(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "",
+                    realm = "TestRealm",
+                    characterClass = "WARRIOR",
+                    role = "DPS",
+                )
 
-            every { createRaiderUseCase.execute(any()) } returns Result.failure(
-                IllegalArgumentException("Character name cannot be blank")
-            )
+            every { createRaiderUseCase.execute(any()) } returns
+                Result.failure(
+                    IllegalArgumentException("Character name cannot be blank"),
+                )
 
             // When/Then
             try {
@@ -200,9 +205,10 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should throw exception when raider not found`() {
             // Given
-            every { getRaiderUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Raider not found with id: 999")
-            )
+            every { getRaiderUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Raider not found with id: 999"),
+                )
 
             // When/Then
             try {
@@ -219,16 +225,18 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should return updated raider`() {
             // Given
-            val request = UpdateRaiderRequest(
-                status = "BENCHED",
-                rank = "Officer"
-            )
+            val request =
+                UpdateRaiderRequest(
+                    status = "BENCHED",
+                    rank = "Officer",
+                )
 
-            val updatedRaider = createRaider(
-                id = RaiderId(1L),
-                status = RaiderStatus.BENCHED,
-                rank = "Officer"
-            )
+            val updatedRaider =
+                createRaider(
+                    id = RaiderId(1L),
+                    status = RaiderStatus.BENCHED,
+                    rank = "Officer",
+                )
 
             every { updateRaiderUseCase.execute(any()) } returns Result.success(updatedRaider)
 
@@ -246,19 +254,21 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = UpdateRaiderRequest(
-                characterName = "NewName",
-                realm = "NewRealm",
-                status = "INACTIVE"
-            )
+            val request =
+                UpdateRaiderRequest(
+                    characterName = "NewName",
+                    realm = "NewRealm",
+                    status = "INACTIVE",
+                )
 
             val commandSlot = slot<UpdateRaiderCommand>()
-            val updatedRaider = createRaider(
-                id = RaiderId(42L),
-                characterName = "NewName",
-                realm = "NewRealm",
-                status = RaiderStatus.INACTIVE
-            )
+            val updatedRaider =
+                createRaider(
+                    id = RaiderId(42L),
+                    characterName = "NewName",
+                    realm = "NewRealm",
+                    status = RaiderStatus.INACTIVE,
+                )
 
             every { updateRaiderUseCase.execute(capture(commandSlot)) } returns Result.success(updatedRaider)
 
@@ -277,9 +287,10 @@ class RaiderControllerTest : UnitTest() {
             // Given
             val request = UpdateRaiderRequest(status = "BENCHED")
 
-            every { updateRaiderUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Raider not found with id: 999")
-            )
+            every { updateRaiderUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Raider not found with id: 999"),
+                )
 
             // When/Then
             try {
@@ -325,9 +336,10 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should throw exception when raider not found`() {
             // Given
-            every { deleteRaiderUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Raider not found with id: 999")
-            )
+            every { deleteRaiderUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Raider not found with id: 999"),
+                )
 
             // When/Then
             try {
@@ -345,11 +357,12 @@ class RaiderControllerTest : UnitTest() {
         fun `should return paginated list of raiders for guild`() {
             // Given
             val guildId = "test-guild"
-            val raiders = listOf(
-                createRaider(id = RaiderId(1L), characterName = "Raider1"),
-                createRaider(id = RaiderId(2L), characterName = "Raider2"),
-                createRaider(id = RaiderId(3L), characterName = "Raider3")
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                    createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                    createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                )
             val paginatedResult = PaginatedRaiders(raiders, 3L)
 
             every { listRaidersUseCase.executeByGuildPaginated(any()) } returns Result.success(paginatedResult)
@@ -382,7 +395,7 @@ class RaiderControllerTest : UnitTest() {
 
             // Then
             querySlot.captured.guildId shouldBe "my-guild"
-            querySlot.captured.offset shouldBe 20L  // page 2 * size 10
+            querySlot.captured.offset shouldBe 20L // page 2 * size 10
             querySlot.captured.limit shouldBe 10
         }
 
@@ -413,7 +426,7 @@ class RaiderControllerTest : UnitTest() {
             controller.getRaidersByGuild("my-guild", page = 0, size = null)
 
             // Then
-            querySlot.captured.limit shouldBe 20  // default page size
+            querySlot.captured.limit shouldBe 20 // default page size
         }
 
         @Test
@@ -428,15 +441,16 @@ class RaiderControllerTest : UnitTest() {
             controller.getRaidersByGuild("my-guild", page = 0, size = 500)
 
             // Then
-            querySlot.captured.limit shouldBe 100  // maxPageSize
+            querySlot.captured.limit shouldBe 100 // maxPageSize
         }
 
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            every { listRaidersUseCase.executeByGuildPaginated(any()) } returns Result.failure(
-                RuntimeException("Database query failed")
-            )
+            every { listRaidersUseCase.executeByGuildPaginated(any()) } returns
+                Result.failure(
+                    RuntimeException("Database query failed"),
+                )
 
             // When/Then
             try {
@@ -454,11 +468,12 @@ class RaiderControllerTest : UnitTest() {
         fun `should return all raiders for guild without pagination`() {
             // Given
             val guildId = "test-guild"
-            val raiders = listOf(
-                createRaider(id = RaiderId(1L), characterName = "Raider1"),
-                createRaider(id = RaiderId(2L), characterName = "Raider2"),
-                createRaider(id = RaiderId(3L), characterName = "Raider3")
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                    createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                    createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                )
 
             every { listRaidersUseCase.executeByGuild(any()) } returns Result.success(raiders)
 
@@ -478,9 +493,10 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            every { listRaidersUseCase.executeByGuild(any()) } returns Result.failure(
-                RuntimeException("Database connection failed")
-            )
+            every { listRaidersUseCase.executeByGuild(any()) } returns
+                Result.failure(
+                    RuntimeException("Database connection failed"),
+                )
 
             // When/Then
             try {
@@ -498,18 +514,19 @@ class RaiderControllerTest : UnitTest() {
         fun `should correctly map all raider fields to response`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val raider = Raider(
-                id = RaiderId(123L),
-                guildId = GuildId("test-guild"),
-                characterName = "CompleteChar",
-                realm = "CompleteRealm",
-                characterClass = CharacterClass.PALADIN,
-                role = Role.TANK,
-                rank = "Guild Master",
-                status = RaiderStatus.ACTIVE,
-                joinDate = joinDate,
-                wowauditId = 9876L
-            )
+            val raider =
+                Raider(
+                    id = RaiderId(123L),
+                    guildId = GuildId("test-guild"),
+                    characterName = "CompleteChar",
+                    realm = "CompleteRealm",
+                    characterClass = CharacterClass.PALADIN,
+                    role = Role.TANK,
+                    rank = "Guild Master",
+                    status = RaiderStatus.ACTIVE,
+                    joinDate = joinDate,
+                    wowauditId = 9876L,
+                )
 
             every { getRaiderUseCase.execute(any()) } returns Result.success(raider)
 
@@ -534,10 +551,11 @@ class RaiderControllerTest : UnitTest() {
         @Test
         fun `should return isEligibleForLoot false for non-active raiders`() {
             // Given
-            val raider = createRaider(
-                id = RaiderId(1L),
-                status = RaiderStatus.BENCHED
-            )
+            val raider =
+                createRaider(
+                    id = RaiderId(1L),
+                    status = RaiderStatus.BENCHED,
+                )
 
             every { getRaiderUseCase.execute(any()) } returns Result.success(raider)
 
@@ -559,17 +577,18 @@ class RaiderControllerTest : UnitTest() {
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
-        wowauditId: Long? = null
-    ): Raider = Raider(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId
-    )
+        wowauditId: Long? = null,
+    ): Raider =
+        Raider(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

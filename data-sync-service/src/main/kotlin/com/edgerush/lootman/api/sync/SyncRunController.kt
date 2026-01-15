@@ -31,7 +31,6 @@ class SyncRunController(
     private val syncRunService: SyncRunCrudService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @GetMapping
     @Operation(summary = "Find all sync runs with pagination")
     fun findAll(
@@ -40,12 +39,13 @@ class SyncRunController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<SyncRunResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return syncRunService.findAll(pageRequest)
     }
 
@@ -106,12 +106,13 @@ class SyncRunController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<SyncRunResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return syncRunService.findBySource(source, pageRequest)
     }
 
@@ -125,12 +126,13 @@ class SyncRunController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<SyncRunResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return syncRunService.findByStatus(status, pageRequest)
     }
 

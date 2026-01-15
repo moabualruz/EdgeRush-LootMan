@@ -26,9 +26,8 @@ class InvalidNotificationTypeException(val type: String) :
 @Service
 @Transactional
 class DiscordNotificationConfigService(
-    private val repository: DiscordNotificationConfigRepository
+    private val repository: DiscordNotificationConfigRepository,
 ) {
-
     /**
      * Gets all notification configurations for a guild.
      */
@@ -37,7 +36,7 @@ class DiscordNotificationConfigService(
         val configs = repository.findByGuildId(GuildId(guildId))
         return GuildNotificationConfigsResponse(
             guildId = guildId,
-            configs = configs.map { DiscordNotificationConfigResponse.from(it) }
+            configs = configs.map { DiscordNotificationConfigResponse.from(it) },
         )
     }
 
@@ -45,7 +44,10 @@ class DiscordNotificationConfigService(
      * Gets a specific notification configuration by guild and type.
      */
     @Transactional(readOnly = true)
-    fun getConfigByType(guildId: String, type: String): DiscordNotificationConfigResponse? {
+    fun getConfigByType(
+        guildId: String,
+        type: String,
+    ): DiscordNotificationConfigResponse? {
         val notificationType = parseNotificationType(type)
         return repository.findByGuildIdAndType(GuildId(guildId), notificationType)
             ?.let { DiscordNotificationConfigResponse.from(it) }
@@ -54,26 +56,30 @@ class DiscordNotificationConfigService(
     /**
      * Creates or updates a notification configuration.
      */
-    fun upsertConfig(guildId: String, request: UpsertNotificationConfigRequest): DiscordNotificationConfigResponse {
+    fun upsertConfig(
+        guildId: String,
+        request: UpsertNotificationConfigRequest,
+    ): DiscordNotificationConfigResponse {
         val notificationType = parseNotificationType(request.notificationType)
         val guildIdObj = GuildId(guildId)
 
         val existingConfig = repository.findByGuildIdAndType(guildIdObj, notificationType)
 
-        val config = if (existingConfig != null) {
-            existingConfig
-                .updateChannel(request.channelId)
-                .updateMentionRole(request.mentionRoleId)
-                .let { if (request.enabled) it.enable() else it.disable() }
-        } else {
-            DiscordNotificationConfig.create(
-                guildId = guildIdObj,
-                discordServerId = request.discordServerId,
-                notificationType = notificationType,
-                channelId = request.channelId,
-                mentionRoleId = request.mentionRoleId
-            ).let { if (!request.enabled) it.disable() else it }
-        }
+        val config =
+            if (existingConfig != null) {
+                existingConfig
+                    .updateChannel(request.channelId)
+                    .updateMentionRole(request.mentionRoleId)
+                    .let { if (request.enabled) it.enable() else it.disable() }
+            } else {
+                DiscordNotificationConfig.create(
+                    guildId = guildIdObj,
+                    discordServerId = request.discordServerId,
+                    notificationType = notificationType,
+                    channelId = request.channelId,
+                    mentionRoleId = request.mentionRoleId,
+                ).let { if (!request.enabled) it.disable() else it }
+            }
 
         val savedConfig = repository.save(config)
         return DiscordNotificationConfigResponse.from(savedConfig)
@@ -82,9 +88,14 @@ class DiscordNotificationConfigService(
     /**
      * Updates an existing notification configuration.
      */
-    fun updateConfig(guildId: String, configId: Long, request: UpdateNotificationConfigRequest): DiscordNotificationConfigResponse {
-        val config = repository.findById(DiscordNotificationConfigId(configId))
-            ?: throw NotificationConfigNotFoundException(configId)
+    fun updateConfig(
+        guildId: String,
+        configId: Long,
+        request: UpdateNotificationConfigRequest,
+    ): DiscordNotificationConfigResponse {
+        val config =
+            repository.findById(DiscordNotificationConfigId(configId))
+                ?: throw NotificationConfigNotFoundException(configId)
 
         // Verify the config belongs to the guild
         if (config.guildId.value != guildId) {
@@ -106,9 +117,13 @@ class DiscordNotificationConfigService(
     /**
      * Deletes a notification configuration.
      */
-    fun deleteConfig(guildId: String, configId: Long) {
-        val config = repository.findById(DiscordNotificationConfigId(configId))
-            ?: throw NotificationConfigNotFoundException(configId)
+    fun deleteConfig(
+        guildId: String,
+        configId: Long,
+    ) {
+        val config =
+            repository.findById(DiscordNotificationConfigId(configId))
+                ?: throw NotificationConfigNotFoundException(configId)
 
         // Verify the config belongs to the guild
         if (config.guildId.value != guildId) {
@@ -122,19 +137,23 @@ class DiscordNotificationConfigService(
      * Tests a notification configuration by sending a test message.
      * Note: Actual Discord API call would be implemented here.
      */
-    fun testNotification(guildId: String, type: String): TestNotificationResponse {
+    fun testNotification(
+        guildId: String,
+        type: String,
+    ): TestNotificationResponse {
         val notificationType = parseNotificationType(type)
-        val config = repository.findEnabledByGuildIdAndType(GuildId(guildId), notificationType)
-            ?: return TestNotificationResponse(
-                success = false,
-                message = "No enabled configuration found for type: $type"
-            )
+        val config =
+            repository.findEnabledByGuildIdAndType(GuildId(guildId), notificationType)
+                ?: return TestNotificationResponse(
+                    success = false,
+                    message = "No enabled configuration found for type: $type",
+                )
 
         // TODO: Implement actual Discord API call to send test message
         // For now, just return success if config exists
         return TestNotificationResponse(
             success = true,
-            message = "Test notification would be sent to channel ${config.channelId}"
+            message = "Test notification would be sent to channel ${config.channelId}",
         )
     }
 

@@ -23,7 +23,10 @@ interface GearRepository {
      * @param gearSetType The type of gear set (equipped or best)
      * @return The gear set if found, null otherwise
      */
-    fun findByRaiderIdAndType(raiderId: RaiderId, gearSetType: GearSetType): GearSet?
+    fun findByRaiderIdAndType(
+        raiderId: RaiderId,
+        gearSetType: GearSetType,
+    ): GearSet?
 
     /**
      * Saves a gear set.
@@ -32,5 +35,8 @@ interface GearRepository {
      * @param gearSet The gear set to save
      * @return The saved gear set
      */
-    fun save(raiderId: RaiderId, gearSet: GearSet): GearSet
+    fun save(
+        raiderId: RaiderId,
+        gearSet: GearSet,
+    ): GearSet
 }

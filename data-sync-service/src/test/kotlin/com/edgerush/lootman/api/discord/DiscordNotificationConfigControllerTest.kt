@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.discord
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.discord.model.DiscordNotificationType
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -16,7 +15,6 @@ import java.time.Instant
  * Unit tests for DiscordNotificationConfigController.
  */
 class DiscordNotificationConfigControllerTest : UnitTest() {
-
     private lateinit var configService: DiscordNotificationConfigService
     private lateinit var controller: DiscordNotificationConfigController
 
@@ -30,13 +28,13 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class GetConfigs {
-
         @Test
         fun `should return configs for guild`() {
-            val response = GuildNotificationConfigsResponse(
-                guildId = guildId,
-                configs = listOf(createConfigResponse()),
-            )
+            val response =
+                GuildNotificationConfigsResponse(
+                    guildId = guildId,
+                    configs = listOf(createConfigResponse()),
+                )
             every { configService.getConfigsForGuild(guildId) } returns response
 
             val result = controller.getConfigs(guildId)
@@ -48,7 +46,6 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class GetConfigByType {
-
         @Test
         fun `should return config when found`() {
             val response = createConfigResponse()
@@ -72,14 +69,14 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class UpsertConfig {
-
         @Test
         fun `should create or update config`() {
-            val request = UpsertNotificationConfigRequest(
-                discordServerId = "server-123",
-                notificationType = "LOOT_AWARD",
-                channelId = "channel-456",
-            )
+            val request =
+                UpsertNotificationConfigRequest(
+                    discordServerId = "server-123",
+                    notificationType = "LOOT_AWARD",
+                    channelId = "channel-456",
+                )
             val response = createConfigResponse()
             every { configService.upsertConfig(guildId, request) } returns response
 
@@ -92,14 +89,14 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateConfig {
-
         @Test
         fun `should update config`() {
             val configId = 1L
-            val request = UpdateNotificationConfigRequest(
-                channelId = "new-channel",
-                enabled = false,
-            )
+            val request =
+                UpdateNotificationConfigRequest(
+                    channelId = "new-channel",
+                    enabled = false,
+                )
             val response = createConfigResponse()
             every { configService.updateConfig(guildId, configId, request) } returns response
 
@@ -112,7 +109,6 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteConfig {
-
         @Test
         fun `should delete config and return 204`() {
             val configId = 1L
@@ -127,13 +123,13 @@ class DiscordNotificationConfigControllerTest : UnitTest() {
 
     @Nested
     inner class TestNotification {
-
         @Test
         fun `should return test result`() {
-            val response = TestNotificationResponse(
-                success = true,
-                message = "Test notification sent",
-            )
+            val response =
+                TestNotificationResponse(
+                    success = true,
+                    message = "Test notification sent",
+                )
             every { configService.testNotification(guildId, "LOOT_AWARD") } returns response
 
             val result = controller.testNotification(guildId, "LOOT_AWARD")

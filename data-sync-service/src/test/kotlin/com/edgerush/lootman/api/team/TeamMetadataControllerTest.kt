@@ -19,7 +19,6 @@ import java.time.OffsetDateTime
  * Unit tests for TeamMetadataController.
  */
 class TeamMetadataControllerTest : UnitTest() {
-
     private lateinit var teamMetadataService: TeamMetadataCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: TeamMetadataController
@@ -33,16 +32,16 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createTeamMetadataResponse(teamId = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createTeamMetadataResponse(teamId = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { teamMetadataService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class TeamMetadataControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<TeamMetadataResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TeamMetadataResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { teamMetadataService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return team metadata when found`() {
             // Given
@@ -110,25 +109,26 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created team metadata with 201 status`() {
             // Given
-            val request = CreateTeamMetadataRequest(
-                teamId = 1L,
-                guildId = 100L,
-                guildName = "Edge Rush",
-                name = "Main Raid",
-                region = "EU",
-                realm = "Silvermoon",
-                url = "https://wowaudit.com/team/1",
-            )
+            val request =
+                CreateTeamMetadataRequest(
+                    teamId = 1L,
+                    guildId = 100L,
+                    guildName = "Edge Rush",
+                    name = "Main Raid",
+                    region = "EU",
+                    realm = "Silvermoon",
+                    url = "https://wowaudit.com/team/1",
+                )
 
-            val created = createTeamMetadataResponse(
-                teamId = 1L,
-                name = "Main Raid",
-                guildName = "Edge Rush",
-            )
+            val created =
+                createTeamMetadataResponse(
+                    teamId = 1L,
+                    name = "Main Raid",
+                    guildName = "Edge Rush",
+                )
             every { teamMetadataService.create(request) } returns created
 
             // When
@@ -145,20 +145,21 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated team metadata`() {
             // Given
-            val request = UpdateTeamMetadataRequest(
-                name = "Updated Team Name",
-                url = "https://wowaudit.com/team/updated",
-            )
+            val request =
+                UpdateTeamMetadataRequest(
+                    name = "Updated Team Name",
+                    url = "https://wowaudit.com/team/updated",
+                )
 
-            val updated = createTeamMetadataResponse(
-                teamId = 1L,
-                name = "Updated Team Name",
-                url = "https://wowaudit.com/team/updated",
-            )
+            val updated =
+                createTeamMetadataResponse(
+                    teamId = 1L,
+                    name = "Updated Team Name",
+                    url = "https://wowaudit.com/team/updated",
+                )
             every { teamMetadataService.update(1L, request) } returns updated
 
             // When
@@ -190,7 +191,6 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -222,7 +222,6 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when team metadata exists`() {
             // Given
@@ -251,21 +250,22 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return team metadata for a guild`() {
             // Given
             val guildId = 100L
-            val teams = listOf(
-                createTeamMetadataResponse(teamId = 1L, guildId = guildId),
-                createTeamMetadataResponse(teamId = 2L, guildId = guildId),
-            )
-            val expectedResponse = PagedResponse(
-                content = teams,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val teams =
+                listOf(
+                    createTeamMetadataResponse(teamId = 1L, guildId = guildId),
+                    createTeamMetadataResponse(teamId = 2L, guildId = guildId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = teams,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { teamMetadataService.findByGuildId(guildId, any()) } returns expectedResponse
 
             // When
@@ -279,21 +279,22 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRegionTests {
-
         @Test
         fun `should return team metadata for a region`() {
             // Given
             val region = "EU"
-            val teams = listOf(
-                createTeamMetadataResponse(teamId = 1L, region = region),
-                createTeamMetadataResponse(teamId = 2L, region = region),
-            )
-            val expectedResponse = PagedResponse(
-                content = teams,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val teams =
+                listOf(
+                    createTeamMetadataResponse(teamId = 1L, region = region),
+                    createTeamMetadataResponse(teamId = 2L, region = region),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = teams,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { teamMetadataService.findByRegion(region, any()) } returns expectedResponse
 
             // When
@@ -307,7 +308,6 @@ class TeamMetadataControllerTest : UnitTest() {
 
     @Nested
     inner class CountByGuildIdTests {
-
         @Test
         fun `should return count for guild`() {
             // Given
@@ -336,18 +336,19 @@ class TeamMetadataControllerTest : UnitTest() {
         lastRefreshedMythicPlus: OffsetDateTime? = OffsetDateTime.now().minusHours(3),
         wishlistUpdatedAt: OffsetDateTime? = OffsetDateTime.now().minusDays(1),
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): TeamMetadataResponse = TeamMetadataResponse(
-        teamId = teamId,
-        guildId = guildId,
-        guildName = guildName,
-        name = name,
-        region = region,
-        realm = realm,
-        url = url,
-        lastRefreshedBlizzard = lastRefreshedBlizzard,
-        lastRefreshedPercentiles = lastRefreshedPercentiles,
-        lastRefreshedMythicPlus = lastRefreshedMythicPlus,
-        wishlistUpdatedAt = wishlistUpdatedAt,
-        syncedAt = syncedAt,
-    )
+    ): TeamMetadataResponse =
+        TeamMetadataResponse(
+            teamId = teamId,
+            guildId = guildId,
+            guildName = guildName,
+            name = name,
+            region = region,
+            realm = realm,
+            url = url,
+            lastRefreshedBlizzard = lastRefreshedBlizzard,
+            lastRefreshedPercentiles = lastRefreshedPercentiles,
+            lastRefreshedMythicPlus = lastRefreshedMythicPlus,
+            wishlistUpdatedAt = wishlistUpdatedAt,
+            syncedAt = syncedAt,
+        )
 }

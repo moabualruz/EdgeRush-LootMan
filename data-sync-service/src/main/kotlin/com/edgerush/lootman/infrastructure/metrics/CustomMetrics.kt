@@ -12,11 +12,13 @@ import java.time.Duration
  */
 @Component
 class CustomMetrics(private val meterRegistry: MeterRegistry) {
-
     /**
      * Record a FLPS calculation event.
      */
-    fun recordFlpsCalculation(guildId: String, score: Double) {
+    fun recordFlpsCalculation(
+        guildId: String,
+        score: Double,
+    ) {
         Counter.builder("flps.calculations.total")
             .description("Total number of FLPS calculations performed")
             .tag("guild_id", guildId)
@@ -40,7 +42,10 @@ class CustomMetrics(private val meterRegistry: MeterRegistry) {
     /**
      * Record a loot award event.
      */
-    fun recordLootAward(guildId: String, tier: String) {
+    fun recordLootAward(
+        guildId: String,
+        tier: String,
+    ) {
         Counter.builder("loot.awards.total")
             .description("Total number of loot awards")
             .tag("guild_id", guildId)
@@ -63,7 +68,10 @@ class CustomMetrics(private val meterRegistry: MeterRegistry) {
     /**
      * Record attendance tracking event.
      */
-    fun recordAttendanceTracked(guildId: String, raiderCount: Int) {
+    fun recordAttendanceTracked(
+        guildId: String,
+        raiderCount: Int,
+    ) {
         Counter.builder("attendance.tracked.total")
             .description("Total number of attendance tracking events")
             .tag("guild_id", guildId)
@@ -77,7 +85,10 @@ class CustomMetrics(private val meterRegistry: MeterRegistry) {
     /**
      * Record audit log entry.
      */
-    fun recordAuditEntry(operation: String, entityType: String) {
+    fun recordAuditEntry(
+        operation: String,
+        entityType: String,
+    ) {
         Counter.builder("audit.entries.total")
             .description("Total number of audit log entries")
             .tag("operation", operation)

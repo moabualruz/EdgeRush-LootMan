@@ -13,26 +13,25 @@ import java.time.OffsetDateTime
  * Unit tests for Raid DTOs.
  */
 class RaidDtoTest : UnitTest() {
-
     @Nested
     inner class CreateRaidRequestTests {
-
         @Test
         fun `should create request with all fields`() {
             // Given/When
-            val request = CreateRaidRequest(
-                date = LocalDate.of(2024, 3, 15),
-                startTime = LocalTime.of(20, 0),
-                endTime = LocalTime.of(23, 30),
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                optional = false,
-                status = "SCHEDULED",
-                totalSize = 20,
-                notes = "Progression night",
-                teamId = 1L,
-                seasonId = 5L,
-            )
+            val request =
+                CreateRaidRequest(
+                    date = LocalDate.of(2024, 3, 15),
+                    startTime = LocalTime.of(20, 0),
+                    endTime = LocalTime.of(23, 30),
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    optional = false,
+                    status = "SCHEDULED",
+                    totalSize = 20,
+                    notes = "Progression night",
+                    teamId = 1L,
+                    seasonId = 5L,
+                )
 
             // Then
             request.date shouldBe LocalDate.of(2024, 3, 15)
@@ -59,14 +58,14 @@ class RaidDtoTest : UnitTest() {
 
     @Nested
     inner class UpdateRaidRequestTests {
-
         @Test
         fun `should create request with partial fields`() {
             // Given/When
-            val request = UpdateRaidRequest(
-                status = "COMPLETED",
-                presentSize = 19,
-            )
+            val request =
+                UpdateRaidRequest(
+                    status = "COMPLETED",
+                    presentSize = 19,
+                )
 
             // Then
             request.status shouldBe "COMPLETED"
@@ -96,7 +95,6 @@ class RaidDtoTest : UnitTest() {
 
     @Nested
     inner class RaidResponseTests {
-
         @Test
         fun `should convert entity to response`() {
             // Given
@@ -104,26 +102,27 @@ class RaidDtoTest : UnitTest() {
             val createdAt = OffsetDateTime.now().minusDays(7)
             val updatedAt = OffsetDateTime.now().minusHours(1)
 
-            val entity = RaidEntity(
-                raidId = 123L,
-                date = LocalDate.of(2024, 3, 15),
-                startTime = LocalTime.of(20, 0),
-                endTime = LocalTime.of(23, 30),
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                optional = false,
-                status = "SCHEDULED",
-                presentSize = 19,
-                totalSize = 20,
-                notes = "Progression night",
-                selectionsImage = "http://example.com/image.png",
-                teamId = 1L,
-                seasonId = 5L,
-                periodId = 10L,
-                createdAt = createdAt,
-                updatedAt = updatedAt,
-                syncedAt = syncedAt,
-            )
+            val entity =
+                RaidEntity(
+                    raidId = 123L,
+                    date = LocalDate.of(2024, 3, 15),
+                    startTime = LocalTime.of(20, 0),
+                    endTime = LocalTime.of(23, 30),
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    optional = false,
+                    status = "SCHEDULED",
+                    presentSize = 19,
+                    totalSize = 20,
+                    notes = "Progression night",
+                    selectionsImage = "http://example.com/image.png",
+                    teamId = 1L,
+                    seasonId = 5L,
+                    periodId = 10L,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt,
+                    syncedAt = syncedAt,
+                )
 
             // When
             val response = RaidResponse.from(entity)
@@ -152,26 +151,27 @@ class RaidDtoTest : UnitTest() {
         @Test
         fun `should handle null optional fields`() {
             // Given
-            val entity = RaidEntity(
-                raidId = 1L,
-                date = null,
-                startTime = null,
-                endTime = null,
-                instance = null,
-                difficulty = null,
-                optional = null,
-                status = null,
-                presentSize = null,
-                totalSize = null,
-                notes = null,
-                selectionsImage = null,
-                teamId = null,
-                seasonId = null,
-                periodId = null,
-                createdAt = null,
-                updatedAt = null,
-                syncedAt = OffsetDateTime.now(),
-            )
+            val entity =
+                RaidEntity(
+                    raidId = 1L,
+                    date = null,
+                    startTime = null,
+                    endTime = null,
+                    instance = null,
+                    difficulty = null,
+                    optional = null,
+                    status = null,
+                    presentSize = null,
+                    totalSize = null,
+                    notes = null,
+                    selectionsImage = null,
+                    teamId = null,
+                    seasonId = null,
+                    periodId = null,
+                    createdAt = null,
+                    updatedAt = null,
+                    syncedAt = OffsetDateTime.now(),
+                )
 
             // When
             val response = RaidResponse.from(entity)

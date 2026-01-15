@@ -19,7 +19,6 @@ import java.time.OffsetDateTime
  * Unit tests for RaiderEntityController.
  */
 class RaiderEntityControllerTest : UnitTest() {
-
     private lateinit var raiderEntityService: RaiderEntityCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaiderEntityController
@@ -33,15 +32,15 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
-            val expectedResponse = PagedResponse(
-                content = listOf(createRaiderEntityResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createRaiderEntityResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { raiderEntityService.findAll(any()) } returns expectedResponse
 
             val result = controller.findAll(page = 0, size = null)
@@ -63,7 +62,6 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return raider when found`() {
             val expected = createRaiderEntityResponse(id = 123L, characterName = "Testchar")
@@ -90,17 +88,17 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created raider with 201 status`() {
-            val request = CreateRaiderEntityRequest(
-                characterName = "Testchar",
-                realm = "Silvermoon",
-                region = "EU",
-                clazz = "Warrior",
-                spec = "Protection",
-                role = "Tank",
-            )
+            val request =
+                CreateRaiderEntityRequest(
+                    characterName = "Testchar",
+                    realm = "Silvermoon",
+                    region = "EU",
+                    clazz = "Warrior",
+                    spec = "Protection",
+                    role = "Tank",
+                )
             val created = createRaiderEntityResponse(id = 1L, characterName = "Testchar")
             every { raiderEntityService.create(request) } returns created
 
@@ -113,7 +111,6 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated raider`() {
             val request = UpdateRaiderEntityRequest(spec = "Arms", role = "DPS")
@@ -129,7 +126,6 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             every { raiderEntityService.delete(1L) } returns Unit
@@ -142,7 +138,6 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when raider exists`() {
             every { raiderEntityService.existsById(1L) } returns true
@@ -155,13 +150,13 @@ class RaiderEntityControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRealmTests {
-
         @Test
         fun `should return raiders for a realm`() {
-            val raiders = listOf(
-                createRaiderEntityResponse(id = 1L, realm = "Silvermoon"),
-                createRaiderEntityResponse(id = 2L, realm = "Silvermoon"),
-            )
+            val raiders =
+                listOf(
+                    createRaiderEntityResponse(id = 1L, realm = "Silvermoon"),
+                    createRaiderEntityResponse(id = 2L, realm = "Silvermoon"),
+                )
             every { raiderEntityService.findByRealm("Silvermoon", any()) } returns PagedResponse(raiders, 0, 20, 2)
 
             val result = controller.findByRealm("Silvermoon", 0, null)

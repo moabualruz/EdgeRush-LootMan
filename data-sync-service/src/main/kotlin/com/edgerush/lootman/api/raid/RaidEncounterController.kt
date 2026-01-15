@@ -34,7 +34,6 @@ class RaidEncounterController(
     private val encounterService: RaidEncounterCrudService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @Operation(summary = "Get all encounters", description = "Returns a paginated list of all raid encounters")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Successfully retrieved encounters"),
@@ -46,12 +45,13 @@ class RaidEncounterController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidEncounterResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return encounterService.findAll(pageRequest)
     }
 
@@ -122,12 +122,13 @@ class RaidEncounterController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidEncounterResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return encounterService.findByRaid(raidId, pageRequest)
     }
 
@@ -141,12 +142,13 @@ class RaidEncounterController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidEncounterResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return encounterService.findEnabledByRaid(raidId, pageRequest)
     }
 

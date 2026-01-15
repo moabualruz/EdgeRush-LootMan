@@ -21,17 +21,16 @@ import org.springframework.http.HttpStatus
  * - Contains proper server URLs
  */
 class OpenApiContractTest : IntegrationTest() {
-
     @Nested
     inner class OpenApiSpecAvailability {
-
         @Test
         fun `should return OpenAPI spec from v3 api-docs endpoint`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                String::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    String::class.java,
+                )
 
             // Assert
             response.statusCode shouldBe HttpStatus.OK
@@ -42,10 +41,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should return OpenAPI spec in JSON format`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             response.statusCode shouldBe HttpStatus.OK
@@ -58,14 +58,14 @@ class OpenApiContractTest : IntegrationTest() {
 
     @Nested
     inner class ApiMetadata {
-
         @Test
         fun `should have correct API title`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val info = response.body!!["info"] as Map<*, *>
@@ -75,10 +75,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should have API version`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val info = response.body!!["info"] as Map<*, *>
@@ -88,10 +89,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should have API description`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val info = response.body!!["info"] as Map<*, *>
@@ -102,14 +104,14 @@ class OpenApiContractTest : IntegrationTest() {
 
     @Nested
     inner class SecuritySchemes {
-
         @Test
         fun `should define bearer authentication scheme`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val components = response.body!!["components"] as Map<*, *>
@@ -125,14 +127,14 @@ class OpenApiContractTest : IntegrationTest() {
 
     @Nested
     inner class ServerConfiguration {
-
         @Test
         fun `should include server URLs`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val servers = response.body!!["servers"] as List<*>
@@ -145,14 +147,14 @@ class OpenApiContractTest : IntegrationTest() {
 
     @Nested
     inner class PathDocumentation {
-
         @Test
         fun `should document raider endpoints`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val paths = response.body!!["paths"] as Map<*, *>
@@ -163,10 +165,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should document loot endpoints`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val paths = response.body!!["paths"] as Map<*, *>
@@ -177,10 +180,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should document FLPS endpoints`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val paths = response.body!!["paths"] as Map<*, *>
@@ -191,10 +195,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should document attendance endpoints`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert
             val paths = response.body!!["paths"] as Map<*, *>
@@ -205,10 +210,11 @@ class OpenApiContractTest : IntegrationTest() {
         @Test
         fun `should have significant number of documented paths`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/v3/api-docs",
-                Map::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/v3/api-docs",
+                    Map::class.java,
+                )
 
             // Assert - we have 44 controllers, should have many paths
             val paths = response.body!!["paths"] as Map<*, *>
@@ -220,19 +226,21 @@ class OpenApiContractTest : IntegrationTest() {
 
     @Nested
     inner class SwaggerUiAvailability {
-
         @Test
         fun `should have Swagger UI available`() {
             // Act
-            val response = restTemplate.getForEntity(
-                "/swagger-ui.html",
-                String::class.java,
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/swagger-ui.html",
+                    String::class.java,
+                )
 
             // Assert - Should redirect or return HTML
-            (response.statusCode == HttpStatus.OK ||
-                response.statusCode == HttpStatus.FOUND ||
-                response.statusCode == HttpStatus.MOVED_PERMANENTLY) shouldBe true
+            (
+                response.statusCode == HttpStatus.OK ||
+                    response.statusCode == HttpStatus.FOUND ||
+                    response.statusCode == HttpStatus.MOVED_PERMANENTLY
+            ) shouldBe true
         }
     }
 }

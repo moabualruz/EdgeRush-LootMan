@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the loot_award_wish_data table.
  */
 class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcLootAwardWishDataRepository
 
@@ -35,7 +34,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return wish data when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardWishDataEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardWishDataEntity>>()
@@ -70,7 +68,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardWishDataEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,17 +88,18 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardWishDataEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardWishDataEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    specName = "Frost",
-                    specIcon = "spell_deathknight_frostpresence",
-                    value = 5
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        specName = "Frost",
+                        specIcon = "spell_deathknight_frostpresence",
+                        value = 5,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -125,17 +124,18 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardWishDataEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardWishDataEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    specName = null,
-                    specIcon = null,
-                    value = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        specName = null,
+                        specIcon = null,
+                        value = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -152,7 +152,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated wish data`() {
             // Given
@@ -164,13 +163,13 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<LootAwardWishDataEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardWishDataEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -184,7 +183,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByLootAwardIdTests {
-
         @Test
         fun `should return wish data for loot award`() {
             // Given
@@ -196,13 +194,13 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardWishDataEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardWishDataEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, lootAwardId, specName = "Frost"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, specName = "Unholy"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, specName = "Unholy"), 1),
                 )
             }
 
@@ -225,7 +223,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardWishDataEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -239,14 +237,13 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_wish_data") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -263,7 +260,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -283,7 +280,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_id = ?") },
                     Long::class.java,
-                    eq(lootAwardId)
+                    eq(lootAwardId),
                 )
             } returns 3L
 
@@ -297,7 +294,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when wish data exists`() {
             // Given
@@ -307,7 +303,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -327,7 +323,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -347,7 +343,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -361,7 +357,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new wish data when id is null`() {
             // Given
@@ -402,7 +397,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -410,7 +405,6 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete wish data by id`() {
             // Given
@@ -419,7 +413,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -430,7 +424,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -443,7 +437,7 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
         lootAwardId: Long,
         specName: String? = "Frost",
         specIcon: String? = "spell_icon",
-        value: Int? = 5
+        value: Int? = 5,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -460,12 +454,13 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
         lootAwardId: Long = 100L,
         specName: String? = "Frost",
         specIcon: String? = "spell_icon",
-        value: Int? = 5
-    ): LootAwardWishDataEntity = LootAwardWishDataEntity(
-        id = id,
-        lootAwardId = lootAwardId,
-        specName = specName,
-        specIcon = specIcon,
-        value = value
-    )
+        value: Int? = 5,
+    ): LootAwardWishDataEntity =
+        LootAwardWishDataEntity(
+            id = id,
+            lootAwardId = lootAwardId,
+            specName = specName,
+            specIcon = specIcon,
+            value = value,
+        )
 }

@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 
 class PeriodSnapshotControllerTest : UnitTest() {
-
     private lateinit var service: PeriodSnapshotCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: PeriodSnapshotController
@@ -83,7 +82,12 @@ class PeriodSnapshotControllerTest : UnitTest() {
         }
     }
 
-    private fun createResponse(id: Long = 1L, teamId: Long? = 1L, seasonId: Long? = 1L, periodId: Long? = 1L,
-        currentPeriod: Long? = 5L, fetchedAt: OffsetDateTime = OffsetDateTime.now()
+    private fun createResponse(
+        id: Long = 1L,
+        teamId: Long? = 1L,
+        seasonId: Long? = 1L,
+        periodId: Long? = 1L,
+        currentPeriod: Long? = 5L,
+        fetchedAt: OffsetDateTime = OffsetDateTime.now(),
     ) = PeriodSnapshotResponse(id, teamId, seasonId, periodId, currentPeriod, fetchedAt)
 }

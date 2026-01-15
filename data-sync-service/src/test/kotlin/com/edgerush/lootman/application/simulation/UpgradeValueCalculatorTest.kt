@@ -1,14 +1,11 @@
 package com.edgerush.lootman.application.simulation
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.flps.model.UpgradeValue
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import com.edgerush.lootman.domain.simulation.model.SimulationProfile
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
-import io.kotest.matchers.doubles.shouldBeGreaterThan
-import io.kotest.matchers.doubles.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class UpgradeValueCalculatorTest : UnitTest() {
-
     private lateinit var simulationRepository: SimulationRepository
     private lateinit var calculator: UpgradeValueCalculator
 
@@ -32,21 +28,21 @@ class UpgradeValueCalculatorTest : UnitTest() {
     private fun createProfile(
         guildId: String = "guild-123",
         characterName: String = "Testchar",
-        characterRealm: String = "TestRealm"
+        characterRealm: String = "TestRealm",
     ): SimulationProfile {
         return SimulationProfile.create(
             guildId = guildId,
             characterName = characterName,
             characterRealm = characterRealm,
             profileContent = """warrior="$characterName"""",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
     private fun createResult(
         itemId: Long = 12345L,
         dpsGain: Double = 5000.0,
-        percentGain: Double = 5.0
+        percentGain: Double = 5.0,
     ): SimulationResult {
         return SimulationResult.create(
             itemId = itemId,
@@ -54,7 +50,7 @@ class UpgradeValueCalculatorTest : UnitTest() {
             slot = "head",
             dpsGain = dpsGain,
             percentGain = percentGain,
-            simulatedAt = Instant.now()
+            simulatedAt = Instant.now(),
         )
     }
 
@@ -72,13 +68,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                )
 
             // Assert
             uv.value shouldBe 0.5 // 5% / 10% max = 0.5
@@ -96,13 +93,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                )
 
             // Assert
             uv.value shouldBe 1.0
@@ -120,13 +118,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                )
 
             // Assert
             uv.value shouldBe 0.0
@@ -145,13 +144,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { wishlist.getUpgradePercentage(itemId) } returns 50.0
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = wishlist
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = wishlist,
+                )
 
             // Assert
             uv.value shouldBe 0.5 // 50% / 100% = 0.5
@@ -170,13 +170,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { wishlist.getUpgradePercentage(itemId) } returns 80.0
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = wishlist
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = wishlist,
+                )
 
             // Assert
             uv.value shouldBe 0.8
@@ -190,13 +191,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findProfileByCharacter(any(), any(), any()) } returns null
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                )
 
             // Assert
             uv.value shouldBe 0.0
@@ -217,14 +219,15 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findLatestResultForItem(42L, 12345L) } returns result
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null,
-                maxPercentGain = 5.0 // Custom max
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                    maxPercentGain = 5.0, // Custom max
+                )
 
             // Assert
             uv.value shouldBe 1.0 // 5% / 5% max = 1.0
@@ -243,11 +246,12 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findResultsByProfile(42L) } returns listOf(createResult())
 
             // Act
-            val hasData = calculator.hasSimulationData(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm"
-            )
+            val hasData =
+                calculator.hasSimulationData(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             hasData shouldBe true
@@ -259,11 +263,12 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findProfileByCharacter(any(), any(), any()) } returns null
 
             // Act
-            val hasData = calculator.hasSimulationData(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm"
-            )
+            val hasData =
+                calculator.hasSimulationData(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             hasData shouldBe false
@@ -279,11 +284,12 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findResultsByProfile(42L) } returns emptyList()
 
             // Act
-            val hasData = calculator.hasSimulationData(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm"
-            )
+            val hasData =
+                calculator.hasSimulationData(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             hasData shouldBe false
@@ -298,11 +304,12 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns null
 
             // Act
-            val hasData = calculator.hasSimulationData(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm"
-            )
+            val hasData =
+                calculator.hasSimulationData(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             hasData shouldBe false
@@ -324,13 +331,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { wishlist.getUpgradePercentage(itemId) } returns 60.0
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = wishlist
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = wishlist,
+                )
 
             // Assert
             uv.value shouldBe 0.6 // Falls back to wishlist
@@ -347,13 +355,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { simulationRepository.findProfileIdByCharacter("guild-123", "Testchar", "TestRealm") } returns null
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = null
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = null,
+                )
 
             // Assert
             uv.value shouldBe 0.0
@@ -372,13 +381,14 @@ class UpgradeValueCalculatorTest : UnitTest() {
             every { wishlist.getUpgradePercentage(itemId) } returns null
 
             // Act
-            val uv = calculator.calculateUpgradeValue(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlistFallback = wishlist
-            )
+            val uv =
+                calculator.calculateUpgradeValue(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlistFallback = wishlist,
+                )
 
             // Assert
             uv.value shouldBe 0.0

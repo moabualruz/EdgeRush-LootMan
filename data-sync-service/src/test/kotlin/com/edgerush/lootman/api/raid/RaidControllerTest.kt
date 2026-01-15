@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.raid
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.api.common.CrudService
 import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.api.common.PagedResponse
 import com.edgerush.lootman.api.common.PaginationProperties
@@ -25,7 +24,6 @@ import java.time.OffsetDateTime
  * using the generic CrudService pattern.
  */
 class RaidControllerTest : UnitTest() {
-
     private lateinit var raidService: RaidCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaidController
@@ -39,16 +37,16 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createRaidResponse(raidId = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createRaidResponse(raidId = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { raidService.findAll(any()) } returns expectedResponse
 
             // When
@@ -64,12 +62,13 @@ class RaidControllerTest : UnitTest() {
         @Test
         fun `should use custom page size when provided`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createRaidResponse()),
-                page = 0,
-                size = 50,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createRaidResponse()),
+                    page = 0,
+                    size = 50,
+                    totalElements = 1,
+                )
             every { raidService.findAll(any()) } returns expectedResponse
 
             // When
@@ -86,12 +85,13 @@ class RaidControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<RaidResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<RaidResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { raidService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -104,17 +104,19 @@ class RaidControllerTest : UnitTest() {
         @Test
         fun `should return multiple raids`() {
             // Given
-            val raids = listOf(
-                createRaidResponse(raidId = 1L, instance = "Nerub-ar Palace"),
-                createRaidResponse(raidId = 2L, instance = "Vault of the Incarnates"),
-                createRaidResponse(raidId = 3L, instance = "Aberrus, the Shadowed Crucible"),
-            )
-            val expectedResponse = PagedResponse(
-                content = raids,
-                page = 0,
-                size = 20,
-                totalElements = 3,
-            )
+            val raids =
+                listOf(
+                    createRaidResponse(raidId = 1L, instance = "Nerub-ar Palace"),
+                    createRaidResponse(raidId = 2L, instance = "Vault of the Incarnates"),
+                    createRaidResponse(raidId = 3L, instance = "Aberrus, the Shadowed Crucible"),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = raids,
+                    page = 0,
+                    size = 20,
+                    totalElements = 3,
+                )
             every { raidService.findAll(any()) } returns expectedResponse
 
             // When
@@ -130,7 +132,6 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return raid when found`() {
             // Given
@@ -163,28 +164,29 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created raid with 201 status`() {
             // Given
-            val request = CreateRaidRequest(
-                date = LocalDate.of(2024, 3, 15),
-                startTime = LocalTime.of(20, 0),
-                endTime = LocalTime.of(23, 30),
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                optional = false,
-                status = "SCHEDULED",
-                totalSize = 20,
-                teamId = 1L,
-            )
+            val request =
+                CreateRaidRequest(
+                    date = LocalDate.of(2024, 3, 15),
+                    startTime = LocalTime.of(20, 0),
+                    endTime = LocalTime.of(23, 30),
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    optional = false,
+                    status = "SCHEDULED",
+                    totalSize = 20,
+                    teamId = 1L,
+                )
 
-            val created = createRaidResponse(
-                raidId = 1L,
-                date = LocalDate.of(2024, 3, 15),
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-            )
+            val created =
+                createRaidResponse(
+                    raidId = 1L,
+                    date = LocalDate.of(2024, 3, 15),
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                )
             every { raidService.create(request) } returns created
 
             // When
@@ -202,19 +204,20 @@ class RaidControllerTest : UnitTest() {
         fun `should pass correct request to service`() {
             // Given
             val requestSlot = slot<CreateRaidRequest>()
-            val request = CreateRaidRequest(
-                date = LocalDate.of(2024, 6, 20),
-                startTime = LocalTime.of(19, 30),
-                endTime = null,
-                instance = "Vault of the Incarnates",
-                difficulty = "Heroic",
-                optional = true,
-                status = "SCHEDULED",
-                totalSize = 25,
-                notes = "Alt raid night",
-                teamId = 2L,
-                seasonId = 5L,
-            )
+            val request =
+                CreateRaidRequest(
+                    date = LocalDate.of(2024, 6, 20),
+                    startTime = LocalTime.of(19, 30),
+                    endTime = null,
+                    instance = "Vault of the Incarnates",
+                    difficulty = "Heroic",
+                    optional = true,
+                    status = "SCHEDULED",
+                    totalSize = 25,
+                    notes = "Alt raid night",
+                    teamId = 2L,
+                    seasonId = 5L,
+                )
 
             val created = createRaidResponse(raidId = 42L)
             every { raidService.create(capture(requestSlot)) } returns created
@@ -235,22 +238,23 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated raid`() {
             // Given
-            val request = UpdateRaidRequest(
-                status = "COMPLETED",
-                presentSize = 19,
-                notes = "Cleared all bosses",
-            )
+            val request =
+                UpdateRaidRequest(
+                    status = "COMPLETED",
+                    presentSize = 19,
+                    notes = "Cleared all bosses",
+                )
 
-            val updated = createRaidResponse(
-                raidId = 1L,
-                status = "COMPLETED",
-                presentSize = 19,
-                notes = "Cleared all bosses",
-            )
+            val updated =
+                createRaidResponse(
+                    raidId = 1L,
+                    status = "COMPLETED",
+                    presentSize = 19,
+                    notes = "Cleared all bosses",
+                )
             every { raidService.update(1L, request) } returns updated
 
             // When
@@ -284,10 +288,11 @@ class RaidControllerTest : UnitTest() {
         fun `should pass correct request to service with partial update`() {
             // Given
             val requestSlot = slot<UpdateRaidRequest>()
-            val request = UpdateRaidRequest(
-                endTime = LocalTime.of(22, 45),
-                presentSize = 18,
-            )
+            val request =
+                UpdateRaidRequest(
+                    endTime = LocalTime.of(22, 45),
+                    presentSize = 18,
+                )
 
             val updated = createRaidResponse(raidId = 5L)
             every { raidService.update(eq(5L), capture(requestSlot)) } returns updated
@@ -305,7 +310,6 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -337,7 +341,6 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when raid exists`() {
             // Given
@@ -366,21 +369,22 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class FindByTeamTests {
-
         @Test
         fun `should return raids for a team with pagination`() {
             // Given
             val teamId = 1L
-            val raids = listOf(
-                createRaidResponse(raidId = 1L, teamId = teamId),
-                createRaidResponse(raidId = 2L, teamId = teamId),
-            )
-            val expectedResponse = PagedResponse(
-                content = raids,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val raids =
+                listOf(
+                    createRaidResponse(raidId = 1L, teamId = teamId),
+                    createRaidResponse(raidId = 2L, teamId = teamId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = raids,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { raidService.findByTeam(teamId, any()) } returns expectedResponse
 
             // When
@@ -397,12 +401,13 @@ class RaidControllerTest : UnitTest() {
         @Test
         fun `should return empty response when team has no raids`() {
             // Given
-            val expectedResponse = PagedResponse<RaidResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<RaidResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { raidService.findByTeam(999L, any()) } returns expectedResponse
 
             // When
@@ -416,22 +421,23 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class FindByDateRangeTests {
-
         @Test
         fun `should return raids within date range`() {
             // Given
             val startDate = LocalDate.of(2024, 1, 1)
             val endDate = LocalDate.of(2024, 3, 31)
-            val raids = listOf(
-                createRaidResponse(raidId = 1L, date = LocalDate.of(2024, 1, 15)),
-                createRaidResponse(raidId = 2L, date = LocalDate.of(2024, 2, 20)),
-            )
-            val expectedResponse = PagedResponse(
-                content = raids,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val raids =
+                listOf(
+                    createRaidResponse(raidId = 1L, date = LocalDate.of(2024, 1, 15)),
+                    createRaidResponse(raidId = 2L, date = LocalDate.of(2024, 2, 20)),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = raids,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { raidService.findByDateRange(startDate, endDate, any()) } returns expectedResponse
 
             // When
@@ -450,12 +456,13 @@ class RaidControllerTest : UnitTest() {
             // Given
             val startDate = LocalDate.of(2020, 1, 1)
             val endDate = LocalDate.of(2020, 12, 31)
-            val expectedResponse = PagedResponse<RaidResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<RaidResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { raidService.findByDateRange(startDate, endDate, any()) } returns expectedResponse
 
             // When
@@ -469,7 +476,6 @@ class RaidControllerTest : UnitTest() {
 
     @Nested
     inner class CountByTeamTests {
-
         @Test
         fun `should return count for team`() {
             // Given
@@ -516,24 +522,25 @@ class RaidControllerTest : UnitTest() {
         createdAt: OffsetDateTime? = OffsetDateTime.now(),
         updatedAt: OffsetDateTime? = OffsetDateTime.now(),
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): RaidResponse = RaidResponse(
-        raidId = raidId,
-        date = date,
-        startTime = startTime,
-        endTime = endTime,
-        instance = instance,
-        difficulty = difficulty,
-        optional = optional,
-        status = status,
-        presentSize = presentSize,
-        totalSize = totalSize,
-        notes = notes,
-        selectionsImage = selectionsImage,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        syncedAt = syncedAt,
-    )
+    ): RaidResponse =
+        RaidResponse(
+            raidId = raidId,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
+            instance = instance,
+            difficulty = difficulty,
+            optional = optional,
+            status = status,
+            presentSize = presentSize,
+            totalSize = totalSize,
+            notes = notes,
+            selectionsImage = selectionsImage,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            syncedAt = syncedAt,
+        )
 }

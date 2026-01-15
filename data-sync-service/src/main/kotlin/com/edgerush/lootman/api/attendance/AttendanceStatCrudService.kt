@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with attendance-stat-specific query methods.
  */
 interface AttendanceStatCrudService : CrudService<Long, CreateAttendanceStatRequest, UpdateAttendanceStatRequest, AttendanceStatResponse> {
-
     /**
      * Find attendance stats by character with pagination.
      *
@@ -18,7 +17,10 @@ interface AttendanceStatCrudService : CrudService<Long, CreateAttendanceStatRequ
      * @param pageRequest Pagination parameters
      * @return Paginated list of attendance stats for the character
      */
-    fun findByCharacterId(characterId: Long, pageRequest: PageRequest): PagedResponse<AttendanceStatResponse>
+    fun findByCharacterId(
+        characterId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<AttendanceStatResponse>
 
     /**
      * Find attendance stats by team with pagination.
@@ -27,7 +29,10 @@ interface AttendanceStatCrudService : CrudService<Long, CreateAttendanceStatRequ
      * @param pageRequest Pagination parameters
      * @return Paginated list of attendance stats for the team
      */
-    fun findByTeamId(teamId: Long, pageRequest: PageRequest): PagedResponse<AttendanceStatResponse>
+    fun findByTeamId(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<AttendanceStatResponse>
 
     /**
      * Find attendance stats by season with pagination.
@@ -36,7 +41,10 @@ interface AttendanceStatCrudService : CrudService<Long, CreateAttendanceStatRequ
      * @param pageRequest Pagination parameters
      * @return Paginated list of attendance stats for the season
      */
-    fun findBySeasonId(seasonId: Long, pageRequest: PageRequest): PagedResponse<AttendanceStatResponse>
+    fun findBySeasonId(
+        seasonId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<AttendanceStatResponse>
 
     /**
      * Count attendance stats for a character.

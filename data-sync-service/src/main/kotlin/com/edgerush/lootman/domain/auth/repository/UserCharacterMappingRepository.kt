@@ -9,7 +9,6 @@ import com.edgerush.lootman.domain.shared.RaiderId
  * Repository interface for UserCharacterMapping operations.
  */
 interface UserCharacterMappingRepository {
-
     /**
      * Finds a mapping by its unique identifier.
      */
@@ -33,7 +32,10 @@ interface UserCharacterMappingRepository {
     /**
      * Checks if a specific mapping exists.
      */
-    fun existsByUserIdAndRaiderId(userId: UserId, raiderId: RaiderId): Boolean
+    fun existsByUserIdAndRaiderId(
+        userId: UserId,
+        raiderId: RaiderId,
+    ): Boolean
 
     /**
      * Saves a mapping (creates or updates).

@@ -19,7 +19,6 @@ import java.time.Instant
  * requests, and results.
  */
 class InMemorySimulationRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemorySimulationRepository
 
     private val guildId = "test-guild"
@@ -32,7 +31,6 @@ class InMemorySimulationRepositoryTest : UnitTest() {
 
     @Nested
     inner class ProfileTests {
-
         @Test
         fun `should save and retrieve profile by id`() {
             // Given
@@ -128,7 +126,6 @@ class InMemorySimulationRepositoryTest : UnitTest() {
 
     @Nested
     inner class RequestTests {
-
         @Test
         fun `should save and retrieve request by id`() {
             // Given
@@ -208,7 +205,6 @@ class InMemorySimulationRepositoryTest : UnitTest() {
 
     @Nested
     inner class ResultTests {
-
         @Test
         fun `should save and retrieve results for profile`() {
             // Given
@@ -341,7 +337,6 @@ class InMemorySimulationRepositoryTest : UnitTest() {
 
     @Nested
     inner class ClearTests {
-
         @Test
         fun `should clear all data`() {
             // Given
@@ -365,14 +360,15 @@ class InMemorySimulationRepositoryTest : UnitTest() {
     private fun createProfile(
         characterName: String = "TestChar",
         characterRealm: String = "Area52",
-        profileContent: String = "priest=\"TestChar\"\nlevel=80"
-    ): SimulationProfile = SimulationProfile.create(
-        guildId = guildId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        profileContent = profileContent,
-        createdAt = now
-    )
+        profileContent: String = "priest=\"TestChar\"\nlevel=80",
+    ): SimulationProfile =
+        SimulationProfile.create(
+            guildId = guildId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            profileContent = profileContent,
+            createdAt = now,
+        )
 
     private fun createResult(
         itemId: Long = 12345L,
@@ -380,13 +376,14 @@ class InMemorySimulationRepositoryTest : UnitTest() {
         slot: String = "head",
         dpsGain: Double = 1000.0,
         percentGain: Double = 2.5,
-        simulatedAt: Instant = now
-    ): SimulationResult = SimulationResult.create(
-        itemId = itemId,
-        itemName = itemName,
-        slot = slot,
-        dpsGain = dpsGain,
-        percentGain = percentGain,
-        simulatedAt = simulatedAt
-    )
+        simulatedAt: Instant = now,
+    ): SimulationResult =
+        SimulationResult.create(
+            itemId = itemId,
+            itemName = itemName,
+            slot = slot,
+            dpsGain = dpsGain,
+            percentGain = percentGain,
+            simulatedAt = simulatedAt,
+        )
 }

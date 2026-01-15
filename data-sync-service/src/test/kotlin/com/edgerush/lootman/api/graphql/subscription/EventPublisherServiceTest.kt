@@ -11,18 +11,18 @@ import org.junit.jupiter.api.Test
  * Tests the aggregated event publisher service following TDD principles.
  */
 class EventPublisherServiceTest : UnitTest() {
-
     private val lootEventPublisher = LootEventPublisher()
     private val flpsEventPublisher = FlpsEventPublisher()
     private val penaltyEventPublisher = PenaltyEventPublisher()
     private val syncEventPublisher = SyncEventPublisher()
 
-    private val eventPublisherService = EventPublisherService(
-        loot = lootEventPublisher,
-        flps = flpsEventPublisher,
-        penalty = penaltyEventPublisher,
-        sync = syncEventPublisher,
-    )
+    private val eventPublisherService =
+        EventPublisherService(
+            loot = lootEventPublisher,
+            flps = flpsEventPublisher,
+            penalty = penaltyEventPublisher,
+            sync = syncEventPublisher,
+        )
 
     @Test
     fun `should provide access to loot event publisher`() {

@@ -43,12 +43,13 @@ class GearControllerTest : UnitTest() {
         getGearByTypeUseCase = mockk()
         saveGearUseCase = mockk()
         currentUserService = mockk()
-        controller = GearController(
-            getCurrentGearUseCase,
-            getGearByTypeUseCase,
-            saveGearUseCase,
-            currentUserService,
-        )
+        controller =
+            GearController(
+                getCurrentGearUseCase,
+                getGearByTypeUseCase,
+                saveGearUseCase,
+                currentUserService,
+            )
     }
 
     @Nested
@@ -89,9 +90,10 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should throw exception when gear not found`() {
             // Given
-            every { getCurrentGearUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Gear not found for raider: 999")
-            )
+            every { getCurrentGearUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Gear not found for raider: 999"),
+                )
 
             // When/Then
             try {
@@ -140,9 +142,10 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should throw exception when gear type not found`() {
             // Given
-            every { getGearByTypeUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Gear of type BEST not found for raider: 999")
-            )
+            every { getGearByTypeUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Gear of type BEST not found for raider: 999"),
+                )
 
             // When/Then
             try {
@@ -159,18 +162,20 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should return CREATED status with gear response`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemRequest(
-                        itemId = 100L,
-                        name = "Test Helm",
-                        itemLevel = 600,
-                        quality = "EPIC",
-                        slot = "HEAD"
-                    )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemRequest(
+                                itemId = 100L,
+                                name = "Test Helm",
+                                itemLevel = 600,
+                                quality = "EPIC",
+                                slot = "HEAD",
+                            ),
+                        ),
                 )
-            )
 
             val gearSet = createGearSet()
 
@@ -189,21 +194,23 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemRequest(
-                        itemId = 100L,
-                        name = "Test Helm",
-                        itemLevel = 600,
-                        quality = "EPIC",
-                        slot = "HEAD",
-                        isTierPiece = true,
-                        enchant = "+10 Stats",
-                        sockets = 2
-                    )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemRequest(
+                                itemId = 100L,
+                                name = "Test Helm",
+                                itemLevel = 600,
+                                quality = "EPIC",
+                                slot = "HEAD",
+                                isTierPiece = true,
+                                enchant = "+10 Stats",
+                                sockets = 2,
+                            ),
+                        ),
                 )
-            )
 
             val commandSlot = slot<SaveGearCommand>()
             val gearSet = createGearSet()
@@ -227,22 +234,25 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemRequest(
-                        itemId = 100L,
-                        name = "Test Item",
-                        itemLevel = 0, // Invalid
-                        quality = "EPIC",
-                        slot = "HEAD"
-                    )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemRequest(
+                                itemId = 100L,
+                                name = "Test Item",
+                                itemLevel = 0, // Invalid
+                                quality = "EPIC",
+                                slot = "HEAD",
+                            ),
+                        ),
                 )
-            )
 
-            every { saveGearUseCase.execute(any()) } returns Result.failure(
-                IllegalArgumentException("Item level must be positive")
-            )
+            every { saveGearUseCase.execute(any()) } returns
+                Result.failure(
+                    IllegalArgumentException("Item level must be positive"),
+                )
 
             // When/Then
             try {
@@ -259,24 +269,28 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should return updated gear`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemRequest(
-                        itemId = 100L,
-                        name = "Upgraded Helm",
-                        itemLevel = 620,
-                        quality = "EPIC",
-                        slot = "HEAD"
-                    )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemRequest(
+                                itemId = 100L,
+                                name = "Upgraded Helm",
+                                itemLevel = 620,
+                                quality = "EPIC",
+                                slot = "HEAD",
+                            ),
+                        ),
                 )
-            )
 
-            val updatedGearSet = createGearSet(
-                items = mapOf(
-                    EquipmentSlot.HEAD to createGearItem(itemLevel = 620, name = "Upgraded Helm")
+            val updatedGearSet =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(itemLevel = 620, name = "Upgraded Helm"),
+                        ),
                 )
-            )
 
             every { saveGearUseCase.execute(any()) } returns Result.success(updatedGearSet)
 
@@ -293,10 +307,11 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should pass correct command with path variable raiderId`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "BEST",
-                items = emptyList()
-            )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "BEST",
+                    items = emptyList(),
+                )
 
             val commandSlot = slot<SaveGearCommand>()
             val gearSet = createGearSet(gearSetType = GearSetType.BEST, items = emptyMap())
@@ -314,22 +329,25 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = SaveGearRequest(
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemRequest(
-                        itemId = 100L,
-                        name = "Invalid Item",
-                        itemLevel = 600,
-                        quality = "EPIC",
-                        slot = "HEAD"
-                    )
+            val request =
+                SaveGearRequest(
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemRequest(
+                                itemId = 100L,
+                                name = "Invalid Item",
+                                itemLevel = 600,
+                                quality = "EPIC",
+                                slot = "HEAD",
+                            ),
+                        ),
                 )
-            )
 
-            every { saveGearUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Raider not found: 999")
-            )
+            every { saveGearUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Raider not found: 999"),
+                )
 
             // When/Then
             try {
@@ -346,25 +364,28 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should correctly map all gear fields to response`() {
             // Given
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(
-                    itemId = ItemId(100L),
-                    name = "Tier Helm",
-                    itemLevel = 610,
-                    quality = ItemQuality.EPIC,
-                    slot = EquipmentSlot.HEAD,
-                    isTierPiece = true,
-                    enchant = "+10 Int",
-                    sockets = 1
-                ),
-                EquipmentSlot.SHOULDER to createGearItem(
-                    itemId = ItemId(200L),
-                    name = "Tier Shoulders",
-                    itemLevel = 610,
-                    slot = EquipmentSlot.SHOULDER,
-                    isTierPiece = true
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to
+                        createGearItem(
+                            itemId = ItemId(100L),
+                            name = "Tier Helm",
+                            itemLevel = 610,
+                            quality = ItemQuality.EPIC,
+                            slot = EquipmentSlot.HEAD,
+                            isTierPiece = true,
+                            enchant = "+10 Int",
+                            sockets = 1,
+                        ),
+                    EquipmentSlot.SHOULDER to
+                        createGearItem(
+                            itemId = ItemId(200L),
+                            name = "Tier Shoulders",
+                            itemLevel = 610,
+                            slot = EquipmentSlot.SHOULDER,
+                            isTierPiece = true,
+                        ),
                 )
-            )
             val gearSet = createGearSet(items = items)
 
             every { getCurrentGearUseCase.execute(any()) } returns Result.success(gearSet)
@@ -384,18 +405,20 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should correctly map gear item details`() {
             // Given
-            val items = mapOf(
-                EquipmentSlot.CHEST to createGearItem(
-                    itemId = ItemId(300L),
-                    name = "Legendary Chestplate",
-                    itemLevel = 639,
-                    quality = ItemQuality.LEGENDARY,
-                    slot = EquipmentSlot.CHEST,
-                    isTierPiece = false,
-                    enchant = "+15 Stats",
-                    sockets = 3
+            val items =
+                mapOf(
+                    EquipmentSlot.CHEST to
+                        createGearItem(
+                            itemId = ItemId(300L),
+                            name = "Legendary Chestplate",
+                            itemLevel = 639,
+                            quality = ItemQuality.LEGENDARY,
+                            slot = EquipmentSlot.CHEST,
+                            isTierPiece = false,
+                            enchant = "+15 Stats",
+                            sockets = 3,
+                        ),
                 )
-            )
             val gearSet = createGearSet(items = items)
 
             every { getCurrentGearUseCase.execute(any()) } returns Result.success(gearSet)
@@ -418,12 +441,13 @@ class GearControllerTest : UnitTest() {
         @Test
         fun `should return 4-piece bonus when 4 or more tier pieces equipped`() {
             // Given
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
-                EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
+                    EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true),
+                )
             val gearSet = createGearSet(items = items)
 
             every { getCurrentGearUseCase.execute(any()) } returns Result.success(gearSet)
@@ -458,14 +482,16 @@ class GearControllerTest : UnitTest() {
     }
 
     private fun createGearSet(
-        items: Map<EquipmentSlot, GearItem> = mapOf(
-            EquipmentSlot.HEAD to createGearItem()
-        ),
-        gearSetType: GearSetType = GearSetType.EQUIPPED
-    ): GearSet = GearSet(
-        items = items,
-        gearSetType = gearSetType
-    )
+        items: Map<EquipmentSlot, GearItem> =
+            mapOf(
+                EquipmentSlot.HEAD to createGearItem(),
+            ),
+        gearSetType: GearSetType = GearSetType.EQUIPPED,
+    ): GearSet =
+        GearSet(
+            items = items,
+            gearSetType = gearSetType,
+        )
 
     private fun createGearItem(
         itemId: ItemId = ItemId(12345L),
@@ -475,15 +501,16 @@ class GearControllerTest : UnitTest() {
         slot: EquipmentSlot = EquipmentSlot.HEAD,
         isTierPiece: Boolean = false,
         enchant: String? = null,
-        sockets: Int = 0
-    ): GearItem = GearItem(
-        itemId = itemId,
-        name = name,
-        itemLevel = itemLevel,
-        quality = quality,
-        slot = slot,
-        isTierPiece = isTierPiece,
-        enchant = enchant,
-        sockets = sockets
-    )
+        sockets: Int = 0,
+    ): GearItem =
+        GearItem(
+            itemId = itemId,
+            name = name,
+            itemLevel = itemLevel,
+            quality = quality,
+            slot = slot,
+            isTierPiece = isTierPiece,
+            enchant = enchant,
+            sockets = sockets,
+        )
 }

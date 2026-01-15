@@ -14,5 +14,5 @@ enum class TrialStatus(val isTerminal: Boolean) {
     PROMOTED(true),
 
     /** Trial ended without promotion */
-    ENDED(true)
+    ENDED(true),
 }

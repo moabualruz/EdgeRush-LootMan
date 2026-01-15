@@ -1,9 +1,9 @@
 package com.edgerush.lootman.infrastructure.discord
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.model.DiscordUserLink
 import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -14,13 +14,11 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 /**
  * Unit tests for InMemoryDiscordUserLinkRepository.
  */
 class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemoryDiscordUserLinkRepository
 
     private val discordUserId1 = DiscordUserId("123456789012345678")
@@ -36,17 +34,17 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
     private fun createLink(
         discordUserId: DiscordUserId = discordUserId1,
         raiderId: RaiderId = raiderId1,
-        isPrimary: Boolean = false
-    ): DiscordUserLink = DiscordUserLink.create(
-        discordUserId = discordUserId,
-        raiderId = raiderId,
-        isPrimary = isPrimary,
-        linkedBy = "test"
-    )
+        isPrimary: Boolean = false,
+    ): DiscordUserLink =
+        DiscordUserLink.create(
+            discordUserId = discordUserId,
+            raiderId = raiderId,
+            isPrimary = isPrimary,
+            linkedBy = "test",
+        )
 
     @Nested
     inner class Save {
-
         @Test
         fun `should save link and assign ID`() {
             // Arrange
@@ -88,7 +86,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindById {
-
         @Test
         fun `should find saved link`() {
             // Arrange
@@ -114,7 +111,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByDiscordUserId {
-
         @Test
         fun `should find all links for Discord user`() {
             // Arrange
@@ -145,7 +141,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindPrimaryByDiscordUserId {
-
         @Test
         fun `should find primary link`() {
             // Arrange
@@ -176,7 +171,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderId {
-
         @Test
         fun `should find all links for raider`() {
             // Arrange
@@ -193,7 +187,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByDiscordUserIdAndRaiderId {
-
         @Test
         fun `should return true when link exists`() {
             // Arrange
@@ -218,7 +211,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteById {
-
         @Test
         fun `should delete link`() {
             // Arrange
@@ -234,7 +226,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteByDiscordUserId {
-
         @Test
         fun `should delete all links for Discord user`() {
             // Arrange
@@ -254,7 +245,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class ClearPrimaryForDiscordUser {
-
         @Test
         fun `should clear primary flag`() {
             // Arrange
@@ -285,7 +275,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountByDiscordUserId {
-
         @Test
         fun `should count links for Discord user`() {
             // Arrange
@@ -302,15 +291,16 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllPaginated {
-
         @Test
         fun `should return paginated results`() {
             // Arrange
             repeat(5) { i ->
-                repository.save(createLink(
-                    discordUserId = DiscordUserId("12345678901234567${i}"),
-                    raiderId = RaiderId(i.toLong() + 1)
-                ))
+                repository.save(
+                    createLink(
+                        discordUserId = DiscordUserId("12345678901234567$i"),
+                        raiderId = RaiderId(i.toLong() + 1),
+                    ),
+                )
             }
 
             // Act
@@ -325,7 +315,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class Count {
-
         @Test
         fun `should count all links`() {
             // Arrange
@@ -342,7 +331,6 @@ class InMemoryDiscordUserLinkRepositoryTest : UnitTest() {
 
     @Nested
     inner class Clear {
-
         @Test
         fun `should clear all data`() {
             // Arrange

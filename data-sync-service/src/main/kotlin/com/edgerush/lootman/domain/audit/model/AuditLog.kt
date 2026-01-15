@@ -17,7 +17,7 @@ data class AuditLog(
     val userId: String,
     val username: String,
     val isAdminMode: Boolean,
-    val requestId: String?
+    val requestId: String?,
 ) {
     companion object {
         /**
@@ -32,7 +32,7 @@ data class AuditLog(
             userId: String,
             username: String,
             isAdminMode: Boolean,
-            requestId: String?
+            requestId: String?,
         ): AuditLog {
             require(entityType.isNotBlank()) { "Entity type must not be blank" }
             require(entityId.isNotBlank()) { "Entity ID must not be blank" }
@@ -48,7 +48,7 @@ data class AuditLog(
                 userId = userId,
                 username = username,
                 isAdminMode = isAdminMode,
-                requestId = requestId
+                requestId = requestId,
             )
         }
     }
@@ -74,5 +74,5 @@ enum class AuditOperation {
     CREATE,
     READ,
     UPDATE,
-    DELETE
+    DELETE,
 }

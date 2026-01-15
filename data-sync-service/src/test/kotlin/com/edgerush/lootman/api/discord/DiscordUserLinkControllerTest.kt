@@ -23,7 +23,6 @@ import java.time.Instant
  * Unit tests for DiscordUserLinkController.
  */
 class DiscordUserLinkControllerTest : UnitTest() {
-
     private lateinit var discordUserLinkService: DiscordUserLinkCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: DiscordUserLinkController
@@ -42,28 +41,28 @@ class DiscordUserLinkControllerTest : UnitTest() {
         id: Long = 1L,
         discordUserId: String = this.discordUserId,
         raiderId: Long = this.raiderId,
-        isPrimary: Boolean = false
+        isPrimary: Boolean = false,
     ) = DiscordUserLinkResponse(
         id = id,
         discordUserId = discordUserId,
         raiderId = raiderId,
         isPrimary = isPrimary,
         linkedAt = Instant.now(),
-        linkedBy = "test"
+        linkedBy = "test",
     )
 
     @Nested
     inner class FindAll {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { discordUserLinkService.findAll(any()) } returns expectedResponse
 
             // When
@@ -80,12 +79,13 @@ class DiscordUserLinkControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<DiscordUserLinkResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<DiscordUserLinkResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { discordUserLinkService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -98,7 +98,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class FindById {
-
         @Test
         fun `should return link when found`() {
             // Given
@@ -127,15 +126,15 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class Create {
-
         @Test
         fun `should create link and return 201 status`() {
             // Given
-            val request = CreateDiscordUserLinkRequest(
-                discordUserId = discordUserId,
-                raiderId = raiderId,
-                isPrimary = false
-            )
+            val request =
+                CreateDiscordUserLinkRequest(
+                    discordUserId = discordUserId,
+                    raiderId = raiderId,
+                    isPrimary = false,
+                )
             val expected = createResponse(id = 1L)
             every { discordUserLinkService.create(request) } returns expected
 
@@ -163,7 +162,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class Update {
-
         @Test
         fun `should update link`() {
             // Given
@@ -183,7 +181,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class Delete {
-
         @Test
         fun `should delete link and return 204 status`() {
             // Given
@@ -200,7 +197,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class Exists {
-
         @Test
         fun `should return true when link exists`() {
             // Given
@@ -228,14 +224,14 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class FindByDiscordUserId {
-
         @Test
         fun `should return all links for Discord user`() {
             // Given
-            val expected = listOf(
-                createResponse(id = 1L, raiderId = 1L),
-                createResponse(id = 2L, raiderId = 2L)
-            )
+            val expected =
+                listOf(
+                    createResponse(id = 1L, raiderId = 1L),
+                    createResponse(id = 2L, raiderId = 2L),
+                )
             every { discordUserLinkService.findByDiscordUserId(discordUserId) } returns expected
 
             // When
@@ -249,7 +245,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class FindPrimaryByDiscordUserId {
-
         @Test
         fun `should return primary link`() {
             // Given
@@ -266,7 +261,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class CountByDiscordUserId {
-
         @Test
         fun `should return count of links`() {
             // Given
@@ -282,7 +276,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteByDiscordUserId {
-
         @Test
         fun `should delete all links and return count`() {
             // Given
@@ -298,14 +291,14 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderId {
-
         @Test
         fun `should return all links for raider`() {
             // Given
-            val expected = listOf(
-                createResponse(id = 1L, discordUserId = "111111111111111111"),
-                createResponse(id = 2L, discordUserId = "222222222222222222")
-            )
+            val expected =
+                listOf(
+                    createResponse(id = 1L, discordUserId = "111111111111111111"),
+                    createResponse(id = 2L, discordUserId = "222222222222222222"),
+                )
             every { discordUserLinkService.findByRaiderId(raiderId) } returns expected
 
             // When
@@ -318,7 +311,6 @@ class DiscordUserLinkControllerTest : UnitTest() {
 
     @Nested
     inner class SetPrimary {
-
         @Test
         fun `should set link as primary`() {
             // Given

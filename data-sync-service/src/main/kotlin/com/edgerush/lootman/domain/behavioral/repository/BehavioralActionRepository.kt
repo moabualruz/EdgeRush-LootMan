@@ -31,7 +31,10 @@ interface BehavioralActionRepository {
      * @param limit The maximum number of records to return
      * @return List of behavioral action entities
      */
-    fun findAll(offset: Long, limit: Int): List<BehavioralActionEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity>
 
     /**
      * Counts all behavioral actions.
@@ -48,7 +51,11 @@ interface BehavioralActionRepository {
      * @param limit The maximum number of records to return
      * @return List of behavioral action entities for the guild
      */
-    fun findByGuildId(guildId: String, offset: Long, limit: Int): List<BehavioralActionEntity>
+    fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity>
 
     /**
      * Counts behavioral actions for a guild.
@@ -66,7 +73,11 @@ interface BehavioralActionRepository {
      * @param limit The maximum number of records to return
      * @return List of active behavioral action entities for the guild
      */
-    fun findActiveByGuildId(guildId: String, offset: Long, limit: Int): List<BehavioralActionEntity>
+    fun findActiveByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity>
 
     /**
      * Counts active behavioral actions for a guild.
@@ -85,7 +96,12 @@ interface BehavioralActionRepository {
      * @param limit The maximum number of records to return
      * @return List of behavioral action entities for the character
      */
-    fun findByCharacter(guildId: String, characterName: String, offset: Long, limit: Int): List<BehavioralActionEntity>
+    fun findByCharacter(
+        guildId: String,
+        characterName: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity>
 
     /**
      * Counts behavioral actions for a character.
@@ -94,7 +110,10 @@ interface BehavioralActionRepository {
      * @param characterName The character name
      * @return The count of behavioral actions for the character
      */
-    fun countByCharacter(guildId: String, characterName: String): Long
+    fun countByCharacter(
+        guildId: String,
+        characterName: String,
+    ): Long
 
     /**
      * Gets the total active deduction amount for a character.
@@ -103,7 +122,10 @@ interface BehavioralActionRepository {
      * @param characterName The character name
      * @return The total deduction amount (0.0 to 1.0)
      */
-    fun getTotalActiveDeduction(guildId: String, characterName: String): Double
+    fun getTotalActiveDeduction(
+        guildId: String,
+        characterName: String,
+    ): Double
 
     /**
      * Saves a behavioral action entity.

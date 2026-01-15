@@ -17,7 +17,6 @@ import org.springframework.boot.actuate.health.Status
 import java.time.Instant
 
 class SimulationHealthIndicatorTest : UnitTest() {
-
     private lateinit var simulationRepository: SimulationRepository
     private lateinit var dockerSimulationExecutor: DockerSimulationExecutor
     private lateinit var healthIndicator: SimulationHealthIndicator
@@ -30,13 +29,14 @@ class SimulationHealthIndicatorTest : UnitTest() {
     }
 
     private fun createPendingRequest(): SimulationRequest {
-        val profile = SimulationProfile.create(
-            guildId = "guild-123",
-            characterName = "Testchar",
-            characterRealm = "TestRealm",
-            profileContent = """warrior="Testchar"""",
-            createdAt = Instant.now()
-        )
+        val profile =
+            SimulationProfile.create(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                profileContent = """warrior="Testchar"""",
+                createdAt = Instant.now(),
+            )
         return SimulationRequest.create(profile = profile)
     }
 

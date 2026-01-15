@@ -8,7 +8,6 @@ import com.edgerush.lootman.domain.shared.GuildId
  * Repository interface for User operations.
  */
 interface UserRepository {
-
     /**
      * Finds a user by their unique identifier.
      *
@@ -79,7 +78,10 @@ interface UserRepository {
      * @param limit The maximum number of records to return
      * @return Paginated list of users
      */
-    fun findAll(offset: Long, limit: Int): List<User>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<User>
 
     /**
      * Counts all users.

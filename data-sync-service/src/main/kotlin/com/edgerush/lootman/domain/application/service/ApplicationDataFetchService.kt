@@ -30,26 +30,32 @@ class ApplicationDataFetchService(
      * @return Combined character data
      * @throws CharacterNotFoundException if the character is not found in Raider.IO
      */
-    fun fetchCharacterData(region: String, realm: String, name: String): CharacterFetchResult {
+    fun fetchCharacterData(
+        region: String,
+        realm: String,
+        name: String,
+    ): CharacterFetchResult {
         log.info("Fetching character data for {}-{}-{}", name, realm, region)
 
         // Fetch RaiderIO data (required)
-        val raiderIOProfile = raiderIOClient.fetchCharacterProfile(region, realm, name)
-            .block()
-            ?: throw CharacterNotFoundException("Character not found: $name-$realm-$region")
+        val raiderIOProfile =
+            raiderIOClient.fetchCharacterProfile(region, realm, name)
+                .block()
+                ?: throw CharacterNotFoundException("Character not found: $name-$realm-$region")
 
         // Fetch WarcraftLogs data (optional - don't fail if unavailable)
-        val warcraftLogsResult = try {
-            warcraftLogsClient.fetchCharacterParses(region, realm, name)
-                .onErrorResume { error ->
-                    log.warn("Failed to fetch Warcraft Logs data for {}: {}", name, error.message)
-                    Mono.empty()
-                }
-                .block()
-        } catch (e: Exception) {
-            log.warn("Exception fetching Warcraft Logs data for {}: {}", name, e.message)
-            null
-        }
+        val warcraftLogsResult =
+            try {
+                warcraftLogsClient.fetchCharacterParses(region, realm, name)
+                    .onErrorResume { error ->
+                        log.warn("Failed to fetch Warcraft Logs data for {}: {}", name, error.message)
+                        Mono.empty()
+                    }
+                    .block()
+            } catch (e: Exception) {
+                log.warn("Exception fetching Warcraft Logs data for {}: {}", name, e.message)
+                null
+            }
 
         return CharacterFetchResult(
             characterName = raiderIOProfile.name,
@@ -69,14 +75,22 @@ class ApplicationDataFetchService(
     /**
      * Fetches only Raider.IO data for a character.
      */
-    fun fetchRaiderIOData(region: String, realm: String, name: String): RaiderIOCharacterProfile? {
+    fun fetchRaiderIOData(
+        region: String,
+        realm: String,
+        name: String,
+    ): RaiderIOCharacterProfile? {
         return raiderIOClient.fetchCharacterProfile(region, realm, name).block()
     }
 
     /**
      * Fetches only Warcraft Logs data for a character.
      */
-    fun fetchWarcraftLogsData(region: String, realm: String, name: String): WarcraftLogsParseResult? {
+    fun fetchWarcraftLogsData(
+        region: String,
+        realm: String,
+        name: String,
+    ): WarcraftLogsParseResult? {
         return warcraftLogsClient.fetchCharacterParses(region, realm, name).block()
     }
 }

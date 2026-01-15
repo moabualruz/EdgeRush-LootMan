@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.auth
 
 import com.edgerush.lootman.domain.auth.model.User
-import com.edgerush.lootman.domain.auth.model.UserRole
 import java.time.Instant
 
 /**
@@ -9,7 +8,7 @@ import java.time.Instant
  */
 data class OAuth2UrlResponse(
     val url: String,
-    val provider: String
+    val provider: String,
 )
 
 /**
@@ -17,7 +16,7 @@ data class OAuth2UrlResponse(
  */
 data class OAuth2CallbackRequest(
     val code: String,
-    val state: String? = null
+    val state: String? = null,
 )
 
 /**
@@ -27,14 +26,14 @@ data class TokenResponse(
     val accessToken: String,
     val refreshToken: String,
     val expiresIn: Long,
-    val tokenType: String = "Bearer"
+    val tokenType: String = "Bearer",
 )
 
 /**
  * Request to refresh an access token.
  */
 data class RefreshTokenRequest(
-    val refreshToken: String
+    val refreshToken: String,
 )
 
 /**
@@ -50,21 +49,22 @@ data class UserProfileResponse(
     val role: String,
     val guildId: String?,
     val createdAt: Instant,
-    val lastLogin: Instant?
+    val lastLogin: Instant?,
 ) {
     companion object {
-        fun from(user: User): UserProfileResponse = UserProfileResponse(
-            id = user.id!!.value,
-            discordId = user.discordId,
-            battlenetId = user.battlenetId,
-            username = user.username,
-            email = user.email,
-            avatarUrl = user.avatarUrl,
-            role = user.role.name,
-            guildId = user.guildId?.value,
-            createdAt = user.createdAt,
-            lastLogin = user.lastLogin
-        )
+        fun from(user: User): UserProfileResponse =
+            UserProfileResponse(
+                id = user.id!!.value,
+                discordId = user.discordId,
+                battlenetId = user.battlenetId,
+                username = user.username,
+                email = user.email,
+                avatarUrl = user.avatarUrl,
+                role = user.role.name,
+                guildId = user.guildId?.value,
+                createdAt = user.createdAt,
+                lastLogin = user.lastLogin,
+            )
     }
 }
 
@@ -73,7 +73,7 @@ data class UserProfileResponse(
  */
 data class LogoutResponse(
     val success: Boolean,
-    val message: String = "Successfully logged out"
+    val message: String = "Successfully logged out",
 )
 
 /**
@@ -85,7 +85,7 @@ data class DiscordUserInfo(
     val discriminator: String,
     val avatar: String?,
     val email: String?,
-    val verified: Boolean?
+    val verified: Boolean?,
 ) {
     val avatarUrl: String?
         get() = avatar?.let { "https://cdn.discordapp.com/avatars/$id/$it.png" }
@@ -97,5 +97,5 @@ data class DiscordUserInfo(
 data class BattlenetUserInfo(
     val sub: String,
     val id: Long,
-    val battletag: String
+    val battletag: String,
 )

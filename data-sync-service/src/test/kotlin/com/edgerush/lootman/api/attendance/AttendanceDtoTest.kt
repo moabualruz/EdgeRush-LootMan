@@ -21,22 +21,21 @@ import java.time.LocalDate
  * Tests DTO construction, mapping from domain models, and data integrity.
  */
 class AttendanceDtoTest : UnitTest() {
-
     @Nested
     inner class TrackAttendanceRequestTest {
-
         @Test
         fun `should create request with all fields`() {
-            val request = TrackAttendanceRequest(
-                raiderId = 123L,
-                guildId = "guild-456",
-                instance = "Nerub-ar Palace",
-                encounter = "Queen Ansurek",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 8,
-                totalRaids = 10
-            )
+            val request =
+                TrackAttendanceRequest(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    instance = "Nerub-ar Palace",
+                    encounter = "Queen Ansurek",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                )
 
             request.raiderId shouldBe 123L
             request.guildId shouldBe "guild-456"
@@ -50,43 +49,46 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should create request with null encounter`() {
-            val request = TrackAttendanceRequest(
-                raiderId = 123L,
-                guildId = "guild-456",
-                instance = "Nerub-ar Palace",
-                encounter = null,
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 8,
-                totalRaids = 10
-            )
+            val request =
+                TrackAttendanceRequest(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    instance = "Nerub-ar Palace",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                )
 
             request.encounter shouldBe null
         }
 
         @Test
         fun `should support equality`() {
-            val request1 = TrackAttendanceRequest(
-                raiderId = 123L,
-                guildId = "guild-456",
-                instance = "Nerub-ar Palace",
-                encounter = null,
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 8,
-                totalRaids = 10
-            )
+            val request1 =
+                TrackAttendanceRequest(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    instance = "Nerub-ar Palace",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                )
 
-            val request2 = TrackAttendanceRequest(
-                raiderId = 123L,
-                guildId = "guild-456",
-                instance = "Nerub-ar Palace",
-                encounter = null,
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 8,
-                totalRaids = 10
-            )
+            val request2 =
+                TrackAttendanceRequest(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    instance = "Nerub-ar Palace",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                )
 
             request1 shouldBe request2
         }
@@ -94,19 +96,19 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class TrackAttendanceResponseTest {
-
         @Test
         fun `should create from attendance record`() {
-            val record = AttendanceRecord.create(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                instance = "Nerub-ar Palace",
-                encounter = "Queen Ansurek",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 8,
-                totalRaids = 10
-            )
+            val record =
+                AttendanceRecord.create(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    instance = "Nerub-ar Palace",
+                    encounter = "Queen Ansurek",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                )
 
             val response = TrackAttendanceResponse.from(record)
 
@@ -125,16 +127,17 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should create from record without encounter`() {
-            val record = AttendanceRecord.create(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                instance = "Nerub-ar Palace",
-                encounter = null,
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 10,
-                totalRaids = 10
-            )
+            val record =
+                AttendanceRecord.create(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    instance = "Nerub-ar Palace",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 10,
+                    totalRaids = 10,
+                )
 
             val response = TrackAttendanceResponse.from(record)
 
@@ -144,16 +147,17 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should handle zero attendance`() {
-            val record = AttendanceRecord.create(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                instance = "Nerub-ar Palace",
-                encounter = null,
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                attendedRaids = 0,
-                totalRaids = 10
-            )
+            val record =
+                AttendanceRecord.create(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    instance = "Nerub-ar Palace",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    attendedRaids = 0,
+                    totalRaids = 10,
+                )
 
             val response = TrackAttendanceResponse.from(record)
 
@@ -163,17 +167,17 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class UpdateAttendanceRequestTest {
-
         @Test
         fun `should create request with all fields`() {
-            val request = UpdateAttendanceRequest(
-                instance = "Updated Instance",
-                encounter = "Updated Encounter",
-                startDate = LocalDate.of(2024, 12, 1),
-                endDate = LocalDate.of(2024, 12, 14),
-                attendedRaids = 9,
-                totalRaids = 10
-            )
+            val request =
+                UpdateAttendanceRequest(
+                    instance = "Updated Instance",
+                    encounter = "Updated Encounter",
+                    startDate = LocalDate.of(2024, 12, 1),
+                    endDate = LocalDate.of(2024, 12, 14),
+                    attendedRaids = 9,
+                    totalRaids = 10,
+                )
 
             request.instance shouldBe "Updated Instance"
             request.encounter shouldBe "Updated Encounter"
@@ -197,10 +201,11 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should create request with partial fields`() {
-            val request = UpdateAttendanceRequest(
-                instance = "Updated Instance",
-                attendedRaids = 8
-            )
+            val request =
+                UpdateAttendanceRequest(
+                    instance = "Updated Instance",
+                    attendedRaids = 8,
+                )
 
             request.instance shouldBe "Updated Instance"
             request.attendedRaids shouldBe 8
@@ -212,24 +217,27 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should support equality`() {
-            val request1 = UpdateAttendanceRequest(
-                instance = "Instance",
-                attendedRaids = 5
-            )
-            val request2 = UpdateAttendanceRequest(
-                instance = "Instance",
-                attendedRaids = 5
-            )
+            val request1 =
+                UpdateAttendanceRequest(
+                    instance = "Instance",
+                    attendedRaids = 5,
+                )
+            val request2 =
+                UpdateAttendanceRequest(
+                    instance = "Instance",
+                    attendedRaids = 5,
+                )
 
             request1 shouldBe request2
         }
 
         @Test
         fun `should support copy`() {
-            val request = UpdateAttendanceRequest(
-                instance = "Instance",
-                attendedRaids = 5
-            )
+            val request =
+                UpdateAttendanceRequest(
+                    instance = "Instance",
+                    attendedRaids = 5,
+                )
 
             val copied = request.copy(totalRaids = 10)
 
@@ -241,19 +249,19 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class AttendanceReportResponseTest {
-
         @Test
         fun `should create from attendance report`() {
             val stats = AttendanceStats.calculate(attendedRaids = 8, totalRaids = 10)
-            val report = AttendanceReport(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                instance = "Nerub-ar Palace",
-                encounter = "Queen Ansurek",
-                stats = stats
-            )
+            val report =
+                AttendanceReport(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    instance = "Nerub-ar Palace",
+                    encounter = "Queen Ansurek",
+                    stats = stats,
+                )
 
             val response = AttendanceReportResponse.from(report)
 
@@ -272,15 +280,16 @@ class AttendanceDtoTest : UnitTest() {
         @Test
         fun `should create from report without instance or encounter`() {
             val stats = AttendanceStats.calculate(attendedRaids = 10, totalRaids = 10)
-            val report = AttendanceReport(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                instance = null,
-                encounter = null,
-                stats = stats
-            )
+            val report =
+                AttendanceReport(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    instance = null,
+                    encounter = null,
+                    stats = stats,
+                )
 
             val response = AttendanceReportResponse.from(report)
 
@@ -292,7 +301,6 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class AttendanceStatsDtoTest {
-
         @Test
         fun `should create from attendance stats`() {
             val stats = AttendanceStats.calculate(attendedRaids = 7, totalRaids = 10)
@@ -325,46 +333,47 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class RaiderAttendanceHistoryResponseTest {
-
         @Test
         fun `should create response with records`() {
-            val records = listOf(
-                TrackAttendanceResponse(
-                    recordId = "record-1",
-                    raiderId = 123L,
-                    guildId = "guild-456",
-                    instance = "Instance 1",
-                    encounter = null,
-                    startDate = LocalDate.of(2024, 11, 1),
-                    endDate = LocalDate.of(2024, 11, 7),
-                    attendedRaids = 8,
-                    totalRaids = 10,
-                    attendancePercentage = 0.8,
-                    recordedAt = Instant.now()
-                ),
-                TrackAttendanceResponse(
-                    recordId = "record-2",
-                    raiderId = 123L,
-                    guildId = "guild-456",
-                    instance = "Instance 2",
-                    encounter = null,
-                    startDate = LocalDate.of(2024, 11, 8),
-                    endDate = LocalDate.of(2024, 11, 14),
-                    attendedRaids = 9,
-                    totalRaids = 10,
-                    attendancePercentage = 0.9,
-                    recordedAt = Instant.now()
+            val records =
+                listOf(
+                    TrackAttendanceResponse(
+                        recordId = "record-1",
+                        raiderId = 123L,
+                        guildId = "guild-456",
+                        instance = "Instance 1",
+                        encounter = null,
+                        startDate = LocalDate.of(2024, 11, 1),
+                        endDate = LocalDate.of(2024, 11, 7),
+                        attendedRaids = 8,
+                        totalRaids = 10,
+                        attendancePercentage = 0.8,
+                        recordedAt = Instant.now(),
+                    ),
+                    TrackAttendanceResponse(
+                        recordId = "record-2",
+                        raiderId = 123L,
+                        guildId = "guild-456",
+                        instance = "Instance 2",
+                        encounter = null,
+                        startDate = LocalDate.of(2024, 11, 8),
+                        endDate = LocalDate.of(2024, 11, 14),
+                        attendedRaids = 9,
+                        totalRaids = 10,
+                        attendancePercentage = 0.9,
+                        recordedAt = Instant.now(),
+                    ),
                 )
-            )
 
-            val response = RaiderAttendanceHistoryResponse(
-                raiderId = 123L,
-                guildId = "guild-456",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                records = records,
-                totalRecords = 2
-            )
+            val response =
+                RaiderAttendanceHistoryResponse(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    records = records,
+                    totalRecords = 2,
+                )
 
             response.raiderId shouldBe 123L
             response.guildId shouldBe "guild-456"
@@ -376,14 +385,15 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should create empty response`() {
-            val response = RaiderAttendanceHistoryResponse(
-                raiderId = 123L,
-                guildId = "guild-456",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                records = emptyList(),
-                totalRecords = 0
-            )
+            val response =
+                RaiderAttendanceHistoryResponse(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    records = emptyList(),
+                    totalRecords = 0,
+                )
 
             response.records shouldBe emptyList()
             response.totalRecords shouldBe 0
@@ -391,22 +401,24 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should support equality`() {
-            val response1 = RaiderAttendanceHistoryResponse(
-                raiderId = 123L,
-                guildId = "guild-456",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                records = emptyList(),
-                totalRecords = 0
-            )
-            val response2 = RaiderAttendanceHistoryResponse(
-                raiderId = 123L,
-                guildId = "guild-456",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 14),
-                records = emptyList(),
-                totalRecords = 0
-            )
+            val response1 =
+                RaiderAttendanceHistoryResponse(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    records = emptyList(),
+                    totalRecords = 0,
+                )
+            val response2 =
+                RaiderAttendanceHistoryResponse(
+                    raiderId = 123L,
+                    guildId = "guild-456",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 14),
+                    records = emptyList(),
+                    totalRecords = 0,
+                )
 
             response1 shouldBe response2
         }
@@ -414,35 +426,36 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class GuildAttendanceSummaryResponseTest {
-
         @Test
         fun `should create from guild attendance summary`() {
-            val raiderSummaries = listOf(
-                RaiderAttendanceSummary(
-                    raiderId = 123L,
-                    totalRecords = 5,
-                    totalAttendedRaids = 40,
-                    totalRaids = 50,
-                    averageAttendancePercentage = 0.8
-                ),
-                RaiderAttendanceSummary(
-                    raiderId = 456L,
-                    totalRecords = 5,
-                    totalAttendedRaids = 45,
-                    totalRaids = 50,
-                    averageAttendancePercentage = 0.9
+            val raiderSummaries =
+                listOf(
+                    RaiderAttendanceSummary(
+                        raiderId = 123L,
+                        totalRecords = 5,
+                        totalAttendedRaids = 40,
+                        totalRaids = 50,
+                        averageAttendancePercentage = 0.8,
+                    ),
+                    RaiderAttendanceSummary(
+                        raiderId = 456L,
+                        totalRecords = 5,
+                        totalAttendedRaids = 45,
+                        totalRaids = 50,
+                        averageAttendancePercentage = 0.9,
+                    ),
                 )
-            )
 
-            val summary = GuildAttendanceSummary(
-                guildId = "guild-789",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 30),
-                totalRecords = 10,
-                uniqueRaiders = 2,
-                overallAttendancePercentage = 0.85,
-                raiderSummaries = raiderSummaries
-            )
+            val summary =
+                GuildAttendanceSummary(
+                    guildId = "guild-789",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 30),
+                    totalRecords = 10,
+                    uniqueRaiders = 2,
+                    overallAttendancePercentage = 0.85,
+                    raiderSummaries = raiderSummaries,
+                )
 
             val response = GuildAttendanceSummaryResponse.from(summary)
 
@@ -457,15 +470,16 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should create empty response`() {
-            val summary = GuildAttendanceSummary(
-                guildId = "guild-789",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 30),
-                totalRecords = 0,
-                uniqueRaiders = 0,
-                overallAttendancePercentage = 0.0,
-                raiderSummaries = emptyList()
-            )
+            val summary =
+                GuildAttendanceSummary(
+                    guildId = "guild-789",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 30),
+                    totalRecords = 0,
+                    uniqueRaiders = 0,
+                    overallAttendancePercentage = 0.0,
+                    raiderSummaries = emptyList(),
+                )
 
             val response = GuildAttendanceSummaryResponse.from(summary)
 
@@ -477,15 +491,16 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should support data class operations`() {
-            val response = GuildAttendanceSummaryResponse(
-                guildId = "guild-789",
-                startDate = LocalDate.of(2024, 11, 1),
-                endDate = LocalDate.of(2024, 11, 30),
-                totalRecords = 10,
-                uniqueRaiders = 2,
-                overallAttendancePercentage = 0.85,
-                raiderSummaries = emptyList()
-            )
+            val response =
+                GuildAttendanceSummaryResponse(
+                    guildId = "guild-789",
+                    startDate = LocalDate.of(2024, 11, 1),
+                    endDate = LocalDate.of(2024, 11, 30),
+                    totalRecords = 10,
+                    uniqueRaiders = 2,
+                    overallAttendancePercentage = 0.85,
+                    raiderSummaries = emptyList(),
+                )
 
             response.guildId shouldBe "guild-789"
             response.totalRecords shouldBe 10
@@ -495,16 +510,16 @@ class AttendanceDtoTest : UnitTest() {
 
     @Nested
     inner class RaiderAttendanceSummaryResponseTest {
-
         @Test
         fun `should create from raider attendance summary`() {
-            val summary = RaiderAttendanceSummary(
-                raiderId = 123L,
-                totalRecords = 5,
-                totalAttendedRaids = 40,
-                totalRaids = 50,
-                averageAttendancePercentage = 0.8
-            )
+            val summary =
+                RaiderAttendanceSummary(
+                    raiderId = 123L,
+                    totalRecords = 5,
+                    totalAttendedRaids = 40,
+                    totalRaids = 50,
+                    averageAttendancePercentage = 0.8,
+                )
 
             val response = RaiderAttendanceSummaryResponse.from(summary)
 
@@ -517,13 +532,14 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should handle perfect attendance`() {
-            val summary = RaiderAttendanceSummary(
-                raiderId = 123L,
-                totalRecords = 10,
-                totalAttendedRaids = 100,
-                totalRaids = 100,
-                averageAttendancePercentage = 1.0
-            )
+            val summary =
+                RaiderAttendanceSummary(
+                    raiderId = 123L,
+                    totalRecords = 10,
+                    totalAttendedRaids = 100,
+                    totalRaids = 100,
+                    averageAttendancePercentage = 1.0,
+                )
 
             val response = RaiderAttendanceSummaryResponse.from(summary)
 
@@ -533,13 +549,14 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should handle zero attendance`() {
-            val summary = RaiderAttendanceSummary(
-                raiderId = 123L,
-                totalRecords = 5,
-                totalAttendedRaids = 0,
-                totalRaids = 50,
-                averageAttendancePercentage = 0.0
-            )
+            val summary =
+                RaiderAttendanceSummary(
+                    raiderId = 123L,
+                    totalRecords = 5,
+                    totalAttendedRaids = 0,
+                    totalRaids = 50,
+                    averageAttendancePercentage = 0.0,
+                )
 
             val response = RaiderAttendanceSummaryResponse.from(summary)
 
@@ -549,20 +566,22 @@ class AttendanceDtoTest : UnitTest() {
 
         @Test
         fun `should support equality`() {
-            val response1 = RaiderAttendanceSummaryResponse(
-                raiderId = 123L,
-                totalRecords = 5,
-                totalAttendedRaids = 40,
-                totalRaids = 50,
-                averageAttendancePercentage = 0.8
-            )
-            val response2 = RaiderAttendanceSummaryResponse(
-                raiderId = 123L,
-                totalRecords = 5,
-                totalAttendedRaids = 40,
-                totalRaids = 50,
-                averageAttendancePercentage = 0.8
-            )
+            val response1 =
+                RaiderAttendanceSummaryResponse(
+                    raiderId = 123L,
+                    totalRecords = 5,
+                    totalAttendedRaids = 40,
+                    totalRaids = 50,
+                    averageAttendancePercentage = 0.8,
+                )
+            val response2 =
+                RaiderAttendanceSummaryResponse(
+                    raiderId = 123L,
+                    totalRecords = 5,
+                    totalAttendedRaids = 40,
+                    totalRaids = 50,
+                    averageAttendancePercentage = 0.8,
+                )
 
             response1 shouldBe response2
         }

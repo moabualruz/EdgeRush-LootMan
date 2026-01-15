@@ -22,9 +22,10 @@ class RaiderIOClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val webClient: WebClient = webClientBuilder
-        .baseUrl(baseUrl)
-        .build()
+    private val webClient: WebClient =
+        webClientBuilder
+            .baseUrl(baseUrl)
+            .build()
 
     /**
      * Fetches character profile data from Raider.IO.
@@ -34,7 +35,11 @@ class RaiderIOClient(
      * @param name The character's name
      * @return Character profile data as JSON
      */
-    fun fetchCharacterProfile(region: String, realm: String, name: String): Mono<RaiderIOCharacterProfile> {
+    fun fetchCharacterProfile(
+        region: String,
+        realm: String,
+        name: String,
+    ): Mono<RaiderIOCharacterProfile> {
         val normalizedRealm = normalizeRealm(realm)
 
         return webClient
@@ -163,4 +168,5 @@ data class RaiderIORaidProgression(
 )
 
 class RaiderIONotFoundException(message: String) : RuntimeException(message)
+
 class RaiderIOServerException(message: String) : RuntimeException(message)

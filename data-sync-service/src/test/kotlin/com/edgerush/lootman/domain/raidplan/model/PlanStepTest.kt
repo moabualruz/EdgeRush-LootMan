@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
  * Unit tests for PlanStep entity.
  */
 class PlanStepTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid step with order and notes`() {
             // Arrange & Act
@@ -51,31 +49,31 @@ class PlanStepTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when order is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanStep.create(order = -1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanStep.create(order = -1)
+                }
             exception.message shouldBe "Step order cannot be negative"
         }
     }
 
     @Nested
     inner class MarkerManagementTests {
-
         @Test
         fun `should add marker to step`() {
             // Arrange
             val step = PlanStep.create(order = 0)
-            val marker = PlanMarker(
-                type = MarkerType.SKULL,
-                x = 50.0,
-                y = 50.0,
-                label = "Tank position",
-                color = null,
-            )
+            val marker =
+                PlanMarker(
+                    type = MarkerType.SKULL,
+                    x = 50.0,
+                    y = 50.0,
+                    label = "Tank position",
+                    color = null,
+                )
 
             // Act
             val updatedStep = step.addMarker(marker)
@@ -94,10 +92,11 @@ class PlanStepTest : UnitTest() {
             val step = PlanStep.create(order = 0)
 
             // Act
-            val updatedStep = step
-                .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
-                .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
-                .addMarker(PlanMarker(MarkerType.SQUARE, 30.0, 30.0))
+            val updatedStep =
+                step
+                    .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
+                    .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
+                    .addMarker(PlanMarker(MarkerType.SQUARE, 30.0, 30.0))
 
             // Assert
             updatedStep.markers shouldHaveSize 3
@@ -106,10 +105,11 @@ class PlanStepTest : UnitTest() {
         @Test
         fun `should remove marker at index`() {
             // Arrange
-            val step = PlanStep.create(order = 0)
-                .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
-                .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
-                .addMarker(PlanMarker(MarkerType.SQUARE, 30.0, 30.0))
+            val step =
+                PlanStep.create(order = 0)
+                    .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
+                    .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
+                    .addMarker(PlanMarker(MarkerType.SQUARE, 30.0, 30.0))
 
             // Act
             val updatedStep = step.removeMarkerAt(1)
@@ -123,21 +123,24 @@ class PlanStepTest : UnitTest() {
         @Test
         fun `should throw exception when removing marker at invalid index`() {
             // Arrange
-            val step = PlanStep.create(order = 0)
-                .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
+            val step =
+                PlanStep.create(order = 0)
+                    .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
 
             // Act & Assert
-            val exception = shouldThrow<IndexOutOfBoundsException> {
-                step.removeMarkerAt(5)
-            }
+            val exception =
+                shouldThrow<IndexOutOfBoundsException> {
+                    step.removeMarkerAt(5)
+                }
         }
 
         @Test
         fun `should clear all markers`() {
             // Arrange
-            val step = PlanStep.create(order = 0)
-                .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
-                .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
+            val step =
+                PlanStep.create(order = 0)
+                    .addMarker(PlanMarker(MarkerType.SKULL, 10.0, 10.0))
+                    .addMarker(PlanMarker(MarkerType.CROSS, 20.0, 20.0))
 
             // Act
             val updatedStep = step.clearMarkers()
@@ -149,17 +152,17 @@ class PlanStepTest : UnitTest() {
 
     @Nested
     inner class ShapeManagementTests {
-
         @Test
         fun `should add shape to step`() {
             // Arrange
             val step = PlanStep.create(order = 0)
-            val shape = PlanShape.circle(
-                x = 50.0,
-                y = 50.0,
-                radius = 20.0,
-                color = "#FF0000",
-            )
+            val shape =
+                PlanShape.circle(
+                    x = 50.0,
+                    y = 50.0,
+                    radius = 20.0,
+                    color = "#FF0000",
+                )
 
             // Act
             val updatedStep = step.addShape(shape)
@@ -176,14 +179,15 @@ class PlanStepTest : UnitTest() {
         fun `should add line shape to step`() {
             // Arrange
             val step = PlanStep.create(order = 0)
-            val line = PlanShape.line(
-                x1 = 10.0,
-                y1 = 10.0,
-                x2 = 90.0,
-                y2 = 90.0,
-                color = "#00FF00",
-                strokeWidth = 3,
-            )
+            val line =
+                PlanShape.line(
+                    x1 = 10.0,
+                    y1 = 10.0,
+                    x2 = 90.0,
+                    y2 = 90.0,
+                    color = "#00FF00",
+                    strokeWidth = 3,
+                )
 
             // Act
             val updatedStep = step.addShape(line)
@@ -201,13 +205,14 @@ class PlanStepTest : UnitTest() {
         fun `should add arrow shape to step`() {
             // Arrange
             val step = PlanStep.create(order = 0)
-            val arrow = PlanShape.arrow(
-                x1 = 10.0,
-                y1 = 10.0,
-                x2 = 50.0,
-                y2 = 50.0,
-                color = "#0000FF",
-            )
+            val arrow =
+                PlanShape.arrow(
+                    x1 = 10.0,
+                    y1 = 10.0,
+                    x2 = 50.0,
+                    y2 = 50.0,
+                    color = "#0000FF",
+                )
 
             // Act
             val updatedStep = step.addShape(arrow)
@@ -220,9 +225,10 @@ class PlanStepTest : UnitTest() {
         @Test
         fun `should remove shape at index`() {
             // Arrange
-            val step = PlanStep.create(order = 0)
-                .addShape(PlanShape.circle(10.0, 10.0, 5.0))
-                .addShape(PlanShape.line(0.0, 0.0, 100.0, 100.0))
+            val step =
+                PlanStep.create(order = 0)
+                    .addShape(PlanShape.circle(10.0, 10.0, 5.0))
+                    .addShape(PlanShape.line(0.0, 0.0, 100.0, 100.0))
 
             // Act
             val updatedStep = step.removeShapeAt(0)
@@ -235,9 +241,10 @@ class PlanStepTest : UnitTest() {
         @Test
         fun `should clear all shapes`() {
             // Arrange
-            val step = PlanStep.create(order = 0)
-                .addShape(PlanShape.circle(10.0, 10.0, 5.0))
-                .addShape(PlanShape.line(0.0, 0.0, 100.0, 100.0))
+            val step =
+                PlanStep.create(order = 0)
+                    .addShape(PlanShape.circle(10.0, 10.0, 5.0))
+                    .addShape(PlanShape.line(0.0, 0.0, 100.0, 100.0))
 
             // Act
             val updatedStep = step.clearShapes()
@@ -249,7 +256,6 @@ class PlanStepTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should update notes`() {
             // Arrange

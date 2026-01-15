@@ -61,7 +61,9 @@ class GearController(
      * @return 200 OK with the gear set, or 404 if not found
      */
     @GetMapping("/raider/{raiderId}")
-    fun getCurrentGear(@PathVariable raiderId: Long): GearSetResponse {
+    fun getCurrentGear(
+        @PathVariable raiderId: Long,
+    ): GearSetResponse {
         return getCurrentGearUseCase.execute(GetCurrentGearQuery(raiderId))
             .map { gearSet -> GearSetResponse.from(gearSet) }
             .getOrThrow()
@@ -77,7 +79,7 @@ class GearController(
     @GetMapping("/raider/{raiderId}/type/{type}")
     fun getGearByType(
         @PathVariable raiderId: Long,
-        @PathVariable type: String
+        @PathVariable type: String,
     ): GearSetResponse {
         return getGearByTypeUseCase.execute(GetGearByTypeQuery(raiderId, type))
             .map { gearSet -> GearSetResponse.from(gearSet) }
@@ -94,24 +96,26 @@ class GearController(
     @PostMapping("/raider/{raiderId}")
     fun createGear(
         @PathVariable raiderId: Long,
-        @RequestBody request: SaveGearRequest
+        @RequestBody request: SaveGearRequest,
     ): ResponseEntity<GearSetResponse> {
-        val command = SaveGearCommand(
-            raiderId = raiderId,
-            gearSetType = request.gearSetType,
-            items = request.items.map { item ->
-                GearItemCommand(
-                    itemId = item.itemId,
-                    name = item.name,
-                    itemLevel = item.itemLevel,
-                    quality = item.quality,
-                    slot = item.slot,
-                    isTierPiece = item.isTierPiece,
-                    enchant = item.enchant,
-                    sockets = item.sockets
-                )
-            }
-        )
+        val command =
+            SaveGearCommand(
+                raiderId = raiderId,
+                gearSetType = request.gearSetType,
+                items =
+                    request.items.map { item ->
+                        GearItemCommand(
+                            itemId = item.itemId,
+                            name = item.name,
+                            itemLevel = item.itemLevel,
+                            quality = item.quality,
+                            slot = item.slot,
+                            isTierPiece = item.isTierPiece,
+                            enchant = item.enchant,
+                            sockets = item.sockets,
+                        )
+                    },
+            )
 
         return saveGearUseCase.execute(command)
             .map { gearSet ->
@@ -132,24 +136,26 @@ class GearController(
     @PutMapping("/raider/{raiderId}")
     fun updateGear(
         @PathVariable raiderId: Long,
-        @RequestBody request: SaveGearRequest
+        @RequestBody request: SaveGearRequest,
     ): GearSetResponse {
-        val command = SaveGearCommand(
-            raiderId = raiderId,
-            gearSetType = request.gearSetType,
-            items = request.items.map { item ->
-                GearItemCommand(
-                    itemId = item.itemId,
-                    name = item.name,
-                    itemLevel = item.itemLevel,
-                    quality = item.quality,
-                    slot = item.slot,
-                    isTierPiece = item.isTierPiece,
-                    enchant = item.enchant,
-                    sockets = item.sockets
-                )
-            }
-        )
+        val command =
+            SaveGearCommand(
+                raiderId = raiderId,
+                gearSetType = request.gearSetType,
+                items =
+                    request.items.map { item ->
+                        GearItemCommand(
+                            itemId = item.itemId,
+                            name = item.name,
+                            itemLevel = item.itemLevel,
+                            quality = item.quality,
+                            slot = item.slot,
+                            isTierPiece = item.isTierPiece,
+                            enchant = item.enchant,
+                            sockets = item.sockets,
+                        )
+                    },
+            )
 
         return saveGearUseCase.execute(command)
             .map { gearSet -> GearSetResponse.from(gearSet) }

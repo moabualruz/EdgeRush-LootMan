@@ -22,7 +22,6 @@ class RaiderQueryResolver(
     private val getRaiderUseCase: GetRaiderUseCase,
     private val listRaidersUseCase: ListRaidersUseCase,
 ) : Query {
-
     /**
      * Get a single raider by ID.
      *
@@ -80,15 +79,16 @@ data class RaiderType(
 /**
  * Extension function to convert domain Raider to GraphQL RaiderType.
  */
-private fun Raider.toGraphQLType(): RaiderType = RaiderType(
-    id = this.id.value.toString(),
-    guildId = this.guildId.value,
-    characterName = this.characterName,
-    realm = this.realm,
-    characterClass = this.characterClass,
-    role = this.role,
-    rank = this.rank,
-    status = this.status,
-    fullName = this.getFullName(),
-    isEligibleForLoot = this.isEligibleForLoot(),
-)
+private fun Raider.toGraphQLType(): RaiderType =
+    RaiderType(
+        id = this.id.value.toString(),
+        guildId = this.guildId.value,
+        characterName = this.characterName,
+        realm = this.realm,
+        characterClass = this.characterClass,
+        role = this.role,
+        rank = this.rank,
+        status = this.status,
+        fullName = this.getFullName(),
+        isEligibleForLoot = this.isEligibleForLoot(),
+    )

@@ -18,20 +18,24 @@ class InMemoryRaiderRepository : RaiderRepository {
 
     override fun findById(id: RaiderId): Raider? = storage[id]
 
-    override fun findByGuildId(guildId: GuildId): List<Raider> =
-        storage.values.filter { it.guildId == guildId }
+    override fun findByGuildId(guildId: GuildId): List<Raider> = storage.values.filter { it.guildId == guildId }
 
-    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider> =
+    override fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<Raider> =
         storage.values
             .filter { it.guildId == guildId }
             .drop(offset.toInt())
             .take(limit)
 
-    override fun countByGuildId(guildId: GuildId): Long =
-        storage.values.count { it.guildId == guildId }.toLong()
+    override fun countByGuildId(guildId: GuildId): Long = storage.values.count { it.guildId == guildId }.toLong()
 
-    override fun findByCharacterNameAndRealm(characterName: String, realm: String): Raider? =
-        storage.values.find { it.characterName == characterName && it.realm == realm }
+    override fun findByCharacterNameAndRealm(
+        characterName: String,
+        realm: String,
+    ): Raider? = storage.values.find { it.characterName == characterName && it.realm == realm }
 
     override fun save(raider: Raider): Raider {
         storage[raider.id] = raider
@@ -42,6 +46,5 @@ class InMemoryRaiderRepository : RaiderRepository {
         storage.remove(id)
     }
 
-    override fun findByIds(ids: List<RaiderId>): List<Raider> =
-        ids.mapNotNull { storage[it] }
+    override fun findByIds(ids: List<RaiderId>): List<Raider> = ids.mapNotNull { storage[it] }
 }

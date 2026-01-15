@@ -23,8 +23,14 @@ data class UpdateGuestRequest(
 )
 
 data class GuestResponse(
-    val guestId: Long, val name: String, val realm: String?, val clazz: String?,
-    val role: String?, val blizzardId: Long?, val trackingSince: OffsetDateTime?, val syncedAt: OffsetDateTime
+    val guestId: Long,
+    val name: String,
+    val realm: String?,
+    val clazz: String?,
+    val role: String?,
+    val blizzardId: Long?,
+    val trackingSince: OffsetDateTime?,
+    val syncedAt: OffsetDateTime,
 ) {
     companion object {
         fun from(e: GuestEntity) = GuestResponse(e.guestId, e.name, e.realm, e.clazz, e.role, e.blizzardId, e.trackingSince, e.syncedAt)
@@ -32,4 +38,5 @@ data class GuestResponse(
 }
 
 data class GuestExistsResponse(val exists: Boolean)
+
 data class GuestCountResponse(val count: Long)

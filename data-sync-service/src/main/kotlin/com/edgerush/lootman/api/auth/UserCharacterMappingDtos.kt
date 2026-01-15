@@ -8,7 +8,7 @@ import java.time.Instant
  */
 data class LinkCharacterRequest(
     val raiderId: Long,
-    val isPrimary: Boolean = false
+    val isPrimary: Boolean = false,
 )
 
 /**
@@ -21,7 +21,7 @@ data class UserCharacterMappingResponse(
     val isPrimary: Boolean,
     val linkedAt: Instant,
     val verified: Boolean,
-    val verifiedAt: Instant?
+    val verifiedAt: Instant?,
 ) {
     companion object {
         fun from(mapping: UserCharacterMapping): UserCharacterMappingResponse =
@@ -32,7 +32,7 @@ data class UserCharacterMappingResponse(
                 isPrimary = mapping.isPrimary,
                 linkedAt = mapping.linkedAt,
                 verified = mapping.verified,
-                verifiedAt = mapping.verifiedAt
+                verifiedAt = mapping.verifiedAt,
             )
     }
 }
@@ -41,5 +41,5 @@ data class UserCharacterMappingResponse(
  * Response containing the count of linked characters.
  */
 data class CharacterCountResponse(
-    val count: Long
+    val count: Long,
 )

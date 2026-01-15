@@ -2,7 +2,6 @@ package com.edgerush.datasync.config
 
 import com.edgerush.datasync.test.base.EnabledIfSopsAvailable
 import com.edgerush.datasync.test.base.UnitTest
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -25,7 +24,6 @@ import java.nio.file.Path
  */
 @EnabledIfSopsAvailable
 class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
-
     private lateinit var processor: SopsEnvironmentPostProcessor
     private lateinit var environment: ConfigurableEnvironment
     private lateinit var application: SpringApplication
@@ -49,8 +47,9 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
         @Test
         fun `sops version command should succeed when SOPS is available`() {
             // Arrange
-            val processBuilder = ProcessBuilder("sops", "--version")
-                .redirectErrorStream(true)
+            val processBuilder =
+                ProcessBuilder("sops", "--version")
+                    .redirectErrorStream(true)
 
             // Act
             val process = processBuilder.start()
@@ -65,7 +64,6 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
 
     @Nested
     inner class DecryptSecretsExecution {
-
         @Test
         fun `should handle decryption of non-SOPS encrypted file`() {
             // Arrange - Create a regular YAML file (not SOPS encrypted)
@@ -75,7 +73,7 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
                 database:
                   password: plaintext123
                 api_key: myapikey
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val ageKeyFile = File(tempDir.toFile(), "keys.txt")
@@ -102,7 +100,7 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
                   version: 3.7.3
                 database:
                   password: ENC[AES256_GCM,data...]
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             every { environment.getProperty("SOPS_AGE_KEY_FILE") } returns "/nonexistent/keys.txt"
@@ -142,7 +140,7 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
                 """
                 this is not: valid: yaml: content
                 { invalid brackets [
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val ageKeyFile = File(tempDir.toFile(), "keys.txt")
@@ -161,7 +159,6 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
 
     @Nested
     inner class ProcessExecution {
-
         @Test
         fun `should invoke decryptSecrets method with valid file paths`() {
             // Arrange
@@ -172,11 +169,12 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
             ageKeyFile.writeText("")
 
             // Use reflection to invoke decryptSecrets directly
-            val method = SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
-                "decryptSecrets",
-                String::class.java,
-                String::class.java
-            )
+            val method =
+                SopsEnvironmentPostProcessor::class.java.getDeclaredMethod(
+                    "decryptSecrets",
+                    String::class.java,
+                    String::class.java,
+                )
             method.isAccessible = true
 
             // Act
@@ -195,7 +193,7 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
                 """
                 # This file is not SOPS encrypted, so SOPS will output an error
                 plain: value
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val ageKeyFile = File(tempDir.toFile(), "keys.txt")
@@ -214,7 +212,6 @@ class SopsEnvironmentPostProcessorIntegrationTest : UnitTest() {
 
     @Nested
     inner class EnvironmentVariableFallback {
-
         @Test
         fun `should check system environment when property not in Spring environment`() {
             // Arrange - No property in environment, relies on System.getenv fallback

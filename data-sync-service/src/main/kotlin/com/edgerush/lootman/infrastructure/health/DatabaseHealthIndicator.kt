@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class DatabaseHealthIndicator(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : HealthIndicator {
-
     override fun health(): Health {
         return try {
             jdbcTemplate.queryForObject("SELECT 1", Int::class.java)

@@ -13,33 +13,32 @@ import java.time.Instant
  * Unit tests for Application entity.
  */
 class ApplicationTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid application with all required fields`() {
             // Arrange & Act
-            val application = Application.create(
-                guildId = GuildId("test-guild"),
-                battleNetId = "Player#1234",
-                discordId = "123456789012345678",
-                email = "player@example.com",
-                characterName = "Arthas",
-                characterRealm = "Illidan",
-                characterClass = "Death Knight",
-                specialization = "Frost",
-                itemLevel = 489.5,
-                raiderIOScore = 2850.0,
-                bestParseAverage = 85.5,
-                age = 28,
-                location = "United States",
-                timezone = "America/New_York",
-                raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
-                previousGuilds = "Previous Guild 1, Previous Guild 2",
-                reasonForLeaving = "Guild disbanded",
-                whyThisGuild = "Looking for a competitive mythic raiding guild",
-            )
+            val application =
+                Application.create(
+                    guildId = GuildId("test-guild"),
+                    battleNetId = "Player#1234",
+                    discordId = "123456789012345678",
+                    email = "player@example.com",
+                    characterName = "Arthas",
+                    characterRealm = "Illidan",
+                    characterClass = "Death Knight",
+                    specialization = "Frost",
+                    itemLevel = 489.5,
+                    raiderIOScore = 2850.0,
+                    bestParseAverage = 85.5,
+                    age = 28,
+                    location = "United States",
+                    timezone = "America/New_York",
+                    raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
+                    previousGuilds = "Previous Guild 1, Previous Guild 2",
+                    reasonForLeaving = "Guild disbanded",
+                    whyThisGuild = "Looking for a competitive mythic raiding guild",
+                )
 
             // Assert
             application shouldNotBe null
@@ -119,7 +118,6 @@ class ApplicationTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when character name is blank`() {
             // Arrange, Act & Assert
@@ -339,7 +337,6 @@ class ApplicationTest : UnitTest() {
 
     @Nested
     inner class StatusTransitionTests {
-
         @Test
         fun `should approve application`() {
             // Arrange
@@ -432,30 +429,30 @@ class ApplicationTest : UnitTest() {
 
     @Nested
     inner class OptionalFieldsTests {
-
         @Test
         fun `should allow null raider IO score`() {
             // Arrange & Act
-            val application = Application.create(
-                guildId = GuildId("test-guild"),
-                battleNetId = "Player#1234",
-                discordId = "123456789012345678",
-                email = "player@example.com",
-                characterName = "Arthas",
-                characterRealm = "Illidan",
-                characterClass = "Death Knight",
-                specialization = "Frost",
-                itemLevel = 489.5,
-                raiderIOScore = null,
-                bestParseAverage = null,
-                age = 28,
-                location = "United States",
-                timezone = "America/New_York",
-                raidDaysAvailable = listOf("Tuesday"),
-                previousGuilds = "Previous Guild",
-                reasonForLeaving = "Disbanded",
-                whyThisGuild = "Looking for competitive guild",
-            )
+            val application =
+                Application.create(
+                    guildId = GuildId("test-guild"),
+                    battleNetId = "Player#1234",
+                    discordId = "123456789012345678",
+                    email = "player@example.com",
+                    characterName = "Arthas",
+                    characterRealm = "Illidan",
+                    characterClass = "Death Knight",
+                    specialization = "Frost",
+                    itemLevel = 489.5,
+                    raiderIOScore = null,
+                    bestParseAverage = null,
+                    age = 28,
+                    location = "United States",
+                    timezone = "America/New_York",
+                    raidDaysAvailable = listOf("Tuesday"),
+                    previousGuilds = "Previous Guild",
+                    reasonForLeaving = "Disbanded",
+                    whyThisGuild = "Looking for competitive guild",
+                )
 
             // Assert
             application.raiderIOScore shouldBe null
@@ -465,50 +462,52 @@ class ApplicationTest : UnitTest() {
         @Test
         fun `should allow zero item level for fresh characters`() {
             // Arrange & Act
-            val application = Application.create(
-                guildId = GuildId("test-guild"),
-                battleNetId = "Player#1234",
-                discordId = "123456789012345678",
-                email = "player@example.com",
-                characterName = "Arthas",
-                characterRealm = "Illidan",
-                characterClass = "Death Knight",
-                specialization = "Frost",
-                itemLevel = 0.0,
-                raiderIOScore = null,
-                bestParseAverage = null,
-                age = 28,
-                location = "United States",
-                timezone = "America/New_York",
-                raidDaysAvailable = listOf("Tuesday"),
-                previousGuilds = "Previous Guild",
-                reasonForLeaving = "Disbanded",
-                whyThisGuild = "Looking for competitive guild",
-            )
+            val application =
+                Application.create(
+                    guildId = GuildId("test-guild"),
+                    battleNetId = "Player#1234",
+                    discordId = "123456789012345678",
+                    email = "player@example.com",
+                    characterName = "Arthas",
+                    characterRealm = "Illidan",
+                    characterClass = "Death Knight",
+                    specialization = "Frost",
+                    itemLevel = 0.0,
+                    raiderIOScore = null,
+                    bestParseAverage = null,
+                    age = 28,
+                    location = "United States",
+                    timezone = "America/New_York",
+                    raidDaysAvailable = listOf("Tuesday"),
+                    previousGuilds = "Previous Guild",
+                    reasonForLeaving = "Disbanded",
+                    whyThisGuild = "Looking for competitive guild",
+                )
 
             // Assert
             application.itemLevel shouldBe 0.0
         }
     }
 
-    private fun createValidApplication(): Application = Application.create(
-        guildId = GuildId("test-guild"),
-        battleNetId = "Player#1234",
-        discordId = "123456789012345678",
-        email = "player@example.com",
-        characterName = "Arthas",
-        characterRealm = "Illidan",
-        characterClass = "Death Knight",
-        specialization = "Frost",
-        itemLevel = 489.5,
-        raiderIOScore = 2850.0,
-        bestParseAverage = 85.5,
-        age = 28,
-        location = "United States",
-        timezone = "America/New_York",
-        raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
-        previousGuilds = "Previous Guild 1, Previous Guild 2",
-        reasonForLeaving = "Guild disbanded",
-        whyThisGuild = "Looking for a competitive mythic raiding guild",
-    )
+    private fun createValidApplication(): Application =
+        Application.create(
+            guildId = GuildId("test-guild"),
+            battleNetId = "Player#1234",
+            discordId = "123456789012345678",
+            email = "player@example.com",
+            characterName = "Arthas",
+            characterRealm = "Illidan",
+            characterClass = "Death Knight",
+            specialization = "Frost",
+            itemLevel = 489.5,
+            raiderIOScore = 2850.0,
+            bestParseAverage = 85.5,
+            age = 28,
+            location = "United States",
+            timezone = "America/New_York",
+            raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
+            previousGuilds = "Previous Guild 1, Previous Guild 2",
+            reasonForLeaving = "Guild disbanded",
+            whyThisGuild = "Looking for a competitive mythic raiding guild",
+        )
 }

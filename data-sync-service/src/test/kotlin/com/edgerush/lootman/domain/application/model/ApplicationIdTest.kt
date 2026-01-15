@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
  * Unit tests for ApplicationId value object.
  */
 class ApplicationIdTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid application ID with non-blank value`() {
             // Arrange & Act
@@ -37,29 +35,29 @@ class ApplicationIdTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when value is blank`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ApplicationId("")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ApplicationId("")
+                }
             exception.message shouldContain "blank"
         }
 
         @Test
         fun `should throw exception when value is whitespace only`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ApplicationId("   ")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ApplicationId("   ")
+                }
             exception.message shouldContain "blank"
         }
     }
 
     @Nested
     inner class GenerationTests {
-
         @Test
         fun `should generate unique application ID`() {
             // Arrange & Act
@@ -91,7 +89,6 @@ class ApplicationIdTest : UnitTest() {
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when values are the same`() {
             // Arrange
@@ -125,7 +122,6 @@ class ApplicationIdTest : UnitTest() {
 
     @Nested
     inner class UsageTests {
-
         @Test
         fun `should work as map key`() {
             // Arrange

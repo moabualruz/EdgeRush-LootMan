@@ -2,10 +2,8 @@ package com.edgerush.datasync.config
 
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.api.common.DeprecatedEndpoint
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -27,7 +25,6 @@ import java.net.URI
  * to responses for endpoints marked with @DeprecatedEndpoint annotation.
  */
 class DeprecationHeaderFilterTest : UnitTest() {
-
     @MockK(relaxed = true)
     private lateinit var exchange: ServerWebExchange
 
@@ -61,7 +58,6 @@ class DeprecationHeaderFilterTest : UnitTest() {
 
     @Nested
     inner class WhenEndpointNotDeprecated {
-
         @Test
         fun `should not add deprecation headers when endpoint is not deprecated`() {
             // Arrange
@@ -91,15 +87,15 @@ class DeprecationHeaderFilterTest : UnitTest() {
 
     @Nested
     inner class WhenEndpointIsDeprecated {
-
         @Test
         fun `should add Deprecation header with date when endpoint is deprecated`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "",
-                replacement = "",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "",
+                    replacement = "",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -113,11 +109,12 @@ class DeprecationHeaderFilterTest : UnitTest() {
         @Test
         fun `should add Sunset header when sunset date is specified`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "2026-06-01",
-                replacement = "",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "2026-06-01",
+                    replacement = "",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -130,11 +127,12 @@ class DeprecationHeaderFilterTest : UnitTest() {
         @Test
         fun `should not add Sunset header when sunset date is empty`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "",
-                replacement = "",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "",
+                    replacement = "",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -147,11 +145,12 @@ class DeprecationHeaderFilterTest : UnitTest() {
         @Test
         fun `should add Link header when replacement endpoint is specified`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "",
-                replacement = "/api/v2/new-endpoint",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "",
+                    replacement = "/api/v2/new-endpoint",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -166,11 +165,12 @@ class DeprecationHeaderFilterTest : UnitTest() {
         @Test
         fun `should not add Link header when replacement is empty`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "",
-                replacement = "",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "",
+                    replacement = "",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -183,11 +183,12 @@ class DeprecationHeaderFilterTest : UnitTest() {
         @Test
         fun `should add all headers when fully configured`() {
             // Arrange
-            val handler = createDeprecatedHandlerMethod(
-                since = "2026-01-01",
-                sunset = "2026-06-01",
-                replacement = "/api/v2/new-endpoint",
-            )
+            val handler =
+                createDeprecatedHandlerMethod(
+                    since = "2026-01-01",
+                    sunset = "2026-06-01",
+                    replacement = "/api/v2/new-endpoint",
+                )
             every { handlerMapping.getHandler(exchange) } returns Mono.just(handler)
 
             // Act
@@ -205,7 +206,6 @@ class DeprecationHeaderFilterTest : UnitTest() {
 
     @Nested
     inner class ErrorHandling {
-
         @Test
         fun `should continue chain when handler mapping throws exception`() {
             // Arrange
@@ -226,20 +226,21 @@ class DeprecationHeaderFilterTest : UnitTest() {
         replacement: String,
     ): HandlerMethod {
         // Find the appropriate test method based on parameters
-        val method = when {
-            sunset.isNotBlank() && replacement.isNotBlank() -> {
-                TestDeprecatedController::class.java.getMethod("fullyConfiguredEndpoint")
+        val method =
+            when {
+                sunset.isNotBlank() && replacement.isNotBlank() -> {
+                    TestDeprecatedController::class.java.getMethod("fullyConfiguredEndpoint")
+                }
+                sunset.isNotBlank() -> {
+                    TestDeprecatedController::class.java.getMethod("withSunsetEndpoint")
+                }
+                replacement.isNotBlank() -> {
+                    TestDeprecatedController::class.java.getMethod("withReplacementEndpoint")
+                }
+                else -> {
+                    TestDeprecatedController::class.java.getMethod("basicDeprecatedEndpoint")
+                }
             }
-            sunset.isNotBlank() -> {
-                TestDeprecatedController::class.java.getMethod("withSunsetEndpoint")
-            }
-            replacement.isNotBlank() -> {
-                TestDeprecatedController::class.java.getMethod("withReplacementEndpoint")
-            }
-            else -> {
-                TestDeprecatedController::class.java.getMethod("basicDeprecatedEndpoint")
-            }
-        }
         return HandlerMethod(TestDeprecatedController(), method)
     }
 

@@ -48,12 +48,13 @@ data class PagedResponse<T>(
     /**
      * Map the content to a different type while preserving pagination metadata.
      */
-    fun <R> map(transform: (T) -> R): PagedResponse<R> = PagedResponse(
-        content = content.map(transform),
-        page = page,
-        size = size,
-        totalElements = totalElements,
-    )
+    fun <R> map(transform: (T) -> R): PagedResponse<R> =
+        PagedResponse(
+            content = content.map(transform),
+            page = page,
+            size = size,
+            totalElements = totalElements,
+        )
 
     companion object {
         /**
@@ -63,21 +64,23 @@ data class PagedResponse<T>(
             content: List<T>,
             pageRequest: PageRequest,
             totalElements: Long,
-        ): PagedResponse<T> = PagedResponse(
-            content = content,
-            page = pageRequest.page,
-            size = pageRequest.size,
-            totalElements = totalElements,
-        )
+        ): PagedResponse<T> =
+            PagedResponse(
+                content = content,
+                page = pageRequest.page,
+                size = pageRequest.size,
+                totalElements = totalElements,
+            )
 
         /**
          * Create an empty PagedResponse.
          */
-        fun <T> empty(pageRequest: PageRequest): PagedResponse<T> = PagedResponse(
-            content = emptyList(),
-            page = pageRequest.page,
-            size = pageRequest.size,
-            totalElements = 0,
-        )
+        fun <T> empty(pageRequest: PageRequest): PagedResponse<T> =
+            PagedResponse(
+                content = emptyList(),
+                page = pageRequest.page,
+                size = pageRequest.size,
+                totalElements = 0,
+            )
     }
 }

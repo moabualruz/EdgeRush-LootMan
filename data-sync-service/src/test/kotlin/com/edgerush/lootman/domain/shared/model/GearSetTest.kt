@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for GearSet, GearItem, EquipmentSlot, ItemQuality, and GearSetType.
  */
 class GearSetTest : UnitTest() {
-
     // region Test Fixtures
 
     private fun createGearItem(
@@ -24,7 +23,7 @@ class GearSetTest : UnitTest() {
         slot: EquipmentSlot = EquipmentSlot.HEAD,
         isTierPiece: Boolean = false,
         enchant: String? = null,
-        sockets: Int = 0
+        sockets: Int = 0,
     ) = GearItem(
         itemId = ItemId(itemId),
         name = name,
@@ -33,32 +32,32 @@ class GearSetTest : UnitTest() {
         slot = slot,
         isTierPiece = isTierPiece,
         enchant = enchant,
-        sockets = sockets
+        sockets = sockets,
     )
 
     private fun createGearSet(
         items: Map<EquipmentSlot, GearItem> = emptyMap(),
-        gearSetType: GearSetType = GearSetType.EQUIPPED
+        gearSetType: GearSetType = GearSetType.EQUIPPED,
     ) = GearSet(items = items, gearSetType = gearSetType)
 
     // endregion
 
     @Nested
     inner class GearItemTests {
-
         @Test
         fun `should create valid gear item with all fields`() {
             // Arrange & Act
-            val item = createGearItem(
-                itemId = 207160L,
-                name = "Crown of the Firelands",
-                itemLevel = 489,
-                quality = ItemQuality.EPIC,
-                slot = EquipmentSlot.HEAD,
-                isTierPiece = true,
-                enchant = "Incandescent Essence",
-                sockets = 2
-            )
+            val item =
+                createGearItem(
+                    itemId = 207160L,
+                    name = "Crown of the Firelands",
+                    itemLevel = 489,
+                    quality = ItemQuality.EPIC,
+                    slot = EquipmentSlot.HEAD,
+                    isTierPiece = true,
+                    enchant = "Incandescent Essence",
+                    sockets = 2,
+                )
 
             // Assert
             item.itemId shouldBe ItemId(207160L)
@@ -85,27 +84,30 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should throw exception when item level is zero`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createGearItem(itemLevel = 0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createGearItem(itemLevel = 0)
+                }
             exception.message shouldBe "Item level must be positive"
         }
 
         @Test
         fun `should throw exception when item level is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createGearItem(itemLevel = -1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createGearItem(itemLevel = -1)
+                }
             exception.message shouldBe "Item level must be positive"
         }
 
         @Test
         fun `should throw exception when sockets is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createGearItem(sockets = -1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createGearItem(sockets = -1)
+                }
             exception.message shouldBe "Sockets cannot be negative"
         }
 
@@ -141,7 +143,6 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class GearSetAverageItemLevelTests {
-
         @Test
         fun `should return zero average when items map is empty`() {
             // Arrange
@@ -170,11 +171,12 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should calculate average item level for multiple items`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 480),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, itemLevel = 490),
-                EquipmentSlot.LEGS to createGearItem(slot = EquipmentSlot.LEGS, itemLevel = 500)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 480),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, itemLevel = 490),
+                    EquipmentSlot.LEGS to createGearItem(slot = EquipmentSlot.LEGS, itemLevel = 500),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act
@@ -187,10 +189,11 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should handle items with varying item levels`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
-                EquipmentSlot.NECK to createGearItem(slot = EquipmentSlot.NECK, itemLevel = 489)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
+                    EquipmentSlot.NECK to createGearItem(slot = EquipmentSlot.NECK, itemLevel = 489),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act
@@ -203,14 +206,14 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class GearSetTierPieceTests {
-
         @Test
         fun `should return zero tier piece count when no tier pieces equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = false),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = false),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act
@@ -223,12 +226,13 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should count tier pieces correctly`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false),
-                EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false),
+                    EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act
@@ -253,14 +257,14 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class GearSetTierBonusTests {
-
         @Test
         fun `should have 2-piece tier bonus when 2 or more tier pieces equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act & Assert
@@ -270,10 +274,11 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should not have 2-piece tier bonus when only 1 tier piece equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act & Assert
@@ -283,12 +288,13 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should have 4-piece tier bonus when 4 or more tier pieces equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
-                EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
+                    EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act & Assert
@@ -298,12 +304,13 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should not have 4-piece tier bonus when only 3 tier pieces equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
-                EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = false)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
+                    EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = false),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act & Assert
@@ -313,12 +320,13 @@ class GearSetTest : UnitTest() {
         @Test
         fun `should have both 2-piece and 4-piece tier bonus when 4 tier pieces equipped`() {
             // Arrange
-            val items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
-                EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true)
-            )
+            val items =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                    EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                    EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = true),
+                    EquipmentSlot.HANDS to createGearItem(slot = EquipmentSlot.HANDS, isTierPiece = true),
+                )
             val gearSet = createGearSet(items = items)
 
             // Act & Assert
@@ -332,9 +340,10 @@ class GearSetTest : UnitTest() {
             val gearSet = createGearSet()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                gearSet.hasTierBonus(1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    gearSet.hasTierBonus(1)
+                }
             exception.message shouldBe "Tier bonus can only be 2 or 4 pieces"
         }
 
@@ -344,9 +353,10 @@ class GearSetTest : UnitTest() {
             val gearSet = createGearSet()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                gearSet.hasTierBonus(3)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    gearSet.hasTierBonus(3)
+                }
             exception.message shouldBe "Tier bonus can only be 2 or 4 pieces"
         }
 
@@ -356,9 +366,10 @@ class GearSetTest : UnitTest() {
             val gearSet = createGearSet()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                gearSet.hasTierBonus(5)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    gearSet.hasTierBonus(5)
+                }
             exception.message shouldBe "Tier bonus can only be 2 or 4 pieces"
         }
 
@@ -368,16 +379,16 @@ class GearSetTest : UnitTest() {
             val gearSet = createGearSet()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                gearSet.hasTierBonus(0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    gearSet.hasTierBonus(0)
+                }
             exception.message shouldBe "Tier bonus can only be 2 or 4 pieces"
         }
     }
 
     @Nested
     inner class GearSetGetItemTests {
-
         @Test
         fun `should return item when slot has item equipped`() {
             // Arrange
@@ -419,7 +430,6 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class EquipmentSlotTests {
-
         @Test
         fun `should have all 16 equipment slots`() {
             // Act
@@ -464,7 +474,6 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class ItemQualityTests {
-
         @Test
         fun `should have all 7 quality levels`() {
             // Act
@@ -506,7 +515,6 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class GearSetTypeTests {
-
         @Test
         fun `should have EQUIPPED and BEST types`() {
             // Act
@@ -538,17 +546,17 @@ class GearSetTest : UnitTest() {
 
     @Nested
     inner class GearSetFullEquipmentTests {
-
         @Test
         fun `should handle full 16 slot gear set`() {
             // Arrange
-            val items = EquipmentSlot.entries.associateWith { slot ->
-                createGearItem(
-                    itemId = 10000L + slot.ordinal,
-                    slot = slot,
-                    itemLevel = 480 + slot.ordinal
-                )
-            }
+            val items =
+                EquipmentSlot.entries.associateWith { slot ->
+                    createGearItem(
+                        itemId = 10000L + slot.ordinal,
+                        slot = slot,
+                        itemLevel = 480 + slot.ordinal,
+                    )
+                }
             val gearSet = createGearSet(items = items)
 
             // Act

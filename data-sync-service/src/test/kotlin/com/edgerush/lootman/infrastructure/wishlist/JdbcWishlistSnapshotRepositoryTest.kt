@@ -23,7 +23,6 @@ import java.time.ZoneOffset
  * Unit tests for JdbcWishlistSnapshotRepository.
  */
 class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcWishlistSnapshotRepository
 
@@ -37,11 +36,17 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return snapshot when found`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<WishlistSnapshotEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<WishlistSnapshotEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<WishlistSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id), 0))
             }
@@ -53,14 +58,28 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         @Test
         fun `should return null when snapshot not found`() {
             val id = 999L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<WishlistSnapshotEntity>>(), eq(id)) } returns emptyList()
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<WishlistSnapshotEntity>>(), eq(id),
+                )
+            } returns emptyList()
             repository.findById(id) shouldBe null
         }
 
         @Test
         fun `should handle null optional fields`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<WishlistSnapshotEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<WishlistSnapshotEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<WishlistSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id, raiderId = null, teamId = null, seasonId = null, periodId = null), 0))
             }
@@ -73,11 +92,17 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return snapshots for raider`() {
             val raiderId = 100L
-            every { jdbcTemplate.query(match<String> { it.contains("raider_id = ?") }, any<RowMapper<WishlistSnapshotEntity>>(), eq(raiderId), any<Int>(), any<Long>()) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("raider_id = ?")
+                    },
+                    any<RowMapper<WishlistSnapshotEntity>>(), eq(raiderId), any<Int>(), any<Long>(),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<WishlistSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L, raiderId = raiderId), 0), rowMapper.mapRow(mockResultSet(2L, raiderId = raiderId), 1))
             }
@@ -88,11 +113,17 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByTeamIdTests {
-
         @Test
         fun `should return snapshots for team`() {
             val teamId = 100L
-            every { jdbcTemplate.query(match<String> { it.contains("team_id = ?") }, any<RowMapper<WishlistSnapshotEntity>>(), eq(teamId), any<Int>(), any<Long>()) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("team_id = ?")
+                    },
+                    any<RowMapper<WishlistSnapshotEntity>>(), eq(teamId), any<Int>(), any<Long>(),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<WishlistSnapshotEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L, teamId = teamId), 0))
             }
@@ -103,13 +134,13 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new snapshot when id is null`() {
             val entity = createEntity(id = null)
             val generatedId = 1L
             every { jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>()) } answers {
-                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId)); 1
+                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId))
+                1
             }
             val result = repository.save(entity)
             result.id shouldBe generatedId
@@ -136,7 +167,13 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         }
     }
 
-    private fun mockResultSet(id: Long, raiderId: Long? = 100L, teamId: Long? = 1L, seasonId: Long? = 1L, periodId: Long? = 5L): ResultSet {
+    private fun mockResultSet(
+        id: Long,
+        raiderId: Long? = 100L,
+        teamId: Long? = 1L,
+        seasonId: Long? = 1L,
+        periodId: Long? = 5L,
+    ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
         every { rs.getLong("raider_id") } returns (raiderId ?: 0L)
@@ -148,11 +185,33 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         every { rs.getString("character_region") } returns "US"
         every { rs.getString("raw_payload") } returns "{}"
         var wasNullCount = 0
-        every { rs.wasNull() } answers { val isNull = when(wasNullCount) { 0 -> raiderId == null; 1 -> teamId == null; 2 -> seasonId == null; 3 -> periodId == null; else -> false }; wasNullCount++; isNull }
+        every { rs.wasNull() } answers {
+            val isNull =
+                when (wasNullCount) {
+                    0 -> raiderId == null
+                    1 -> teamId == null
+                    2 -> seasonId == null
+                    3 -> periodId == null
+                    else -> false
+                }
+            wasNullCount++
+            isNull
+        }
         every { rs.getTimestamp("synced_at") } returns Timestamp.from(now.toInstant())
         return rs
     }
 
-    private fun createEntity(id: Long? = 1L, raiderId: Long? = 100L, characterName: String = "TestChar", characterRealm: String = "Illidan", characterRegion: String? = "US", teamId: Long? = 1L, seasonId: Long? = 1L, periodId: Long? = 5L, rawPayload: String = "{}", syncedAt: OffsetDateTime = now) =
+    private fun createEntity(
+        id: Long? = 1L,
+        raiderId: Long? = 100L,
+        characterName: String = "TestChar",
+        characterRealm: String = "Illidan",
+        characterRegion: String? = "US",
+        teamId: Long? = 1L,
+        seasonId: Long? = 1L,
+        periodId: Long? = 5L,
+        rawPayload: String = "{}",
+        syncedAt: OffsetDateTime = now,
+    ) =
         WishlistSnapshotEntity(id, raiderId, characterName, characterRealm, characterRegion, teamId, seasonId, periodId, rawPayload, syncedAt)
 }

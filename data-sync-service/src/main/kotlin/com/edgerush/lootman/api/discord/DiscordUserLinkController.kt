@@ -30,23 +30,23 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Discord User Links", description = "Discord to WoW character linking endpoints")
 class DiscordUserLinkController(
     private val discordUserLinkService: DiscordUserLinkCrudService,
-    private val paginationProperties: PaginationProperties
+    private val paginationProperties: PaginationProperties,
 ) {
-
     @GetMapping
     @Operation(summary = "Find all Discord user links with pagination")
     fun findAll(
         @Parameter(description = "Page number (0-indexed)")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Page size")
-        @RequestParam(required = false) size: Int?
+        @RequestParam(required = false) size: Int?,
     ): PagedResponse<DiscordUserLinkResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return discordUserLinkService.findAll(pageRequest)
     }
 
@@ -54,7 +54,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Find Discord user link by ID")
     fun findById(
         @Parameter(description = "Link ID")
-        @PathVariable id: Long
+        @PathVariable id: Long,
     ): DiscordUserLinkResponse {
         return discordUserLinkService.findById(id)
     }
@@ -62,7 +62,7 @@ class DiscordUserLinkController(
     @PostMapping
     @Operation(summary = "Create a new Discord user link")
     fun create(
-        @Valid @RequestBody request: CreateDiscordUserLinkRequest
+        @Valid @RequestBody request: CreateDiscordUserLinkRequest,
     ): ResponseEntity<DiscordUserLinkResponse> {
         val created = discordUserLinkService.create(request)
         return ResponseEntity.status(HttpStatus.CREATED).body(created)
@@ -73,7 +73,7 @@ class DiscordUserLinkController(
     fun update(
         @Parameter(description = "Link ID")
         @PathVariable id: Long,
-        @Valid @RequestBody request: UpdateDiscordUserLinkRequest
+        @Valid @RequestBody request: UpdateDiscordUserLinkRequest,
     ): DiscordUserLinkResponse {
         return discordUserLinkService.update(id, request)
     }
@@ -82,7 +82,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Delete a Discord user link")
     fun delete(
         @Parameter(description = "Link ID")
-        @PathVariable id: Long
+        @PathVariable id: Long,
     ): ResponseEntity<Unit> {
         discordUserLinkService.delete(id)
         return ResponseEntity.noContent().build()
@@ -92,7 +92,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Check if Discord user link exists")
     fun exists(
         @Parameter(description = "Link ID")
-        @PathVariable id: Long
+        @PathVariable id: Long,
     ): DiscordUserLinkExistsResponse {
         return DiscordUserLinkExistsResponse(exists = discordUserLinkService.existsById(id))
     }
@@ -101,7 +101,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Find all links for a Discord user")
     fun findByDiscordUserId(
         @Parameter(description = "Discord user ID (snowflake)")
-        @PathVariable discordUserId: String
+        @PathVariable discordUserId: String,
     ): List<DiscordUserLinkResponse> {
         return discordUserLinkService.findByDiscordUserId(discordUserId)
     }
@@ -110,7 +110,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Find the primary link for a Discord user")
     fun findPrimaryByDiscordUserId(
         @Parameter(description = "Discord user ID (snowflake)")
-        @PathVariable discordUserId: String
+        @PathVariable discordUserId: String,
     ): DiscordUserLinkResponse {
         return discordUserLinkService.findPrimaryByDiscordUserId(discordUserId)
     }
@@ -119,7 +119,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Count links for a Discord user")
     fun countByDiscordUserId(
         @Parameter(description = "Discord user ID (snowflake)")
-        @PathVariable discordUserId: String
+        @PathVariable discordUserId: String,
     ): DiscordUserLinkCountResponse {
         return DiscordUserLinkCountResponse(count = discordUserLinkService.countByDiscordUserId(discordUserId))
     }
@@ -128,7 +128,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Delete all links for a Discord user")
     fun deleteByDiscordUserId(
         @Parameter(description = "Discord user ID (snowflake)")
-        @PathVariable discordUserId: String
+        @PathVariable discordUserId: String,
     ): DiscordUserLinkCountResponse {
         val deletedCount = discordUserLinkService.deleteByDiscordUserId(discordUserId)
         return DiscordUserLinkCountResponse(count = deletedCount.toLong())
@@ -138,7 +138,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Find all Discord users linked to a raider")
     fun findByRaiderId(
         @Parameter(description = "Raider ID")
-        @PathVariable raiderId: Long
+        @PathVariable raiderId: Long,
     ): List<DiscordUserLinkResponse> {
         return discordUserLinkService.findByRaiderId(raiderId)
     }
@@ -147,7 +147,7 @@ class DiscordUserLinkController(
     @Operation(summary = "Set a link as the primary link for its Discord user")
     fun setPrimary(
         @Parameter(description = "Link ID")
-        @PathVariable id: Long
+        @PathVariable id: Long,
     ): DiscordUserLinkResponse {
         return discordUserLinkService.setPrimary(id)
     }

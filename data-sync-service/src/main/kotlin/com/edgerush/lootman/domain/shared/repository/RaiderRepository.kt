@@ -34,7 +34,11 @@ interface RaiderRepository {
      * @param limit The maximum number of records to return
      * @return Paginated list of raiders
      */
-    fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Raider>
+    fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<Raider>
 
     /**
      * Counts total raiders in a guild.
@@ -51,7 +55,10 @@ interface RaiderRepository {
      * @param realm The character's realm
      * @return The raider if found, null otherwise
      */
-    fun findByCharacterNameAndRealm(characterName: String, realm: String): Raider?
+    fun findByCharacterNameAndRealm(
+        characterName: String,
+        realm: String,
+    ): Raider?
 
     /**
      * Saves a raider.

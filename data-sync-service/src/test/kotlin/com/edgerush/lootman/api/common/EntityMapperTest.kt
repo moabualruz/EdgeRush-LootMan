@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Tests verify the expected behavior of mapper implementations.
  */
 class EntityMapperTest : UnitTest() {
-
     // Test entity
     data class TestEntity(
         val id: Long? = null,
@@ -21,7 +20,9 @@ class EntityMapperTest : UnitTest() {
 
     // Test DTOs
     data class CreateRequest(val name: String, val description: String?)
+
     data class UpdateRequest(val name: String, val description: String?)
+
     data class Response(val id: Long, val name: String, val description: String?)
 
     // Concrete mapper implementation for testing
@@ -34,7 +35,10 @@ class EntityMapperTest : UnitTest() {
             )
         }
 
-        override fun updateEntity(entity: TestEntity, request: UpdateRequest): TestEntity {
+        override fun updateEntity(
+            entity: TestEntity,
+            request: UpdateRequest,
+        ): TestEntity {
             return entity.copy(
                 name = request.name,
                 description = request.description,
@@ -54,7 +58,6 @@ class EntityMapperTest : UnitTest() {
 
     @Nested
     inner class ToEntityTests {
-
         @Test
         fun `should convert create request to entity`() {
             // Given
@@ -85,7 +88,6 @@ class EntityMapperTest : UnitTest() {
 
     @Nested
     inner class UpdateEntityTests {
-
         @Test
         fun `should update entity from update request`() {
             // Given
@@ -117,7 +119,6 @@ class EntityMapperTest : UnitTest() {
 
     @Nested
     inner class ToResponseTests {
-
         @Test
         fun `should convert entity to response`() {
             // Given
@@ -147,15 +148,15 @@ class EntityMapperTest : UnitTest() {
 
     @Nested
     inner class ToResponseListTests {
-
         @Test
         fun `should convert list of entities to responses`() {
             // Given
-            val entities = listOf(
-                TestEntity(id = 1, name = "First", description = "A"),
-                TestEntity(id = 2, name = "Second", description = "B"),
-                TestEntity(id = 3, name = "Third", description = null),
-            )
+            val entities =
+                listOf(
+                    TestEntity(id = 1, name = "First", description = "A"),
+                    TestEntity(id = 2, name = "Second", description = "B"),
+                    TestEntity(id = 3, name = "Third", description = null),
+                )
 
             // When
             val responses = mapper.toResponseList(entities)
@@ -188,7 +189,6 @@ class EntityMapperTest : UnitTest() {
  * Unit tests for GuildScopedEntityMapper interface contract.
  */
 class GuildScopedEntityMapperTest : UnitTest() {
-
     data class GuildEntity(
         val id: Long? = null,
         val name: String,
@@ -196,7 +196,9 @@ class GuildScopedEntityMapperTest : UnitTest() {
     )
 
     data class CreateRequest(val name: String)
+
     data class UpdateRequest(val name: String)
+
     data class Response(val id: Long, val name: String, val guildId: String)
 
     class TestGuildMapper : GuildScopedEntityMapper<GuildEntity, CreateRequest, UpdateRequest, Response> {
@@ -204,7 +206,10 @@ class GuildScopedEntityMapperTest : UnitTest() {
             throw UnsupportedOperationException("Use toEntityWithGuild instead")
         }
 
-        override fun toEntityWithGuild(request: CreateRequest, guildId: String): GuildEntity {
+        override fun toEntityWithGuild(
+            request: CreateRequest,
+            guildId: String,
+        ): GuildEntity {
             return GuildEntity(
                 id = null,
                 name = request.name,
@@ -212,7 +217,10 @@ class GuildScopedEntityMapperTest : UnitTest() {
             )
         }
 
-        override fun updateEntity(entity: GuildEntity, request: UpdateRequest): GuildEntity {
+        override fun updateEntity(
+            entity: GuildEntity,
+            request: UpdateRequest,
+        ): GuildEntity {
             return entity.copy(name = request.name)
         }
 
@@ -229,7 +237,6 @@ class GuildScopedEntityMapperTest : UnitTest() {
 
     @Nested
     inner class ToEntityWithGuildTests {
-
         @Test
         fun `should create entity with guild context`() {
             // Given
@@ -265,7 +272,6 @@ class GuildScopedEntityMapperTest : UnitTest() {
  * Unit tests for RaiderScopedEntityMapper interface contract.
  */
 class RaiderScopedEntityMapperTest : UnitTest() {
-
     data class RaiderEntity(
         val id: Long? = null,
         val value: Int,
@@ -273,7 +279,9 @@ class RaiderScopedEntityMapperTest : UnitTest() {
     )
 
     data class CreateRequest(val value: Int)
+
     data class UpdateRequest(val value: Int)
+
     data class Response(val id: Long, val value: Int, val raiderId: Long)
 
     class TestRaiderMapper : RaiderScopedEntityMapper<RaiderEntity, CreateRequest, UpdateRequest, Response> {
@@ -281,7 +289,10 @@ class RaiderScopedEntityMapperTest : UnitTest() {
             throw UnsupportedOperationException("Use toEntityWithRaider instead")
         }
 
-        override fun toEntityWithRaider(request: CreateRequest, raiderId: Long): RaiderEntity {
+        override fun toEntityWithRaider(
+            request: CreateRequest,
+            raiderId: Long,
+        ): RaiderEntity {
             return RaiderEntity(
                 id = null,
                 value = request.value,
@@ -289,7 +300,10 @@ class RaiderScopedEntityMapperTest : UnitTest() {
             )
         }
 
-        override fun updateEntity(entity: RaiderEntity, request: UpdateRequest): RaiderEntity {
+        override fun updateEntity(
+            entity: RaiderEntity,
+            request: UpdateRequest,
+        ): RaiderEntity {
             return entity.copy(value = request.value)
         }
 
@@ -306,7 +320,6 @@ class RaiderScopedEntityMapperTest : UnitTest() {
 
     @Nested
     inner class ToEntityWithRaiderTests {
-
         @Test
         fun `should create entity with raider context`() {
             // Given

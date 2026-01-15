@@ -53,26 +53,28 @@ data class RaiderEntityResponse(
     val lastSync: OffsetDateTime,
 ) {
     companion object {
-        fun from(entity: RaiderEntity) = RaiderEntityResponse(
-            id = entity.id!!,
-            characterName = entity.characterName,
-            realm = entity.realm,
-            region = entity.region,
-            wowauditId = entity.wowauditId,
-            clazz = entity.clazz,
-            spec = entity.spec,
-            role = entity.role,
-            rank = entity.rank,
-            status = entity.status,
-            note = entity.note,
-            blizzardId = entity.blizzardId,
-            trackingSince = entity.trackingSince,
-            joinDate = entity.joinDate,
-            blizzardLastModified = entity.blizzardLastModified,
-            lastSync = entity.lastSync,
-        )
+        fun from(entity: RaiderEntity) =
+            RaiderEntityResponse(
+                id = entity.id!!,
+                characterName = entity.characterName,
+                realm = entity.realm,
+                region = entity.region,
+                wowauditId = entity.wowauditId,
+                clazz = entity.clazz,
+                spec = entity.spec,
+                role = entity.role,
+                rank = entity.rank,
+                status = entity.status,
+                note = entity.note,
+                blizzardId = entity.blizzardId,
+                trackingSince = entity.trackingSince,
+                joinDate = entity.joinDate,
+                blizzardLastModified = entity.blizzardLastModified,
+                lastSync = entity.lastSync,
+            )
     }
 }
 
 data class RaiderEntityExistsResponse(val exists: Boolean)
+
 data class RaiderEntityCountResponse(val count: Long)

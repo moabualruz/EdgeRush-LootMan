@@ -13,7 +13,7 @@ data class UserRefreshToken(
     val tokenHash: String,
     val expiresAt: Instant,
     val createdAt: Instant = Instant.now(),
-    val revokedAt: Instant? = null
+    val revokedAt: Instant? = null,
 ) {
     init {
         require(tokenHash.isNotBlank()) { "Token hash must not be blank" }
@@ -22,14 +22,12 @@ data class UserRefreshToken(
     /**
      * Checks if the token is valid (not expired and not revoked).
      */
-    fun isValid(now: Instant = Instant.now()): Boolean =
-        revokedAt == null && expiresAt.isAfter(now)
+    fun isValid(now: Instant = Instant.now()): Boolean = revokedAt == null && expiresAt.isAfter(now)
 
     /**
      * Checks if the token is expired.
      */
-    fun isExpired(now: Instant = Instant.now()): Boolean =
-        expiresAt.isBefore(now) || expiresAt == now
+    fun isExpired(now: Instant = Instant.now()): Boolean = expiresAt.isBefore(now) || expiresAt == now
 
     /**
      * Checks if the token has been revoked.
@@ -57,11 +55,12 @@ data class UserRefreshToken(
         fun create(
             userId: UserId,
             tokenHash: String,
-            validityDays: Long = 30
-        ): UserRefreshToken = UserRefreshToken(
-            userId = userId,
-            tokenHash = tokenHash,
-            expiresAt = Instant.now().plusSeconds(validityDays * 24 * 60 * 60)
-        )
+            validityDays: Long = 30,
+        ): UserRefreshToken =
+            UserRefreshToken(
+                userId = userId,
+                tokenHash = tokenHash,
+                expiresAt = Instant.now().plusSeconds(validityDays * 24 * 60 * 60),
+            )
     }
 }

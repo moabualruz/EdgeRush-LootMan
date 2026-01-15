@@ -23,7 +23,6 @@ import java.time.OffsetDateTime
  * Tests the service layer using mocked repository.
  */
 class RaidCrudServiceImplTest : UnitTest() {
-
     private lateinit var raidRepository: RaidRepository
     private lateinit var service: RaidCrudServiceImpl
 
@@ -35,14 +34,14 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response`() {
             // Given
-            val raids = listOf(
-                createRaidEntity(raidId = 1L),
-                createRaidEntity(raidId = 2L),
-            )
+            val raids =
+                listOf(
+                    createRaidEntity(raidId = 1L),
+                    createRaidEntity(raidId = 2L),
+                )
             every { raidRepository.findAll(0L, 20) } returns raids
             every { raidRepository.count() } returns 2L
 
@@ -92,7 +91,6 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return raid when found`() {
             // Given
@@ -124,21 +122,21 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should create raid and return response`() {
             // Given
-            val request = CreateRaidRequest(
-                date = LocalDate.of(2024, 3, 15),
-                startTime = LocalTime.of(20, 0),
-                endTime = LocalTime.of(23, 30),
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                optional = false,
-                status = "SCHEDULED",
-                totalSize = 20,
-                teamId = 1L,
-            )
+            val request =
+                CreateRaidRequest(
+                    date = LocalDate.of(2024, 3, 15),
+                    startTime = LocalTime.of(20, 0),
+                    endTime = LocalTime.of(23, 30),
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    optional = false,
+                    status = "SCHEDULED",
+                    totalSize = 20,
+                    teamId = 1L,
+                )
 
             val entitySlot = slot<RaidEntity>()
             every { raidRepository.save(capture(entitySlot)) } answers { entitySlot.captured }
@@ -174,7 +172,6 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should update raid and return response`() {
             // Given
@@ -199,12 +196,13 @@ class RaidCrudServiceImplTest : UnitTest() {
         @Test
         fun `should preserve existing values for null fields`() {
             // Given
-            val existing = createRaidEntity(
-                raidId = 1L,
-                instance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                notes = "Original notes",
-            )
+            val existing =
+                createRaidEntity(
+                    raidId = 1L,
+                    instance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    notes = "Original notes",
+                )
             every { raidRepository.findById(1L) } returns existing
 
             val request = UpdateRaidRequest(status = "COMPLETED")
@@ -259,7 +257,6 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete raid when exists`() {
             // Given
@@ -290,7 +287,6 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when raid exists`() {
             // Given
@@ -318,15 +314,15 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByTeamTests {
-
         @Test
         fun `should return paged raids for team`() {
             // Given
             val teamId = 1L
-            val raids = listOf(
-                createRaidEntity(raidId = 1L, teamId = teamId),
-                createRaidEntity(raidId = 2L, teamId = teamId),
-            )
+            val raids =
+                listOf(
+                    createRaidEntity(raidId = 1L, teamId = teamId),
+                    createRaidEntity(raidId = 2L, teamId = teamId),
+                )
             every { raidRepository.findByTeamId(teamId, 0L, 20) } returns raids
             every { raidRepository.countByTeamId(teamId) } returns 2L
 
@@ -361,16 +357,16 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByDateRangeTests {
-
         @Test
         fun `should return raids within date range`() {
             // Given
             val startDate = LocalDate.of(2024, 1, 1)
             val endDate = LocalDate.of(2024, 3, 31)
-            val raids = listOf(
-                createRaidEntity(raidId = 1L, date = LocalDate.of(2024, 1, 15)),
-                createRaidEntity(raidId = 2L, date = LocalDate.of(2024, 2, 20)),
-            )
+            val raids =
+                listOf(
+                    createRaidEntity(raidId = 1L, date = LocalDate.of(2024, 1, 15)),
+                    createRaidEntity(raidId = 2L, date = LocalDate.of(2024, 2, 20)),
+                )
             every { raidRepository.findByDateRange(startDate, endDate, 0L, 20) } returns raids
             every { raidRepository.countByDateRange(startDate, endDate) } returns 2L
 
@@ -405,7 +401,6 @@ class RaidCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class CountByTeamTests {
-
         @Test
         fun `should return count for team`() {
             // Given
@@ -451,24 +446,25 @@ class RaidCrudServiceImplTest : UnitTest() {
         createdAt: OffsetDateTime? = OffsetDateTime.now(),
         updatedAt: OffsetDateTime? = OffsetDateTime.now(),
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): RaidEntity = RaidEntity(
-        raidId = raidId,
-        date = date,
-        startTime = startTime,
-        endTime = endTime,
-        instance = instance,
-        difficulty = difficulty,
-        optional = optional,
-        status = status,
-        presentSize = presentSize,
-        totalSize = totalSize,
-        notes = notes,
-        selectionsImage = selectionsImage,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        syncedAt = syncedAt,
-    )
+    ): RaidEntity =
+        RaidEntity(
+            raidId = raidId,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
+            instance = instance,
+            difficulty = difficulty,
+            optional = optional,
+            status = status,
+            presentSize = presentSize,
+            totalSize = totalSize,
+            notes = notes,
+            selectionsImage = selectionsImage,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            syncedAt = syncedAt,
+        )
 }

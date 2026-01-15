@@ -15,13 +15,13 @@ import java.time.ZoneOffset
 class JdbcRaiderEntityRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : RaiderEntityRepository {
-
     override fun findById(id: Long): RaiderEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_name, realm, region, wowaudit_id, class, spec, role, rank, status,
                    note, blizzard_id, tracking_since, join_date, blizzard_last_modified, last_sync
             FROM raiders WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.query(sql, raiderRowMapper, id).firstOrNull()
     }
 
@@ -30,35 +30,49 @@ class JdbcRaiderEntityRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<RaiderEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaiderEntity> {
+        val sql =
+            """
             SELECT id, character_name, realm, region, wowaudit_id, class, spec, role, rank, status,
                    note, blizzard_id, tracking_since, join_date, blizzard_last_modified, last_sync
             FROM raiders ORDER BY last_sync DESC, id LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.query(sql, raiderRowMapper, limit, offset)
     }
 
     override fun count(): Long = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raiders", Long::class.java) ?: 0L
 
-    override fun findByRealm(realm: String, offset: Long, limit: Int): List<RaiderEntity> {
-        val sql = """
+    override fun findByRealm(
+        realm: String,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderEntity> {
+        val sql =
+            """
             SELECT id, character_name, realm, region, wowaudit_id, class, spec, role, rank, status,
                    note, blizzard_id, tracking_since, join_date, blizzard_last_modified, last_sync
             FROM raiders WHERE realm = ? ORDER BY last_sync DESC, id LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.query(sql, raiderRowMapper, realm, limit, offset)
     }
 
     override fun countByRealm(realm: String): Long =
         jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raiders WHERE realm = ?", Long::class.java, realm) ?: 0L
 
-    override fun findByRegion(region: String, offset: Long, limit: Int): List<RaiderEntity> {
-        val sql = """
+    override fun findByRegion(
+        region: String,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderEntity> {
+        val sql =
+            """
             SELECT id, character_name, realm, region, wowaudit_id, class, spec, role, rank, status,
                    note, blizzard_id, tracking_since, join_date, blizzard_last_modified, last_sync
             FROM raiders WHERE region = ? ORDER BY last_sync DESC, id LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.query(sql, raiderRowMapper, region, limit, offset)
     }
 
@@ -66,16 +80,24 @@ class JdbcRaiderEntityRepository(
         jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raiders WHERE region = ?", Long::class.java, region) ?: 0L
 
     override fun save(entity: RaiderEntity): RaiderEntity =
-        if (entity.id == null) insert(entity) else { update(entity); entity }
+        if (entity.id == null) {
+            insert(entity)
+        } else {
+            update(entity)
+            entity
+        }
 
-    override fun delete(id: Long) { jdbcTemplate.update("DELETE FROM raiders WHERE id = ?", id) }
+    override fun delete(id: Long) {
+        jdbcTemplate.update("DELETE FROM raiders WHERE id = ?", id)
+    }
 
     private fun insert(entity: RaiderEntity): RaiderEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raiders (character_name, realm, region, wowaudit_id, class, spec, role, rank, status,
                 note, blizzard_id, tracking_since, join_date, blizzard_last_modified, last_sync)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ conn ->
             val ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
@@ -101,29 +123,35 @@ class JdbcRaiderEntityRepository(
     }
 
     private fun update(entity: RaiderEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE raiders SET character_name=?, realm=?, region=?, wowaudit_id=?, class=?, spec=?, role=?,
                 rank=?, status=?, note=?, blizzard_id=?, tracking_since=?, join_date=?, blizzard_last_modified=?, last_sync=?
             WHERE id = ?
-        """.trimIndent()
-        jdbcTemplate.update(sql, entity.characterName, entity.realm, entity.region, entity.wowauditId,
+            """.trimIndent()
+        jdbcTemplate.update(
+            sql, entity.characterName, entity.realm, entity.region, entity.wowauditId,
             entity.clazz, entity.spec, entity.role, entity.rank, entity.status, entity.note, entity.blizzardId,
             entity.trackingSince?.let { Timestamp.from(it.toInstant()) }, entity.joinDate?.let { Timestamp.from(it.toInstant()) },
-            entity.blizzardLastModified?.let { Timestamp.from(it.toInstant()) }, Timestamp.from(entity.lastSync.toInstant()), entity.id)
-    }
-
-    private val raiderRowMapper = RowMapper { rs, _ ->
-        val wowauditIdVal = rs.getLong("wowaudit_id"); val wowauditId = if (rs.wasNull()) null else wowauditIdVal
-        val blizzardIdVal = rs.getLong("blizzard_id"); val blizzardId = if (rs.wasNull()) null else blizzardIdVal
-        RaiderEntity(
-            id = rs.getLong("id"), characterName = rs.getString("character_name"), realm = rs.getString("realm"),
-            region = rs.getString("region"), wowauditId = wowauditId, clazz = rs.getString("class"),
-            spec = rs.getString("spec"), role = rs.getString("role"), rank = rs.getString("rank"),
-            status = rs.getString("status"), note = rs.getString("note"), blizzardId = blizzardId,
-            trackingSince = rs.getTimestamp("tracking_since")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            joinDate = rs.getTimestamp("join_date")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            blizzardLastModified = rs.getTimestamp("blizzard_last_modified")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            lastSync = rs.getTimestamp("last_sync")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            entity.blizzardLastModified?.let { Timestamp.from(it.toInstant()) }, Timestamp.from(entity.lastSync.toInstant()), entity.id,
         )
     }
+
+    private val raiderRowMapper =
+        RowMapper { rs, _ ->
+            val wowauditIdVal = rs.getLong("wowaudit_id")
+            val wowauditId = if (rs.wasNull()) null else wowauditIdVal
+            val blizzardIdVal = rs.getLong("blizzard_id")
+            val blizzardId = if (rs.wasNull()) null else blizzardIdVal
+            RaiderEntity(
+                id = rs.getLong("id"), characterName = rs.getString("character_name"), realm = rs.getString("realm"),
+                region = rs.getString("region"), wowauditId = wowauditId, clazz = rs.getString("class"),
+                spec = rs.getString("spec"), role = rs.getString("role"), rank = rs.getString("rank"),
+                status = rs.getString("status"), note = rs.getString("note"), blizzardId = blizzardId,
+                trackingSince = rs.getTimestamp("tracking_since")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                joinDate = rs.getTimestamp("join_date")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                blizzardLastModified = rs.getTimestamp("blizzard_last_modified")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                lastSync = rs.getTimestamp("last_sync")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            )
+        }
 }

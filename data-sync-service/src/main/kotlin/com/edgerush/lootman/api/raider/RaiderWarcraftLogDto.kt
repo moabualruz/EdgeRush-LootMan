@@ -23,11 +23,16 @@ data class RaiderWarcraftLogResponse(
     val score: Int?,
 ) {
     companion object {
-        fun from(e: RaiderWarcraftLogEntity) = RaiderWarcraftLogResponse(
-            e.id!!, e.raiderId, e.difficulty, e.score
-        )
+        fun from(e: RaiderWarcraftLogEntity) =
+            RaiderWarcraftLogResponse(
+                e.id!!,
+                e.raiderId,
+                e.difficulty,
+                e.score,
+            )
     }
 }
 
 data class RaiderWarcraftLogExistsResponse(val exists: Boolean)
+
 data class RaiderWarcraftLogCountResponse(val count: Long)

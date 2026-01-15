@@ -36,7 +36,6 @@ class RaidController(
     private val raidService: RaidCrudService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @Operation(summary = "Get all raids", description = "Returns a paginated list of all raids")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Successfully retrieved raids"),
@@ -48,12 +47,13 @@ class RaidController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return raidService.findAll(pageRequest)
     }
 
@@ -124,12 +124,13 @@ class RaidController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return raidService.findByTeam(teamId, pageRequest)
     }
 
@@ -137,20 +138,23 @@ class RaidController(
     @GetMapping("/date-range")
     fun findByDateRange(
         @Parameter(description = "Start date (inclusive)")
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate,
+        @RequestParam
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate,
         @Parameter(description = "End date (inclusive)")
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate,
+        @RequestParam
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate,
         @Parameter(description = "Page number (0-indexed)")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaidResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return raidService.findByDateRange(startDate, endDate, pageRequest)
     }
 

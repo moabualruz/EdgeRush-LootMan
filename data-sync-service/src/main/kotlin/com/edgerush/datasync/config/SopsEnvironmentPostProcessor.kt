@@ -36,7 +36,6 @@ import java.io.StringReader
  * other configuration sources (environment variables, application.yaml, etc.).
  */
 class SopsEnvironmentPostProcessor : EnvironmentPostProcessor {
-
     companion object {
         private val logger = LoggerFactory.getLogger(SopsEnvironmentPostProcessor::class.java)
         private const val PROPERTY_SOURCE_NAME = "sops-secrets"
@@ -45,19 +44,21 @@ class SopsEnvironmentPostProcessor : EnvironmentPostProcessor {
 
     override fun postProcessEnvironment(
         environment: ConfigurableEnvironment,
-        application: SpringApplication
+        application: SpringApplication,
     ) {
-        val ageKeyFile = environment.getProperty("SOPS_AGE_KEY_FILE")
-            ?: System.getenv("SOPS_AGE_KEY_FILE")
+        val ageKeyFile =
+            environment.getProperty("SOPS_AGE_KEY_FILE")
+                ?: System.getenv("SOPS_AGE_KEY_FILE")
 
         if (ageKeyFile.isNullOrBlank()) {
             logger.debug("SOPS_AGE_KEY_FILE not set, skipping secrets decryption")
             return
         }
 
-        val secretsFile = environment.getProperty("SOPS_SECRETS_FILE")
-            ?: System.getenv("SOPS_SECRETS_FILE")
-            ?: DEFAULT_SECRETS_FILE
+        val secretsFile =
+            environment.getProperty("SOPS_SECRETS_FILE")
+                ?: System.getenv("SOPS_SECRETS_FILE")
+                ?: DEFAULT_SECRETS_FILE
 
         if (!File(secretsFile).exists()) {
             logger.debug("Secrets file not found at $secretsFile, skipping SOPS decryption")
@@ -84,12 +85,16 @@ class SopsEnvironmentPostProcessor : EnvironmentPostProcessor {
      * @param ageKeyFile Path to the age key file
      * @return Decrypted YAML content, or null if decryption fails
      */
-    private fun decryptSecrets(secretsFile: String, ageKeyFile: String): String? {
-        val processBuilder = ProcessBuilder("sops", "-d", secretsFile)
-            .apply {
-                environment()["SOPS_AGE_KEY_FILE"] = ageKeyFile
-            }
-            .redirectErrorStream(true)
+    private fun decryptSecrets(
+        secretsFile: String,
+        ageKeyFile: String,
+    ): String? {
+        val processBuilder =
+            ProcessBuilder("sops", "-d", secretsFile)
+                .apply {
+                    environment()["SOPS_AGE_KEY_FILE"] = ageKeyFile
+                }
+                .redirectErrorStream(true)
 
         val process = processBuilder.start()
         val output = process.inputStream.bufferedReader().readText()
@@ -123,7 +128,10 @@ class SopsEnvironmentPostProcessor : EnvironmentPostProcessor {
         return flattenMap(parsed, "")
     }
 
-    private fun flattenMap(map: Map<String, Any>, prefix: String): Map<String, Any> {
+    private fun flattenMap(
+        map: Map<String, Any>,
+        prefix: String,
+    ): Map<String, Any> {
         val result = mutableMapOf<String, Any>()
 
         for ((key, value) in map) {

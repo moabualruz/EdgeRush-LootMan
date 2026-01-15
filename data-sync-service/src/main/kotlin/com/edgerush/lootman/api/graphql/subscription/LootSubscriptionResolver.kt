@@ -6,7 +6,6 @@ import com.expediagroup.graphql.server.operations.Subscription
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -20,7 +19,6 @@ import java.time.Instant
 class LootSubscriptionResolver(
     private val lootEventPublisher: LootEventPublisher,
 ) : Subscription {
-
     /**
      * Subscribe to loot awarded events for a guild.
      *
@@ -74,13 +72,16 @@ class LootEventPublisher {
      * @param guildId The guild ID where the revocation occurred
      * @param awardId The ID of the revoked award
      */
-    suspend fun publishLootRevoked(guildId: String, awardId: String) {
+    suspend fun publishLootRevoked(
+        guildId: String,
+        awardId: String,
+    ) {
         _lootRevokedEvents.emit(
             LootRevokedEvent(
                 guildId = guildId,
                 awardId = awardId,
                 revokedAt = Instant.now(),
-            )
+            ),
         )
     }
 }
@@ -110,12 +111,13 @@ data class LootRevokedEvent(
 /**
  * Extension function to convert LootAward to LootAwardedEvent.
  */
-private fun LootAward.toLootAwardedEvent(): LootAwardedEvent = LootAwardedEvent(
-    id = this.id.value,
-    guildId = this.guildId.value,
-    raiderId = this.raiderId.value.toString(),
-    itemId = this.itemId.value.toString(),
-    tier = this.tier,
-    flpsScore = this.flpsScore.value,
-    awardedAt = this.awardedAt,
-)
+private fun LootAward.toLootAwardedEvent(): LootAwardedEvent =
+    LootAwardedEvent(
+        id = this.id.value,
+        guildId = this.guildId.value,
+        raiderId = this.raiderId.value.toString(),
+        itemId = this.itemId.value.toString(),
+        tier = this.tier,
+        flpsScore = this.flpsScore.value,
+        awardedAt = this.awardedAt,
+    )

@@ -17,9 +17,8 @@ import reactor.core.publisher.Mono
 @Order(1)
 class AuditWebFilter(
     private val auditLogRepository: AuditLogRepository,
-    private val customMetrics: CustomMetrics? = null
+    private val customMetrics: CustomMetrics? = null,
 ) : WebFilter {
-
     companion object {
         private val WRITE_METHODS = setOf(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.PATCH)
         private const val API_PATH_PREFIX = "/api/"
@@ -34,7 +33,10 @@ class AuditWebFilter(
         private const val DEFAULT_USERNAME = "anonymous"
     }
 
-    override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+    override fun filter(
+        exchange: ServerWebExchange,
+        chain: WebFilterChain,
+    ): Mono<Void> {
         val request = exchange.request
         val method = request.method
         val path = request.uri.path
@@ -54,7 +56,10 @@ class AuditWebFilter(
             }
     }
 
-    private fun shouldPotentiallyAudit(method: HttpMethod?, path: String): Boolean {
+    private fun shouldPotentiallyAudit(
+        method: HttpMethod?,
+        path: String,
+    ): Boolean {
         if (method !in WRITE_METHODS) {
             return false
         }
@@ -70,16 +75,20 @@ class AuditWebFilter(
         return true
     }
 
-    private fun captureAuditLog(request: ServerHttpRequest, statusCode: Int) {
+    private fun captureAuditLog(
+        request: ServerHttpRequest,
+        statusCode: Int,
+    ) {
         val method = request.method
         val path = request.uri.path
 
-        val operation = when (method) {
-            HttpMethod.POST -> AuditOperation.CREATE
-            HttpMethod.PUT, HttpMethod.PATCH -> AuditOperation.UPDATE
-            HttpMethod.DELETE -> AuditOperation.DELETE
-            else -> return
-        }
+        val operation =
+            when (method) {
+                HttpMethod.POST -> AuditOperation.CREATE
+                HttpMethod.PUT, HttpMethod.PATCH -> AuditOperation.UPDATE
+                HttpMethod.DELETE -> AuditOperation.DELETE
+                else -> return
+            }
 
         val (entityType, entityId) = extractEntityInfo(path)
 
@@ -89,15 +98,16 @@ class AuditWebFilter(
         val isAdminMode = headers.getFirst(HEADER_ADMIN_MODE)?.toBoolean() ?: false
         val requestId = headers.getFirst(HEADER_REQUEST_ID)
 
-        val auditLog = AuditLog.create(
-            operation = operation,
-            entityType = entityType,
-            entityId = entityId,
-            userId = userId,
-            username = username,
-            isAdminMode = isAdminMode,
-            requestId = requestId
-        )
+        val auditLog =
+            AuditLog.create(
+                operation = operation,
+                entityType = entityType,
+                entityId = entityId,
+                userId = userId,
+                username = username,
+                isAdminMode = isAdminMode,
+                requestId = requestId,
+            )
 
         try {
             auditLogRepository.save(auditLog)
@@ -108,10 +118,11 @@ class AuditWebFilter(
     }
 
     private fun extractEntityInfo(path: String): Pair<String, String> {
-        val pathParts = path.removePrefix("/api/v1/")
-            .removePrefix("/api/")
-            .split("/")
-            .filter { it.isNotBlank() }
+        val pathParts =
+            path.removePrefix("/api/v1/")
+                .removePrefix("/api/")
+                .split("/")
+                .filter { it.isNotBlank() }
 
         if (pathParts.isEmpty()) {
             return "unknown" to "unknown"

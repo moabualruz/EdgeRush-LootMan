@@ -47,12 +47,14 @@ data class RaiderGearItemResponse(
     val name: String?,
 ) {
     companion object {
-        fun from(e: RaiderGearItemEntity) = RaiderGearItemResponse(
-            e.id!!, e.raiderId, e.gearSet, e.slot, e.itemId, e.itemLevel,
-            e.quality, e.enchant, e.enchantQuality, e.upgradeLevel, e.sockets, e.name
-        )
+        fun from(e: RaiderGearItemEntity) =
+            RaiderGearItemResponse(
+                e.id!!, e.raiderId, e.gearSet, e.slot, e.itemId, e.itemLevel,
+                e.quality, e.enchant, e.enchantQuality, e.upgradeLevel, e.sockets, e.name,
+            )
     }
 }
 
 data class RaiderGearItemExistsResponse(val exists: Boolean)
+
 data class RaiderGearItemCountResponse(val count: Long)

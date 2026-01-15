@@ -12,28 +12,28 @@ import org.springframework.stereotype.Service
  */
 @Service
 class ProfileGeneratorService {
-
     /**
      * Mapping from EquipmentSlot to SimC slot names.
      */
-    private val slotMapping = mapOf(
-        EquipmentSlot.HEAD to "head",
-        EquipmentSlot.NECK to "neck",
-        EquipmentSlot.SHOULDER to "shoulder",
-        EquipmentSlot.BACK to "back",
-        EquipmentSlot.CHEST to "chest",
-        EquipmentSlot.WRIST to "wrist",
-        EquipmentSlot.HANDS to "hands",
-        EquipmentSlot.WAIST to "waist",
-        EquipmentSlot.LEGS to "legs",
-        EquipmentSlot.FEET to "feet",
-        EquipmentSlot.FINGER_1 to "finger1",
-        EquipmentSlot.FINGER_2 to "finger2",
-        EquipmentSlot.TRINKET_1 to "trinket1",
-        EquipmentSlot.TRINKET_2 to "trinket2",
-        EquipmentSlot.MAIN_HAND to "main_hand",
-        EquipmentSlot.OFF_HAND to "off_hand"
-    )
+    private val slotMapping =
+        mapOf(
+            EquipmentSlot.HEAD to "head",
+            EquipmentSlot.NECK to "neck",
+            EquipmentSlot.SHOULDER to "shoulder",
+            EquipmentSlot.BACK to "back",
+            EquipmentSlot.CHEST to "chest",
+            EquipmentSlot.WRIST to "wrist",
+            EquipmentSlot.HANDS to "hands",
+            EquipmentSlot.WAIST to "waist",
+            EquipmentSlot.LEGS to "legs",
+            EquipmentSlot.FEET to "feet",
+            EquipmentSlot.FINGER_1 to "finger1",
+            EquipmentSlot.FINGER_2 to "finger2",
+            EquipmentSlot.TRINKET_1 to "trinket1",
+            EquipmentSlot.TRINKET_2 to "trinket2",
+            EquipmentSlot.MAIN_HAND to "main_hand",
+            EquipmentSlot.OFF_HAND to "off_hand",
+        )
 
     /**
      * Generates a SimulationCraft profile for a character.
@@ -54,7 +54,7 @@ class ProfileGeneratorService {
         characterSpec: String,
         characterLevel: Int,
         characterRace: String,
-        gear: GearSet?
+        gear: GearSet?,
     ): String {
         val builder = StringBuilder()
 
@@ -90,13 +90,13 @@ class ProfileGeneratorService {
     fun generateMinimalProfile(
         characterName: String,
         characterClass: String,
-        characterSpec: String
+        characterSpec: String,
     ): String {
         return """
             |$characterClass="$characterName"
             |level=80
             |race=human
             |spec=${characterSpec.lowercase()}
-        """.trimMargin()
+            """.trimMargin()
     }
 }

@@ -31,7 +31,10 @@ interface CharacterHistoryRepository {
      * @param limit The maximum number of records to return
      * @return List of character history entities
      */
-    fun findAll(offset: Long, limit: Int): List<CharacterHistoryEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity>
 
     /**
      * Counts all character history.
@@ -48,7 +51,11 @@ interface CharacterHistoryRepository {
      * @param limit The maximum number of records to return
      * @return List of character history entities for the character
      */
-    fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<CharacterHistoryEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity>
 
     /**
      * Counts character history for a character.
@@ -66,7 +73,11 @@ interface CharacterHistoryRepository {
      * @param limit The maximum number of records to return
      * @return List of character history entities for the team
      */
-    fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<CharacterHistoryEntity>
+    fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity>
 
     /**
      * Counts character history for a team.

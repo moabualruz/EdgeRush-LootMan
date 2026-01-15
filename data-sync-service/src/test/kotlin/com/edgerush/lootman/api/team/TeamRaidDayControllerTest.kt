@@ -21,7 +21,6 @@ import java.time.OffsetDateTime
  * Unit tests for TeamRaidDayController.
  */
 class TeamRaidDayControllerTest : UnitTest() {
-
     private lateinit var teamRaidDayService: TeamRaidDayCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: TeamRaidDayController
@@ -35,16 +34,16 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createTeamRaidDayResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createTeamRaidDayResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { teamRaidDayService.findAll(any()) } returns expectedResponse
 
             // When
@@ -61,12 +60,13 @@ class TeamRaidDayControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<TeamRaidDayResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TeamRaidDayResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { teamRaidDayService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -79,7 +79,6 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return team raid day when found`() {
             // Given
@@ -112,25 +111,26 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created team raid day with 201 status`() {
             // Given
-            val request = CreateTeamRaidDayRequest(
-                teamId = 1L,
-                weekDay = "Wednesday",
-                startTime = LocalTime.of(20, 0),
-                endTime = LocalTime.of(23, 0),
-                currentInstance = "Nerub-ar Palace",
-                difficulty = "Mythic",
-                activeFrom = LocalDate.of(2024, 1, 1),
-            )
+            val request =
+                CreateTeamRaidDayRequest(
+                    teamId = 1L,
+                    weekDay = "Wednesday",
+                    startTime = LocalTime.of(20, 0),
+                    endTime = LocalTime.of(23, 0),
+                    currentInstance = "Nerub-ar Palace",
+                    difficulty = "Mythic",
+                    activeFrom = LocalDate.of(2024, 1, 1),
+                )
 
-            val created = createTeamRaidDayResponse(
-                id = 1L,
-                teamId = 1L,
-                weekDay = "Wednesday",
-            )
+            val created =
+                createTeamRaidDayResponse(
+                    id = 1L,
+                    teamId = 1L,
+                    weekDay = "Wednesday",
+                )
             every { teamRaidDayService.create(request) } returns created
 
             // When
@@ -146,20 +146,21 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated team raid day`() {
             // Given
-            val request = UpdateTeamRaidDayRequest(
-                startTime = LocalTime.of(19, 30),
-                endTime = LocalTime.of(22, 30),
-            )
+            val request =
+                UpdateTeamRaidDayRequest(
+                    startTime = LocalTime.of(19, 30),
+                    endTime = LocalTime.of(22, 30),
+                )
 
-            val updated = createTeamRaidDayResponse(
-                id = 1L,
-                startTime = LocalTime.of(19, 30),
-                endTime = LocalTime.of(22, 30),
-            )
+            val updated =
+                createTeamRaidDayResponse(
+                    id = 1L,
+                    startTime = LocalTime.of(19, 30),
+                    endTime = LocalTime.of(22, 30),
+                )
             every { teamRaidDayService.update(1L, request) } returns updated
 
             // When
@@ -191,7 +192,6 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -223,7 +223,6 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when team raid day exists`() {
             // Given
@@ -252,21 +251,22 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class FindByTeamIdTests {
-
         @Test
         fun `should return team raid days for a team`() {
             // Given
             val teamId = 1L
-            val raidDays = listOf(
-                createTeamRaidDayResponse(id = 1L, teamId = teamId, weekDay = "Wednesday"),
-                createTeamRaidDayResponse(id = 2L, teamId = teamId, weekDay = "Sunday"),
-            )
-            val expectedResponse = PagedResponse(
-                content = raidDays,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val raidDays =
+                listOf(
+                    createTeamRaidDayResponse(id = 1L, teamId = teamId, weekDay = "Wednesday"),
+                    createTeamRaidDayResponse(id = 2L, teamId = teamId, weekDay = "Sunday"),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = raidDays,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { teamRaidDayService.findByTeamId(teamId, any()) } returns expectedResponse
 
             // When
@@ -280,7 +280,6 @@ class TeamRaidDayControllerTest : UnitTest() {
 
     @Nested
     inner class CountByTeamIdTests {
-
         @Test
         fun `should return count for team`() {
             // Given
@@ -306,15 +305,16 @@ class TeamRaidDayControllerTest : UnitTest() {
         difficulty: String? = "Mythic",
         activeFrom: LocalDate? = LocalDate.of(2024, 1, 1),
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): TeamRaidDayResponse = TeamRaidDayResponse(
-        id = id,
-        teamId = teamId,
-        weekDay = weekDay,
-        startTime = startTime,
-        endTime = endTime,
-        currentInstance = currentInstance,
-        difficulty = difficulty,
-        activeFrom = activeFrom,
-        syncedAt = syncedAt,
-    )
+    ): TeamRaidDayResponse =
+        TeamRaidDayResponse(
+            id = id,
+            teamId = teamId,
+            weekDay = weekDay,
+            startTime = startTime,
+            endTime = endTime,
+            currentInstance = currentInstance,
+            difficulty = difficulty,
+            activeFrom = activeFrom,
+            syncedAt = syncedAt,
+        )
 }

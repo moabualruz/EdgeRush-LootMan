@@ -6,10 +6,6 @@ import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain as stringContain
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -18,9 +14,9 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import java.time.Instant
+import io.kotest.matchers.string.shouldContain as stringContain
 
 class DockerSimulationExecutorTest : UnitTest() {
-
     private lateinit var executor: DockerSimulationExecutor
 
     @TempDir
@@ -28,11 +24,12 @@ class DockerSimulationExecutorTest : UnitTest() {
 
     @BeforeEach
     fun setUp() {
-        executor = DockerSimulationExecutor(
-            dockerImage = "simulationcraftorg/simc",
-            profileDirectory = tempDir.toString(),
-            dockerCommand = "docker"
-        )
+        executor =
+            DockerSimulationExecutor(
+                dockerImage = "simulationcraftorg/simc",
+                profileDirectory = tempDir.toString(),
+                dockerCommand = "docker",
+            )
     }
 
     private fun createProfile(): SimulationProfile {
@@ -40,13 +37,14 @@ class DockerSimulationExecutorTest : UnitTest() {
             guildId = "guild-123",
             characterName = "Testchar",
             characterRealm = "TestRealm",
-            profileContent = """
+            profileContent =
+                """
                 warrior="Testchar"
                 level=80
                 race=human
                 spec=fury
-            """.trimIndent(),
-            createdAt = Instant.now()
+                """.trimIndent(),
+            createdAt = Instant.now(),
         )
     }
 
@@ -89,11 +87,12 @@ class DockerSimulationExecutorTest : UnitTest() {
         fun `should build correct docker command`() {
             // Arrange
             val profile = createProfile()
-            val request = SimulationRequest.create(
-                profile = profile,
-                iterations = 10000,
-                fightLengthSeconds = 300
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = profile,
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                )
 
             // Act
             val command = executor.buildDockerCommand(request, File(tempDir.toFile(), "test.simc"))
@@ -127,7 +126,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should parse simulation results from json`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -156,7 +156,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -172,7 +172,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle empty profilesets`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -180,7 +181,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -252,13 +253,14 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle json with missing profilesets path`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "players": []
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -270,7 +272,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle profileset with missing item id`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -290,7 +293,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -302,7 +305,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle profileset with missing slot`() {
             // Arrange - name starts with non-word character so slot extraction fails
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -322,7 +326,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -334,7 +338,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should use default base dps when players array is empty`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -348,7 +353,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         "players": []
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -362,7 +367,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should calculate dps gain correctly from percentage`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -382,7 +388,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -401,11 +407,12 @@ class DockerSimulationExecutorTest : UnitTest() {
         fun `should create profile directory if not exists`() {
             // Arrange
             val nonExistentDir = tempDir.resolve("non-existent-dir").toString()
-            val executorWithNonExistentDir = DockerSimulationExecutor(
-                dockerImage = "simulationcraftorg/simc",
-                profileDirectory = nonExistentDir,
-                dockerCommand = "docker"
-            )
+            val executorWithNonExistentDir =
+                DockerSimulationExecutor(
+                    dockerImage = "simulationcraftorg/simc",
+                    profileDirectory = nonExistentDir,
+                    dockerCommand = "docker",
+                )
             val profile = createProfile()
             val request = SimulationRequest.create(profile = profile)
 
@@ -441,7 +448,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle player data with missing dps path`() {
             // Arrange - player array exists but has no dps data
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -460,7 +468,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -473,7 +481,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle non-array players node`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -487,7 +496,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         "players": "not an array"
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -500,7 +509,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle missing players node`() {
             // Arrange
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -513,7 +523,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -529,11 +539,12 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should use default timeout when not specified`() {
             // Arrange & Act
-            val executorWithDefaults = DockerSimulationExecutor(
-                dockerImage = "simc",
-                profileDirectory = tempDir.toString(),
-                dockerCommand = "docker"
-            )
+            val executorWithDefaults =
+                DockerSimulationExecutor(
+                    dockerImage = "simc",
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = "docker",
+                )
 
             // Assert - timeout defaults to 30 minutes
             // We can verify the executor was created successfully
@@ -546,12 +557,13 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should use custom timeout when specified`() {
             // Arrange
-            val customTimeoutExecutor = DockerSimulationExecutor(
-                dockerImage = "simc",
-                profileDirectory = tempDir.toString(),
-                dockerCommand = "docker",
-                timeoutMinutes = 60
-            )
+            val customTimeoutExecutor =
+                DockerSimulationExecutor(
+                    dockerImage = "simc",
+                    profileDirectory = tempDir.toString(),
+                    dockerCommand = "docker",
+                    timeoutMinutes = 60,
+                )
 
             // Assert - executor should be created successfully with custom timeout
             val profile = createProfile()
@@ -568,18 +580,20 @@ class DockerSimulationExecutorTest : UnitTest() {
             runBlocking {
                 // Arrange - use a command that sleeps longer than timeout
                 // On Windows use "timeout" (or "ping -n"), on Unix use "sleep"
-                val sleepCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
-                    "cmd"
-                } else {
-                    "sleep"
-                }
+                val sleepCommand =
+                    if (System.getProperty("os.name").lowercase().contains("windows")) {
+                        "cmd"
+                    } else {
+                        "sleep"
+                    }
 
-                val shortTimeoutExecutor = DockerSimulationExecutor(
-                    dockerImage = "simc",
-                    profileDirectory = tempDir.toString(),
-                    dockerCommand = sleepCommand,
-                    timeoutMinutes = 0 // 0 minutes means immediate timeout
-                )
+                val shortTimeoutExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "simc",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = sleepCommand,
+                        timeoutMinutes = 0, // 0 minutes means immediate timeout
+                    )
 
                 val profile = createProfile()
                 val request = SimulationRequest.create(profile = profile)
@@ -597,18 +611,20 @@ class DockerSimulationExecutorTest : UnitTest() {
         fun `should return failure when process exits with non-zero code`() {
             runBlocking {
                 // Arrange - use a command that exits with error
-                val failCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
-                    "cmd"
-                } else {
-                    "false"
-                }
+                val failCommand =
+                    if (System.getProperty("os.name").lowercase().contains("windows")) {
+                        "cmd"
+                    } else {
+                        "false"
+                    }
 
-                val failingExecutor = DockerSimulationExecutor(
-                    dockerImage = "/c exit 1", // For cmd, this becomes: cmd /c exit 1
-                    profileDirectory = tempDir.toString(),
-                    dockerCommand = failCommand,
-                    timeoutMinutes = 1
-                )
+                val failingExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "/c exit 1", // For cmd, this becomes: cmd /c exit 1
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = failCommand,
+                        timeoutMinutes = 1,
+                    )
 
                 val profile = createProfile()
                 val request = SimulationRequest.create(profile = profile)
@@ -627,18 +643,20 @@ class DockerSimulationExecutorTest : UnitTest() {
         fun `should return failure when output file does not exist`() {
             runBlocking {
                 // Arrange - use echo which succeeds but doesn't create output file
-                val echoCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
-                    "cmd"
-                } else {
-                    "echo"
-                }
+                val echoCommand =
+                    if (System.getProperty("os.name").lowercase().contains("windows")) {
+                        "cmd"
+                    } else {
+                        "echo"
+                    }
 
-                val noOutputExecutor = DockerSimulationExecutor(
-                    dockerImage = "/c echo done", // cmd /c echo done
-                    profileDirectory = tempDir.toString(),
-                    dockerCommand = echoCommand,
-                    timeoutMinutes = 1
-                )
+                val noOutputExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "/c echo done", // cmd /c echo done
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = echoCommand,
+                        timeoutMinutes = 1,
+                    )
 
                 val profile = createProfile()
                 val request = SimulationRequest.create(profile = profile)
@@ -664,7 +682,8 @@ class DockerSimulationExecutorTest : UnitTest() {
 
                 // Create the expected output file with valid simulation results
                 val outputFile = File(profileFile.parent, "${profileFile.nameWithoutExtension}_results.json")
-                outputFile.writeText("""
+                outputFile.writeText(
+                    """
                     {
                         "sim": {
                             "profilesets": {
@@ -684,21 +703,24 @@ class DockerSimulationExecutorTest : UnitTest() {
                             ]
                         }
                     }
-                """.trimIndent())
+                    """.trimIndent(),
+                )
 
                 // Use echo to simulate a successful command
-                val echoCommand = if (System.getProperty("os.name").lowercase().contains("windows")) {
-                    "cmd"
-                } else {
-                    "true"
-                }
+                val echoCommand =
+                    if (System.getProperty("os.name").lowercase().contains("windows")) {
+                        "cmd"
+                    } else {
+                        "true"
+                    }
 
-                val successExecutor = DockerSimulationExecutor(
-                    dockerImage = "/c echo done",
-                    profileDirectory = tempDir.toString(),
-                    dockerCommand = echoCommand,
-                    timeoutMinutes = 1
-                )
+                val successExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "/c echo done",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = echoCommand,
+                        timeoutMinutes = 1,
+                    )
 
                 // Act
                 val result = successExecutor.execute(request)
@@ -714,12 +736,13 @@ class DockerSimulationExecutorTest : UnitTest() {
         fun `should handle exception during execution`() {
             runBlocking {
                 // Arrange - use a non-existent command to trigger an exception
-                val badExecutor = DockerSimulationExecutor(
-                    dockerImage = "simc",
-                    profileDirectory = tempDir.toString(),
-                    dockerCommand = "this_command_does_not_exist_anywhere_12345",
-                    timeoutMinutes = 1
-                )
+                val badExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "simc",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = "this_command_does_not_exist_anywhere_12345",
+                        timeoutMinutes = 1,
+                    )
 
                 val profile = createProfile()
                 val request = SimulationRequest.create(profile = profile)
@@ -738,7 +761,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle player with null collected_data path`() {
             // Arrange - player has no collected_data at all
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -756,7 +780,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -769,7 +793,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle player with null dps path inside collected_data`() {
             // Arrange - collected_data exists but dps path is missing
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -790,7 +815,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)
@@ -803,7 +828,8 @@ class DockerSimulationExecutorTest : UnitTest() {
         @Test
         fun `should handle player with null mean inside dps`() {
             // Arrange - dps exists but mean is missing
-            val jsonContent = """
+            val jsonContent =
+                """
                 {
                     "sim": {
                         "profilesets": {
@@ -826,7 +852,7 @@ class DockerSimulationExecutorTest : UnitTest() {
                         ]
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             // Act
             val results = executor.parseSimulationResults(jsonContent)

@@ -53,42 +53,45 @@ class AttendanceControllerTest : UnitTest() {
         listRaiderAttendanceUseCase = mockk()
         getGuildAttendanceSummaryUseCase = mockk()
         currentUserService = mockk()
-        controller = AttendanceController(
-            trackAttendanceUseCase,
-            getAttendanceReportUseCase,
-            getAttendanceRecordUseCase,
-            updateAttendanceUseCase,
-            deleteAttendanceUseCase,
-            listRaiderAttendanceUseCase,
-            getGuildAttendanceSummaryUseCase,
-            currentUserService,
-        )
+        controller =
+            AttendanceController(
+                trackAttendanceUseCase,
+                getAttendanceReportUseCase,
+                getAttendanceRecordUseCase,
+                updateAttendanceUseCase,
+                deleteAttendanceUseCase,
+                listRaiderAttendanceUseCase,
+                getGuildAttendanceSummaryUseCase,
+                currentUserService,
+            )
     }
 
     @Test
     fun `trackAttendance should return CREATED status with attendance response`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 8,
-            totalRaids = 10,
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
-        val attendanceRecord = AttendanceRecord.create(
-            raiderId = RaiderId(123L),
-            guildId = GuildId("guild-456"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 8,
-            totalRaids = 10,
-        )
+        val attendanceRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         every { trackAttendanceUseCase.execute(any()) } returns Result.success(attendanceRecord)
 
@@ -111,29 +114,31 @@ class AttendanceControllerTest : UnitTest() {
     @Test
     fun `trackAttendance should pass correct command to use case`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 999L,
-            guildId = "my-guild",
-            instance = "Vault of the Incarnates",
-            encounter = "Raszageth",
-            startDate = LocalDate.of(2024, 2, 1),
-            endDate = LocalDate.of(2024, 2, 28),
-            attendedRaids = 5,
-            totalRaids = 8,
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 999L,
+                guildId = "my-guild",
+                instance = "Vault of the Incarnates",
+                encounter = "Raszageth",
+                startDate = LocalDate.of(2024, 2, 1),
+                endDate = LocalDate.of(2024, 2, 28),
+                attendedRaids = 5,
+                totalRaids = 8,
+            )
 
         val commandSlot = slot<TrackAttendanceCommand>()
 
-        val attendanceRecord = AttendanceRecord.create(
-            raiderId = RaiderId(999L),
-            guildId = GuildId("my-guild"),
-            instance = "Vault of the Incarnates",
-            encounter = "Raszageth",
-            startDate = LocalDate.of(2024, 2, 1),
-            endDate = LocalDate.of(2024, 2, 28),
-            attendedRaids = 5,
-            totalRaids = 8,
-        )
+        val attendanceRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(999L),
+                guildId = GuildId("my-guild"),
+                instance = "Vault of the Incarnates",
+                encounter = "Raszageth",
+                startDate = LocalDate.of(2024, 2, 1),
+                endDate = LocalDate.of(2024, 2, 28),
+                attendedRaids = 5,
+                totalRaids = 8,
+            )
 
         every { trackAttendanceUseCase.execute(capture(commandSlot)) } returns Result.success(attendanceRecord)
 
@@ -154,27 +159,29 @@ class AttendanceControllerTest : UnitTest() {
     @Test
     fun `trackAttendance should handle encounter-specific attendance`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 3,
-            totalRaids = 4,
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 3,
+                totalRaids = 4,
+            )
 
-        val attendanceRecord = AttendanceRecord.create(
-            raiderId = RaiderId(123L),
-            guildId = GuildId("guild-456"),
-            instance = "Nerub-ar Palace",
-            encounter = "Queen Ansurek",
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 3,
-            totalRaids = 4,
-        )
+        val attendanceRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                instance = "Nerub-ar Palace",
+                encounter = "Queen Ansurek",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 3,
+                totalRaids = 4,
+            )
 
         every { trackAttendanceUseCase.execute(any()) } returns Result.success(attendanceRecord)
 
@@ -190,20 +197,22 @@ class AttendanceControllerTest : UnitTest() {
     @Test
     fun `trackAttendance should throw exception when use case fails`() {
         // Given
-        val request = TrackAttendanceRequest(
-            raiderId = 123L,
-            guildId = "guild-456",
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 31),
-            endDate = LocalDate.of(2024, 1, 1),
-            attendedRaids = 8,
-            totalRaids = 10,
-        )
+        val request =
+            TrackAttendanceRequest(
+                raiderId = 123L,
+                guildId = "guild-456",
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 31),
+                endDate = LocalDate.of(2024, 1, 1),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
-        every { trackAttendanceUseCase.execute(any()) } returns Result.failure(
-            IllegalArgumentException("End date cannot be before start date")
-        )
+        every { trackAttendanceUseCase.execute(any()) } returns
+            Result.failure(
+                IllegalArgumentException("End date cannot be before start date"),
+            )
 
         // When/Then
         try {
@@ -223,27 +232,29 @@ class AttendanceControllerTest : UnitTest() {
         val endDate = LocalDate.of(2024, 1, 31)
 
         val stats = AttendanceStats.calculate(attendedRaids = 8, totalRaids = 10)
-        val report = AttendanceReport(
-            raiderId = RaiderId(raiderId),
-            guildId = GuildId(guildId),
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-            stats = stats,
-        )
+        val report =
+            AttendanceReport(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+                stats = stats,
+            )
 
         every { getAttendanceReportUseCase.execute(any()) } returns Result.success(report)
 
         // When
-        val response = controller.getAttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-        )
+        val response =
+            controller.getAttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+            )
 
         // Then
         response.raiderId shouldBe raiderId
@@ -272,27 +283,29 @@ class AttendanceControllerTest : UnitTest() {
         val querySlot = slot<GetAttendanceReportQuery>()
 
         val stats = AttendanceStats.calculate(attendedRaids = 6, totalRaids = 8)
-        val report = AttendanceReport(
-            raiderId = RaiderId(raiderId),
-            guildId = GuildId(guildId),
-            startDate = startDate,
-            endDate = endDate,
-            instance = instance,
-            encounter = null,
-            stats = stats,
-        )
+        val report =
+            AttendanceReport(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                startDate = startDate,
+                endDate = endDate,
+                instance = instance,
+                encounter = null,
+                stats = stats,
+            )
 
         every { getAttendanceReportUseCase.execute(capture(querySlot)) } returns Result.success(report)
 
         // When
-        val response = controller.getAttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = instance,
-            encounter = null,
-        )
+        val response =
+            controller.getAttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = instance,
+                encounter = null,
+            )
 
         // Then
         querySlot.captured.raiderId shouldBe raiderId
@@ -318,27 +331,29 @@ class AttendanceControllerTest : UnitTest() {
         val querySlot = slot<GetAttendanceReportQuery>()
 
         val stats = AttendanceStats.calculate(attendedRaids = 3, totalRaids = 4)
-        val report = AttendanceReport(
-            raiderId = RaiderId(raiderId),
-            guildId = GuildId(guildId),
-            startDate = startDate,
-            endDate = endDate,
-            instance = instance,
-            encounter = encounter,
-            stats = stats,
-        )
+        val report =
+            AttendanceReport(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                startDate = startDate,
+                endDate = endDate,
+                instance = instance,
+                encounter = encounter,
+                stats = stats,
+            )
 
         every { getAttendanceReportUseCase.execute(capture(querySlot)) } returns Result.success(report)
 
         // When
-        val response = controller.getAttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = instance,
-            encounter = encounter,
-        )
+        val response =
+            controller.getAttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = instance,
+                encounter = encounter,
+            )
 
         // Then
         querySlot.captured.raiderId shouldBe raiderId
@@ -360,27 +375,29 @@ class AttendanceControllerTest : UnitTest() {
         val endDate = LocalDate.of(2024, 1, 31)
 
         val stats = AttendanceStats.calculate(attendedRaids = 10, totalRaids = 10)
-        val report = AttendanceReport(
-            raiderId = RaiderId(raiderId),
-            guildId = GuildId(guildId),
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-            stats = stats,
-        )
+        val report =
+            AttendanceReport(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+                stats = stats,
+            )
 
         every { getAttendanceReportUseCase.execute(any()) } returns Result.success(report)
 
         // When
-        val response = controller.getAttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-        )
+        val response =
+            controller.getAttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+            )
 
         // Then
         response.stats.attendancePercentage shouldBe 1.0
@@ -398,27 +415,29 @@ class AttendanceControllerTest : UnitTest() {
         val endDate = LocalDate.of(2024, 1, 31)
 
         val stats = AttendanceStats.calculate(attendedRaids = 0, totalRaids = 10)
-        val report = AttendanceReport(
-            raiderId = RaiderId(raiderId),
-            guildId = GuildId(guildId),
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-            stats = stats,
-        )
+        val report =
+            AttendanceReport(
+                raiderId = RaiderId(raiderId),
+                guildId = GuildId(guildId),
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+                stats = stats,
+            )
 
         every { getAttendanceReportUseCase.execute(any()) } returns Result.success(report)
 
         // When
-        val response = controller.getAttendanceReport(
-            raiderId = raiderId,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            instance = null,
-            encounter = null,
-        )
+        val response =
+            controller.getAttendanceReport(
+                raiderId = raiderId,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                instance = null,
+                encounter = null,
+            )
 
         // Then
         response.stats.attendancePercentage shouldBe 0.0
@@ -435,9 +454,10 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        every { getAttendanceReportUseCase.execute(any()) } returns Result.failure(
-            IllegalArgumentException("Cannot query encounter attendance without specifying an instance")
-        )
+        every { getAttendanceReportUseCase.execute(any()) } returns
+            Result.failure(
+                IllegalArgumentException("Cannot query encounter attendance without specifying an instance"),
+            )
 
         // When/Then
         try {
@@ -459,16 +479,17 @@ class AttendanceControllerTest : UnitTest() {
     fun `getAttendanceRecord should return record when found`() {
         // Given
         val recordId = "record-123"
-        val record = AttendanceRecord.create(
-            raiderId = RaiderId(123L),
-            guildId = GuildId("guild-456"),
-            instance = "Nerub-ar Palace",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 8,
-            totalRaids = 10,
-        )
+        val record =
+            AttendanceRecord.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                instance = "Nerub-ar Palace",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 8,
+                totalRaids = 10,
+            )
 
         every { getAttendanceRecordUseCase.execute(any()) } returns Result.success(record)
 
@@ -490,9 +511,10 @@ class AttendanceControllerTest : UnitTest() {
         // Given
         val recordId = "non-existent-record"
 
-        every { getAttendanceRecordUseCase.execute(any()) } returns Result.failure(
-            NoSuchElementException("Attendance record not found: $recordId")
-        )
+        every { getAttendanceRecordUseCase.execute(any()) } returns
+            Result.failure(
+                NoSuchElementException("Attendance record not found: $recordId"),
+            )
 
         // When/Then
         try {
@@ -507,22 +529,24 @@ class AttendanceControllerTest : UnitTest() {
     fun `updateAttendanceRecord should return updated record`() {
         // Given
         val recordId = "record-123"
-        val request = UpdateAttendanceRequest(
-            instance = "Updated Instance",
-            attendedRaids = 9,
-            totalRaids = 10,
-        )
+        val request =
+            UpdateAttendanceRequest(
+                instance = "Updated Instance",
+                attendedRaids = 9,
+                totalRaids = 10,
+            )
 
-        val updatedRecord = AttendanceRecord.create(
-            raiderId = RaiderId(123L),
-            guildId = GuildId("guild-456"),
-            instance = "Updated Instance",
-            encounter = null,
-            startDate = LocalDate.of(2024, 1, 1),
-            endDate = LocalDate.of(2024, 1, 31),
-            attendedRaids = 9,
-            totalRaids = 10,
-        )
+        val updatedRecord =
+            AttendanceRecord.create(
+                raiderId = RaiderId(123L),
+                guildId = GuildId("guild-456"),
+                instance = "Updated Instance",
+                encounter = null,
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                attendedRaids = 9,
+                totalRaids = 10,
+            )
 
         every { updateAttendanceUseCase.execute(any()) } returns Result.success(updatedRecord)
 
@@ -543,9 +567,10 @@ class AttendanceControllerTest : UnitTest() {
         val recordId = "non-existent-record"
         val request = UpdateAttendanceRequest(instance = "Updated Instance")
 
-        every { updateAttendanceUseCase.execute(any()) } returns Result.failure(
-            NoSuchElementException("Attendance record not found: $recordId")
-        )
+        every { updateAttendanceUseCase.execute(any()) } returns
+            Result.failure(
+                NoSuchElementException("Attendance record not found: $recordId"),
+            )
 
         // When/Then
         try {
@@ -577,9 +602,10 @@ class AttendanceControllerTest : UnitTest() {
         // Given
         val recordId = "non-existent-record"
 
-        every { deleteAttendanceUseCase.execute(any()) } returns Result.failure(
-            NoSuchElementException("Attendance record not found: $recordId")
-        )
+        every { deleteAttendanceUseCase.execute(any()) } returns
+            Result.failure(
+                NoSuchElementException("Attendance record not found: $recordId"),
+            )
 
         // When/Then
         try {
@@ -598,28 +624,29 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        val records = listOf(
-            AttendanceRecord.create(
-                raiderId = RaiderId(raiderId),
-                guildId = GuildId(guildId),
-                instance = "Instance 1",
-                encounter = null,
-                startDate = LocalDate.of(2024, 1, 1),
-                endDate = LocalDate.of(2024, 1, 15),
-                attendedRaids = 8,
-                totalRaids = 10,
-            ),
-            AttendanceRecord.create(
-                raiderId = RaiderId(raiderId),
-                guildId = GuildId(guildId),
-                instance = "Instance 2",
-                encounter = null,
-                startDate = LocalDate.of(2024, 1, 16),
-                endDate = LocalDate.of(2024, 1, 31),
-                attendedRaids = 9,
-                totalRaids = 10,
-            ),
-        )
+        val records =
+            listOf(
+                AttendanceRecord.create(
+                    raiderId = RaiderId(raiderId),
+                    guildId = GuildId(guildId),
+                    instance = "Instance 1",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 1, 1),
+                    endDate = LocalDate.of(2024, 1, 15),
+                    attendedRaids = 8,
+                    totalRaids = 10,
+                ),
+                AttendanceRecord.create(
+                    raiderId = RaiderId(raiderId),
+                    guildId = GuildId(guildId),
+                    instance = "Instance 2",
+                    encounter = null,
+                    startDate = LocalDate.of(2024, 1, 16),
+                    endDate = LocalDate.of(2024, 1, 31),
+                    attendedRaids = 9,
+                    totalRaids = 10,
+                ),
+            )
 
         every { listRaiderAttendanceUseCase.execute(any()) } returns Result.success(records)
 
@@ -663,9 +690,10 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        every { listRaiderAttendanceUseCase.execute(any()) } returns Result.failure(
-            IllegalArgumentException("Invalid date range")
-        )
+        every { listRaiderAttendanceUseCase.execute(any()) } returns
+            Result.failure(
+                IllegalArgumentException("Invalid date range"),
+            )
 
         // When/Then
         try {
@@ -683,30 +711,32 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        val summary = com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            totalRecords = 10,
-            uniqueRaiders = 5,
-            overallAttendancePercentage = 0.85,
-            raiderSummaries = listOf(
-                com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
-                    raiderId = 123L,
-                    totalRecords = 2,
-                    totalAttendedRaids = 18,
-                    totalRaids = 20,
-                    averageAttendancePercentage = 0.9,
-                ),
-                com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
-                    raiderId = 456L,
-                    totalRecords = 2,
-                    totalAttendedRaids = 16,
-                    totalRaids = 20,
-                    averageAttendancePercentage = 0.8,
-                ),
-            ),
-        )
+        val summary =
+            com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                totalRecords = 10,
+                uniqueRaiders = 5,
+                overallAttendancePercentage = 0.85,
+                raiderSummaries =
+                    listOf(
+                        com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
+                            raiderId = 123L,
+                            totalRecords = 2,
+                            totalAttendedRaids = 18,
+                            totalRaids = 20,
+                            averageAttendancePercentage = 0.9,
+                        ),
+                        com.edgerush.lootman.application.attendance.RaiderAttendanceSummary(
+                            raiderId = 456L,
+                            totalRecords = 2,
+                            totalAttendedRaids = 16,
+                            totalRaids = 20,
+                            averageAttendancePercentage = 0.8,
+                        ),
+                    ),
+            )
 
         every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
 
@@ -732,15 +762,16 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        val summary = com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
-            guildId = guildId,
-            startDate = startDate,
-            endDate = endDate,
-            totalRecords = 0,
-            uniqueRaiders = 0,
-            overallAttendancePercentage = 0.0,
-            raiderSummaries = emptyList(),
-        )
+        val summary =
+            com.edgerush.lootman.application.attendance.GuildAttendanceSummary(
+                guildId = guildId,
+                startDate = startDate,
+                endDate = endDate,
+                totalRecords = 0,
+                uniqueRaiders = 0,
+                overallAttendancePercentage = 0.0,
+                raiderSummaries = emptyList(),
+            )
 
         every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
 
@@ -761,9 +792,10 @@ class AttendanceControllerTest : UnitTest() {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
 
-        every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.failure(
-            IllegalArgumentException("Invalid date range")
-        )
+        every { getGuildAttendanceSummaryUseCase.execute(any()) } returns
+            Result.failure(
+                IllegalArgumentException("Invalid date range"),
+            )
 
         // When/Then
         try {

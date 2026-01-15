@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for ApplicationStatus enum.
  */
 class ApplicationStatusTest : UnitTest() {
-
     @Test
     fun `should have PENDING status`() {
         ApplicationStatus.PENDING.name shouldBe "PENDING"

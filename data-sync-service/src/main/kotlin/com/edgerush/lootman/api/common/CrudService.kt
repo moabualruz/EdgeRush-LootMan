@@ -44,7 +44,10 @@ interface CrudService<ID, CreateReq, UpdateReq, Resp> {
      * @return The updated entity response
      * @throws NoSuchElementException if entity not found
      */
-    fun update(id: ID, request: UpdateReq): Resp
+    fun update(
+        id: ID,
+        request: UpdateReq,
+    ): Resp
 
     /**
      * Delete an entity by its identifier.
@@ -79,7 +82,10 @@ interface GuildScopedCrudService<ID, CreateReq, UpdateReq, Resp> : CrudService<I
      * @param pageRequest Pagination parameters
      * @return Paged response containing entities for the guild
      */
-    fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<Resp>
+    fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<Resp>
 
     /**
      * Count entities for a specific guild.
@@ -106,7 +112,10 @@ interface RaiderScopedCrudService<ID, CreateReq, UpdateReq, Resp> : CrudService<
      * @param pageRequest Pagination parameters
      * @return Paged response containing entities for the raider
      */
-    fun findByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<Resp>
+    fun findByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<Resp>
 
     /**
      * Count entities for a specific raider.

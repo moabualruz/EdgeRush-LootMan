@@ -60,15 +60,23 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should replace existing gear set for same raider and type`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val originalGearSet = createGearSet(items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400)
-            ))
+            val originalGearSet =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400),
+                        ),
+                )
             repository.save(raiderId, originalGearSet)
 
-            val newGearSet = createGearSet(items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, itemLevel = 445)
-            ))
+            val newGearSet =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
+                            EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, itemLevel = 445),
+                        ),
+                )
 
             // Act
             repository.save(raiderId, newGearSet)
@@ -84,12 +92,22 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should save different gear set types for same raider`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val equippedGear = createGearSet(gearSetType = GearSetType.EQUIPPED, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400)
-            ))
-            val bestGear = createGearSet(gearSetType = GearSetType.BEST, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450)
-            ))
+            val equippedGear =
+                createGearSet(
+                    gearSetType = GearSetType.EQUIPPED,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400),
+                        ),
+                )
+            val bestGear =
+                createGearSet(
+                    gearSetType = GearSetType.BEST,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
+                        ),
+                )
 
             // Act
             repository.save(raiderId, equippedGear)
@@ -105,12 +123,20 @@ class InMemoryGearRepositoryTest : UnitTest() {
             // Arrange
             val raider1 = RaiderId(1L)
             val raider2 = RaiderId(2L)
-            val gearSet1 = createGearSet(items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Raider1 Helm")
-            ))
-            val gearSet2 = createGearSet(items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Raider2 Helm")
-            ))
+            val gearSet1 =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Raider1 Helm"),
+                        ),
+                )
+            val gearSet2 =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Raider2 Helm"),
+                        ),
+                )
 
             // Act
             repository.save(raider1, gearSet1)
@@ -155,12 +181,22 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should return equipped gear even when best gear also exists`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val equippedGear = createGearSet(gearSetType = GearSetType.EQUIPPED, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Equipped Helm")
-            ))
-            val bestGear = createGearSet(gearSetType = GearSetType.BEST, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Best Helm")
-            ))
+            val equippedGear =
+                createGearSet(
+                    gearSetType = GearSetType.EQUIPPED,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Equipped Helm"),
+                        ),
+                )
+            val bestGear =
+                createGearSet(
+                    gearSetType = GearSetType.BEST,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, name = "Best Helm"),
+                        ),
+                )
 
             repository.save(raiderId, equippedGear)
             repository.save(raiderId, bestGear)
@@ -234,12 +270,22 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should return correct gear set type`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val equippedGear = createGearSet(gearSetType = GearSetType.EQUIPPED, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400)
-            ))
-            val bestGear = createGearSet(gearSetType = GearSetType.BEST, items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450)
-            ))
+            val equippedGear =
+                createGearSet(
+                    gearSetType = GearSetType.EQUIPPED,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400),
+                        ),
+                )
+            val bestGear =
+                createGearSet(
+                    gearSetType = GearSetType.BEST,
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 450),
+                        ),
+                )
 
             repository.save(raiderId, equippedGear)
             repository.save(raiderId, bestGear)
@@ -255,11 +301,16 @@ class InMemoryGearRepositoryTest : UnitTest() {
         @Test
         fun `should handle concurrent saves without data loss`() {
             // Arrange
-            val gearSets = (1..100).map { index ->
-                RaiderId(index.toLong()) to createGearSet(items = mapOf(
-                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400 + index)
-                ))
-            }
+            val gearSets =
+                (1..100).map { index ->
+                    RaiderId(index.toLong()) to
+                        createGearSet(
+                            items =
+                                mapOf(
+                                    EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, itemLevel = 400 + index),
+                                ),
+                        )
+                }
 
             // Act - simulate concurrent saves
             gearSets.parallelStream().forEach { (raiderId, gearSet) ->
@@ -279,11 +330,15 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should correctly store gear items with tier pieces`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val gearSet = createGearSet(items = mapOf(
-                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
-                EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
-                EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false)
-            ))
+            val gearSet =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD, isTierPiece = true),
+                            EquipmentSlot.SHOULDER to createGearItem(slot = EquipmentSlot.SHOULDER, isTierPiece = true),
+                            EquipmentSlot.CHEST to createGearItem(slot = EquipmentSlot.CHEST, isTierPiece = false),
+                        ),
+                )
 
             // Act
             repository.save(raiderId, gearSet)
@@ -297,13 +352,18 @@ class InMemoryGearRepositoryTest : UnitTest() {
         fun `should correctly store gear items with enchants and sockets`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val gearSet = createGearSet(items = mapOf(
-                EquipmentSlot.NECK to createGearItem(
-                    slot = EquipmentSlot.NECK,
-                    enchant = "Haste +200",
-                    sockets = 3
+            val gearSet =
+                createGearSet(
+                    items =
+                        mapOf(
+                            EquipmentSlot.NECK to
+                                createGearItem(
+                                    slot = EquipmentSlot.NECK,
+                                    enchant = "Haste +200",
+                                    sockets = 3,
+                                ),
+                        ),
                 )
-            ))
 
             // Act
             repository.save(raiderId, gearSet)
@@ -331,14 +391,16 @@ class InMemoryGearRepositoryTest : UnitTest() {
     }
 
     private fun createGearSet(
-        items: Map<EquipmentSlot, GearItem> = mapOf(
-            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD)
-        ),
-        gearSetType: GearSetType = GearSetType.EQUIPPED
-    ): GearSet = GearSet(
-        items = items,
-        gearSetType = gearSetType
-    )
+        items: Map<EquipmentSlot, GearItem> =
+            mapOf(
+                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD),
+            ),
+        gearSetType: GearSetType = GearSetType.EQUIPPED,
+    ): GearSet =
+        GearSet(
+            items = items,
+            gearSetType = gearSetType,
+        )
 
     private fun createGearItem(
         itemId: ItemId = ItemId(12345L),
@@ -348,15 +410,16 @@ class InMemoryGearRepositoryTest : UnitTest() {
         slot: EquipmentSlot = EquipmentSlot.HEAD,
         isTierPiece: Boolean = false,
         enchant: String? = null,
-        sockets: Int = 0
-    ): GearItem = GearItem(
-        itemId = itemId,
-        name = name,
-        itemLevel = itemLevel,
-        quality = quality,
-        slot = slot,
-        isTierPiece = isTierPiece,
-        enchant = enchant,
-        sockets = sockets
-    )
+        sockets: Int = 0,
+    ): GearItem =
+        GearItem(
+            itemId = itemId,
+            name = name,
+            itemLevel = itemLevel,
+            quality = quality,
+            slot = slot,
+            isTierPiece = isTierPiece,
+            enchant = enchant,
+            sockets = sockets,
+        )
 }

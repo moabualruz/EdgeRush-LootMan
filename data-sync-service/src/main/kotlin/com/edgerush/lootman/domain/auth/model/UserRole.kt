@@ -17,7 +17,9 @@ enum class UserRole {
     /**
      * System administrator with full access.
      */
-    SYSTEM_ADMIN;
+    SYSTEM_ADMIN,
+
+    ;
 
     companion object {
         /**

@@ -20,9 +20,9 @@ import java.time.ZoneOffset
 class JdbcLootAwardEntityRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : LootAwardEntityRepository {
-
     override fun findById(id: Long): LootAwardEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                    rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
                    response_type_rgba, response_type_excluded, propagated_response_type_id,
@@ -31,7 +31,7 @@ class JdbcLootAwardEntityRepository(
                    difficulty, discarded, character_id, awarded_by_character_id, awarded_by_name
             FROM loot_awards
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, lootAwardRowMapper, id)
         return results.firstOrNull()
@@ -43,8 +43,12 @@ class JdbcLootAwardEntityRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<LootAwardEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity> {
+        val sql =
+            """
             SELECT id, raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                    rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
                    response_type_rgba, response_type_excluded, propagated_response_type_id,
@@ -54,7 +58,7 @@ class JdbcLootAwardEntityRepository(
             FROM loot_awards
             ORDER BY awarded_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, limit, offset)
     }
@@ -64,8 +68,13 @@ class JdbcLootAwardEntityRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<LootAwardEntity> {
-        val sql = """
+    override fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity> {
+        val sql =
+            """
             SELECT id, raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                    rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
                    response_type_rgba, response_type_excluded, propagated_response_type_id,
@@ -76,7 +85,7 @@ class JdbcLootAwardEntityRepository(
             WHERE raider_id = ?
             ORDER BY awarded_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, raiderId, limit, offset)
     }
@@ -86,8 +95,13 @@ class JdbcLootAwardEntityRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, raiderId) ?: 0L
     }
 
-    override fun findByItemId(itemId: Long, offset: Long, limit: Int): List<LootAwardEntity> {
-        val sql = """
+    override fun findByItemId(
+        itemId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity> {
+        val sql =
+            """
             SELECT id, raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                    rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
                    response_type_rgba, response_type_excluded, propagated_response_type_id,
@@ -98,7 +112,7 @@ class JdbcLootAwardEntityRepository(
             WHERE item_id = ?
             ORDER BY awarded_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, itemId, limit, offset)
     }
@@ -108,8 +122,13 @@ class JdbcLootAwardEntityRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, itemId) ?: 0L
     }
 
-    override fun findByTier(tier: String, offset: Long, limit: Int): List<LootAwardEntity> {
-        val sql = """
+    override fun findByTier(
+        tier: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity> {
+        val sql =
+            """
             SELECT id, raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                    rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
                    response_type_rgba, response_type_excluded, propagated_response_type_id,
@@ -120,7 +139,7 @@ class JdbcLootAwardEntityRepository(
             WHERE tier = ?
             ORDER BY awarded_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, tier, limit, offset)
     }
@@ -145,7 +164,8 @@ class JdbcLootAwardEntityRepository(
     }
 
     private fun insertLootAward(entity: LootAwardEntity): LootAwardEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO loot_awards (
                 raider_id, item_id, item_name, tier, flps, rdf, awarded_at,
                 rclootcouncil_id, icon, slot, quality, response_type_id, response_type_name,
@@ -154,7 +174,7 @@ class JdbcLootAwardEntityRepository(
                 propagated_response_type_excluded, same_response_amount, note, wish_value,
                 difficulty, discarded, character_id, awarded_by_character_id, awarded_by_name
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -194,7 +214,8 @@ class JdbcLootAwardEntityRepository(
     }
 
     private fun updateLootAward(entity: LootAwardEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE loot_awards SET
                 raider_id = ?, item_id = ?, item_name = ?, tier = ?, flps = ?, rdf = ?,
                 awarded_at = ?, rclootcouncil_id = ?, icon = ?, slot = ?, quality = ?,
@@ -205,7 +226,7 @@ class JdbcLootAwardEntityRepository(
                 wish_value = ?, difficulty = ?, discarded = ?, character_id = ?,
                 awarded_by_character_id = ?, awarded_by_name = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -240,63 +261,64 @@ class JdbcLootAwardEntityRepository(
         )
     }
 
-    private val lootAwardRowMapper = RowMapper { rs, _ ->
-        val responseTypeIdValue = rs.getInt("response_type_id")
-        val responseTypeId = if (rs.wasNull()) null else responseTypeIdValue
+    private val lootAwardRowMapper =
+        RowMapper { rs, _ ->
+            val responseTypeIdValue = rs.getInt("response_type_id")
+            val responseTypeId = if (rs.wasNull()) null else responseTypeIdValue
 
-        val responseTypeExcludedValue = rs.getBoolean("response_type_excluded")
-        val responseTypeExcluded = if (rs.wasNull()) null else responseTypeExcludedValue
+            val responseTypeExcludedValue = rs.getBoolean("response_type_excluded")
+            val responseTypeExcluded = if (rs.wasNull()) null else responseTypeExcludedValue
 
-        val propagatedResponseTypeIdValue = rs.getInt("propagated_response_type_id")
-        val propagatedResponseTypeId = if (rs.wasNull()) null else propagatedResponseTypeIdValue
+            val propagatedResponseTypeIdValue = rs.getInt("propagated_response_type_id")
+            val propagatedResponseTypeId = if (rs.wasNull()) null else propagatedResponseTypeIdValue
 
-        val propagatedResponseTypeExcludedValue = rs.getBoolean("propagated_response_type_excluded")
-        val propagatedResponseTypeExcluded = if (rs.wasNull()) null else propagatedResponseTypeExcludedValue
+            val propagatedResponseTypeExcludedValue = rs.getBoolean("propagated_response_type_excluded")
+            val propagatedResponseTypeExcluded = if (rs.wasNull()) null else propagatedResponseTypeExcludedValue
 
-        val sameResponseAmountValue = rs.getInt("same_response_amount")
-        val sameResponseAmount = if (rs.wasNull()) null else sameResponseAmountValue
+            val sameResponseAmountValue = rs.getInt("same_response_amount")
+            val sameResponseAmount = if (rs.wasNull()) null else sameResponseAmountValue
 
-        val wishValueValue = rs.getInt("wish_value")
-        val wishValue = if (rs.wasNull()) null else wishValueValue
+            val wishValueValue = rs.getInt("wish_value")
+            val wishValue = if (rs.wasNull()) null else wishValueValue
 
-        val discardedValue = rs.getBoolean("discarded")
-        val discarded = if (rs.wasNull()) null else discardedValue
+            val discardedValue = rs.getBoolean("discarded")
+            val discarded = if (rs.wasNull()) null else discardedValue
 
-        val characterIdValue = rs.getLong("character_id")
-        val characterId = if (rs.wasNull()) null else characterIdValue
+            val characterIdValue = rs.getLong("character_id")
+            val characterId = if (rs.wasNull()) null else characterIdValue
 
-        val awardedByCharacterIdValue = rs.getLong("awarded_by_character_id")
-        val awardedByCharacterId = if (rs.wasNull()) null else awardedByCharacterIdValue
+            val awardedByCharacterIdValue = rs.getLong("awarded_by_character_id")
+            val awardedByCharacterId = if (rs.wasNull()) null else awardedByCharacterIdValue
 
-        LootAwardEntity(
-            id = rs.getLong("id"),
-            raiderId = rs.getLong("raider_id"),
-            itemId = rs.getLong("item_id"),
-            itemName = rs.getString("item_name"),
-            tier = rs.getString("tier"),
-            flps = rs.getDouble("flps"),
-            rdf = rs.getDouble("rdf"),
-            awardedAt = rs.getTimestamp("awarded_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-            rclootcouncilId = rs.getString("rclootcouncil_id"),
-            icon = rs.getString("icon"),
-            slot = rs.getString("slot"),
-            quality = rs.getString("quality"),
-            responseTypeId = responseTypeId,
-            responseTypeName = rs.getString("response_type_name"),
-            responseTypeRgba = rs.getString("response_type_rgba"),
-            responseTypeExcluded = responseTypeExcluded,
-            propagatedResponseTypeId = propagatedResponseTypeId,
-            propagatedResponseTypeName = rs.getString("propagated_response_type_name"),
-            propagatedResponseTypeRgba = rs.getString("propagated_response_type_rgba"),
-            propagatedResponseTypeExcluded = propagatedResponseTypeExcluded,
-            sameResponseAmount = sameResponseAmount,
-            note = rs.getString("note"),
-            wishValue = wishValue,
-            difficulty = rs.getString("difficulty"),
-            discarded = discarded,
-            characterId = characterId,
-            awardedByCharacterId = awardedByCharacterId,
-            awardedByName = rs.getString("awarded_by_name"),
-        )
-    }
+            LootAwardEntity(
+                id = rs.getLong("id"),
+                raiderId = rs.getLong("raider_id"),
+                itemId = rs.getLong("item_id"),
+                itemName = rs.getString("item_name"),
+                tier = rs.getString("tier"),
+                flps = rs.getDouble("flps"),
+                rdf = rs.getDouble("rdf"),
+                awardedAt = rs.getTimestamp("awarded_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+                rclootcouncilId = rs.getString("rclootcouncil_id"),
+                icon = rs.getString("icon"),
+                slot = rs.getString("slot"),
+                quality = rs.getString("quality"),
+                responseTypeId = responseTypeId,
+                responseTypeName = rs.getString("response_type_name"),
+                responseTypeRgba = rs.getString("response_type_rgba"),
+                responseTypeExcluded = responseTypeExcluded,
+                propagatedResponseTypeId = propagatedResponseTypeId,
+                propagatedResponseTypeName = rs.getString("propagated_response_type_name"),
+                propagatedResponseTypeRgba = rs.getString("propagated_response_type_rgba"),
+                propagatedResponseTypeExcluded = propagatedResponseTypeExcluded,
+                sameResponseAmount = sameResponseAmount,
+                note = rs.getString("note"),
+                wishValue = wishValue,
+                difficulty = rs.getString("difficulty"),
+                discarded = discarded,
+                characterId = characterId,
+                awardedByCharacterId = awardedByCharacterId,
+                awardedByName = rs.getString("awarded_by_name"),
+            )
+        }
 }

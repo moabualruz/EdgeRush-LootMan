@@ -31,6 +31,7 @@ class ApplicationQuestionControllerTest : UnitTest() {
             every { service.findAll(any()) } returns expected
             controller.findAll(0, null) shouldBe expected
         }
+
         @Test fun `should cap page size`() {
             val slot = slot<PageRequest>()
             every { service.findAll(capture(slot)) } returns PagedResponse(emptyList(), 0, 100, 0)
@@ -40,15 +41,47 @@ class ApplicationQuestionControllerTest : UnitTest() {
     }
 
     @Nested inner class CrudTests {
-        @Test fun `should find by id`() { every { service.findById(1L) } returns createResponse(); controller.findById(1L).id shouldBe 1L }
-        @Test fun `should create with 201`() { every { service.create(any()) } returns createResponse(); controller.create(CreateApplicationQuestionRequest(1L)).statusCode shouldBe HttpStatus.CREATED }
-        @Test fun `should delete with 204`() { every { service.delete(1L) } returns Unit; controller.delete(1L).statusCode shouldBe HttpStatus.NO_CONTENT }
-        @Test fun `should check exists`() { every { service.existsById(1L) } returns true; controller.exists(1L).exists shouldBe true }
+        @Test fun `should find by id`() {
+            every { service.findById(1L) } returns createResponse()
+            controller.findById(1L).id shouldBe 1L
+        }
+
+        @Test fun `should create with 201`() {
+            every { service.create(any()) } returns createResponse()
+            controller.create(CreateApplicationQuestionRequest(1L)).statusCode shouldBe HttpStatus.CREATED
+        }
+
+        @Test fun `should delete with 204`() {
+            every { service.delete(1L) } returns Unit
+            controller.delete(1L).statusCode shouldBe HttpStatus.NO_CONTENT
+        }
+
+        @Test fun `should check exists`() {
+            every { service.existsById(1L) } returns true
+            controller.exists(1L).exists shouldBe true
+        }
     }
 
     @Nested inner class FindByApplicationIdTests {
-        @Test fun `should return questions for application`() { every { service.findByApplicationId(1L, any()) } returns PagedResponse(listOf(createResponse()), 0, 20, 1); controller.findByApplicationId(1L, 0, null).totalElements shouldBe 1 }
+        @Test fun `should return questions for application`() {
+            every { service.findByApplicationId(1L, any()) } returns PagedResponse(listOf(createResponse()), 0, 20, 1)
+            controller.findByApplicationId(1L, 0, null).totalElements shouldBe 1
+        }
     }
 
-    private fun createResponse(id: Long = 1L, applicationId: Long = 1L, position: Int? = 1, question: String? = "Q?", answer: String? = "A", filesJson: String? = "[]") = ApplicationQuestionResponse(id, applicationId, position, question, answer, filesJson)
+    private fun createResponse(
+        id: Long = 1L,
+        applicationId: Long = 1L,
+        position: Int? = 1,
+        question: String? = "Q?",
+        answer: String? = "A",
+        filesJson: String? = "[]",
+    ) = ApplicationQuestionResponse(
+        id,
+        applicationId,
+        position,
+        question,
+        answer,
+        filesJson,
+    )
 }

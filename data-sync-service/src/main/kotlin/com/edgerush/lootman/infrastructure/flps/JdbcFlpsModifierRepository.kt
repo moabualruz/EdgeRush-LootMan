@@ -22,9 +22,8 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class JdbcFlpsModifierRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : FlpsModifierRepository {
-
     override fun findByGuildId(guildId: GuildId): FlpsModifiers {
         // Load default modifiers
         val defaults = loadDefaultModifiers()
@@ -40,21 +39,23 @@ class JdbcFlpsModifierRepository(
     }
 
     private fun loadDefaultModifiers(): Map<String, Double> {
-        val sql = """
+        val sql =
+            """
             SELECT category, modifier_key, modifier_value
             FROM flps_default_modifiers
-        """.trimIndent()
+            """.trimIndent()
 
         val rows = jdbcTemplate.query(sql, modifierRowMapper)
         return rows.associate { "${it.category}.${it.modifierKey}" to it.modifierValue }
     }
 
     private fun loadGuildOverrides(guildId: GuildId): Map<String, Double> {
-        val sql = """
+        val sql =
+            """
             SELECT category, modifier_key, modifier_value
             FROM flps_guild_modifiers
             WHERE guild_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val rows = jdbcTemplate.query(sql, modifierRowMapper, guildId.value)
         return rows.associate { "${it.category}.${it.modifierKey}" to it.modifierValue }
@@ -62,43 +63,51 @@ class JdbcFlpsModifierRepository(
 
     private fun mergeModifiers(
         defaults: Map<String, Double>,
-        overrides: Map<String, Double>
+        overrides: Map<String, Double>,
     ): Map<String, Double> {
         return defaults + overrides // Overrides take precedence
     }
 
-    private fun buildFlpsModifiers(guildId: GuildId, modifiers: Map<String, Double>): FlpsModifiers {
+    private fun buildFlpsModifiers(
+        guildId: GuildId,
+        modifiers: Map<String, Double>,
+    ): FlpsModifiers {
         return FlpsModifiers(
             guildId = guildId,
-            rmsWeights = RmsWeights(
-                attendance = modifiers["rms.attendance_weight"] ?: RmsWeights().attendance,
-                mechanical = modifiers["rms.mechanical_weight"] ?: RmsWeights().mechanical,
-                preparation = modifiers["rms.preparation_weight"] ?: RmsWeights().preparation,
-            ),
-            ipiWeights = IpiWeights(
-                upgradeValue = modifiers["ipi.upgrade_value_weight"] ?: IpiWeights().upgradeValue,
-                tierBonus = modifiers["ipi.tier_bonus_weight"] ?: IpiWeights().tierBonus,
-                roleMultiplier = modifiers["ipi.role_multiplier_weight"] ?: IpiWeights().roleMultiplier,
-            ),
-            roleMultipliers = RoleMultipliers(
-                tank = modifiers["role.tank_multiplier"] ?: RoleMultipliers().tank,
-                healer = modifiers["role.healer_multiplier"] ?: RoleMultipliers().healer,
-                dps = modifiers["role.dps_multiplier"] ?: RoleMultipliers().dps,
-            ),
-            thresholds = FlpsThresholds(
-                eligibilityAttendance = modifiers["threshold.eligibility_attendance"] ?: FlpsThresholds().eligibilityAttendance,
-                eligibilityActivity = modifiers["threshold.eligibility_activity"] ?: FlpsThresholds().eligibilityActivity,
-            ),
+            rmsWeights =
+                RmsWeights(
+                    attendance = modifiers["rms.attendance_weight"] ?: RmsWeights().attendance,
+                    mechanical = modifiers["rms.mechanical_weight"] ?: RmsWeights().mechanical,
+                    preparation = modifiers["rms.preparation_weight"] ?: RmsWeights().preparation,
+                ),
+            ipiWeights =
+                IpiWeights(
+                    upgradeValue = modifiers["ipi.upgrade_value_weight"] ?: IpiWeights().upgradeValue,
+                    tierBonus = modifiers["ipi.tier_bonus_weight"] ?: IpiWeights().tierBonus,
+                    roleMultiplier = modifiers["ipi.role_multiplier_weight"] ?: IpiWeights().roleMultiplier,
+                ),
+            roleMultipliers =
+                RoleMultipliers(
+                    tank = modifiers["role.tank_multiplier"] ?: RoleMultipliers().tank,
+                    healer = modifiers["role.healer_multiplier"] ?: RoleMultipliers().healer,
+                    dps = modifiers["role.dps_multiplier"] ?: RoleMultipliers().dps,
+                ),
+            thresholds =
+                FlpsThresholds(
+                    eligibilityAttendance = modifiers["threshold.eligibility_attendance"] ?: FlpsThresholds().eligibilityAttendance,
+                    eligibilityActivity = modifiers["threshold.eligibility_activity"] ?: FlpsThresholds().eligibilityActivity,
+                ),
         )
     }
 
-    private val modifierRowMapper = RowMapper { rs, _ ->
-        ModifierRow(
-            category = rs.getString("category"),
-            modifierKey = rs.getString("modifier_key"),
-            modifierValue = rs.getDouble("modifier_value"),
-        )
-    }
+    private val modifierRowMapper =
+        RowMapper { rs, _ ->
+            ModifierRow(
+                category = rs.getString("category"),
+                modifierKey = rs.getString("modifier_key"),
+                modifierValue = rs.getDouble("modifier_value"),
+            )
+        }
 
     /**
      * Internal data class to represent a row from the modifiers tables.

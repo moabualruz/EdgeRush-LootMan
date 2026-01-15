@@ -37,8 +37,9 @@ class PerformanceController(
         currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId))
         val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser)
 
-        val raider = raiderEntityRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+        val raider =
+            raiderEntityRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         return buildPerformanceResponse(raiderId, raider.characterName, GuildId(guildId))
     }
@@ -49,8 +50,9 @@ class PerformanceController(
         @PathVariable guildId: String,
         @PathVariable raiderId: Long,
     ): PerformanceMetricsResponse {
-        val raider = raiderEntityRepository.findById(raiderId)
-            ?: throw IllegalArgumentException("Raider not found: $raiderId")
+        val raider =
+            raiderEntityRepository.findById(raiderId)
+                ?: throw IllegalArgumentException("Raider not found: $raiderId")
 
         // No guild validation on RaiderEntity - performance data scoped by guildId in repository
         return buildPerformanceResponse(RaiderId(raiderId), raider.characterName, GuildId(guildId))
@@ -64,12 +66,13 @@ class PerformanceController(
         val now = Instant.now()
         val oneWeekAgo = now.minus(7, ChronoUnit.DAYS)
 
-        val performanceData = raiderPerformanceRepository.findByRaiderAndPeriod(
-            raiderId,
-            guildId,
-            oneWeekAgo,
-            now,
-        )
+        val performanceData =
+            raiderPerformanceRepository.findByRaiderAndPeriod(
+                raiderId,
+                guildId,
+                oneWeekAgo,
+                now,
+            )
 
         val dpa = performanceData?.deathsPerAttempt ?: 0.0
         val adt = performanceData?.avoidableDamagePercentage ?: 0.0

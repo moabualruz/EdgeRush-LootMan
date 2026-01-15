@@ -28,7 +28,6 @@ import java.time.temporal.ChronoUnit
  * The repository operates on the loot_bans table.
  */
 class JdbcLootBanRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcLootBanRepository
 
@@ -44,7 +43,6 @@ class JdbcLootBanRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return loot ban when found`() {
             // Given
@@ -54,7 +52,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootBan>>(),
-                    eq(banId.value)
+                    eq(banId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootBan>>()
@@ -79,7 +77,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootBan>>(),
-                    eq(banId.value)
+                    eq(banId.value),
                 )
             } returns emptyList()
 
@@ -101,18 +99,19 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootBan>>(),
-                    eq(banId.value)
+                    eq(banId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootBan>>()
-                val rs = mockResultSet(
-                    id = banId.value,
-                    raiderId = 100L,
-                    guildId = "test-guild",
-                    reason = "Excessive loot hoarding",
-                    bannedAt = bannedAt,
-                    expiresAt = expiresAt
-                )
+                val rs =
+                    mockResultSet(
+                        id = banId.value,
+                        raiderId = 100L,
+                        guildId = "test-guild",
+                        reason = "Excessive loot hoarding",
+                        bannedAt = bannedAt,
+                        expiresAt = expiresAt,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -138,14 +137,15 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootBan>>(),
-                    eq(banId.value)
+                    eq(banId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootBan>>()
-                val rs = mockResultSet(
-                    id = banId.value,
-                    expiresAt = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = banId.value,
+                        expiresAt = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -161,7 +161,6 @@ class JdbcLootBanRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindActiveByRaiderIdTests {
-
         @Test
         fun `should return active bans for raider`() {
             // Given
@@ -178,13 +177,13 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<LootBan>>(),
                     eq(raiderId.value.toString()),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootBan>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet("ban-1", raiderId = raiderId.value, guildId = guildId.value), 0),
-                    rowMapper.mapRow(mockResultSet("ban-2", raiderId = raiderId.value, guildId = guildId.value), 1)
+                    rowMapper.mapRow(mockResultSet("ban-2", raiderId = raiderId.value, guildId = guildId.value), 1),
                 )
             }
 
@@ -212,7 +211,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<LootBan>>(),
                     eq(raiderId.value.toString()),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns emptyList()
 
@@ -226,7 +225,6 @@ class JdbcLootBanRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new loot ban when not exists`() {
             // Given
@@ -246,7 +244,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -270,7 +268,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -291,7 +289,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -320,7 +318,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                     permanentBan.reason,
                     any<Timestamp>(),
                     null, // expiresAt should be null
-                    true
+                    true,
                 )
             }
         }
@@ -349,7 +347,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                     any<Timestamp>(),
                     null, // expiresAt should be null
                     true,
-                    permanentBan.id.value
+                    permanentBan.id.value,
                 )
             }
         }
@@ -357,7 +355,6 @@ class JdbcLootBanRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete loot ban by id`() {
             // Given
@@ -366,7 +363,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(banId.value)
+                    eq(banId.value),
                 )
             } returns 1
 
@@ -377,7 +374,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    banId.value
+                    banId.value,
                 )
             }
         }
@@ -391,7 +388,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
         guildId: String = "test-guild",
         reason: String = "Test ban reason",
         bannedAt: Instant = now,
-        expiresAt: Instant? = oneWeekFromNow
+        expiresAt: Instant? = oneWeekFromNow,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("id") } returns id
@@ -410,13 +407,14 @@ class JdbcLootBanRepositoryTest : UnitTest() {
         guildId: GuildId = GuildId("test-guild"),
         reason: String = "Test ban reason",
         bannedAt: Instant = now,
-        expiresAt: Instant? = oneWeekFromNow
-    ): LootBan = LootBan(
-        id = id,
-        raiderId = raiderId,
-        guildId = guildId,
-        reason = reason,
-        bannedAt = bannedAt,
-        expiresAt = expiresAt
-    )
+        expiresAt: Instant? = oneWeekFromNow,
+    ): LootBan =
+        LootBan(
+            id = id,
+            raiderId = raiderId,
+            guildId = guildId,
+            reason = reason,
+            bannedAt = bannedAt,
+            expiresAt = expiresAt,
+        )
 }

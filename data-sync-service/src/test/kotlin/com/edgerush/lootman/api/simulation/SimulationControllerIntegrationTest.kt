@@ -25,21 +25,21 @@ import java.time.Instant
  * - Workflow from submission to results retrieval
  */
 class SimulationControllerIntegrationTest : IntegrationTest() {
-
     private fun createSubmitRequest(
         characterRealm: String = "TestRealm",
         characterClass: String = "warrior",
-        characterSpec: String = "fury"
+        characterSpec: String = "fury",
     ): HttpEntity<SubmitSimulationRequest> {
-        val request = SubmitSimulationRequest(
-            characterRealm = characterRealm,
-            characterClass = characterClass,
-            characterSpec = characterSpec,
-            characterLevel = 80,
-            characterRace = "human",
-            iterations = 1000,
-            fightLengthSeconds = 300
-        )
+        val request =
+            SubmitSimulationRequest(
+                characterRealm = characterRealm,
+                characterClass = characterClass,
+                characterSpec = characterSpec,
+                characterLevel = 80,
+                characterRace = "human",
+                iterations = 1000,
+                fightLengthSeconds = 300,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -55,11 +55,12 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             val entity = createSubmitRequest()
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                entity,
-                TestSimulationRequestResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    entity,
+                    TestSimulationRequestResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.ACCEPTED
@@ -80,23 +81,25 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/$characterName",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
 
             // Then - verify in database
-            val profileCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
-                Long::class.java,
-                guildId,
-                characterName
-            )
+            val profileCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
+                    Long::class.java,
+                    guildId,
+                    characterName,
+                )
             profileCount shouldBe 1L
 
-            val requestCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM simulation_requests WHERE status = ?",
-                Long::class.java,
-                SimulationStatus.PENDING.name
-            )
+            val requestCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM simulation_requests WHERE status = ?",
+                    Long::class.java,
+                    SimulationStatus.PENDING.name,
+                )
             requestCount shouldBe 1L
         }
 
@@ -111,31 +114,34 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/$characterName",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
-            val response2 = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                entity,
-                TestSimulationRequestResponse::class.java
-            )
+            val response2 =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    entity,
+                    TestSimulationRequestResponse::class.java,
+                )
 
             // Then - second submission should also succeed
             response2.statusCode shouldBe HttpStatus.ACCEPTED
 
             // Profile should be reused (only 1 profile)
-            val profileCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
-                Long::class.java,
-                guildId,
-                characterName
-            )
+            val profileCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
+                    Long::class.java,
+                    guildId,
+                    characterName,
+                )
             profileCount shouldBe 1L
 
             // But 2 requests should exist
-            val requestCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM simulation_requests",
-                Long::class.java
-            )
+            val requestCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM simulation_requests",
+                    Long::class.java,
+                )
             requestCount shouldBe 2L
         }
     }
@@ -148,18 +154,20 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             val guildId = "status-guild-123"
             val characterName = "StatusChar"
             val entity = createSubmitRequest()
-            val submitResponse = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                entity,
-                TestSimulationRequestResponse::class.java
-            )
+            val submitResponse =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    entity,
+                    TestSimulationRequestResponse::class.java,
+                )
             val requestId = submitResponse.body?.id
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/requests/$requestId",
-                TestSimulationRequestResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/requests/$requestId",
+                    TestSimulationRequestResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -170,10 +178,11 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return 404 when request does not exist`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/requests/999999",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/requests/999999",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -192,14 +201,15 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/$characterName",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
-                TestSimulationResultsResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
+                    TestSimulationResultsResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -219,27 +229,40 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             jdbcTemplate.update(
                 """INSERT INTO simulation_profiles (guild_id, character_name, character_realm, profile_content, created_at)
                    VALUES (?, ?, ?, ?, ?)""",
-                guildId, characterName, characterRealm, "warrior=\"$characterName\"", Instant.now()
+                guildId,
+                characterName,
+                characterRealm,
+                "warrior=\"$characterName\"",
+                Instant.now(),
             )
 
-            val profileId = jdbcTemplate.queryForObject(
-                "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
-                Long::class.java,
-                guildId, characterName
-            )
+            val profileId =
+                jdbcTemplate.queryForObject(
+                    "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ?",
+                    Long::class.java,
+                    guildId,
+                    characterName,
+                )
 
             // Insert result
             jdbcTemplate.update(
                 """INSERT INTO simulation_results (profile_id, item_id, item_name, slot, dps_gain, percent_gain, simulated_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                profileId, 12345L, "Test Sword", "main_hand", 1000.0, 1.5, Instant.now()
+                profileId,
+                12345L,
+                "Test Sword",
+                "main_hand",
+                1000.0,
+                1.5,
+                Instant.now(),
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
-                TestSimulationResultsResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
+                    TestSimulationResultsResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -259,19 +282,20 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/Char1",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/$guildId/characters/Char2",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/pending",
-                Array<TestSimulationRequestResponse>::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/pending",
+                    Array<TestSimulationRequestResponse>::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -286,19 +310,20 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/guild-A/characters/CharA",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/guild-B/characters/CharB",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/guild-A/pending",
-                Array<TestSimulationRequestResponse>::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/guild-A/pending",
+                    Array<TestSimulationRequestResponse>::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -312,11 +337,12 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return execution summary`() {
             // When - execute with no pending (Docker not available in test)
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/execute-pending",
-                null,
-                TestExecutionSummaryResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/execute-pending",
+                    null,
+                    TestExecutionSummaryResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -330,10 +356,11 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return service status with endpoints`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                TestSimulationStatusResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    TestSimulationStatusResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -349,14 +376,15 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/status-guild/characters/Char1",
                 entity,
-                TestSimulationRequestResponse::class.java
+                TestSimulationRequestResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                TestSimulationStatusResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    TestSimulationStatusResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -374,11 +402,12 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             val entity = createSubmitRequest()
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.ACCEPTED
@@ -398,10 +427,11 @@ class SimulationControllerIntegrationTest : IntegrationTest() {
             val characterRealm = "TestRealm"
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/$guildId/characters/$characterName/realms/$characterRealm/results",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -425,7 +455,7 @@ data class TestSimulationRequestResponse(
     val submittedAt: Instant?,
     val completedAt: Instant?,
     val errorMessage: String?,
-    val resultCount: Int
+    val resultCount: Int,
 )
 
 data class TestSimulationResultItem(
@@ -436,7 +466,7 @@ data class TestSimulationResultItem(
     val percentGain: Double,
     val isUpgrade: Boolean,
     val normalizedValue: Double,
-    val simulatedAt: Instant
+    val simulatedAt: Instant,
 )
 
 data class TestSimulationResultsResponse(
@@ -444,16 +474,16 @@ data class TestSimulationResultsResponse(
     val characterName: String,
     val characterRealm: String,
     val results: List<TestSimulationResultItem>,
-    val retrievedAt: Instant
+    val retrievedAt: Instant,
 )
 
 data class TestExecutionSummaryResponse(
     val executedCount: Int,
-    val executedAt: Instant
+    val executedAt: Instant,
 )
 
 data class TestSimulationStatusResponse(
     val status: String,
     val pendingSimulations: Int,
-    val endpoints: Map<String, String>
+    val endpoints: Map<String, String>,
 )

@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with loot-ban-specific query methods.
  */
 interface LootBanCrudService : CrudService<Long, CreateLootBanEntityRequest, UpdateLootBanEntityRequest, LootBanResponse> {
-
     /**
      * Find loot bans by guild with pagination.
      *
@@ -18,7 +17,10 @@ interface LootBanCrudService : CrudService<Long, CreateLootBanEntityRequest, Upd
      * @param pageRequest Pagination parameters
      * @return Paginated list of loot bans for the guild
      */
-    fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<LootBanResponse>
+    fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootBanResponse>
 
     /**
      * Find active loot bans by guild with pagination.
@@ -27,7 +29,10 @@ interface LootBanCrudService : CrudService<Long, CreateLootBanEntityRequest, Upd
      * @param pageRequest Pagination parameters
      * @return Paginated list of active loot bans for the guild
      */
-    fun findActiveByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<LootBanResponse>
+    fun findActiveByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootBanResponse>
 
     /**
      * Check if a character is currently banned from loot.
@@ -36,7 +41,10 @@ interface LootBanCrudService : CrudService<Long, CreateLootBanEntityRequest, Upd
      * @param characterName The character name to check
      * @return true if the character is currently banned, false otherwise
      */
-    fun isCharacterBanned(guildId: String, characterName: String): Boolean
+    fun isCharacterBanned(
+        guildId: String,
+        characterName: String,
+    ): Boolean
 
     /**
      * Count loot bans for a guild.

@@ -22,11 +22,16 @@ data class LootAwardOldItemResponse(
     val bonusId: String?,
 ) {
     companion object {
-        fun from(e: LootAwardOldItemEntity) = LootAwardOldItemResponse(
-            e.id!!, e.lootAwardId, e.itemId, e.bonusId
-        )
+        fun from(e: LootAwardOldItemEntity) =
+            LootAwardOldItemResponse(
+                e.id!!,
+                e.lootAwardId,
+                e.itemId,
+                e.bonusId,
+            )
     }
 }
 
 data class LootAwardOldItemExistsResponse(val exists: Boolean)
+
 data class LootAwardOldItemCountResponse(val count: Long)

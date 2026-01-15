@@ -11,21 +11,21 @@ import org.springframework.stereotype.Service
  */
 @Service
 class RaidPlanService(
-    private val raidPlanRepository: RaidPlanRepository
+    private val raidPlanRepository: RaidPlanRepository,
 ) {
-
     /**
      * Creates a new raid plan.
      */
     fun createPlan(request: CreateRaidPlanRequest): RaidPlan {
-        val plan = RaidPlan.create(
-            guildId = GuildId(request.guildId),
-            encounterId = request.encounterId,
-            encounterName = request.encounterName,
-            name = request.name,
-            createdBy = request.createdBy,
-            visibility = request.visibility
-        )
+        val plan =
+            RaidPlan.create(
+                guildId = GuildId(request.guildId),
+                encounterId = request.encounterId,
+                encounterName = request.encounterName,
+                name = request.name,
+                createdBy = request.createdBy,
+                visibility = request.visibility,
+            )
         return raidPlanRepository.save(plan)
     }
 
@@ -57,7 +57,11 @@ class RaidPlanService(
     /**
      * Gets paginated raid plans for a guild.
      */
-    fun getPlansByGuildPaginated(guildId: String, page: Int, size: Int): PagedRaidPlans {
+    fun getPlansByGuildPaginated(
+        guildId: String,
+        page: Int,
+        size: Int,
+    ): PagedRaidPlans {
         val guildIdObj = GuildId(guildId)
         val offset = page.toLong() * size
         val plans = raidPlanRepository.findByGuildId(guildIdObj, offset, size)
@@ -67,14 +71,17 @@ class RaidPlanService(
             page = page,
             size = size,
             totalElements = total,
-            totalPages = ((total + size - 1) / size).toInt()
+            totalPages = ((total + size - 1) / size).toInt(),
         )
     }
 
     /**
      * Gets raid plans for a specific encounter.
      */
-    fun getPlansByEncounter(guildId: String, encounterId: Int): List<RaidPlan> {
+    fun getPlansByEncounter(
+        guildId: String,
+        encounterId: Int,
+    ): List<RaidPlan> {
         return raidPlanRepository.findByGuildIdAndEncounterId(GuildId(guildId), encounterId)
     }
 
@@ -82,23 +89,27 @@ class RaidPlanService(
      * Updates a raid plan.
      * @throws RaidPlanNotFoundException if not found
      */
-    fun updatePlan(id: String, request: UpdateRaidPlanRequest): RaidPlan {
+    fun updatePlan(
+        id: String,
+        request: UpdateRaidPlanRequest,
+    ): RaidPlan {
         var plan = getPlan(id)
 
         request.name?.let { newName ->
-            plan = RaidPlan.reconstitute(
-                id = plan.id,
-                guildId = plan.guildId,
-                encounterId = plan.encounterId,
-                encounterName = plan.encounterName,
-                name = newName,
-                steps = plan.steps,
-                visibility = plan.visibility,
-                shareToken = plan.shareToken,
-                createdBy = plan.createdBy,
-                createdAt = plan.createdAt,
-                updatedAt = java.time.Instant.now()
-            )
+            plan =
+                RaidPlan.reconstitute(
+                    id = plan.id,
+                    guildId = plan.guildId,
+                    encounterId = plan.encounterId,
+                    encounterName = plan.encounterName,
+                    name = newName,
+                    steps = plan.steps,
+                    visibility = plan.visibility,
+                    shareToken = plan.shareToken,
+                    createdBy = plan.createdBy,
+                    createdAt = plan.createdAt,
+                    updatedAt = java.time.Instant.now(),
+                )
         }
 
         request.visibility?.let { newVisibility ->
@@ -112,7 +123,10 @@ class RaidPlanService(
      * Adds a step to a raid plan.
      * @throws RaidPlanNotFoundException if not found
      */
-    fun addStep(planId: String, notes: String? = null): RaidPlan {
+    fun addStep(
+        planId: String,
+        notes: String? = null,
+    ): RaidPlan {
         val plan = getPlan(planId)
         val updatedPlan = plan.addStep(notes)
         return raidPlanRepository.save(updatedPlan)
@@ -122,7 +136,10 @@ class RaidPlanService(
      * Removes a step from a raid plan.
      * @throws RaidPlanNotFoundException if not found
      */
-    fun removeStep(planId: String, stepOrder: Int): RaidPlan {
+    fun removeStep(
+        planId: String,
+        stepOrder: Int,
+    ): RaidPlan {
         val plan = getPlan(planId)
         val updatedPlan = plan.removeStep(stepOrder)
         return raidPlanRepository.save(updatedPlan)
@@ -132,7 +149,11 @@ class RaidPlanService(
      * Updates a step's notes.
      * @throws RaidPlanNotFoundException if not found
      */
-    fun updateStep(planId: String, stepOrder: Int, notes: String?): RaidPlan {
+    fun updateStep(
+        planId: String,
+        stepOrder: Int,
+        notes: String?,
+    ): RaidPlan {
         val plan = getPlan(planId)
         val updatedPlan = plan.updateStep(stepOrder, notes)
         return raidPlanRepository.save(updatedPlan)
@@ -178,7 +199,7 @@ data class CreateRaidPlanRequest(
     val encounterName: String,
     val name: String,
     val createdBy: Long,
-    val visibility: PlanVisibility = PlanVisibility.GUILD
+    val visibility: PlanVisibility = PlanVisibility.GUILD,
 )
 
 /**
@@ -186,7 +207,7 @@ data class CreateRaidPlanRequest(
  */
 data class UpdateRaidPlanRequest(
     val name: String? = null,
-    val visibility: PlanVisibility? = null
+    val visibility: PlanVisibility? = null,
 )
 
 /**
@@ -197,7 +218,7 @@ data class PagedRaidPlans(
     val page: Int,
     val size: Int,
     val totalElements: Long,
-    val totalPages: Int
+    val totalPages: Int,
 )
 
 /**

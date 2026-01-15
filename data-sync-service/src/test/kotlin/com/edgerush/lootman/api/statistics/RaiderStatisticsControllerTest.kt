@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
 class RaiderStatisticsControllerTest : UnitTest() {
-
     private lateinit var service: RaiderStatisticsCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaiderStatisticsController
@@ -101,10 +100,10 @@ class RaiderStatisticsControllerTest : UnitTest() {
         collectiblesToys: Int? = 300,
         collectiblesUniquePets: Int? = 150,
         collectiblesLevel25Pets: Int? = 50,
-        honorLevel: Int? = 100
+        honorLevel: Int? = 100,
     ) = RaiderStatisticsResponse(
         id, raiderId, mythicPlusScore, weeklyHighestMplus, seasonHighestMplus,
         worldQuestsTotal, worldQuestsThisWeek, collectiblesMounts, collectiblesToys,
-        collectiblesUniquePets, collectiblesLevel25Pets, honorLevel
+        collectiblesUniquePets, collectiblesLevel25Pets, honorLevel,
     )
 }

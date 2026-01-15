@@ -32,7 +32,7 @@ class GuildController(
     private val updateGuildUseCase: UpdateGuildUseCase,
     private val deleteGuildUseCase: DeleteGuildUseCase,
     private val getGuildUseCase: GetGuildUseCase,
-    private val listGuildsUseCase: ListGuildsUseCase
+    private val listGuildsUseCase: ListGuildsUseCase,
 ) {
     /**
      * Create a new guild.
@@ -41,18 +41,21 @@ class GuildController(
      * @return 201 Created with the created guild
      */
     @PostMapping
-    fun createGuild(@RequestBody request: CreateGuildRequest): ResponseEntity<GuildResponse> {
-        val command = CreateGuildCommand(
-            id = request.id,
-            name = request.name,
-            description = request.description,
-            realm = request.realm,
-            region = request.region,
-            syncEnabled = request.syncEnabled,
-            syncCronExpression = request.syncCronExpression,
-            timezone = request.timezone,
-            benchmarkMode = request.benchmarkMode
-        )
+    fun createGuild(
+        @RequestBody request: CreateGuildRequest,
+    ): ResponseEntity<GuildResponse> {
+        val command =
+            CreateGuildCommand(
+                id = request.id,
+                name = request.name,
+                description = request.description,
+                realm = request.realm,
+                region = request.region,
+                syncEnabled = request.syncEnabled,
+                syncCronExpression = request.syncCronExpression,
+                timezone = request.timezone,
+                benchmarkMode = request.benchmarkMode,
+            )
 
         return createGuildUseCase.execute(command)
             .map { guild ->
@@ -70,7 +73,9 @@ class GuildController(
      * @return 200 OK with the guild, or 404 if not found
      */
     @GetMapping("/{id}")
-    fun getGuild(@PathVariable id: String): GuildResponse {
+    fun getGuild(
+        @PathVariable id: String,
+    ): GuildResponse {
         return getGuildUseCase.execute(GetGuildQuery(id))
             .map { guild -> GuildResponse.from(guild) }
             .getOrThrow()
@@ -86,22 +91,23 @@ class GuildController(
     @PutMapping("/{id}")
     fun updateGuild(
         @PathVariable id: String,
-        @RequestBody request: UpdateGuildRequest
+        @RequestBody request: UpdateGuildRequest,
     ): GuildResponse {
-        val command = UpdateGuildCommand(
-            id = id,
-            name = request.name,
-            description = request.description,
-            realm = request.realm,
-            region = request.region,
-            syncEnabled = request.syncEnabled,
-            syncCronExpression = request.syncCronExpression,
-            timezone = request.timezone,
-            benchmarkMode = request.benchmarkMode,
-            customBenchmarkRms = request.customBenchmarkRms,
-            customBenchmarkIpi = request.customBenchmarkIpi,
-            isActive = request.isActive
-        )
+        val command =
+            UpdateGuildCommand(
+                id = id,
+                name = request.name,
+                description = request.description,
+                realm = request.realm,
+                region = request.region,
+                syncEnabled = request.syncEnabled,
+                syncCronExpression = request.syncCronExpression,
+                timezone = request.timezone,
+                benchmarkMode = request.benchmarkMode,
+                customBenchmarkRms = request.customBenchmarkRms,
+                customBenchmarkIpi = request.customBenchmarkIpi,
+                isActive = request.isActive,
+            )
 
         return updateGuildUseCase.execute(command)
             .map { guild -> GuildResponse.from(guild) }
@@ -115,7 +121,9 @@ class GuildController(
      * @return 204 No Content on success, or 404 if not found
      */
     @DeleteMapping("/{id}")
-    fun deleteGuild(@PathVariable id: String): ResponseEntity<Void> {
+    fun deleteGuild(
+        @PathVariable id: String,
+    ): ResponseEntity<Void> {
         return deleteGuildUseCase.execute(DeleteGuildCommand(id))
             .map { ResponseEntity.noContent().build<Void>() }
             .getOrThrow()

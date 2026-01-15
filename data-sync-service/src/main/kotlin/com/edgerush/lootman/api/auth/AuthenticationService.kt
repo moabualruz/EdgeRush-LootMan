@@ -28,17 +28,18 @@ class AuthenticationService(
     private val userRepository: UserRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val oauth2Service: OAuth2Service,
-    private val properties: OAuth2Properties
+    private val properties: OAuth2Properties,
 ) {
     private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
     private val secureRandom = SecureRandom()
 
     private val jwtKey: SecretKey by lazy {
-        val secret = properties.jwt.secret.ifBlank {
-            // Generate a random key if not configured (for development)
-            logger.warn("JWT secret not configured, using random key. Sessions will not persist across restarts.")
-            Base64.getEncoder().encodeToString(ByteArray(64).also { secureRandom.nextBytes(it) })
-        }
+        val secret =
+            properties.jwt.secret.ifBlank {
+                // Generate a random key if not configured (for development)
+                logger.warn("JWT secret not configured, using random key. Sessions will not persist across restarts.")
+                Base64.getEncoder().encodeToString(ByteArray(64).also { secureRandom.nextBytes(it) })
+            }
         Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
     }
 
@@ -50,7 +51,7 @@ class AuthenticationService(
     fun getDiscordAuthUrl(state: String? = null): OAuth2UrlResponse {
         return OAuth2UrlResponse(
             url = oauth2Service.getDiscordAuthorizationUrl(state),
-            provider = "discord"
+            provider = "discord",
         )
     }
 
@@ -61,27 +62,28 @@ class AuthenticationService(
         val discordUser = oauth2Service.exchangeDiscordCode(code)
 
         // Find or create user
-        val user = userRepository.findByDiscordId(discordUser.id)
-            ?.let { existingUser ->
-                // Update user profile from Discord
-                userRepository.save(
-                    existingUser
-                        .updateProfile(
-                            username = discordUser.username,
-                            email = discordUser.email,
-                            avatarUrl = discordUser.avatarUrl
-                        )
-                        .recordLogin()
+        val user =
+            userRepository.findByDiscordId(discordUser.id)
+                ?.let { existingUser ->
+                    // Update user profile from Discord
+                    userRepository.save(
+                        existingUser
+                            .updateProfile(
+                                username = discordUser.username,
+                                email = discordUser.email,
+                                avatarUrl = discordUser.avatarUrl,
+                            )
+                            .recordLogin(),
+                    )
+                }
+                ?: userRepository.save(
+                    User.fromDiscord(
+                        discordId = discordUser.id,
+                        username = discordUser.username,
+                        email = discordUser.email,
+                        avatarUrl = discordUser.avatarUrl,
+                    ).recordLogin(),
                 )
-            }
-            ?: userRepository.save(
-                User.fromDiscord(
-                    discordId = discordUser.id,
-                    username = discordUser.username,
-                    email = discordUser.email,
-                    avatarUrl = discordUser.avatarUrl
-                ).recordLogin()
-            )
 
         return generateTokens(user)
     }
@@ -94,7 +96,7 @@ class AuthenticationService(
     fun getBattlenetAuthUrl(state: String? = null): OAuth2UrlResponse {
         return OAuth2UrlResponse(
             url = oauth2Service.getBattlenetAuthorizationUrl(state),
-            provider = "battlenet"
+            provider = "battlenet",
         )
     }
 
@@ -105,21 +107,22 @@ class AuthenticationService(
         val battlenetUser = oauth2Service.exchangeBattlenetCode(code)
 
         // Find or create user
-        val user = userRepository.findByBattlenetId(battlenetUser.sub)
-            ?.let { existingUser ->
-                // Update user profile from Battle.net
-                userRepository.save(
-                    existingUser
-                        .updateProfile(username = battlenetUser.battletag)
-                        .recordLogin()
+        val user =
+            userRepository.findByBattlenetId(battlenetUser.sub)
+                ?.let { existingUser ->
+                    // Update user profile from Battle.net
+                    userRepository.save(
+                        existingUser
+                            .updateProfile(username = battlenetUser.battletag)
+                            .recordLogin(),
+                    )
+                }
+                ?: userRepository.save(
+                    User.fromBattlenet(
+                        battlenetId = battlenetUser.sub,
+                        username = battlenetUser.battletag,
+                    ).recordLogin(),
                 )
-            }
-            ?: userRepository.save(
-                User.fromBattlenet(
-                    battlenetId = battlenetUser.sub,
-                    username = battlenetUser.battletag
-                ).recordLogin()
-            )
 
         return generateTokens(user)
     }
@@ -131,15 +134,17 @@ class AuthenticationService(
      */
     fun refreshAccessToken(refreshToken: String): TokenResponse {
         val tokenHash = hashToken(refreshToken)
-        val storedToken = refreshTokenRepository.findByTokenHash(tokenHash)
-            ?: throw InvalidRefreshTokenException("Refresh token not found")
+        val storedToken =
+            refreshTokenRepository.findByTokenHash(tokenHash)
+                ?: throw InvalidRefreshTokenException("Refresh token not found")
 
         if (!storedToken.isValid()) {
             throw InvalidRefreshTokenException("Refresh token is expired or revoked")
         }
 
-        val user = userRepository.findById(storedToken.userId)
-            ?: throw InvalidRefreshTokenException("User not found for refresh token")
+        val user =
+            userRepository.findById(storedToken.userId)
+                ?: throw InvalidRefreshTokenException("User not found for refresh token")
 
         // Revoke the old refresh token and generate new tokens
         refreshTokenRepository.save(storedToken.revoke())
@@ -164,8 +169,9 @@ class AuthenticationService(
         val claims = parseToken(token)
         val userId = UserId((claims.subject).toLong())
 
-        val user = userRepository.findById(userId)
-            ?: throw UserNotFoundException(userId.value)
+        val user =
+            userRepository.findById(userId)
+                ?: throw UserNotFoundException(userId.value)
 
         return UserProfileResponse.from(user)
     }
@@ -192,7 +198,7 @@ class AuthenticationService(
         return TokenResponse(
             accessToken = accessToken,
             refreshToken = refreshToken,
-            expiresIn = properties.jwt.accessTokenValidityMinutes * 60
+            expiresIn = properties.jwt.accessTokenValidityMinutes * 60,
         )
     }
 
@@ -219,11 +225,12 @@ class AuthenticationService(
         val tokenHash = hashToken(tokenString)
 
         // Store the hashed token
-        val refreshToken = UserRefreshToken.create(
-            userId = user.id!!,
-            tokenHash = tokenHash,
-            validityDays = properties.jwt.refreshTokenValidityDays
-        )
+        val refreshToken =
+            UserRefreshToken.create(
+                userId = user.id!!,
+                tokenHash = tokenHash,
+                validityDays = properties.jwt.refreshTokenValidityDays,
+            )
         refreshTokenRepository.save(refreshToken)
 
         return tokenString

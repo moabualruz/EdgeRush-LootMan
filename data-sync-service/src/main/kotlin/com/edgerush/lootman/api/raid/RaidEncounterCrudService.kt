@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with raid-encounter-specific query methods.
  */
 interface RaidEncounterCrudService : CrudService<Long, CreateRaidEncounterRequest, UpdateRaidEncounterRequest, RaidEncounterResponse> {
-
     /**
      * Find encounters by raid with pagination.
      *
@@ -18,7 +17,10 @@ interface RaidEncounterCrudService : CrudService<Long, CreateRaidEncounterReques
      * @param pageRequest Pagination parameters
      * @return Paginated list of encounters for the raid
      */
-    fun findByRaid(raidId: Long, pageRequest: PageRequest): PagedResponse<RaidEncounterResponse>
+    fun findByRaid(
+        raidId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidEncounterResponse>
 
     /**
      * Find enabled encounters by raid with pagination.
@@ -27,7 +29,10 @@ interface RaidEncounterCrudService : CrudService<Long, CreateRaidEncounterReques
      * @param pageRequest Pagination parameters
      * @return Paginated list of enabled encounters for the raid
      */
-    fun findEnabledByRaid(raidId: Long, pageRequest: PageRequest): PagedResponse<RaidEncounterResponse>
+    fun findEnabledByRaid(
+        raidId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidEncounterResponse>
 
     /**
      * Count encounters for a raid.

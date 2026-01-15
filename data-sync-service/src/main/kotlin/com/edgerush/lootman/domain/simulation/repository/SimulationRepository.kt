@@ -12,7 +12,6 @@ import com.edgerush.lootman.domain.simulation.model.SimulationResult
  * database operations.
  */
 interface SimulationRepository {
-
     /**
      * Saves or updates a simulation profile.
      *
@@ -42,7 +41,7 @@ interface SimulationRepository {
     fun findProfileByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): SimulationProfile?
 
     /**
@@ -56,7 +55,7 @@ interface SimulationRepository {
     fun findProfileIdByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long?
 
     /**
@@ -88,7 +87,10 @@ interface SimulationRepository {
      * @param profileId The profile ID this result belongs to
      * @param result The simulation result to save
      */
-    fun saveResult(profileId: Long, result: SimulationResult)
+    fun saveResult(
+        profileId: Long,
+        result: SimulationResult,
+    )
 
     /**
      * Finds the latest simulation result for a specific item.
@@ -97,7 +99,10 @@ interface SimulationRepository {
      * @param itemId The WoW item ID
      * @return The latest result, or null if none exists
      */
-    fun findLatestResultForItem(profileId: Long, itemId: Long): SimulationResult?
+    fun findLatestResultForItem(
+        profileId: Long,
+        itemId: Long,
+    ): SimulationResult?
 
     /**
      * Finds all simulation results for a profile.

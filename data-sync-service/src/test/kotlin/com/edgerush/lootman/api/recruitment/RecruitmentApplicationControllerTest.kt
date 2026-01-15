@@ -14,7 +14,6 @@ import com.edgerush.lootman.domain.shared.GuildId
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -32,7 +31,6 @@ import reactor.core.publisher.Mono
  * Unit tests for RecruitmentApplicationController.
  */
 class RecruitmentApplicationControllerTest {
-
     private lateinit var mockMvc: MockMvc
     private lateinit var applicationService: ApplicationService
     private lateinit var raiderIOClient: RaiderIOClient
@@ -52,7 +50,6 @@ class RecruitmentApplicationControllerTest {
 
     @Nested
     inner class GetApplicationsByGuildTests {
-
         @Test
         fun `should return applications for a guild`() {
             // Arrange
@@ -81,7 +78,7 @@ class RecruitmentApplicationControllerTest {
             // Act & Assert
             mockMvc.perform(
                 get("/api/v1/recruitment/applications/guilds/$guildId")
-                    .param("status", "PENDING")
+                    .param("status", "PENDING"),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$[0].status").value("PENDING"))
@@ -90,7 +87,6 @@ class RecruitmentApplicationControllerTest {
 
     @Nested
     inner class GetApplicationByIdTests {
-
         @Test
         fun `should return application when found`() {
             // Arrange
@@ -120,7 +116,6 @@ class RecruitmentApplicationControllerTest {
 
     @Nested
     inner class SubmitApplicationTests {
-
         @Test
         fun `should create application successfully`() {
             // Arrange
@@ -150,31 +145,32 @@ class RecruitmentApplicationControllerTest {
                 )
             } returns application
 
-            val request = SubmitApplicationRequest(
-                battleNetId = "Player#1234",
-                discordId = "123456789012345678",
-                email = "player@example.com",
-                characterName = "Arthas",
-                characterRealm = "Illidan",
-                characterClass = "Death Knight",
-                specialization = "Frost",
-                itemLevel = 489.5,
-                raiderIOScore = 2850.0,
-                bestParseAverage = 85.5,
-                age = 28,
-                location = "United States",
-                timezone = "America/New_York",
-                raidDaysAvailable = listOf("Tuesday", "Wednesday"),
-                previousGuilds = "Previous Guild",
-                reasonForLeaving = "Guild disbanded",
-                whyThisGuild = "Looking for competitive guild",
-            )
+            val request =
+                SubmitApplicationRequest(
+                    battleNetId = "Player#1234",
+                    discordId = "123456789012345678",
+                    email = "player@example.com",
+                    characterName = "Arthas",
+                    characterRealm = "Illidan",
+                    characterClass = "Death Knight",
+                    specialization = "Frost",
+                    itemLevel = 489.5,
+                    raiderIOScore = 2850.0,
+                    bestParseAverage = 85.5,
+                    age = 28,
+                    location = "United States",
+                    timezone = "America/New_York",
+                    raidDaysAvailable = listOf("Tuesday", "Wednesday"),
+                    previousGuilds = "Previous Guild",
+                    reasonForLeaving = "Guild disbanded",
+                    whyThisGuild = "Looking for competitive guild",
+                )
 
             // Act & Assert
             mockMvc.perform(
                 post("/api/v1/recruitment/applications/guilds/$guildId")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.characterName").value("Arthas"))
@@ -208,31 +204,32 @@ class RecruitmentApplicationControllerTest {
                 )
             } throws IllegalStateException("Application already exists")
 
-            val request = SubmitApplicationRequest(
-                battleNetId = "Player#1234",
-                discordId = "123456789012345678",
-                email = "player@example.com",
-                characterName = "Arthas",
-                characterRealm = "Illidan",
-                characterClass = "Death Knight",
-                specialization = "Frost",
-                itemLevel = 489.5,
-                raiderIOScore = 2850.0,
-                bestParseAverage = 85.5,
-                age = 28,
-                location = "United States",
-                timezone = "America/New_York",
-                raidDaysAvailable = listOf("Tuesday"),
-                previousGuilds = "Previous Guild",
-                reasonForLeaving = "Guild disbanded",
-                whyThisGuild = "Looking for competitive guild",
-            )
+            val request =
+                SubmitApplicationRequest(
+                    battleNetId = "Player#1234",
+                    discordId = "123456789012345678",
+                    email = "player@example.com",
+                    characterName = "Arthas",
+                    characterRealm = "Illidan",
+                    characterClass = "Death Knight",
+                    specialization = "Frost",
+                    itemLevel = 489.5,
+                    raiderIOScore = 2850.0,
+                    bestParseAverage = 85.5,
+                    age = 28,
+                    location = "United States",
+                    timezone = "America/New_York",
+                    raidDaysAvailable = listOf("Tuesday"),
+                    previousGuilds = "Previous Guild",
+                    reasonForLeaving = "Guild disbanded",
+                    whyThisGuild = "Looking for competitive guild",
+                )
 
             // Act & Assert
             mockMvc.perform(
                 post("/api/v1/recruitment/applications/guilds/$guildId")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isConflict)
         }
@@ -240,7 +237,6 @@ class RecruitmentApplicationControllerTest {
 
     @Nested
     inner class ReviewApplicationTests {
-
         @Test
         fun `should approve application`() {
             // Arrange
@@ -257,7 +253,7 @@ class RecruitmentApplicationControllerTest {
             mockMvc.perform(
                 put("/api/v1/recruitment/applications/$applicationId/approve")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.status").value("APPROVED"))
@@ -279,7 +275,7 @@ class RecruitmentApplicationControllerTest {
             mockMvc.perform(
                 put("/api/v1/recruitment/applications/$applicationId/reject")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.status").value("REJECTED"))
@@ -300,7 +296,7 @@ class RecruitmentApplicationControllerTest {
             mockMvc.perform(
                 put("/api/v1/recruitment/applications/$applicationId/approve")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isNotFound)
         }
@@ -308,30 +304,41 @@ class RecruitmentApplicationControllerTest {
 
     @Nested
     inner class CharacterLookupTests {
-
         @Test
         fun `should fetch character data from RaiderIO`() {
             // Arrange
-            val profile = RaiderIOCharacterProfile(
-                name = "Arthas",
-                race = "Human",
-                characterClass = "Death Knight",
-                activeSpecName = "Frost",
-                activeSpecRole = "DPS",
-                gender = "male",
-                faction = "alliance",
-                region = "us",
-                realm = "Illidan",
-                profileUrl = "https://raider.io/characters/us/illidan/Arthas",
-                gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
-                mythicPlusScoresBySeason = listOf(
-                    RaiderIOMythicPlusSeasonScore(
-                        season = "season-tww-1",
-                        scores = RaiderIOScores(all = 2850.0, dps = 2800.0, healer = 0.0, tank = 0.0, spec0 = null, spec1 = null, spec2 = null, spec3 = null)
-                    )
-                ),
-                raidProgression = null
-            )
+            val profile =
+                RaiderIOCharacterProfile(
+                    name = "Arthas",
+                    race = "Human",
+                    characterClass = "Death Knight",
+                    activeSpecName = "Frost",
+                    activeSpecRole = "DPS",
+                    gender = "male",
+                    faction = "alliance",
+                    region = "us",
+                    realm = "Illidan",
+                    profileUrl = "https://raider.io/characters/us/illidan/Arthas",
+                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
+                    mythicPlusScoresBySeason =
+                        listOf(
+                            RaiderIOMythicPlusSeasonScore(
+                                season = "season-tww-1",
+                                scores =
+                                    RaiderIOScores(
+                                        all = 2850.0,
+                                        dps = 2800.0,
+                                        healer = 0.0,
+                                        tank = 0.0,
+                                        spec0 = null,
+                                        spec1 = null,
+                                        spec2 = null,
+                                        spec3 = null,
+                                    ),
+                            ),
+                        ),
+                    raidProgression = null,
+                )
 
             every {
                 raiderIOClient.fetchCharacterProfile("us", "Illidan", "Arthas")
@@ -342,7 +349,7 @@ class RecruitmentApplicationControllerTest {
                 get("/api/v1/recruitment/applications/character-lookup")
                     .param("region", "us")
                     .param("realm", "Illidan")
-                    .param("name", "Arthas")
+                    .param("name", "Arthas"),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.name").value("Arthas"))
@@ -352,24 +359,25 @@ class RecruitmentApplicationControllerTest {
         }
     }
 
-    private fun createValidApplication(): Application = Application.create(
-        guildId = GuildId("test-guild"),
-        battleNetId = "Player#1234",
-        discordId = "123456789012345678",
-        email = "player@example.com",
-        characterName = "Arthas",
-        characterRealm = "Illidan",
-        characterClass = "Death Knight",
-        specialization = "Frost",
-        itemLevel = 489.5,
-        raiderIOScore = 2850.0,
-        bestParseAverage = 85.5,
-        age = 28,
-        location = "United States",
-        timezone = "America/New_York",
-        raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
-        previousGuilds = "Previous Guild 1, Previous Guild 2",
-        reasonForLeaving = "Guild disbanded",
-        whyThisGuild = "Looking for a competitive mythic raiding guild",
-    )
+    private fun createValidApplication(): Application =
+        Application.create(
+            guildId = GuildId("test-guild"),
+            battleNetId = "Player#1234",
+            discordId = "123456789012345678",
+            email = "player@example.com",
+            characterName = "Arthas",
+            characterRealm = "Illidan",
+            characterClass = "Death Knight",
+            specialization = "Frost",
+            itemLevel = 489.5,
+            raiderIOScore = 2850.0,
+            bestParseAverage = 85.5,
+            age = 28,
+            location = "United States",
+            timezone = "America/New_York",
+            raidDaysAvailable = listOf("Tuesday", "Wednesday", "Thursday"),
+            previousGuilds = "Previous Guild 1, Previous Guild 2",
+            reasonForLeaving = "Guild disbanded",
+            whyThisGuild = "Looking for a competitive mythic raiding guild",
+        )
 }

@@ -18,11 +18,9 @@ class InMemoryUserRepository : UserRepository {
 
     override fun findById(id: UserId): User? = storage[id]
 
-    override fun findByDiscordId(discordId: String): User? =
-        storage.values.find { it.discordId == discordId }
+    override fun findByDiscordId(discordId: String): User? = storage.values.find { it.discordId == discordId }
 
-    override fun findByBattlenetId(battlenetId: String): User? =
-        storage.values.find { it.battlenetId == battlenetId }
+    override fun findByBattlenetId(battlenetId: String): User? = storage.values.find { it.battlenetId == battlenetId }
 
     override fun findByGuildId(guildId: GuildId): List<User> =
         storage.values
@@ -30,12 +28,13 @@ class InMemoryUserRepository : UserRepository {
             .sortedBy { it.username }
 
     override fun save(user: User): User {
-        val savedUser = if (user.id == null) {
-            val newId = UserId(idGenerator.getAndIncrement())
-            user.withId(newId)
-        } else {
-            user
-        }
+        val savedUser =
+            if (user.id == null) {
+                val newId = UserId(idGenerator.getAndIncrement())
+                user.withId(newId)
+            } else {
+                user
+            }
         storage[savedUser.id!!] = savedUser
         return savedUser
     }
@@ -44,13 +43,14 @@ class InMemoryUserRepository : UserRepository {
         storage.remove(id)
     }
 
-    override fun existsByDiscordId(discordId: String): Boolean =
-        storage.values.any { it.discordId == discordId }
+    override fun existsByDiscordId(discordId: String): Boolean = storage.values.any { it.discordId == discordId }
 
-    override fun existsByBattlenetId(battlenetId: String): Boolean =
-        storage.values.any { it.battlenetId == battlenetId }
+    override fun existsByBattlenetId(battlenetId: String): Boolean = storage.values.any { it.battlenetId == battlenetId }
 
-    override fun findAll(offset: Long, limit: Int): List<User> =
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<User> =
         storage.values
             .sortedBy { it.id?.value }
             .drop(offset.toInt())

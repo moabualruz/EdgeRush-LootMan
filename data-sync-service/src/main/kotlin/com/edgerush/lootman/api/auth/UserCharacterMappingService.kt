@@ -26,9 +26,8 @@ class CharacterAlreadyLinkedException(val userId: Long, val raiderId: Long) :
 @Service
 @Transactional
 class UserCharacterMappingService(
-    private val repository: UserCharacterMappingRepository
+    private val repository: UserCharacterMappingRepository,
 ) {
-
     /**
      * Gets all character mappings for a user.
      */
@@ -48,7 +47,10 @@ class UserCharacterMappingService(
     /**
      * Links a character to a user.
      */
-    fun linkCharacter(userId: UserId, request: LinkCharacterRequest): UserCharacterMappingResponse {
+    fun linkCharacter(
+        userId: UserId,
+        request: LinkCharacterRequest,
+    ): UserCharacterMappingResponse {
         val raiderId = RaiderId(request.raiderId)
 
         // Check for duplicate
@@ -64,11 +66,12 @@ class UserCharacterMappingService(
         // If no characters exist for this user, make it primary automatically
         val isPrimary = request.isPrimary || repository.countByUserId(userId) == 0L
 
-        val mapping = UserCharacterMapping.create(
-            userId = userId,
-            raiderId = raiderId,
-            isPrimary = isPrimary
-        )
+        val mapping =
+            UserCharacterMapping.create(
+                userId = userId,
+                raiderId = raiderId,
+                isPrimary = isPrimary,
+            )
 
         val savedMapping = repository.save(mapping)
         return UserCharacterMappingResponse.from(savedMapping)
@@ -77,9 +80,13 @@ class UserCharacterMappingService(
     /**
      * Unlinks a character from a user.
      */
-    fun unlinkCharacter(userId: UserId, mappingId: Long) {
-        val mapping = repository.findById(UserCharacterMappingId(mappingId))
-            ?: throw CharacterMappingNotFoundException(mappingId)
+    fun unlinkCharacter(
+        userId: UserId,
+        mappingId: Long,
+    ) {
+        val mapping =
+            repository.findById(UserCharacterMappingId(mappingId))
+                ?: throw CharacterMappingNotFoundException(mappingId)
 
         // Verify ownership
         if (mapping.userId != userId) {
@@ -101,9 +108,13 @@ class UserCharacterMappingService(
     /**
      * Sets a character as the primary for a user.
      */
-    fun setPrimaryCharacter(userId: UserId, mappingId: Long): UserCharacterMappingResponse {
-        val mapping = repository.findById(UserCharacterMappingId(mappingId))
-            ?: throw CharacterMappingNotFoundException(mappingId)
+    fun setPrimaryCharacter(
+        userId: UserId,
+        mappingId: Long,
+    ): UserCharacterMappingResponse {
+        val mapping =
+            repository.findById(UserCharacterMappingId(mappingId))
+                ?: throw CharacterMappingNotFoundException(mappingId)
 
         // Verify ownership
         if (mapping.userId != userId) {

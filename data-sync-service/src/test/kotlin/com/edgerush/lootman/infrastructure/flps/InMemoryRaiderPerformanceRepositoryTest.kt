@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit
  * Tests the in-memory storage and retrieval of raider performance data.
  */
 class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemoryRaiderPerformanceRepository
 
     private val guildId = GuildId("test-guild")
@@ -34,16 +33,16 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveAndFindByRaiderAndPeriodTests {
-
         @Test
         fun `should save and retrieve performance data by raider and period`() {
             // Given
             val raiderId = RaiderId(1L)
-            val data = createPerformanceData(
-                raiderId = raiderId,
-                periodStart = oneWeekAgo,
-                periodEnd = now
-            )
+            val data =
+                createPerformanceData(
+                    raiderId = raiderId,
+                    periodStart = oneWeekAgo,
+                    periodEnd = now,
+                )
 
             repository.save(guildId, data)
 
@@ -73,11 +72,12 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         fun `should return null when data exists but period does not match`() {
             // Given
             val raiderId = RaiderId(1L)
-            val data = createPerformanceData(
-                raiderId = raiderId,
-                periodStart = twoWeeksAgo,
-                periodEnd = oneWeekAgo
-            )
+            val data =
+                createPerformanceData(
+                    raiderId = raiderId,
+                    periodStart = twoWeeksAgo,
+                    periodEnd = oneWeekAgo,
+                )
 
             repository.save(guildId, data)
 
@@ -106,25 +106,26 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterAndPeriodTests {
-
         @Test
         fun `should find performance data by character name and realm`() {
             // Given
-            val data = createPerformanceData(
-                characterName = "UniqueChar",
-                characterRealm = "UniqueRealm"
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "UniqueChar",
+                    characterRealm = "UniqueRealm",
+                )
 
             repository.save(guildId, data)
 
             // When
-            val result = repository.findByCharacterAndPeriod(
-                "UniqueChar",
-                "UniqueRealm",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "UniqueChar",
+                    "UniqueRealm",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldNotBe null
@@ -135,13 +136,14 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when character not found`() {
             // When
-            val result = repository.findByCharacterAndPeriod(
-                "NonExistent",
-                "Unknown",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "NonExistent",
+                    "Unknown",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -150,21 +152,23 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should be case-sensitive for character name`() {
             // Given
-            val data = createPerformanceData(
-                characterName = "TestRaider",
-                characterRealm = "Area52"
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "TestRaider",
+                    characterRealm = "Area52",
+                )
 
             repository.save(guildId, data)
 
             // When - search with different case
-            val result = repository.findByCharacterAndPeriod(
-                "testraider", // lowercase
-                "Area52",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "testraider", // lowercase
+                    "Area52",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -173,21 +177,23 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when character name does not match`() {
             // Given - tests filter branch: data.characterName == characterName = false
-            val data = createPerformanceData(
-                characterName = "OtherRaider",
-                characterRealm = "Area52"
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "OtherRaider",
+                    characterRealm = "Area52",
+                )
 
             repository.save(guildId, data)
 
             // When
-            val result = repository.findByCharacterAndPeriod(
-                "DifferentName",
-                "Area52",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "DifferentName",
+                    "Area52",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -196,21 +202,23 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when character realm does not match`() {
             // Given - tests filter branch: data.characterRealm == characterRealm = false
-            val data = createPerformanceData(
-                characterName = "TestRaider",
-                characterRealm = "Area52"
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "TestRaider",
+                    characterRealm = "Area52",
+                )
 
             repository.save(guildId, data)
 
             // When
-            val result = repository.findByCharacterAndPeriod(
-                "TestRaider",
-                "DifferentRealm",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "TestRaider",
+                    "DifferentRealm",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -219,23 +227,25 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when period does not match for character search`() {
             // Given - tests matchesPeriod branch returning false
-            val data = createPerformanceData(
-                characterName = "TestRaider",
-                characterRealm = "Area52",
-                periodStart = twoWeeksAgo,
-                periodEnd = oneWeekAgo
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "TestRaider",
+                    characterRealm = "Area52",
+                    periodStart = twoWeeksAgo,
+                    periodEnd = oneWeekAgo,
+                )
 
             repository.save(guildId, data)
 
             // When - different period
-            val result = repository.findByCharacterAndPeriod(
-                "TestRaider",
-                "Area52",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "TestRaider",
+                    "Area52",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -244,23 +254,25 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when start date matches but end date does not match`() {
             // Given - tests matchesPeriod branch: periodStart matches but periodEnd doesn't
-            val data = createPerformanceData(
-                characterName = "TestRaider",
-                characterRealm = "Area52",
-                periodStart = oneWeekAgo,
-                periodEnd = twoWeeksAgo // Different end date
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "TestRaider",
+                    characterRealm = "Area52",
+                    periodStart = oneWeekAgo,
+                    periodEnd = twoWeeksAgo, // Different end date
+                )
 
             repository.save(guildId, data)
 
             // When - same start date, different end date
-            val result = repository.findByCharacterAndPeriod(
-                "TestRaider",
-                "Area52",
-                guildId,
-                oneWeekAgo,
-                now // Different end date
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "TestRaider",
+                    "Area52",
+                    guildId,
+                    oneWeekAgo,
+                    now, // Different end date
+                )
 
             // Then
             result shouldBe null
@@ -270,28 +282,31 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         fun `should return null when guild matches but data reference differs`() {
             // Given - tests matchesGuild branch: key.startsWith(guildId) is true but value != data
             // This happens when there's data for the same guild but different raider
-            val data1 = createPerformanceData(
-                raiderId = RaiderId(1L),
-                characterName = "Raider1",
-                characterRealm = "Area52"
-            )
-            val data2 = createPerformanceData(
-                raiderId = RaiderId(2L),
-                characterName = "Raider2",
-                characterRealm = "OtherRealm"
-            )
+            val data1 =
+                createPerformanceData(
+                    raiderId = RaiderId(1L),
+                    characterName = "Raider1",
+                    characterRealm = "Area52",
+                )
+            val data2 =
+                createPerformanceData(
+                    raiderId = RaiderId(2L),
+                    characterName = "Raider2",
+                    characterRealm = "OtherRealm",
+                )
 
             repository.save(guildId, data1)
             repository.save(guildId, data2)
 
             // When - search for Raider2 but with wrong realm
-            val result = repository.findByCharacterAndPeriod(
-                "Raider2",
-                "Area52", // Wrong realm for Raider2
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "Raider2",
+                    "Area52", // Wrong realm for Raider2
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -300,21 +315,23 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should return null when guild does not match for character search`() {
             // Given - tests matchesGuild branch returning false
-            val data = createPerformanceData(
-                characterName = "TestRaider",
-                characterRealm = "Area52"
-            )
+            val data =
+                createPerformanceData(
+                    characterName = "TestRaider",
+                    characterRealm = "Area52",
+                )
 
             repository.save(GuildId("other-guild"), data)
 
             // When - different guild
-            val result = repository.findByCharacterAndPeriod(
-                "TestRaider",
-                "Area52",
-                guildId,
-                oneWeekAgo,
-                now
-            )
+            val result =
+                repository.findByCharacterAndPeriod(
+                    "TestRaider",
+                    "Area52",
+                    guildId,
+                    oneWeekAgo,
+                    now,
+                )
 
             // Then
             result shouldBe null
@@ -323,7 +340,6 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllByGuildAndPeriodTests {
-
         @Test
         fun `should return all performance data for guild in period`() {
             // Given
@@ -359,18 +375,20 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         @Test
         fun `should only return data matching the period`() {
             // Given
-            val dataCurrentPeriod = createPerformanceData(
-                raiderId = RaiderId(1L),
-                characterName = "Current",
-                periodStart = oneWeekAgo,
-                periodEnd = now
-            )
-            val dataOldPeriod = createPerformanceData(
-                raiderId = RaiderId(2L),
-                characterName = "Old",
-                periodStart = threeWeeksAgo,
-                periodEnd = twoWeeksAgo
-            )
+            val dataCurrentPeriod =
+                createPerformanceData(
+                    raiderId = RaiderId(1L),
+                    characterName = "Current",
+                    periodStart = oneWeekAgo,
+                    periodEnd = now,
+                )
+            val dataOldPeriod =
+                createPerformanceData(
+                    raiderId = RaiderId(2L),
+                    characterName = "Old",
+                    periodStart = threeWeeksAgo,
+                    periodEnd = twoWeeksAgo,
+                )
 
             repository.save(guildId, dataCurrentPeriod)
             repository.save(guildId, dataOldPeriod)
@@ -386,21 +404,22 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should update existing data for same raider, guild, and period`() {
             // Given
             val raiderId = RaiderId(1L)
-            val initialData = createPerformanceData(
-                raiderId = raiderId,
-                totalDeaths = 5,
-                totalFights = 20
-            )
-            val updatedData = createPerformanceData(
-                raiderId = raiderId,
-                totalDeaths = 8,
-                totalFights = 25
-            )
+            val initialData =
+                createPerformanceData(
+                    raiderId = raiderId,
+                    totalDeaths = 5,
+                    totalFights = 20,
+                )
+            val updatedData =
+                createPerformanceData(
+                    raiderId = raiderId,
+                    totalDeaths = 8,
+                    totalFights = 25,
+                )
 
             repository.save(guildId, initialData)
             repository.save(guildId, updatedData)
@@ -417,7 +436,6 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
 
     @Nested
     inner class ClearTests {
-
         @Test
         fun `should clear all data`() {
             // Given
@@ -444,16 +462,17 @@ class InMemoryRaiderPerformanceRepositoryTest : UnitTest() {
         deathsPerAttempt: Double = 0.25,
         avoidableDamagePercentage: Double = 10.0,
         periodStart: Instant = oneWeekAgo,
-        periodEnd: Instant = now
-    ): RaiderPerformanceData = RaiderPerformanceData(
-        raiderId = raiderId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        totalDeaths = totalDeaths,
-        totalFights = totalFights,
-        deathsPerAttempt = deathsPerAttempt,
-        avoidableDamagePercentage = avoidableDamagePercentage,
-        periodStart = periodStart,
-        periodEnd = periodEnd
-    )
+        periodEnd: Instant = now,
+    ): RaiderPerformanceData =
+        RaiderPerformanceData(
+            raiderId = raiderId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            totalDeaths = totalDeaths,
+            totalFights = totalFights,
+            deathsPerAttempt = deathsPerAttempt,
+            avoidableDamagePercentage = avoidableDamagePercentage,
+            periodStart = periodStart,
+            periodEnd = periodEnd,
+        )
 }

@@ -16,7 +16,6 @@ import java.time.OffsetDateTime
 class TeamMetadataCrudServiceImpl(
     private val repository: TeamMetadataRepository,
 ) : TeamMetadataCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<TeamMetadataResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class TeamMetadataCrudServiceImpl(
     }
 
     override fun findById(id: Long): TeamMetadataResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Team metadata not found with teamId: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Team metadata not found with teamId: $id")
         return TeamMetadataResponse.from(entity)
     }
 
@@ -41,40 +41,46 @@ class TeamMetadataCrudServiceImpl(
     }
 
     override fun create(request: CreateTeamMetadataRequest): TeamMetadataResponse {
-        val entity = TeamMetadataEntity(
-            teamId = request.teamId,
-            guildId = request.guildId,
-            guildName = request.guildName,
-            name = request.name,
-            region = request.region,
-            realm = request.realm,
-            url = request.url,
-            lastRefreshedBlizzard = request.lastRefreshedBlizzard,
-            lastRefreshedPercentiles = request.lastRefreshedPercentiles,
-            lastRefreshedMythicPlus = request.lastRefreshedMythicPlus,
-            wishlistUpdatedAt = request.wishlistUpdatedAt,
-            syncedAt = OffsetDateTime.now(),
-        )
+        val entity =
+            TeamMetadataEntity(
+                teamId = request.teamId,
+                guildId = request.guildId,
+                guildName = request.guildName,
+                name = request.name,
+                region = request.region,
+                realm = request.realm,
+                url = request.url,
+                lastRefreshedBlizzard = request.lastRefreshedBlizzard,
+                lastRefreshedPercentiles = request.lastRefreshedPercentiles,
+                lastRefreshedMythicPlus = request.lastRefreshedMythicPlus,
+                wishlistUpdatedAt = request.wishlistUpdatedAt,
+                syncedAt = OffsetDateTime.now(),
+            )
         val saved = repository.save(entity)
         return TeamMetadataResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateTeamMetadataRequest): TeamMetadataResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Team metadata not found with teamId: $id")
+    override fun update(
+        id: Long,
+        request: UpdateTeamMetadataRequest,
+    ): TeamMetadataResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Team metadata not found with teamId: $id")
 
-        val updated = existing.copy(
-            guildId = request.guildId ?: existing.guildId,
-            guildName = request.guildName ?: existing.guildName,
-            name = request.name ?: existing.name,
-            region = request.region ?: existing.region,
-            realm = request.realm ?: existing.realm,
-            url = request.url ?: existing.url,
-            lastRefreshedBlizzard = request.lastRefreshedBlizzard ?: existing.lastRefreshedBlizzard,
-            lastRefreshedPercentiles = request.lastRefreshedPercentiles ?: existing.lastRefreshedPercentiles,
-            lastRefreshedMythicPlus = request.lastRefreshedMythicPlus ?: existing.lastRefreshedMythicPlus,
-            wishlistUpdatedAt = request.wishlistUpdatedAt ?: existing.wishlistUpdatedAt,
-        )
+        val updated =
+            existing.copy(
+                guildId = request.guildId ?: existing.guildId,
+                guildName = request.guildName ?: existing.guildName,
+                name = request.name ?: existing.name,
+                region = request.region ?: existing.region,
+                realm = request.realm ?: existing.realm,
+                url = request.url ?: existing.url,
+                lastRefreshedBlizzard = request.lastRefreshedBlizzard ?: existing.lastRefreshedBlizzard,
+                lastRefreshedPercentiles = request.lastRefreshedPercentiles ?: existing.lastRefreshedPercentiles,
+                lastRefreshedMythicPlus = request.lastRefreshedMythicPlus ?: existing.lastRefreshedMythicPlus,
+                wishlistUpdatedAt = request.wishlistUpdatedAt ?: existing.wishlistUpdatedAt,
+            )
 
         repository.save(updated)
         return TeamMetadataResponse.from(updated)
@@ -87,7 +93,10 @@ class TeamMetadataCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByGuildId(guildId: Long, pageRequest: PageRequest): PagedResponse<TeamMetadataResponse> {
+    override fun findByGuildId(
+        guildId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamMetadataResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByGuildId(guildId, offset, pageRequest.size)
         val total = repository.countByGuildId(guildId)
@@ -100,7 +109,10 @@ class TeamMetadataCrudServiceImpl(
         )
     }
 
-    override fun findByRegion(region: String, pageRequest: PageRequest): PagedResponse<TeamMetadataResponse> {
+    override fun findByRegion(
+        region: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamMetadataResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByRegion(region, offset, pageRequest.size)
         val total = repository.countByRegion(region)

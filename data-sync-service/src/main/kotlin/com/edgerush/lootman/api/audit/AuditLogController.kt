@@ -26,7 +26,6 @@ import java.time.Instant
 class AuditLogController(
     private val auditLogService: AuditLogService,
 ) {
-
     @GetMapping("/entity/{entityType}/{entityId}")
     @Operation(summary = "Find audit logs by entity type and ID")
     fun findByEntity(
@@ -51,9 +50,11 @@ class AuditLogController(
     @Operation(summary = "Find audit logs within a time range")
     fun findByTimeRange(
         @Parameter(description = "Start of time range (ISO-8601 format)")
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) from: Instant,
+        @RequestParam
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) from: Instant,
         @Parameter(description = "End of time range (ISO-8601 format)")
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) to: Instant,
+        @RequestParam
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) to: Instant,
     ): List<AuditLogResponse> {
         return auditLogService.findByTimeRange(from, to)
     }

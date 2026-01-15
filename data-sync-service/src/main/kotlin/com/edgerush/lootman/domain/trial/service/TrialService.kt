@@ -42,12 +42,13 @@ class TrialService(
             throw IllegalStateException("Trial already exists for application ${applicationId.value}")
         }
 
-        val trial = Trial.create(
-            applicationId = applicationId,
-            guildId = guildId,
-            raidsRequired = raidsRequired,
-            raiderId = raiderId,
-        )
+        val trial =
+            Trial.create(
+                applicationId = applicationId,
+                guildId = guildId,
+                raidsRequired = raidsRequired,
+                raiderId = raiderId,
+            )
 
         return trialRepository.save(trial)
     }
@@ -80,7 +81,11 @@ class TrialService(
      * Lists all trials for a guild with pagination.
      */
     @Transactional(readOnly = true)
-    fun listTrials(guildId: GuildId, offset: Long = 0, limit: Int = 50): List<Trial> {
+    fun listTrials(
+        guildId: GuildId,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Trial> {
         return trialRepository.findByGuildId(guildId, offset, limit)
     }
 
@@ -109,7 +114,10 @@ class TrialService(
      * Counts trials for a guild filtered by status.
      */
     @Transactional(readOnly = true)
-    fun countTrialsByStatus(guildId: GuildId, status: TrialStatus): Long {
+    fun countTrialsByStatus(
+        guildId: GuildId,
+        status: TrialStatus,
+    ): Long {
         return trialRepository.countByGuildIdAndStatus(guildId, status)
     }
 
@@ -127,12 +135,13 @@ class TrialService(
     ): Trial {
         val trial = findTrialOrThrow(trialId)
 
-        val updated = trial.updateMetrics(
-            raidsAttended = raidsAttended,
-            attendanceRate = attendanceRate,
-            averagePerformance = averagePerformance,
-            deathsPerRaid = deathsPerRaid,
-        )
+        val updated =
+            trial.updateMetrics(
+                raidsAttended = raidsAttended,
+                attendanceRate = attendanceRate,
+                averagePerformance = averagePerformance,
+                deathsPerRaid = deathsPerRaid,
+            )
 
         return trialRepository.save(updated)
     }

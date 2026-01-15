@@ -23,16 +23,16 @@ import java.time.Instant
  */
 @Repository
 class JdbcRaiderPerformanceRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : RaiderPerformanceRepository {
-
     override fun findByRaiderAndPeriod(
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): RaiderPerformanceData? {
-        val sql = """
+        val sql =
+            """
             SELECT
                 r.id as raider_id,
                 wlp.character_name,
@@ -53,16 +53,17 @@ class JdbcRaiderPerformanceRepository(
                 AND wlr.start_time >= ?
                 AND wlr.end_time <= ?
             GROUP BY r.id, wlp.character_name, wlp.character_realm
-        """.trimIndent()
+            """.trimIndent()
 
-        val results = jdbcTemplate.query(
-            sql,
-            performanceRowMapper(startDate, endDate),
-            raiderId.value,
-            guildId.value,
-            Timestamp.from(startDate),
-            Timestamp.from(endDate)
-        )
+        val results =
+            jdbcTemplate.query(
+                sql,
+                performanceRowMapper(startDate, endDate),
+                raiderId.value,
+                guildId.value,
+                Timestamp.from(startDate),
+                Timestamp.from(endDate),
+            )
 
         return results.firstOrNull()
     }
@@ -72,9 +73,10 @@ class JdbcRaiderPerformanceRepository(
         characterRealm: String,
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): RaiderPerformanceData? {
-        val sql = """
+        val sql =
+            """
             SELECT
                 COALESCE(r.id, 0) as raider_id,
                 wlp.character_name,
@@ -96,17 +98,18 @@ class JdbcRaiderPerformanceRepository(
                 AND wlr.start_time >= ?
                 AND wlr.end_time <= ?
             GROUP BY r.id, wlp.character_name, wlp.character_realm
-        """.trimIndent()
+            """.trimIndent()
 
-        val results = jdbcTemplate.query(
-            sql,
-            performanceRowMapper(startDate, endDate),
-            characterName,
-            characterRealm,
-            guildId.value,
-            Timestamp.from(startDate),
-            Timestamp.from(endDate)
-        )
+        val results =
+            jdbcTemplate.query(
+                sql,
+                performanceRowMapper(startDate, endDate),
+                characterName,
+                characterRealm,
+                guildId.value,
+                Timestamp.from(startDate),
+                Timestamp.from(endDate),
+            )
 
         return results.firstOrNull()
     }
@@ -114,9 +117,10 @@ class JdbcRaiderPerformanceRepository(
     override fun findAllByGuildAndPeriod(
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): List<RaiderPerformanceData> {
-        val sql = """
+        val sql =
+            """
             SELECT
                 COALESCE(r.id, 0) as raider_id,
                 wlp.character_name,
@@ -137,28 +141,29 @@ class JdbcRaiderPerformanceRepository(
                 AND wlr.end_time <= ?
             GROUP BY r.id, wlp.character_name, wlp.character_realm
             ORDER BY wlp.character_name
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(
             sql,
             performanceRowMapper(startDate, endDate),
             guildId.value,
             Timestamp.from(startDate),
-            Timestamp.from(endDate)
+            Timestamp.from(endDate),
         )
     }
 
     private fun performanceRowMapper(
         periodStart: Instant,
-        periodEnd: Instant
+        periodEnd: Instant,
     ) = RowMapper { rs, _ ->
         val totalDeaths = rs.getInt("total_deaths")
         val totalFights = rs.getInt("total_fights")
-        val deathsPerAttempt = if (totalFights > 0) {
-            totalDeaths.toDouble() / totalFights
-        } else {
-            0.0
-        }
+        val deathsPerAttempt =
+            if (totalFights > 0) {
+                totalDeaths.toDouble() / totalFights
+            } else {
+                0.0
+            }
 
         var avgAvoidableDamage = rs.getDouble("avg_avoidable_damage")
         if (rs.wasNull()) {
@@ -178,7 +183,7 @@ class JdbcRaiderPerformanceRepository(
             deathsPerAttempt = deathsPerAttempt,
             avoidableDamagePercentage = avgAvoidableDamage,
             periodStart = dbPeriodStart,
-            periodEnd = dbPeriodEnd
+            periodEnd = dbPeriodEnd,
         )
     }
 }

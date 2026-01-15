@@ -29,7 +29,6 @@ import java.time.LocalDateTime
  * The repository operates on the raiders table.
  */
 class JdbcRaiderRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderRepository
 
@@ -41,7 +40,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return raider when found by id`() {
             // Given
@@ -51,7 +49,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
@@ -77,7 +75,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns emptyList()
 
@@ -98,22 +96,23 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                val rs = mockResultSet(
-                    id = raiderId.value,
-                    characterName = "FullRaider",
-                    realm = "Illidan",
-                    guildId = "test-guild",
-                    characterClass = "WARRIOR",
-                    role = "TANK",
-                    rank = "Officer",
-                    status = "ACTIVE",
-                    joinDate = joinDate,
-                    wowauditId = 12345L
-                )
+                val rs =
+                    mockResultSet(
+                        id = raiderId.value,
+                        characterName = "FullRaider",
+                        realm = "Illidan",
+                        guildId = "test-guild",
+                        characterClass = "WARRIOR",
+                        role = "TANK",
+                        rank = "Officer",
+                        status = "ACTIVE",
+                        joinDate = joinDate,
+                        wowauditId = 12345L,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -137,7 +136,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return all raiders for guild`() {
             // Given
@@ -147,14 +145,14 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, "Raider1", "Area52", guildId.value), 0),
                     rowMapper.mapRow(mockResultSet(2L, "Raider2", "Area52", guildId.value), 1),
-                    rowMapper.mapRow(mockResultSet(3L, "Raider3", "Area52", guildId.value), 2)
+                    rowMapper.mapRow(mockResultSet(3L, "Raider3", "Area52", guildId.value), 2),
                 )
             }
 
@@ -178,7 +176,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns emptyList()
 
@@ -192,7 +190,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterNameAndRealmTests {
-
         @Test
         fun `should return raider when found by name and realm`() {
             // Given
@@ -204,7 +201,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     match<String> { it.contains("characterName = ?") && it.contains("realm = ?") },
                     any<RowMapper<Raider>>(),
                     eq(characterName),
-                    eq(realm)
+                    eq(realm),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
@@ -231,7 +228,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     match<String> { it.contains("characterName = ?") && it.contains("realm = ?") },
                     any<RowMapper<Raider>>(),
                     eq(characterName),
-                    eq(realm)
+                    eq(realm),
                 )
             } returns emptyList()
 
@@ -245,7 +242,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdPaginatedTests {
-
         @Test
         fun `should return paginated raiders for guild`() {
             // Given
@@ -259,13 +255,13 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     any<RowMapper<Raider>>(),
                     eq(guildId.value),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(11L, "Raider11", "Area52", guildId.value), 0),
-                    rowMapper.mapRow(mockResultSet(12L, "Raider12", "Area52", guildId.value), 1)
+                    rowMapper.mapRow(mockResultSet(12L, "Raider12", "Area52", guildId.value), 1),
                 )
             }
 
@@ -291,7 +287,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     any<RowMapper<Raider>>(),
                     eq(guildId.value),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } returns emptyList()
 
@@ -305,7 +301,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountByGuildIdTests {
-
         @Test
         fun `should return count of raiders for guild`() {
             // Given
@@ -315,7 +310,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT") },
                     Long::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 42L
 
@@ -335,7 +330,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT") },
                     Long::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 0L
 
@@ -355,7 +350,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT") },
                     Long::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns null
 
@@ -369,7 +364,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new raider when not exists`() {
             // Given
@@ -389,7 +383,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -413,7 +407,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -443,7 +437,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     raider.rank,
                     raider.status.name,
                     match<Timestamp> { it.toLocalDateTime() == joinDate },
-                    raider.wowauditId
+                    raider.wowauditId,
                 )
             }
         }
@@ -474,7 +468,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                     raider.status.name,
                     match<Timestamp> { it.toLocalDateTime() == joinDate },
                     raider.wowauditId,
-                    raider.id.value
+                    raider.id.value,
                 )
             }
         }
@@ -495,7 +489,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -503,7 +497,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete raider by id`() {
             // Given
@@ -512,7 +505,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns 1
 
@@ -523,7 +516,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    raiderId.value
+                    raiderId.value,
                 )
             }
         }
@@ -536,7 +529,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns 0
 
@@ -546,7 +539,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") },
-                    raiderId.value
+                    raiderId.value,
                 )
             }
         }
@@ -554,7 +547,6 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
     @Nested
     inner class RowMapperEdgeCases {
-
         @Test
         fun `should default to WARRIOR when characterClass is invalid`() {
             // Given
@@ -564,16 +556,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    characterClass = "INVALID_CLASS"
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            characterClass = "INVALID_CLASS",
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -592,16 +589,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    role = "INVALID_ROLE"
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            role = "INVALID_ROLE",
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -620,16 +622,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    status = "INVALID_STATUS"
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            status = "INVALID_STATUS",
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -648,16 +655,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    characterClass = null
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            characterClass = null,
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -676,16 +688,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    role = null
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            role = null,
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -704,16 +721,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    status = null
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            status = null,
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -732,16 +754,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    guildId = null
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            guildId = null,
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -760,16 +787,21 @@ class JdbcRaiderRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<Raider>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Raider>>()
-                listOf(rowMapper.mapRow(mockResultSet(
-                    id = raiderId.value,
-                    characterName = "TestRaider",
-                    realm = "Area52",
-                    characterClass = "death knight"
-                ), 0))
+                listOf(
+                    rowMapper.mapRow(
+                        mockResultSet(
+                            id = raiderId.value,
+                            characterName = "TestRaider",
+                            realm = "Area52",
+                            characterClass = "death knight",
+                        ),
+                        0,
+                    ),
+                )
             }
 
             // When
@@ -792,7 +824,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
         rank: String? = null,
         status: String? = "ACTIVE",
         joinDate: LocalDateTime? = null,
-        wowauditId: Long? = null
+        wowauditId: Long? = null,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -819,17 +851,18 @@ class JdbcRaiderRepositoryTest : UnitTest() {
         rank: String? = null,
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = null,
-        wowauditId: Long? = null
-    ): Raider = Raider(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId
-    )
+        wowauditId: Long? = null,
+    ): Raider =
+        Raider(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

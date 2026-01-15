@@ -17,7 +17,6 @@ import java.time.Instant
 class FlpsSubscriptionResolver(
     private val flpsEventPublisher: FlpsEventPublisher,
 ) : Subscription {
-
     /**
      * Subscribe to FLPS score updates for a guild.
      *
@@ -89,7 +88,7 @@ class FlpsEventPublisher {
                 oldScore = oldScore,
                 newScore = newScore,
                 updatedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -123,7 +122,7 @@ class FlpsEventPublisher {
                 itemId = itemId,
                 expiredRdf = expiredRdf,
                 expiredAt = Instant.now(),
-            )
+            ),
         )
     }
 }

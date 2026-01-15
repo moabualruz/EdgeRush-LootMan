@@ -31,7 +31,10 @@ interface SyncRunRepository {
      * @param limit The maximum number of records to return
      * @return List of sync run entities
      */
-    fun findAll(offset: Long, limit: Int): List<SyncRunEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity>
 
     /**
      * Counts all sync runs.
@@ -48,7 +51,11 @@ interface SyncRunRepository {
      * @param limit The maximum number of records to return
      * @return List of sync run entities for the source
      */
-    fun findBySource(source: String, offset: Long, limit: Int): List<SyncRunEntity>
+    fun findBySource(
+        source: String,
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity>
 
     /**
      * Counts sync runs for a source.
@@ -66,7 +73,11 @@ interface SyncRunRepository {
      * @param limit The maximum number of records to return
      * @return List of sync run entities with the status
      */
-    fun findByStatus(status: String, offset: Long, limit: Int): List<SyncRunEntity>
+    fun findByStatus(
+        status: String,
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity>
 
     /**
      * Counts sync runs for a status.

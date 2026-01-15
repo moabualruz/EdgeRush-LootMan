@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
 class RaiderGearItemControllerTest : UnitTest() {
-
     private lateinit var service: RaiderGearItemCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: RaiderGearItemController
@@ -110,6 +109,7 @@ class RaiderGearItemControllerTest : UnitTest() {
         enchantQuality: Int? = 3,
         upgradeLevel: Int? = 8,
         sockets: Int? = 1,
-        name: String? = "Epic Helmet"
-    ) = RaiderGearItemResponse(id, raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, enchantQuality, upgradeLevel, sockets, name)
+        name: String? = "Epic Helmet",
+    ) =
+        RaiderGearItemResponse(id, raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, enchantQuality, upgradeLevel, sockets, name)
 }

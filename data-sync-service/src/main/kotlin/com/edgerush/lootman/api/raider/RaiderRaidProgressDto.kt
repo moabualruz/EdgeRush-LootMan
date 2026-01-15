@@ -26,11 +26,17 @@ data class RaiderRaidProgressResponse(
     val bossesDefeated: Int?,
 ) {
     companion object {
-        fun from(e: RaiderRaidProgressEntity) = RaiderRaidProgressResponse(
-            e.id!!, e.raiderId, e.raid, e.difficulty, e.bossesDefeated
-        )
+        fun from(e: RaiderRaidProgressEntity) =
+            RaiderRaidProgressResponse(
+                e.id!!,
+                e.raiderId,
+                e.raid,
+                e.difficulty,
+                e.bossesDefeated,
+            )
     }
 }
 
 data class RaiderRaidProgressExistsResponse(val exists: Boolean)
+
 data class RaiderRaidProgressCountResponse(val count: Long)

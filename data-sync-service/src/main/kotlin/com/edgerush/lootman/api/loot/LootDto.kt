@@ -15,17 +15,13 @@ import java.time.Instant
 data class AwardLootRequest(
     @field:Min(value = 1, message = "Item ID must be positive")
     val itemId: Long,
-
     @field:NotBlank(message = "Raider ID is required")
     val raiderId: String,
-
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:DecimalMin(value = "0.0", message = "FLPS score must be non-negative")
     @field:DecimalMax(value = "1.0", message = "FLPS score cannot exceed 1.0")
     val flpsScore: Double,
-
     @field:NotBlank(message = "Tier is required")
     val tier: String,
 )
@@ -36,14 +32,11 @@ data class AwardLootRequest(
 data class CreateLootBanRequest(
     @field:NotBlank(message = "Raider ID is required")
     val raiderId: String,
-
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Reason is required")
     @field:Size(min = 5, max = 500, message = "Reason must be between 5 and 500 characters")
     val reason: String,
-
     val expiresAt: Instant?,
 )
 
@@ -138,7 +131,7 @@ data class LootBanDto(
  */
 data class UpdateLootBanRequest(
     val reason: String? = null,
-    val expiresAt: Instant? = null
+    val expiresAt: Instant? = null,
 )
 
 /**
@@ -147,7 +140,7 @@ data class UpdateLootBanRequest(
 data class LootAwardsListResponse(
     val awards: List<LootAwardDto>,
     val totalCount: Int,
-    val activeCount: Int
+    val activeCount: Int,
 ) {
     companion object {
         fun from(awards: List<LootAward>): LootAwardsListResponse {
@@ -155,7 +148,7 @@ data class LootAwardsListResponse(
             return LootAwardsListResponse(
                 awards = awardDtos,
                 totalCount = awardDtos.size,
-                activeCount = awardDtos.count { it.isActive }
+                activeCount = awardDtos.count { it.isActive },
             )
         }
     }
@@ -167,7 +160,7 @@ data class LootAwardsListResponse(
 data class LootBansListResponse(
     val bans: List<LootBanDto>,
     val totalCount: Int,
-    val activeCount: Int
+    val activeCount: Int,
 ) {
     companion object {
         fun from(bans: List<LootBan>): LootBansListResponse {
@@ -175,7 +168,7 @@ data class LootBansListResponse(
             return LootBansListResponse(
                 bans = banDtos,
                 totalCount = banDtos.size,
-                activeCount = banDtos.count { it.isActive }
+                activeCount = banDtos.count { it.isActive },
             )
         }
     }

@@ -20,7 +20,6 @@ import java.time.OffsetDateTime
  * Unit tests for GuildConfigurationController.
  */
 class GuildConfigurationControllerTest : UnitTest() {
-
     private lateinit var guildConfigurationService: GuildConfigurationCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: GuildConfigurationController
@@ -34,16 +33,16 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createGuildConfigurationResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createGuildConfigurationResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { guildConfigurationService.findAll(any()) } returns expectedResponse
 
             // When
@@ -60,12 +59,13 @@ class GuildConfigurationControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<GuildConfigurationResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<GuildConfigurationResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { guildConfigurationService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -78,7 +78,6 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return guild configuration when found`() {
             // Given
@@ -111,7 +110,6 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return guild configuration when found by guild ID`() {
             // Given
@@ -130,23 +128,24 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created guild configuration with 201 status`() {
             // Given
-            val request = CreateGuildConfigurationRequest(
-                guildId = "my-guild",
-                guildName = "My Guild",
-                guildDescription = "A test guild",
-                wowauditGuildUri = "/guilds/123",
-                syncEnabled = true,
-            )
+            val request =
+                CreateGuildConfigurationRequest(
+                    guildId = "my-guild",
+                    guildName = "My Guild",
+                    guildDescription = "A test guild",
+                    wowauditGuildUri = "/guilds/123",
+                    syncEnabled = true,
+                )
 
-            val created = createGuildConfigurationResponse(
-                id = 1L,
-                guildId = "my-guild",
-                guildName = "My Guild",
-            )
+            val created =
+                createGuildConfigurationResponse(
+                    id = 1L,
+                    guildId = "my-guild",
+                    guildName = "My Guild",
+                )
             every { guildConfigurationService.create(request) } returns created
 
             // When
@@ -162,20 +161,21 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated guild configuration`() {
             // Given
-            val request = UpdateGuildConfigurationRequest(
-                guildName = "Updated Guild Name",
-                syncEnabled = false,
-            )
+            val request =
+                UpdateGuildConfigurationRequest(
+                    guildName = "Updated Guild Name",
+                    syncEnabled = false,
+                )
 
-            val updated = createGuildConfigurationResponse(
-                id = 1L,
-                guildName = "Updated Guild Name",
-                syncEnabled = false,
-            )
+            val updated =
+                createGuildConfigurationResponse(
+                    id = 1L,
+                    guildName = "Updated Guild Name",
+                    syncEnabled = false,
+                )
             every { guildConfigurationService.update(1L, request) } returns updated
 
             // When
@@ -207,7 +207,6 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -225,7 +224,6 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when guild configuration exists`() {
             // Given
@@ -254,20 +252,21 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class FindActiveTests {
-
         @Test
         fun `should return only active guild configurations`() {
             // Given
-            val configs = listOf(
-                createGuildConfigurationResponse(id = 1L, isActive = true),
-                createGuildConfigurationResponse(id = 2L, isActive = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = configs,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val configs =
+                listOf(
+                    createGuildConfigurationResponse(id = 1L, isActive = true),
+                    createGuildConfigurationResponse(id = 2L, isActive = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = configs,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { guildConfigurationService.findActive(any()) } returns expectedResponse
 
             // When
@@ -281,22 +280,23 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateBenchmarkTests {
-
         @Test
         fun `should update benchmark configuration`() {
             // Given
-            val request = UpdateBenchmarkRequest(
-                benchmarkMode = "CUSTOM",
-                customBenchmarkRms = BigDecimal("0.95"),
-                customBenchmarkIpi = BigDecimal("0.90"),
-            )
+            val request =
+                UpdateBenchmarkRequest(
+                    benchmarkMode = "CUSTOM",
+                    customBenchmarkRms = BigDecimal("0.95"),
+                    customBenchmarkIpi = BigDecimal("0.90"),
+                )
 
-            val updated = createGuildConfigurationResponse(
-                id = 1L,
-                benchmarkMode = "CUSTOM",
-                customBenchmarkRms = BigDecimal("0.95"),
-                customBenchmarkIpi = BigDecimal("0.90"),
-            )
+            val updated =
+                createGuildConfigurationResponse(
+                    id = 1L,
+                    benchmarkMode = "CUSTOM",
+                    customBenchmarkRms = BigDecimal("0.95"),
+                    customBenchmarkIpi = BigDecimal("0.90"),
+                )
             every { guildConfigurationService.updateBenchmark(1L, request) } returns updated
 
             // When
@@ -311,7 +311,6 @@ class GuildConfigurationControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateSyncStatusTests {
-
         @Test
         fun `should update sync status`() {
             // Given
@@ -319,12 +318,13 @@ class GuildConfigurationControllerTest : UnitTest() {
             val status = "SUCCESS"
             val error: String? = null
 
-            val updated = createGuildConfigurationResponse(
-                id = 1L,
-                guildId = guildId,
-                lastSyncStatus = status,
-                lastSyncAt = OffsetDateTime.now(),
-            )
+            val updated =
+                createGuildConfigurationResponse(
+                    id = 1L,
+                    guildId = guildId,
+                    lastSyncStatus = status,
+                    lastSyncAt = OffsetDateTime.now(),
+                )
             every { guildConfigurationService.updateSyncStatus(guildId, status, error) } returns updated
 
             // When
@@ -357,26 +357,27 @@ class GuildConfigurationControllerTest : UnitTest() {
         customBenchmarkRms: BigDecimal? = null,
         customBenchmarkIpi: BigDecimal? = null,
         benchmarkUpdatedAt: OffsetDateTime? = null,
-    ): GuildConfigurationResponse = GuildConfigurationResponse(
-        id = id,
-        guildId = guildId,
-        guildName = guildName,
-        guildDescription = guildDescription,
-        wowauditGuildUri = wowauditGuildUri,
-        wowauditBaseUrl = wowauditBaseUrl,
-        syncEnabled = syncEnabled,
-        syncCronExpression = syncCronExpression,
-        syncRunOnStartup = syncRunOnStartup,
-        lastSyncAt = lastSyncAt,
-        lastSyncStatus = lastSyncStatus,
-        lastSyncError = lastSyncError,
-        timezone = timezone,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        benchmarkMode = benchmarkMode,
-        customBenchmarkRms = customBenchmarkRms,
-        customBenchmarkIpi = customBenchmarkIpi,
-        benchmarkUpdatedAt = benchmarkUpdatedAt,
-    )
+    ): GuildConfigurationResponse =
+        GuildConfigurationResponse(
+            id = id,
+            guildId = guildId,
+            guildName = guildName,
+            guildDescription = guildDescription,
+            wowauditGuildUri = wowauditGuildUri,
+            wowauditBaseUrl = wowauditBaseUrl,
+            syncEnabled = syncEnabled,
+            syncCronExpression = syncCronExpression,
+            syncRunOnStartup = syncRunOnStartup,
+            lastSyncAt = lastSyncAt,
+            lastSyncStatus = lastSyncStatus,
+            lastSyncError = lastSyncError,
+            timezone = timezone,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            benchmarkMode = benchmarkMode,
+            customBenchmarkRms = customBenchmarkRms,
+            customBenchmarkIpi = customBenchmarkIpi,
+            benchmarkUpdatedAt = benchmarkUpdatedAt,
+        )
 }

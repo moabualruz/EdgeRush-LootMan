@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with team-raid-day-specific query methods.
  */
 interface TeamRaidDayCrudService : CrudService<Long, CreateTeamRaidDayRequest, UpdateTeamRaidDayRequest, TeamRaidDayResponse> {
-
     /**
      * Find team raid days by team with pagination.
      *
@@ -18,7 +17,10 @@ interface TeamRaidDayCrudService : CrudService<Long, CreateTeamRaidDayRequest, U
      * @param pageRequest Pagination parameters
      * @return Paginated list of team raid days for the team
      */
-    fun findByTeamId(teamId: Long, pageRequest: PageRequest): PagedResponse<TeamRaidDayResponse>
+    fun findByTeamId(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamRaidDayResponse>
 
     /**
      * Count team raid days for a team.

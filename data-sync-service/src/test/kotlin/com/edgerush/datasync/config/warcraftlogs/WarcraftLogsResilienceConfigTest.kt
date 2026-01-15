@@ -18,7 +18,6 @@ import java.time.Duration
  * including failure thresholds, wait durations, and retry attempts.
  */
 class WarcraftLogsResilienceConfigTest : UnitTest() {
-
     private lateinit var config: WarcraftLogsResilienceConfig
 
     @BeforeEach
@@ -28,7 +27,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class CircuitBreakerBean {
-
         @Test
         fun `should create a CircuitBreaker bean`() {
             // Act
@@ -97,7 +95,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class RetryBean {
-
         @Test
         fun `should create a Retry bean`() {
             // Act
@@ -140,7 +137,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class CircuitBreakerBehavior {
-
         @Test
         fun `should track successful calls`() {
             // Arrange
@@ -213,7 +209,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class RetryBehavior {
-
         @Test
         fun `should have metrics available`() {
             // Act
@@ -238,7 +233,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class IndependentInstances {
-
         @Test
         fun `should create independent circuit breaker instances`() {
             // Act
@@ -300,7 +294,6 @@ class WarcraftLogsResilienceConfigTest : UnitTest() {
 
     @Nested
     inner class ConfigurationValues {
-
         @Test
         fun `circuit breaker should have reasonable failure threshold`() {
             // Act

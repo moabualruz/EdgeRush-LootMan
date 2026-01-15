@@ -23,11 +23,16 @@ data class RaiderCrestCountResponse(
     val crestCount: Int?,
 ) {
     companion object {
-        fun from(e: RaiderCrestCountEntity) = RaiderCrestCountResponse(
-            e.id!!, e.raiderId, e.crestType, e.crestCount
-        )
+        fun from(e: RaiderCrestCountEntity) =
+            RaiderCrestCountResponse(
+                e.id!!,
+                e.raiderId,
+                e.crestType,
+                e.crestCount,
+            )
     }
 }
 
 data class RaiderCrestCountExistsResponse(val exists: Boolean)
+
 data class RaiderCrestCountCountResponse(val count: Long)

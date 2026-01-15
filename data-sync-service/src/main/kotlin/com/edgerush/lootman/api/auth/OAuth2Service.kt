@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets
 class OAuth2Service(
     private val properties: OAuth2Properties,
     private val restTemplate: RestTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     private val logger = LoggerFactory.getLogger(OAuth2Service::class.java)
 
@@ -56,32 +56,36 @@ class OAuth2Service(
 
         // Exchange code for access token
         val tokenResponse = exchangeDiscordCodeForToken(code)
-        val accessToken = tokenResponse["access_token"] as? String
-            ?: throw OAuth2AuthenticationException("Discord", "No access token in response")
+        val accessToken =
+            tokenResponse["access_token"] as? String
+                ?: throw OAuth2AuthenticationException("Discord", "No access token in response")
 
         // Get user info
         return getDiscordUserInfo(accessToken)
     }
 
     private fun exchangeDiscordCodeForToken(code: String): Map<*, *> {
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_FORM_URLENCODED
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_FORM_URLENCODED
+            }
 
-        val body = LinkedMultiValueMap<String, String>().apply {
-            add("client_id", properties.discord.clientId)
-            add("client_secret", properties.discord.clientSecret)
-            add("grant_type", "authorization_code")
-            add("code", code)
-            add("redirect_uri", properties.discord.redirectUri)
-        }
+        val body =
+            LinkedMultiValueMap<String, String>().apply {
+                add("client_id", properties.discord.clientId)
+                add("client_secret", properties.discord.clientSecret)
+                add("grant_type", "authorization_code")
+                add("code", code)
+                add("redirect_uri", properties.discord.redirectUri)
+            }
 
         try {
-            val response = restTemplate.postForEntity(
-                properties.discord.tokenUrl,
-                HttpEntity(body, headers),
-                Map::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    properties.discord.tokenUrl,
+                    HttpEntity(body, headers),
+                    Map::class.java,
+                )
 
             return response.body ?: throw OAuth2AuthenticationException("Discord", "Empty token response")
         } catch (e: RestClientException) {
@@ -91,17 +95,19 @@ class OAuth2Service(
     }
 
     private fun getDiscordUserInfo(accessToken: String): DiscordUserInfo {
-        val headers = HttpHeaders().apply {
-            setBearerAuth(accessToken)
-        }
+        val headers =
+            HttpHeaders().apply {
+                setBearerAuth(accessToken)
+            }
 
         try {
-            val response = restTemplate.exchange(
-                properties.discord.userInfoUrl,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                Map::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    properties.discord.userInfoUrl,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    Map::class.java,
+                )
 
             val body = response.body ?: throw OAuth2AuthenticationException("Discord", "Empty user info response")
 
@@ -111,7 +117,7 @@ class OAuth2Service(
                 discriminator = body["discriminator"] as? String ?: "0",
                 avatar = body["avatar"] as? String,
                 email = body["email"] as? String,
-                verified = body["verified"] as? Boolean
+                verified = body["verified"] as? Boolean,
             )
         } catch (e: RestClientException) {
             logger.error("Discord user info fetch failed", e)
@@ -149,31 +155,35 @@ class OAuth2Service(
 
         // Exchange code for access token
         val tokenResponse = exchangeBattlenetCodeForToken(code)
-        val accessToken = tokenResponse["access_token"] as? String
-            ?: throw OAuth2AuthenticationException("Battle.net", "No access token in response")
+        val accessToken =
+            tokenResponse["access_token"] as? String
+                ?: throw OAuth2AuthenticationException("Battle.net", "No access token in response")
 
         // Get user info
         return getBattlenetUserInfo(accessToken)
     }
 
     private fun exchangeBattlenetCodeForToken(code: String): Map<*, *> {
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_FORM_URLENCODED
-            setBasicAuth(properties.battlenet.clientId, properties.battlenet.clientSecret)
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_FORM_URLENCODED
+                setBasicAuth(properties.battlenet.clientId, properties.battlenet.clientSecret)
+            }
 
-        val body = LinkedMultiValueMap<String, String>().apply {
-            add("grant_type", "authorization_code")
-            add("code", code)
-            add("redirect_uri", properties.battlenet.redirectUri)
-        }
+        val body =
+            LinkedMultiValueMap<String, String>().apply {
+                add("grant_type", "authorization_code")
+                add("code", code)
+                add("redirect_uri", properties.battlenet.redirectUri)
+            }
 
         try {
-            val response = restTemplate.postForEntity(
-                properties.battlenet.tokenUrl,
-                HttpEntity(body, headers),
-                Map::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    properties.battlenet.tokenUrl,
+                    HttpEntity(body, headers),
+                    Map::class.java,
+                )
 
             return response.body ?: throw OAuth2AuthenticationException("Battle.net", "Empty token response")
         } catch (e: RestClientException) {
@@ -183,24 +193,26 @@ class OAuth2Service(
     }
 
     private fun getBattlenetUserInfo(accessToken: String): BattlenetUserInfo {
-        val headers = HttpHeaders().apply {
-            setBearerAuth(accessToken)
-        }
+        val headers =
+            HttpHeaders().apply {
+                setBearerAuth(accessToken)
+            }
 
         try {
-            val response = restTemplate.exchange(
-                properties.battlenet.userInfoUrl,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                Map::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    properties.battlenet.userInfoUrl,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    Map::class.java,
+                )
 
             val body = response.body ?: throw OAuth2AuthenticationException("Battle.net", "Empty user info response")
 
             return BattlenetUserInfo(
                 sub = body["sub"] as String,
                 id = (body["id"] as Number).toLong(),
-                battletag = body["battletag"] as String
+                battletag = body["battletag"] as String,
             )
         } catch (e: RestClientException) {
             logger.error("Battle.net user info fetch failed", e)

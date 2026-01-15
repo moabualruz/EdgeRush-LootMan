@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
 class ApplicationAltControllerTest : UnitTest() {
-
     private lateinit var service: ApplicationAltCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: ApplicationAltController
@@ -92,6 +91,6 @@ class ApplicationAltControllerTest : UnitTest() {
         role: String? = "dps",
         level: Int? = 70,
         faction: String? = "Alliance",
-        race: String? = "Human"
+        race: String? = "Human",
     ) = ApplicationAltResponse(id, applicationId, name, realm, region, clazz, role, level, faction, race)
 }

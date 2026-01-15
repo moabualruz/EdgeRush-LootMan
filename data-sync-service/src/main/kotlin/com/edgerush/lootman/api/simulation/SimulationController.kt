@@ -2,7 +2,6 @@ package com.edgerush.lootman.api.simulation
 
 import com.edgerush.lootman.application.simulation.SimulationService
 import com.edgerush.lootman.domain.simulation.model.SimulationRequest
-import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,7 +25,7 @@ import java.time.Instant
 @RequestMapping("/api/v1/simulation")
 class SimulationController(
     private val simulationService: SimulationService,
-    private val simulationRepository: SimulationRepository
+    private val simulationRepository: SimulationRepository,
 ) {
     /**
      * Submit a new simulation request for a character.
@@ -35,19 +34,20 @@ class SimulationController(
     fun submitSimulation(
         @PathVariable guildId: String,
         @PathVariable characterName: String,
-        @RequestBody request: SubmitSimulationRequest
+        @RequestBody request: SubmitSimulationRequest,
     ): ResponseEntity<SimulationRequestDto> {
-        val simulationRequest = simulationService.submitSimulation(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = request.characterRealm,
-            characterClass = request.characterClass,
-            characterSpec = request.characterSpec,
-            characterLevel = request.characterLevel ?: 80,
-            characterRace = request.characterRace ?: "human",
-            iterations = request.iterations ?: SimulationRequest.DEFAULT_ITERATIONS,
-            fightLengthSeconds = request.fightLengthSeconds ?: SimulationRequest.DEFAULT_FIGHT_LENGTH_SECONDS
-        )
+        val simulationRequest =
+            simulationService.submitSimulation(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = request.characterRealm,
+                characterClass = request.characterClass,
+                characterSpec = request.characterSpec,
+                characterLevel = request.characterLevel ?: 80,
+                characterRace = request.characterRace ?: "human",
+                iterations = request.iterations ?: SimulationRequest.DEFAULT_ITERATIONS,
+                fightLengthSeconds = request.fightLengthSeconds ?: SimulationRequest.DEFAULT_FIGHT_LENGTH_SECONDS,
+            )
 
         return ResponseEntity
             .status(HttpStatus.ACCEPTED)
@@ -59,10 +59,11 @@ class SimulationController(
      */
     @GetMapping("/requests/{requestId}")
     fun getSimulationStatus(
-        @PathVariable requestId: Long
+        @PathVariable requestId: Long,
     ): ResponseEntity<SimulationRequestDto> {
-        val request = simulationRepository.findRequestById(requestId)
-            ?: return ResponseEntity.notFound().build()
+        val request =
+            simulationRepository.findRequestById(requestId)
+                ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(SimulationRequestDto.from(request))
     }
@@ -74,13 +75,14 @@ class SimulationController(
     fun getSimulationResults(
         @PathVariable guildId: String,
         @PathVariable characterName: String,
-        @PathVariable characterRealm: String
+        @PathVariable characterRealm: String,
     ): ResponseEntity<SimulationResultsResponse> {
-        val results = simulationService.getSimulationResults(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm
-        )
+        val results =
+            simulationService.getSimulationResults(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+            )
 
         return ResponseEntity.ok(
             SimulationResultsResponse(
@@ -88,8 +90,8 @@ class SimulationController(
                 characterName = characterName,
                 characterRealm = characterRealm,
                 results = results.map { SimulationResultDto.from(it) },
-                retrievedAt = Instant.now()
-            )
+                retrievedAt = Instant.now(),
+            ),
         )
     }
 
@@ -98,11 +100,12 @@ class SimulationController(
      */
     @GetMapping("/guilds/{guildId}/pending")
     fun getPendingSimulations(
-        @PathVariable guildId: String
+        @PathVariable guildId: String,
     ): ResponseEntity<List<SimulationRequestDto>> {
-        val pending = simulationRepository.findPendingRequests()
-            .filter { it.profile.guildId == guildId }
-            .map { SimulationRequestDto.from(it) }
+        val pending =
+            simulationRepository.findPendingRequests()
+                .filter { it.profile.guildId == guildId }
+                .map { SimulationRequestDto.from(it) }
 
         return ResponseEntity.ok(pending)
     }
@@ -118,8 +121,8 @@ class SimulationController(
         return ResponseEntity.ok(
             ExecutionSummaryResponse(
                 executedCount = executedCount,
-                executedAt = Instant.now()
-            )
+                executedAt = Instant.now(),
+            ),
         )
     }
 
@@ -134,14 +137,15 @@ class SimulationController(
             SimulationStatusResponse(
                 status = "operational",
                 pendingSimulations = pendingCount,
-                endpoints = mapOf(
-                    "Submit Simulation" to "POST /api/v1/simulation/guilds/{guildId}/characters/{characterName}",
-                    "Get Status" to "GET /api/v1/simulation/requests/{requestId}",
-                    "Get Results" to "GET /api/v1/simulation/guilds/{guildId}/characters/{characterName}/realms/{characterRealm}/results",
-                    "Get Pending" to "GET /api/v1/simulation/guilds/{guildId}/pending",
-                    "Execute Pending" to "POST /api/v1/simulation/execute-pending"
-                )
-            )
+                endpoints =
+                    mapOf(
+                        "Submit Simulation" to "POST /api/v1/simulation/guilds/{guildId}/characters/{characterName}",
+                        "Get Status" to "GET /api/v1/simulation/requests/{requestId}",
+                        "Get Results" to "GET /api/v1/simulation/guilds/{guildId}/characters/{characterName}/realms/{characterRealm}/results",
+                        "Get Pending" to "GET /api/v1/simulation/guilds/{guildId}/pending",
+                        "Execute Pending" to "POST /api/v1/simulation/execute-pending",
+                    ),
+            ),
         )
     }
 }

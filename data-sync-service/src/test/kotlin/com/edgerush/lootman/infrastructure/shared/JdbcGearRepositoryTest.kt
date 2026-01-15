@@ -28,7 +28,6 @@ import java.sql.ResultSet
  * The repository operates on the raider_gear_items table.
  */
 class JdbcGearRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcGearRepository
 
@@ -40,7 +39,6 @@ class JdbcGearRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindCurrentGearTests {
-
         @Test
         fun `should return equipped gear set when found`() {
             // Given
@@ -51,13 +49,14 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    eq("EQUIPPED")
+                    eq("EQUIPPED"),
                 )
-            } returns listOf(
-                createGearItem(EquipmentSlot.HEAD, 619),
-                createGearItem(EquipmentSlot.CHEST, 619),
-                createGearItem(EquipmentSlot.MAIN_HAND, 626)
-            )
+            } returns
+                listOf(
+                    createGearItem(EquipmentSlot.HEAD, 619),
+                    createGearItem(EquipmentSlot.CHEST, 619),
+                    createGearItem(EquipmentSlot.MAIN_HAND, 626),
+                )
 
             // When
             val result = repository.findCurrentGear(raiderId)
@@ -78,7 +77,7 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    eq("EQUIPPED")
+                    eq("EQUIPPED"),
                 )
             } returns emptyList()
 
@@ -92,7 +91,6 @@ class JdbcGearRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdAndTypeTests {
-
         @Test
         fun `should return equipped gear set`() {
             // Given
@@ -103,12 +101,13 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    eq("EQUIPPED")
+                    eq("EQUIPPED"),
                 )
-            } returns listOf(
-                createGearItem(EquipmentSlot.HEAD, 619),
-                createGearItem(EquipmentSlot.SHOULDER, 619)
-            )
+            } returns
+                listOf(
+                    createGearItem(EquipmentSlot.HEAD, 619),
+                    createGearItem(EquipmentSlot.SHOULDER, 619),
+                )
 
             // When
             val result = repository.findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
@@ -129,12 +128,13 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    eq("BEST")
+                    eq("BEST"),
                 )
-            } returns listOf(
-                createGearItem(EquipmentSlot.HEAD, 626),
-                createGearItem(EquipmentSlot.SHOULDER, 626)
-            )
+            } returns
+                listOf(
+                    createGearItem(EquipmentSlot.HEAD, 626),
+                    createGearItem(EquipmentSlot.SHOULDER, 626),
+                )
 
             // When
             val result = repository.findByRaiderIdAndType(raiderId, GearSetType.BEST)
@@ -154,19 +154,20 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GearItem>>()
-                val rs = mockResultSet(
-                    slot = "HEAD",
-                    itemId = 12345L,
-                    name = "Helm of Dominance",
-                    itemLevel = 626,
-                    quality = 4, // EPIC
-                    enchant = "Enchant: +150 Intellect",
-                    sockets = 2
-                )
+                val rs =
+                    mockResultSet(
+                        slot = "HEAD",
+                        itemId = 12345L,
+                        name = "Helm of Dominance",
+                        itemLevel = 626,
+                        quality = 4, // EPIC
+                        enchant = "Enchant: +150 Intellect",
+                        sockets = 2,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -195,19 +196,20 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GearItem>>()
-                val rs = mockResultSet(
-                    slot = "TRINKET_1",
-                    itemId = 54321L,
-                    name = "Trinket of Power",
-                    itemLevel = 619,
-                    quality = 4,
-                    enchant = null,
-                    sockets = 0
-                )
+                val rs =
+                    mockResultSet(
+                        slot = "TRINKET_1",
+                        itemId = 54321L,
+                        name = "Trinket of Power",
+                        itemLevel = 619,
+                        quality = 4,
+                        enchant = null,
+                        sockets = 0,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -231,19 +233,20 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GearItem>>()
-                val rs = mockResultSet(
-                    slot = "UNKNOWN_SLOT",
-                    itemId = 99999L,
-                    name = "Mystery Item",
-                    itemLevel = 619,
-                    quality = 4,
-                    enchant = null,
-                    sockets = 0
-                )
+                val rs =
+                    mockResultSet(
+                        slot = "UNKNOWN_SLOT",
+                        itemId = 99999L,
+                        name = "Mystery Item",
+                        itemLevel = 619,
+                        quality = 4,
+                        enchant = null,
+                        sockets = 0,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -267,19 +270,20 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GearItem>>()
-                val rs = mockResultSet(
-                    slot = "HEAD",
-                    itemId = 88888L,
-                    name = "Strange Item",
-                    itemLevel = 619,
-                    quality = 99, // Invalid quality value
-                    enchant = null,
-                    sockets = 0
-                )
+                val rs =
+                    mockResultSet(
+                        slot = "HEAD",
+                        itemId = 88888L,
+                        name = "Strange Item",
+                        itemLevel = 619,
+                        quality = 99, // Invalid quality value
+                        enchant = null,
+                        sockets = 0,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -303,19 +307,20 @@ class JdbcGearRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
-                    any()
+                    any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GearItem>>()
-                val rs = mockResultSet(
-                    slot = "HEAD",
-                    itemId = 77777L,
-                    name = null, // Null name
-                    itemLevel = 619,
-                    quality = 4,
-                    enchant = null,
-                    sockets = 0
-                )
+                val rs =
+                    mockResultSet(
+                        slot = "HEAD",
+                        itemId = 77777L,
+                        name = null, // Null name
+                        itemLevel = 619,
+                        quality = 4,
+                        enchant = null,
+                        sockets = 0,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -332,7 +337,6 @@ class JdbcGearRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should delete existing gear and insert new items`() {
             // Given
@@ -351,7 +355,7 @@ class JdbcGearRepositoryTest : UnitTest() {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") },
                     raiderId.value,
-                    "EQUIPPED"
+                    "EQUIPPED",
                 )
             }
         }
@@ -373,13 +377,13 @@ class JdbcGearRepositoryTest : UnitTest() {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") },
                     raiderId.value,
-                    "EQUIPPED"
+                    "EQUIPPED",
                 )
             }
             verify(exactly = 3) {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -400,7 +404,7 @@ class JdbcGearRepositoryTest : UnitTest() {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") },
                     raiderId.value,
-                    "BEST"
+                    "BEST",
                 )
             }
         }
@@ -415,7 +419,7 @@ class JdbcGearRepositoryTest : UnitTest() {
         itemLevel: Int = 619,
         quality: Int = 4,
         enchant: String? = null,
-        sockets: Int = 0
+        sockets: Int = 0,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("slot") } returns slot
@@ -430,26 +434,28 @@ class JdbcGearRepositoryTest : UnitTest() {
 
     private fun createGearItem(
         slot: EquipmentSlot,
-        itemLevel: Int = 619
-    ): GearItem = GearItem(
-        itemId = ItemId(12345L),
-        name = "Test Item ${slot.name}",
-        itemLevel = itemLevel,
-        quality = ItemQuality.EPIC,
-        slot = slot,
-        isTierPiece = false,
-        enchant = null,
-        sockets = 0
-    )
+        itemLevel: Int = 619,
+    ): GearItem =
+        GearItem(
+            itemId = ItemId(12345L),
+            name = "Test Item ${slot.name}",
+            itemLevel = itemLevel,
+            quality = ItemQuality.EPIC,
+            slot = slot,
+            isTierPiece = false,
+            enchant = null,
+            sockets = 0,
+        )
 
     private fun createGearSet(
         gearSetType: GearSetType,
-        itemCount: Int = 2
+        itemCount: Int = 2,
     ): GearSet {
         val slots = listOf(EquipmentSlot.HEAD, EquipmentSlot.SHOULDER, EquipmentSlot.CHEST)
-        val items = slots.take(itemCount).associateWith { slot ->
-            createGearItem(slot)
-        }
+        val items =
+            slots.take(itemCount).associateWith { slot ->
+                createGearItem(slot)
+            }
         return GearSet(items = items, gearSetType = gearSetType)
     }
 }

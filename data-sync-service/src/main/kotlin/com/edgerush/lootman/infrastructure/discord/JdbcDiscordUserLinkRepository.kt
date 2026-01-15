@@ -1,8 +1,8 @@
 package com.edgerush.lootman.infrastructure.discord
 
+import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.model.DiscordUserLink
 import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.repository.DiscordUserLinkRepository
 import com.edgerush.lootman.domain.shared.RaiderId
 import org.springframework.jdbc.core.JdbcTemplate
@@ -19,56 +19,63 @@ import java.sql.Timestamp
  */
 @Repository
 class JdbcDiscordUserLinkRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : DiscordUserLinkRepository {
-
     override fun findById(id: DiscordUserLinkId): DiscordUserLink? {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_user_id, raider_id, is_primary, linked_at, linked_by
             FROM discord_user_links
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, id.value).firstOrNull()
     }
 
     override fun findByDiscordUserId(discordUserId: DiscordUserId): List<DiscordUserLink> {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_user_id, raider_id, is_primary, linked_at, linked_by
             FROM discord_user_links
             WHERE discord_user_id = ?
             ORDER BY is_primary DESC, linked_at ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, discordUserId.value)
     }
 
     override fun findPrimaryByDiscordUserId(discordUserId: DiscordUserId): DiscordUserLink? {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_user_id, raider_id, is_primary, linked_at, linked_by
             FROM discord_user_links
             WHERE discord_user_id = ? AND is_primary = true
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, discordUserId.value).firstOrNull()
     }
 
     override fun findByRaiderId(raiderId: RaiderId): List<DiscordUserLink> {
-        val sql = """
+        val sql =
+            """
             SELECT id, discord_user_id, raider_id, is_primary, linked_at, linked_by
             FROM discord_user_links
             WHERE raider_id = ?
             ORDER BY linked_at ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, raiderId.value)
     }
 
-    override fun existsByDiscordUserIdAndRaiderId(discordUserId: DiscordUserId, raiderId: RaiderId): Boolean {
-        val sql = """
+    override fun existsByDiscordUserIdAndRaiderId(
+        discordUserId: DiscordUserId,
+        raiderId: RaiderId,
+    ): Boolean {
+        val sql =
+            """
             SELECT COUNT(*) FROM discord_user_links
             WHERE discord_user_id = ? AND raider_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val count = jdbcTemplate.queryForObject(sql, Long::class.java, discordUserId.value, raiderId.value)
         return (count ?: 0) > 0
@@ -83,10 +90,11 @@ class JdbcDiscordUserLinkRepository(
     }
 
     private fun insert(link: DiscordUserLink): DiscordUserLink {
-        val sql = """
+        val sql =
+            """
             INSERT INTO discord_user_links (discord_user_id, raider_id, is_primary, linked_at, linked_by)
             VALUES (?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
 
@@ -100,18 +108,20 @@ class JdbcDiscordUserLinkRepository(
             ps
         }, keyHolder)
 
-        val generatedId = keyHolder.keys?.get("id") as? Long
-            ?: throw IllegalStateException("Failed to retrieve generated ID for discord_user_link")
+        val generatedId =
+            keyHolder.keys?.get("id") as? Long
+                ?: throw IllegalStateException("Failed to retrieve generated ID for discord_user_link")
 
         return link.withId(DiscordUserLinkId(generatedId))
     }
 
     private fun update(link: DiscordUserLink): DiscordUserLink {
-        val sql = """
+        val sql =
+            """
             UPDATE discord_user_links
             SET discord_user_id = ?, raider_id = ?, is_primary = ?, linked_at = ?, linked_by = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -120,7 +130,7 @@ class JdbcDiscordUserLinkRepository(
             link.isPrimary,
             Timestamp.from(link.linkedAt),
             link.linkedBy,
-            link.id!!.value
+            link.id!!.value,
         )
 
         return link
@@ -137,11 +147,12 @@ class JdbcDiscordUserLinkRepository(
     }
 
     override fun clearPrimaryForDiscordUser(discordUserId: DiscordUserId) {
-        val sql = """
+        val sql =
+            """
             UPDATE discord_user_links
             SET is_primary = false
             WHERE discord_user_id = ? AND is_primary = true
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(sql, discordUserId.value)
     }
@@ -151,13 +162,17 @@ class JdbcDiscordUserLinkRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, discordUserId.value) ?: 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<DiscordUserLink> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<DiscordUserLink> {
+        val sql =
+            """
             SELECT id, discord_user_id, raider_id, is_primary, linked_at, linked_by
             FROM discord_user_links
             ORDER BY id ASC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, limit, offset)
     }
@@ -167,14 +182,15 @@ class JdbcDiscordUserLinkRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        DiscordUserLink(
-            id = DiscordUserLinkId(rs.getLong("id")),
-            discordUserId = DiscordUserId(rs.getString("discord_user_id")),
-            raiderId = RaiderId(rs.getLong("raider_id")),
-            isPrimary = rs.getBoolean("is_primary"),
-            linkedAt = rs.getTimestamp("linked_at").toInstant(),
-            linkedBy = rs.getString("linked_by")
-        )
-    }
+    private val rowMapper =
+        RowMapper { rs, _ ->
+            DiscordUserLink(
+                id = DiscordUserLinkId(rs.getLong("id")),
+                discordUserId = DiscordUserId(rs.getString("discord_user_id")),
+                raiderId = RaiderId(rs.getLong("raider_id")),
+                isPrimary = rs.getBoolean("is_primary"),
+                linkedAt = rs.getTimestamp("linked_at").toInstant(),
+                linkedBy = rs.getString("linked_by"),
+            )
+        }
 }

@@ -22,11 +22,11 @@ import java.sql.Timestamp
 class JdbcEnhancedApplicationRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : EnhancedApplicationRepository {
-
     private val objectMapper = ObjectMapper()
 
     override fun findById(id: ApplicationId): Application? {
-        val sql = """
+        val sql =
+            """
             SELECT enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                    character_name, character_realm, character_class, specialization, item_level,
                    raider_io_score, best_parse_average, age, location, timezone,
@@ -34,13 +34,18 @@ class JdbcEnhancedApplicationRepository(
                    status, reviewed_by, reviewed_at, created_at, updated_at
             FROM enhanced_applications
             WHERE enhanced_application_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, applicationRowMapper, id.value).firstOrNull()
     }
 
-    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Application> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<Application> {
+        val sql =
+            """
             SELECT enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                    character_name, character_realm, character_class, specialization, item_level,
                    raider_io_score, best_parse_average, age, location, timezone,
@@ -50,7 +55,7 @@ class JdbcEnhancedApplicationRepository(
             WHERE guild_id = ?
             ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, applicationRowMapper, guildId.value, limit, offset)
     }
@@ -61,7 +66,8 @@ class JdbcEnhancedApplicationRepository(
         offset: Long,
         limit: Int,
     ): List<Application> {
-        val sql = """
+        val sql =
+            """
             SELECT enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                    character_name, character_realm, character_class, specialization, item_level,
                    raider_io_score, best_parse_average, age, location, timezone,
@@ -71,13 +77,17 @@ class JdbcEnhancedApplicationRepository(
             WHERE guild_id = ? AND status = ?
             ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, applicationRowMapper, guildId.value, status.name, limit, offset)
     }
 
-    override fun findByGuildIdAndDiscordId(guildId: GuildId, discordId: String): Application? {
-        val sql = """
+    override fun findByGuildIdAndDiscordId(
+        guildId: GuildId,
+        discordId: String,
+    ): Application? {
+        val sql =
+            """
             SELECT enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                    character_name, character_realm, character_class, specialization, item_level,
                    raider_io_score, best_parse_average, age, location, timezone,
@@ -85,13 +95,17 @@ class JdbcEnhancedApplicationRepository(
                    status, reviewed_by, reviewed_at, created_at, updated_at
             FROM enhanced_applications
             WHERE guild_id = ? AND discord_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, applicationRowMapper, guildId.value, discordId).firstOrNull()
     }
 
-    override fun findByGuildIdAndBattleNetId(guildId: GuildId, battleNetId: String): Application? {
-        val sql = """
+    override fun findByGuildIdAndBattleNetId(
+        guildId: GuildId,
+        battleNetId: String,
+    ): Application? {
+        val sql =
+            """
             SELECT enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                    character_name, character_realm, character_class, specialization, item_level,
                    raider_io_score, best_parse_average, age, location, timezone,
@@ -99,7 +113,7 @@ class JdbcEnhancedApplicationRepository(
                    status, reviewed_by, reviewed_at, created_at, updated_at
             FROM enhanced_applications
             WHERE guild_id = ? AND battle_net_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, applicationRowMapper, guildId.value, battleNetId).firstOrNull()
     }
@@ -109,7 +123,10 @@ class JdbcEnhancedApplicationRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
     }
 
-    override fun countByGuildIdAndStatus(guildId: GuildId, status: ApplicationStatus): Long {
+    override fun countByGuildIdAndStatus(
+        guildId: GuildId,
+        status: ApplicationStatus,
+    ): Long {
         val sql = "SELECT COUNT(*) FROM enhanced_applications WHERE guild_id = ? AND status = ?"
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value, status.name) ?: 0L
     }
@@ -134,7 +151,8 @@ class JdbcEnhancedApplicationRepository(
     }
 
     private fun insert(application: Application): Application {
-        val sql = """
+        val sql =
+            """
             INSERT INTO enhanced_applications (
                 enhanced_application_id, guild_id, battle_net_id, discord_id, email,
                 character_name, character_realm, character_class, specialization, item_level,
@@ -142,7 +160,7 @@ class JdbcEnhancedApplicationRepository(
                 raid_days_available, previous_guilds, reason_for_leaving, why_this_guild,
                 status, reviewed_by, reviewed_at, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -176,7 +194,8 @@ class JdbcEnhancedApplicationRepository(
     }
 
     private fun update(application: Application): Application {
-        val sql = """
+        val sql =
+            """
             UPDATE enhanced_applications SET
                 guild_id = ?, battle_net_id = ?, discord_id = ?, email = ?,
                 character_name = ?, character_realm = ?, character_class = ?, specialization = ?,
@@ -185,7 +204,7 @@ class JdbcEnhancedApplicationRepository(
                 previous_guilds = ?, reason_for_leaving = ?, why_this_guild = ?,
                 status = ?, reviewed_by = ?, reviewed_at = ?, updated_at = ?
             WHERE enhanced_application_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -217,44 +236,46 @@ class JdbcEnhancedApplicationRepository(
         return application
     }
 
-    private val applicationRowMapper = RowMapper { rs, _ ->
-        fun getDoubleOrNull(col: String): Double? {
-            val value = rs.getDouble(col)
-            return if (rs.wasNull()) null else value
-        }
+    private val applicationRowMapper =
+        RowMapper { rs, _ ->
+            fun getDoubleOrNull(col: String): Double? {
+                val value = rs.getDouble(col)
+                return if (rs.wasNull()) null else value
+            }
 
-        val raidDaysJson = rs.getString("raid_days_available")
-        val raidDays: List<String> = try {
-            objectMapper.readValue(raidDaysJson, object : TypeReference<List<String>>() {})
-        } catch (e: Exception) {
-            emptyList()
-        }
+            val raidDaysJson = rs.getString("raid_days_available")
+            val raidDays: List<String> =
+                try {
+                    objectMapper.readValue(raidDaysJson, object : TypeReference<List<String>>() {})
+                } catch (e: Exception) {
+                    emptyList()
+                }
 
-        Application.reconstruct(
-            id = ApplicationId(rs.getString("enhanced_application_id")),
-            guildId = GuildId(rs.getString("guild_id")),
-            battleNetId = rs.getString("battle_net_id"),
-            discordId = rs.getString("discord_id"),
-            email = rs.getString("email"),
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            characterClass = rs.getString("character_class"),
-            specialization = rs.getString("specialization"),
-            itemLevel = rs.getDouble("item_level"),
-            raiderIOScore = getDoubleOrNull("raider_io_score"),
-            bestParseAverage = getDoubleOrNull("best_parse_average"),
-            age = rs.getInt("age"),
-            location = rs.getString("location"),
-            timezone = rs.getString("timezone"),
-            raidDaysAvailable = raidDays,
-            previousGuilds = rs.getString("previous_guilds"),
-            reasonForLeaving = rs.getString("reason_for_leaving"),
-            whyThisGuild = rs.getString("why_this_guild"),
-            status = ApplicationStatus.valueOf(rs.getString("status")),
-            reviewedBy = rs.getString("reviewed_by"),
-            reviewedAt = rs.getTimestamp("reviewed_at")?.toInstant(),
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            updatedAt = rs.getTimestamp("updated_at").toInstant(),
-        )
-    }
+            Application.reconstruct(
+                id = ApplicationId(rs.getString("enhanced_application_id")),
+                guildId = GuildId(rs.getString("guild_id")),
+                battleNetId = rs.getString("battle_net_id"),
+                discordId = rs.getString("discord_id"),
+                email = rs.getString("email"),
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                characterClass = rs.getString("character_class"),
+                specialization = rs.getString("specialization"),
+                itemLevel = rs.getDouble("item_level"),
+                raiderIOScore = getDoubleOrNull("raider_io_score"),
+                bestParseAverage = getDoubleOrNull("best_parse_average"),
+                age = rs.getInt("age"),
+                location = rs.getString("location"),
+                timezone = rs.getString("timezone"),
+                raidDaysAvailable = raidDays,
+                previousGuilds = rs.getString("previous_guilds"),
+                reasonForLeaving = rs.getString("reason_for_leaving"),
+                whyThisGuild = rs.getString("why_this_guild"),
+                status = ApplicationStatus.valueOf(rs.getString("status")),
+                reviewedBy = rs.getString("reviewed_by"),
+                reviewedAt = rs.getTimestamp("reviewed_at")?.toInstant(),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                updatedAt = rs.getTimestamp("updated_at").toInstant(),
+            )
+        }
 }

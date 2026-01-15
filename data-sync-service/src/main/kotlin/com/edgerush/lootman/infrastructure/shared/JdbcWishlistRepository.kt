@@ -25,16 +25,16 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class JdbcWishlistRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : WishlistRepository {
-
     override fun findByRaiderId(raiderId: RaiderId): Wishlist? {
-        val sql = """
+        val sql =
+            """
             SELECT itemId, itemName, priority, upgradePercentage, specName
             FROM wishlist_items
             WHERE raiderId = ?
             ORDER BY priority ASC
-        """.trimIndent()
+            """.trimIndent()
 
         val items = jdbcTemplate.query(sql, wishlistItemRowMapper, raiderId.value)
 
@@ -51,11 +51,12 @@ class JdbcWishlistRepository(
         jdbcTemplate.update(deleteSql, wishlist.raiderId.value)
 
         // Insert new wishlist items
-        val insertSql = """
+        val insertSql =
+            """
             INSERT INTO wishlist_items (
                 raiderId, itemId, itemName, priority, upgradePercentage, specName
             ) VALUES (?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         wishlist.items.forEach { item ->
             jdbcTemplate.update(
@@ -65,7 +66,7 @@ class JdbcWishlistRepository(
                 item.itemName,
                 item.priority,
                 item.upgradePercentage,
-                item.specName
+                item.specName,
             )
         }
 
@@ -77,13 +78,14 @@ class JdbcWishlistRepository(
         jdbcTemplate.update(sql, raiderId.value)
     }
 
-    private val wishlistItemRowMapper = RowMapper { rs, _ ->
-        WishlistItem(
-            itemId = ItemId(rs.getLong("itemId")),
-            itemName = rs.getString("itemName") ?: "Unknown Item",
-            priority = rs.getInt("priority"),
-            upgradePercentage = rs.getDouble("upgradePercentage"),
-            specName = rs.getString("specName")
-        )
-    }
+    private val wishlistItemRowMapper =
+        RowMapper { rs, _ ->
+            WishlistItem(
+                itemId = ItemId(rs.getLong("itemId")),
+                itemName = rs.getString("itemName") ?: "Unknown Item",
+                priority = rs.getInt("priority"),
+                upgradePercentage = rs.getDouble("upgradePercentage"),
+                specName = rs.getString("specName"),
+            )
+        }
 }

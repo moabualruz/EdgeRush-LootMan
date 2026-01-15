@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for TrialStatus enum.
  */
 class TrialStatusTest : UnitTest() {
-
     @Test
     fun `should have ACTIVE status`() {
         // Assert

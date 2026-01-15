@@ -11,20 +11,19 @@ import java.time.Instant
  * Unit tests for UserRefreshToken entity.
  */
 class UserRefreshTokenTest : UnitTest() {
-
     private val userId = UserId(1L)
     private val tokenHash = "hashed-token-value"
 
     @Nested
     inner class Creation {
-
         @Test
         fun `should create token with default validity`() {
             // Act
-            val token = UserRefreshToken.create(
-                userId = userId,
-                tokenHash = tokenHash
-            )
+            val token =
+                UserRefreshToken.create(
+                    userId = userId,
+                    tokenHash = tokenHash,
+                )
 
             // Assert
             token.userId shouldBe userId
@@ -36,11 +35,12 @@ class UserRefreshTokenTest : UnitTest() {
         @Test
         fun `should create token with custom validity`() {
             // Act
-            val token = UserRefreshToken.create(
-                userId = userId,
-                tokenHash = tokenHash,
-                validityDays = 7
-            )
+            val token =
+                UserRefreshToken.create(
+                    userId = userId,
+                    tokenHash = tokenHash,
+                    validityDays = 7,
+                )
 
             // Assert
             val expectedExpiry = Instant.now().plusSeconds(7 * 24 * 60 * 60)
@@ -55,7 +55,7 @@ class UserRefreshTokenTest : UnitTest() {
                 UserRefreshToken(
                     userId = userId,
                     tokenHash = "  ",
-                    expiresAt = Instant.now().plusSeconds(3600)
+                    expiresAt = Instant.now().plusSeconds(3600),
                 )
             }
         }
@@ -63,7 +63,6 @@ class UserRefreshTokenTest : UnitTest() {
 
     @Nested
     inner class Validation {
-
         @Test
         fun `should be valid when not expired and not revoked`() {
             // Arrange
@@ -78,11 +77,12 @@ class UserRefreshTokenTest : UnitTest() {
         @Test
         fun `should be invalid when expired`() {
             // Arrange
-            val token = UserRefreshToken(
-                userId = userId,
-                tokenHash = tokenHash,
-                expiresAt = Instant.now().minusSeconds(3600)
-            )
+            val token =
+                UserRefreshToken(
+                    userId = userId,
+                    tokenHash = tokenHash,
+                    expiresAt = Instant.now().minusSeconds(3600),
+                )
 
             // Assert
             token.isValid() shouldBe false
@@ -103,11 +103,12 @@ class UserRefreshTokenTest : UnitTest() {
         fun `should use provided timestamp for validation`() {
             // Arrange
             val future = Instant.now().plusSeconds(3600)
-            val token = UserRefreshToken(
-                userId = userId,
-                tokenHash = tokenHash,
-                expiresAt = Instant.now().plusSeconds(1800)
-            )
+            val token =
+                UserRefreshToken(
+                    userId = userId,
+                    tokenHash = tokenHash,
+                    expiresAt = Instant.now().plusSeconds(1800),
+                )
 
             // Act & Assert
             token.isValid(Instant.now()) shouldBe true
@@ -117,7 +118,6 @@ class UserRefreshTokenTest : UnitTest() {
 
     @Nested
     inner class Revocation {
-
         @Test
         fun `should set revokedAt when revoked`() {
             // Arrange

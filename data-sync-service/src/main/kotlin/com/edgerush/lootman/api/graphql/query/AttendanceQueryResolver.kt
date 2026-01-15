@@ -22,7 +22,6 @@ class AttendanceQueryResolver(
     private val listRaiderAttendanceUseCase: ListRaiderAttendanceUseCase,
     private val getGuildAttendanceSummaryUseCase: GetGuildAttendanceSummaryUseCase,
 ) : Query {
-
     /**
      * Get attendance records for a specific raider within a date range.
      *
@@ -39,12 +38,13 @@ class AttendanceQueryResolver(
         startDate: String,
         endDate: String,
     ): List<AttendanceRecordType> {
-        val query = ListRaiderAttendanceQuery(
-            raiderId = raiderId.toLong(),
-            guildId = guildId,
-            startDate = LocalDate.parse(startDate),
-            endDate = LocalDate.parse(endDate),
-        )
+        val query =
+            ListRaiderAttendanceQuery(
+                raiderId = raiderId.toLong(),
+                guildId = guildId,
+                startDate = LocalDate.parse(startDate),
+                endDate = LocalDate.parse(endDate),
+            )
         return listRaiderAttendanceUseCase.execute(query)
             .map { records -> records.map { it.toGraphQLType() } }
             .getOrThrow()
@@ -64,11 +64,12 @@ class AttendanceQueryResolver(
         startDate: String,
         endDate: String,
     ): GuildAttendanceSummaryType {
-        val query = GetGuildAttendanceSummaryQuery(
-            guildId = guildId,
-            startDate = LocalDate.parse(startDate),
-            endDate = LocalDate.parse(endDate),
-        )
+        val query =
+            GetGuildAttendanceSummaryQuery(
+                guildId = guildId,
+                startDate = LocalDate.parse(startDate),
+                endDate = LocalDate.parse(endDate),
+            )
         return getGuildAttendanceSummaryUseCase.execute(query)
             .map { it.toGraphQLType() }
             .getOrThrow()
@@ -118,39 +119,42 @@ data class RaiderAttendanceSummaryType(
 /**
  * Extension function to convert domain AttendanceRecord to GraphQL AttendanceRecordType.
  */
-private fun AttendanceRecord.toGraphQLType(): AttendanceRecordType = AttendanceRecordType(
-    id = this.id.value,
-    raiderId = this.raiderId.value.toString(),
-    guildId = this.guildId.value,
-    instance = this.instance,
-    encounter = this.encounter,
-    startDate = this.startDate,
-    endDate = this.endDate,
-    attendedRaids = this.attendedRaids,
-    totalRaids = this.totalRaids,
-    attendancePercentage = this.attendancePercentage,
-)
+private fun AttendanceRecord.toGraphQLType(): AttendanceRecordType =
+    AttendanceRecordType(
+        id = this.id.value,
+        raiderId = this.raiderId.value.toString(),
+        guildId = this.guildId.value,
+        instance = this.instance,
+        encounter = this.encounter,
+        startDate = this.startDate,
+        endDate = this.endDate,
+        attendedRaids = this.attendedRaids,
+        totalRaids = this.totalRaids,
+        attendancePercentage = this.attendancePercentage,
+    )
 
 /**
  * Extension function to convert GuildAttendanceSummary to GraphQL GuildAttendanceSummaryType.
  */
-private fun GuildAttendanceSummary.toGraphQLType(): GuildAttendanceSummaryType = GuildAttendanceSummaryType(
-    guildId = this.guildId,
-    startDate = this.startDate,
-    endDate = this.endDate,
-    totalRecords = this.totalRecords,
-    uniqueRaiders = this.uniqueRaiders,
-    overallAttendancePercentage = this.overallAttendancePercentage,
-    raiderSummaries = this.raiderSummaries.map { it.toGraphQLType() },
-)
+private fun GuildAttendanceSummary.toGraphQLType(): GuildAttendanceSummaryType =
+    GuildAttendanceSummaryType(
+        guildId = this.guildId,
+        startDate = this.startDate,
+        endDate = this.endDate,
+        totalRecords = this.totalRecords,
+        uniqueRaiders = this.uniqueRaiders,
+        overallAttendancePercentage = this.overallAttendancePercentage,
+        raiderSummaries = this.raiderSummaries.map { it.toGraphQLType() },
+    )
 
 /**
  * Extension function to convert RaiderAttendanceSummary to GraphQL RaiderAttendanceSummaryType.
  */
-private fun RaiderAttendanceSummary.toGraphQLType(): RaiderAttendanceSummaryType = RaiderAttendanceSummaryType(
-    raiderId = this.raiderId.toString(),
-    totalRecords = this.totalRecords,
-    totalAttendedRaids = this.totalAttendedRaids,
-    totalRaids = this.totalRaids,
-    averageAttendancePercentage = this.averageAttendancePercentage,
-)
+private fun RaiderAttendanceSummary.toGraphQLType(): RaiderAttendanceSummaryType =
+    RaiderAttendanceSummaryType(
+        raiderId = this.raiderId.toString(),
+        totalRecords = this.totalRecords,
+        totalAttendedRaids = this.totalAttendedRaids,
+        totalRaids = this.totalRaids,
+        averageAttendancePercentage = this.averageAttendancePercentage,
+    )

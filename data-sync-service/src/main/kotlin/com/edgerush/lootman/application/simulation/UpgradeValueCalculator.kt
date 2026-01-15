@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class UpgradeValueCalculator(
-    private val simulationRepository: SimulationRepository
+    private val simulationRepository: SimulationRepository,
 ) {
     companion object {
         private const val DEFAULT_MAX_PERCENT_GAIN = 10.0
@@ -42,16 +42,17 @@ class UpgradeValueCalculator(
         characterRealm: String,
         itemId: ItemId,
         wishlistFallback: Wishlist?,
-        maxPercentGain: Double = DEFAULT_MAX_PERCENT_GAIN
+        maxPercentGain: Double = DEFAULT_MAX_PERCENT_GAIN,
     ): UpgradeValue {
         // Try to get simulation-based UV first
-        val simulationValue = getSimulationBasedValue(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm,
-            itemId = itemId,
-            maxPercentGain = maxPercentGain
-        )
+        val simulationValue =
+            getSimulationBasedValue(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+                itemId = itemId,
+                maxPercentGain = maxPercentGain,
+            )
 
         if (simulationValue != null) {
             return simulationValue
@@ -77,13 +78,14 @@ class UpgradeValueCalculator(
     fun hasSimulationData(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Boolean {
-        val profile = simulationRepository.findProfileByCharacter(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm
-        ) ?: return false
+        val profile =
+            simulationRepository.findProfileByCharacter(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+            ) ?: return false
 
         // We need to find the profile ID - this is a limitation of the current interface
         // In production, we'd have the ID stored. For now, check if any results exist
@@ -98,24 +100,29 @@ class UpgradeValueCalculator(
         characterName: String,
         characterRealm: String,
         itemId: ItemId,
-        maxPercentGain: Double
+        maxPercentGain: Double,
     ): UpgradeValue? {
-        val profile = simulationRepository.findProfileByCharacter(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm
-        ) ?: return null
+        val profile =
+            simulationRepository.findProfileByCharacter(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+            ) ?: return null
 
         val profileId = getProfileId(guildId, characterName, characterRealm) ?: return null
 
-        val result = simulationRepository.findLatestResultForItem(profileId, itemId.value)
-            ?: return null
+        val result =
+            simulationRepository.findLatestResultForItem(profileId, itemId.value)
+                ?: return null
 
         val normalizedValue = result.normalizedUpgradeValue(maxPercentGain)
         return UpgradeValue.of(normalizedValue)
     }
 
-    private fun calculateFromWishlist(wishlist: Wishlist, itemId: ItemId): UpgradeValue {
+    private fun calculateFromWishlist(
+        wishlist: Wishlist,
+        itemId: ItemId,
+    ): UpgradeValue {
         val upgradePercentage = wishlist.getUpgradePercentage(itemId) ?: 0.0
         // Wishlist percentages are 0-100, normalize to 0-1
         val normalizedValue = (upgradePercentage / 100.0).coerceIn(0.0, 1.0)
@@ -125,12 +132,12 @@ class UpgradeValueCalculator(
     private fun getProfileId(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long? {
         return simulationRepository.findProfileIdByCharacter(
             guildId = guildId,
             characterName = characterName,
-            characterRealm = characterRealm
+            characterRealm = characterRealm,
         )
     }
 }

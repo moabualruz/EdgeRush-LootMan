@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.Instant
 
 /**
  * JDBC implementation of SimulationRepository.
@@ -20,29 +19,30 @@ import java.time.Instant
  */
 @Repository
 class JdbcSimulationRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : SimulationRepository {
+    private val profileRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            SimulationProfile.create(
+                guildId = rs.getString("guild_id"),
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                profileContent = rs.getString("profile_content"),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+            )
+        }
 
-    private val profileRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        SimulationProfile.create(
-            guildId = rs.getString("guild_id"),
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            profileContent = rs.getString("profile_content"),
-            createdAt = rs.getTimestamp("created_at").toInstant()
-        )
-    }
-
-    private val resultRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        SimulationResult.create(
-            itemId = rs.getLong("item_id"),
-            itemName = rs.getString("item_name"),
-            slot = rs.getString("slot"),
-            dpsGain = rs.getDouble("dps_gain"),
-            percentGain = rs.getDouble("percent_gain"),
-            simulatedAt = rs.getTimestamp("simulated_at").toInstant()
-        )
-    }
+    private val resultRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            SimulationResult.create(
+                itemId = rs.getLong("item_id"),
+                itemName = rs.getString("item_name"),
+                slot = rs.getString("slot"),
+                dpsGain = rs.getDouble("dps_gain"),
+                percentGain = rs.getDouble("percent_gain"),
+                simulatedAt = rs.getTimestamp("simulated_at").toInstant(),
+            )
+        }
 
     override fun saveProfile(profile: SimulationProfile): Pair<Long, SimulationProfile> {
         // Upsert profile
@@ -57,49 +57,52 @@ class JdbcSimulationRepository(
             profile.characterName,
             profile.characterRealm,
             profile.profileContent,
-            Timestamp.from(profile.createdAt)
+            Timestamp.from(profile.createdAt),
         )
 
         // Get the ID
-        val id = jdbcTemplate.queryForObject(
-            "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
-            Long::class.java,
-            profile.guildId,
-            profile.characterName,
-            profile.characterRealm
-        ) ?: throw IllegalStateException("Failed to retrieve profile ID after save")
+        val id =
+            jdbcTemplate.queryForObject(
+                "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
+                Long::class.java,
+                profile.guildId,
+                profile.characterName,
+                profile.characterRealm,
+            ) ?: throw IllegalStateException("Failed to retrieve profile ID after save")
 
         return id to profile
     }
 
     override fun findProfileById(id: Long): SimulationProfile? {
-        val profiles = jdbcTemplate.query(
-            "SELECT * FROM simulation_profiles WHERE id = ?",
-            profileRowMapper,
-            id
-        )
+        val profiles =
+            jdbcTemplate.query(
+                "SELECT * FROM simulation_profiles WHERE id = ?",
+                profileRowMapper,
+                id,
+            )
         return profiles.firstOrNull()
     }
 
     override fun findProfileByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): SimulationProfile? {
-        val profiles = jdbcTemplate.query(
-            "SELECT * FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
-            profileRowMapper,
-            guildId,
-            characterName,
-            characterRealm
-        )
+        val profiles =
+            jdbcTemplate.query(
+                "SELECT * FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
+                profileRowMapper,
+                guildId,
+                characterName,
+                characterRealm,
+            )
         return profiles.firstOrNull()
     }
 
     override fun findProfileIdByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long? {
         return try {
             jdbcTemplate.queryForObject(
@@ -107,7 +110,7 @@ class JdbcSimulationRepository(
                 Long::class.java,
                 guildId,
                 characterName,
-                characterRealm
+                characterRealm,
             )
         } catch (e: org.springframework.dao.EmptyResultDataAccessException) {
             null
@@ -116,13 +119,14 @@ class JdbcSimulationRepository(
 
     override fun saveRequest(request: SimulationRequest): SimulationRequest {
         // Get profile ID
-        val profileId = jdbcTemplate.queryForObject(
-            "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
-            Long::class.java,
-            request.profile.guildId,
-            request.profile.characterName,
-            request.profile.characterRealm
-        ) ?: throw IllegalStateException("Profile not found for request")
+        val profileId =
+            jdbcTemplate.queryForObject(
+                "SELECT id FROM simulation_profiles WHERE guild_id = ? AND character_name = ? AND character_realm = ?",
+                Long::class.java,
+                request.profile.guildId,
+                request.profile.characterName,
+                request.profile.characterRealm,
+            ) ?: throw IllegalStateException("Profile not found for request")
 
         if (request.id == null) {
             // Insert new request
@@ -138,14 +142,15 @@ class JdbcSimulationRepository(
                 request.status.name,
                 Timestamp.from(request.submittedAt),
                 request.completedAt?.let { Timestamp.from(it) },
-                request.errorMessage
+                request.errorMessage,
             )
 
             // Get generated ID
-            val id = jdbcTemplate.queryForObject(
-                "SELECT currval(pg_get_serial_sequence('simulation_requests', 'id'))",
-                Long::class.java
-            ) ?: throw IllegalStateException("Failed to retrieve request ID after insert")
+            val id =
+                jdbcTemplate.queryForObject(
+                    "SELECT currval(pg_get_serial_sequence('simulation_requests', 'id'))",
+                    Long::class.java,
+                ) ?: throw IllegalStateException("Failed to retrieve request ID after insert")
 
             return request.withId(id)
         } else {
@@ -159,23 +164,24 @@ class JdbcSimulationRepository(
                 request.status.name,
                 request.completedAt?.let { Timestamp.from(it) },
                 request.errorMessage,
-                request.id
+                request.id,
             )
             return request
         }
     }
 
     override fun findRequestById(id: Long): SimulationRequest? {
-        val requests = jdbcTemplate.query(
-            """
-            SELECT r.*, p.guild_id, p.character_name, p.character_realm, p.profile_content, p.created_at as profile_created_at
-            FROM simulation_requests r
-            JOIN simulation_profiles p ON r.profile_id = p.id
-            WHERE r.id = ?
-            """.trimIndent(),
-            { rs, _ -> mapRequestRow(rs) },
-            id
-        )
+        val requests =
+            jdbcTemplate.query(
+                """
+                SELECT r.*, p.guild_id, p.character_name, p.character_realm, p.profile_content, p.created_at as profile_created_at
+                FROM simulation_requests r
+                JOIN simulation_profiles p ON r.profile_id = p.id
+                WHERE r.id = ?
+                """.trimIndent(),
+                { rs, _ -> mapRequestRow(rs) },
+                id,
+            )
         return requests.firstOrNull()
     }
 
@@ -189,11 +195,14 @@ class JdbcSimulationRepository(
             ORDER BY r.submitted_at ASC
             """.trimIndent(),
             { rs, _ -> mapRequestRow(rs) },
-            "PENDING"
+            "PENDING",
         )
     }
 
-    override fun saveResult(profileId: Long, result: SimulationResult) {
+    override fun saveResult(
+        profileId: Long,
+        result: SimulationResult,
+    ) {
         jdbcTemplate.update(
             """
             INSERT INTO simulation_results
@@ -206,22 +215,26 @@ class JdbcSimulationRepository(
             result.slot,
             result.dpsGain,
             result.percentGain,
-            Timestamp.from(result.simulatedAt)
+            Timestamp.from(result.simulatedAt),
         )
     }
 
-    override fun findLatestResultForItem(profileId: Long, itemId: Long): SimulationResult? {
-        val results = jdbcTemplate.query(
-            """
-            SELECT * FROM simulation_results
-            WHERE profile_id = ? AND item_id = ?
-            ORDER BY simulated_at DESC
-            LIMIT 1
-            """.trimIndent(),
-            resultRowMapper,
-            profileId,
-            itemId
-        )
+    override fun findLatestResultForItem(
+        profileId: Long,
+        itemId: Long,
+    ): SimulationResult? {
+        val results =
+            jdbcTemplate.query(
+                """
+                SELECT * FROM simulation_results
+                WHERE profile_id = ? AND item_id = ?
+                ORDER BY simulated_at DESC
+                LIMIT 1
+                """.trimIndent(),
+                resultRowMapper,
+                profileId,
+                itemId,
+            )
         return results.firstOrNull()
     }
 
@@ -229,23 +242,24 @@ class JdbcSimulationRepository(
         return jdbcTemplate.query(
             "SELECT * FROM simulation_results WHERE profile_id = ? ORDER BY simulated_at DESC",
             resultRowMapper,
-            profileId
+            profileId,
         )
     }
 
     private fun mapRequestRow(rs: ResultSet): SimulationRequest {
-        val profile = SimulationProfile.create(
-            guildId = rs.getString("guild_id"),
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            profileContent = rs.getString("profile_content"),
-            createdAt = rs.getTimestamp("profile_created_at").toInstant()
-        )
+        val profile =
+            SimulationProfile.create(
+                guildId = rs.getString("guild_id"),
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                profileContent = rs.getString("profile_content"),
+                createdAt = rs.getTimestamp("profile_created_at").toInstant(),
+            )
 
         return SimulationRequest.create(
             profile = profile,
             iterations = rs.getInt("iterations"),
-            fightLengthSeconds = rs.getInt("fight_length_seconds")
+            fightLengthSeconds = rs.getInt("fight_length_seconds"),
         ).let { request ->
             // Apply state based on database values
             var result = request.withId(rs.getLong("id"))

@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the raider_crest_counts table.
  */
 class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderCrestCountRepository
 
@@ -35,7 +34,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return crest count when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderCrestCountEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderCrestCountEntity>>()
@@ -70,7 +68,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderCrestCountEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,16 +88,17 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderCrestCountEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderCrestCountEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    crestType = "Heroic",
-                    crestCount = 15
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        crestType = "Heroic",
+                        crestCount = 15,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -123,16 +122,17 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<RaiderCrestCountEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderCrestCountEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    raiderId = 100L,
-                    crestType = "Mythic",
-                    crestCount = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        raiderId = 100L,
+                        crestType = "Mythic",
+                        crestCount = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -147,7 +147,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated crest counts`() {
             // Given
@@ -159,13 +158,13 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<RaiderCrestCountEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderCrestCountEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -179,7 +178,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return crest counts for raider`() {
             // Given
@@ -191,13 +189,13 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderCrestCountEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<RaiderCrestCountEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, raiderId, crestType = "Heroic"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, raiderId, crestType = "Mythic"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, raiderId, crestType = "Mythic"), 1),
                 )
             }
 
@@ -220,7 +218,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                     any<RowMapper<RaiderCrestCountEntity>>(),
                     eq(raiderId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -234,14 +232,13 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_crest_counts") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -258,7 +255,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -278,7 +275,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") },
                     Long::class.java,
-                    eq(raiderId)
+                    eq(raiderId),
                 )
             } returns 3L
 
@@ -292,7 +289,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when crest count exists`() {
             // Given
@@ -302,7 +298,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -322,7 +318,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -342,7 +338,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -356,7 +352,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new crest count when id is null`() {
             // Given
@@ -397,7 +392,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -405,7 +400,6 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete crest count by id`() {
             // Given
@@ -414,7 +408,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -425,7 +419,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -437,7 +431,7 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
         id: Long,
         raiderId: Long,
         crestType: String = "Heroic",
-        crestCount: Int? = 10
+        crestCount: Int? = 10,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -452,11 +446,12 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
         id: Long? = 1L,
         raiderId: Long = 100L,
         crestType: String = "Heroic",
-        crestCount: Int? = 10
-    ): RaiderCrestCountEntity = RaiderCrestCountEntity(
-        id = id,
-        raiderId = raiderId,
-        crestType = crestType,
-        crestCount = crestCount
-    )
+        crestCount: Int? = 10,
+    ): RaiderCrestCountEntity =
+        RaiderCrestCountEntity(
+            id = id,
+            raiderId = raiderId,
+            crestType = crestType,
+            crestCount = crestCount,
+        )
 }

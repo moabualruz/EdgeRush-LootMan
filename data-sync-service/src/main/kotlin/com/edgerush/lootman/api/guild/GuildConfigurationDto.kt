@@ -11,10 +11,8 @@ import java.time.OffsetDateTime
 data class CreateGuildConfigurationRequest(
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Guild name is required")
     val guildName: String,
-
     val guildDescription: String? = null,
     val wowauditApiKeyEncrypted: String? = null,
     val wowauditGuildUri: String? = null,
@@ -79,28 +77,29 @@ data class GuildConfigurationResponse(
     val benchmarkUpdatedAt: OffsetDateTime?,
 ) {
     companion object {
-        fun from(entity: GuildConfigurationEntity): GuildConfigurationResponse = GuildConfigurationResponse(
-            id = entity.id ?: 0L,
-            guildId = entity.guildId,
-            guildName = entity.guildName,
-            guildDescription = entity.guildDescription,
-            wowauditGuildUri = entity.wowauditGuildUri,
-            wowauditBaseUrl = entity.wowauditBaseUrl,
-            syncEnabled = entity.syncEnabled,
-            syncCronExpression = entity.syncCronExpression,
-            syncRunOnStartup = entity.syncRunOnStartup,
-            lastSyncAt = entity.lastSyncAt,
-            lastSyncStatus = entity.lastSyncStatus,
-            lastSyncError = entity.lastSyncError,
-            timezone = entity.timezone,
-            isActive = entity.isActive,
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt,
-            benchmarkMode = entity.benchmarkMode,
-            customBenchmarkRms = entity.customBenchmarkRms,
-            customBenchmarkIpi = entity.customBenchmarkIpi,
-            benchmarkUpdatedAt = entity.benchmarkUpdatedAt,
-        )
+        fun from(entity: GuildConfigurationEntity): GuildConfigurationResponse =
+            GuildConfigurationResponse(
+                id = entity.id ?: 0L,
+                guildId = entity.guildId,
+                guildName = entity.guildName,
+                guildDescription = entity.guildDescription,
+                wowauditGuildUri = entity.wowauditGuildUri,
+                wowauditBaseUrl = entity.wowauditBaseUrl,
+                syncEnabled = entity.syncEnabled,
+                syncCronExpression = entity.syncCronExpression,
+                syncRunOnStartup = entity.syncRunOnStartup,
+                lastSyncAt = entity.lastSyncAt,
+                lastSyncStatus = entity.lastSyncStatus,
+                lastSyncError = entity.lastSyncError,
+                timezone = entity.timezone,
+                isActive = entity.isActive,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt,
+                benchmarkMode = entity.benchmarkMode,
+                customBenchmarkRms = entity.customBenchmarkRms,
+                customBenchmarkIpi = entity.customBenchmarkIpi,
+                benchmarkUpdatedAt = entity.benchmarkUpdatedAt,
+            )
     }
 }
 

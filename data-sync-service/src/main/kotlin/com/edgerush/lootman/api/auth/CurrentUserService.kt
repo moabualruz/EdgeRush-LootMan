@@ -26,9 +26,8 @@ class GuildAccessDeniedException(userId: Long, guildId: String) :
  */
 @Service
 class CurrentUserService(
-    private val userCharacterMappingService: UserCharacterMappingService
+    private val userCharacterMappingService: UserCharacterMappingService,
 ) {
-
     /**
      * Gets the current authenticated user from the security context.
      */
@@ -50,8 +49,9 @@ class CurrentUserService(
                 return@flatMap Mono.error(NoLinkedRaiderException(-1L))
             }
 
-            val primaryMapping = userCharacterMappingService.getPrimaryCharacterForUser(userId)
-                ?: return@flatMap Mono.error(NoLinkedRaiderException(userId.value))
+            val primaryMapping =
+                userCharacterMappingService.getPrimaryCharacterForUser(userId)
+                    ?: return@flatMap Mono.error(NoLinkedRaiderException(userId.value))
 
             Mono.just(RaiderId(primaryMapping.raiderId))
         }
@@ -68,8 +68,9 @@ class CurrentUserService(
             throw NoLinkedRaiderException(-1L)
         }
 
-        val primaryMapping = userCharacterMappingService.getPrimaryCharacterForUser(userId)
-            ?: throw NoLinkedRaiderException(userId.value)
+        val primaryMapping =
+            userCharacterMappingService.getPrimaryCharacterForUser(userId)
+                ?: throw NoLinkedRaiderException(userId.value)
 
         return RaiderId(primaryMapping.raiderId)
     }
@@ -77,7 +78,10 @@ class CurrentUserService(
     /**
      * Validates that the current user has access to the specified guild.
      */
-    fun validateGuildAccess(user: AuthenticatedUser, guildId: GuildId) {
+    fun validateGuildAccess(
+        user: AuthenticatedUser,
+        guildId: GuildId,
+    ) {
         if (!user.hasGuildAccess(guildId.value)) {
             val userId = user.id.toLongOrNull() ?: -1L
             throw GuildAccessDeniedException(userId, guildId.value)

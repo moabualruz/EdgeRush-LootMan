@@ -11,7 +11,6 @@ import java.time.LocalDate
  * Extends the generic CrudService with raid-specific query methods.
  */
 interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidRequest, RaidResponse> {
-
     /**
      * Find raids by team with pagination.
      *
@@ -19,7 +18,10 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
      * @param pageRequest Pagination parameters
      * @return Paginated list of raids for the team
      */
-    fun findByTeam(teamId: Long, pageRequest: PageRequest): PagedResponse<RaidResponse>
+    fun findByTeam(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidResponse>
 
     /**
      * Find raids within a date range with pagination.
@@ -29,7 +31,11 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
      * @param pageRequest Pagination parameters
      * @return Paginated list of raids within the date range
      */
-    fun findByDateRange(startDate: LocalDate, endDate: LocalDate, pageRequest: PageRequest): PagedResponse<RaidResponse>
+    fun findByDateRange(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidResponse>
 
     /**
      * Count raids for a team.
@@ -46,7 +52,10 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
      * @param limit Maximum number of raids to return
      * @return List of upcoming raids ordered by date ascending
      */
-    fun findUpcomingByGuild(guildId: Long, limit: Int): List<RaidResponse>
+    fun findUpcomingByGuild(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidResponse>
 
     /**
      * Find past raids for a guild.
@@ -55,5 +64,8 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
      * @param limit Maximum number of raids to return
      * @return List of past raids ordered by date descending
      */
-    fun findPastByGuild(guildId: Long, limit: Int): List<RaidResponse>
+    fun findPastByGuild(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidResponse>
 }

@@ -12,10 +12,8 @@ data class CreateRaiderVaultSlotRequest(
     @field:NotNull(message = "Raider ID is required")
     @field:Positive(message = "Raider ID must be positive")
     val raiderId: Long,
-
     @field:NotBlank(message = "Slot is required")
     val slot: String,
-
     val unlocked: Boolean? = false,
 )
 
@@ -37,12 +35,13 @@ data class RaiderVaultSlotResponse(
     val unlocked: Boolean?,
 ) {
     companion object {
-        fun from(entity: RaiderVaultSlotEntity): RaiderVaultSlotResponse = RaiderVaultSlotResponse(
-            id = entity.id ?: 0L,
-            raiderId = entity.raiderId,
-            slot = entity.slot,
-            unlocked = entity.unlocked,
-        )
+        fun from(entity: RaiderVaultSlotEntity): RaiderVaultSlotResponse =
+            RaiderVaultSlotResponse(
+                id = entity.id ?: 0L,
+                raiderId = entity.raiderId,
+                slot = entity.slot,
+                unlocked = entity.unlocked,
+            )
     }
 }
 

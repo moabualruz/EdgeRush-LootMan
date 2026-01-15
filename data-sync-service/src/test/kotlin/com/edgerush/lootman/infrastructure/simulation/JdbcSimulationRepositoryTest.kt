@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.Instant
@@ -30,7 +29,6 @@ import java.time.Instant
  * Integration tests with real database should be in a separate test class.
  */
 class JdbcSimulationRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcSimulationRepository
 
@@ -46,7 +44,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             characterName = "Testchar",
             characterRealm = "TestRealm",
             profileContent = """warrior="Testchar"""",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
@@ -81,7 +79,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                     any<RowMapper<SimulationProfile>>(),
                     eq("guild-123"),
                     eq("Testchar"),
-                    eq("TestRealm")
+                    eq("TestRealm"),
                 )
             } returns listOf(profile)
 
@@ -99,7 +97,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     any<String>(),
                     any<RowMapper<SimulationProfile>>(),
-                    *anyVararg()
+                    *anyVararg(),
                 )
             } returns emptyList<SimulationProfile>()
 
@@ -122,7 +120,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                     eq(Long::class.java),
                     eq("guild-123"),
                     eq("Testchar"),
-                    eq("TestRealm")
+                    eq("TestRealm"),
                 )
             } returns 42L
 
@@ -140,7 +138,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     any<String>(),
                     eq(Long::class.java),
-                    *anyVararg()
+                    *anyVararg(),
                 )
             } throws org.springframework.dao.EmptyResultDataAccessException(1)
 
@@ -183,7 +181,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match { it.contains("status = ?") && it.contains("PENDING") },
                     any<RowMapper<SimulationRequest>>(),
-                    eq("PENDING")
+                    eq("PENDING"),
                 )
             } returns emptyList<SimulationRequest>()
 
@@ -200,14 +198,15 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         @Test
         fun `should insert simulation result`() {
             // Arrange
-            val result = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Test Item",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
+            val result =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Test Item",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
 
             // Act
             repository.saveResult(1L, result)
@@ -222,7 +221,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                     eq("head"),
                     eq(1000.0),
                     eq(1.0),
-                    any<Timestamp>()
+                    any<Timestamp>(),
                 )
             }
         }
@@ -233,21 +232,22 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         @Test
         fun `should order by simulated_at desc and limit 1`() {
             // Arrange
-            val result = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Test Item",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
+            val result =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Test Item",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
 
             every {
                 jdbcTemplate.query(
                     match { it.contains("ORDER BY simulated_at DESC") && it.contains("LIMIT 1") },
                     any<RowMapper<SimulationResult>>(),
                     eq(1L),
-                    eq(12345L)
+                    eq(12345L),
                 )
             } returns listOf(result)
 
@@ -344,22 +344,24 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         @Test
         fun `should return all results for profile ordered by date`() {
             // Arrange
-            val result1 = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Item 1",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now(),
-            )
-            val result2 = SimulationResult.create(
-                itemId = 12346L,
-                itemName = "Item 2",
-                slot = "neck",
-                dpsGain = 500.0,
-                percentGain = 0.5,
-                simulatedAt = Instant.now(),
-            )
+            val result1 =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Item 1",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
+            val result2 =
+                SimulationResult.create(
+                    itemId = 12346L,
+                    itemName = "Item 2",
+                    slot = "neck",
+                    dpsGain = 500.0,
+                    percentGain = 0.5,
+                    simulatedAt = Instant.now(),
+                )
 
             every {
                 jdbcTemplate.query(
@@ -415,7 +417,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     capture(capturedMapper),
-                    eq(42L)
+                    eq(42L),
                 )
             } answers {
                 listOf(capturedMapper.captured.mapRow(rs, 0))
@@ -449,7 +451,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                     match { it.contains("ORDER BY simulated_at DESC") && it.contains("LIMIT 1") },
                     capture(capturedMapper),
                     eq(1L),
-                    eq(12345L)
+                    eq(12345L),
                 )
             } answers {
                 listOf(capturedMapper.captured.mapRow(rs, 0))
@@ -466,14 +468,13 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             found?.dpsGain shouldBe 1000.0
             found?.percentGain shouldBe 1.5
         }
-
     }
 
     @Nested
     inner class MapRequestRowTests {
         private fun setupMockResultSetForRequest(
             status: String,
-            errorMessage: String? = null
+            errorMessage: String? = null,
         ): ResultSet {
             val now = Instant.now()
             val rs = mockk<ResultSet>()
@@ -507,7 +508,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -532,7 +533,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -556,7 +557,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -580,7 +581,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -605,7 +606,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -630,7 +631,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.status = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -652,9 +653,10 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             // Arrange
             val profile = createProfile()
             val completedAt = Instant.now()
-            val request = SimulationRequest.create(profile = profile)
-                .markRunning()
-                .markCompleted(emptyList())
+            val request =
+                SimulationRequest.create(profile = profile)
+                    .markRunning()
+                    .markCompleted(emptyList())
 
             every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
             every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java)) } returns 1L
@@ -674,7 +676,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
     inner class MapRequestRowNullHandlingTests {
         private fun setupMockResultSetWithNullCompletedAt(
             status: String,
-            errorMessage: String? = null
+            errorMessage: String? = null,
         ): ResultSet {
             val now = Instant.now()
             val rs = mockk<ResultSet>()
@@ -692,7 +694,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             every { rs.getInt("fight_length_seconds") } returns 300
             every { rs.getString("status") } returns status
             every { rs.getTimestamp("submitted_at") } returns Timestamp.from(now)
-            every { rs.getTimestamp("completed_at") } returns null  // NULL completed_at
+            every { rs.getTimestamp("completed_at") } returns null // NULL completed_at
             every { rs.getString("error_message") } returns errorMessage
 
             return rs
@@ -708,7 +710,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -734,7 +736,7 @@ class JdbcSimulationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("simulation_requests") && it.contains("WHERE r.id = ?") },
                     capture(mapperSlot),
-                    *varargAll { true }
+                    *varargAll { true },
                 )
             } answers {
                 listOf(mapperSlot.captured.mapRow(rs, 0)!!)
@@ -756,9 +758,10 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         fun `should update existing request when id is present`() {
             // Arrange
             val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
-                .withId(42L)
-                .markRunning()
+            val request =
+                SimulationRequest.create(profile = profile)
+                    .withId(42L)
+                    .markRunning()
 
             every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
@@ -780,10 +783,11 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         fun `should update status to completed`() {
             // Arrange
             val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
-                .withId(42L)
-                .markRunning()
-                .markCompleted(emptyList())
+            val request =
+                SimulationRequest.create(profile = profile)
+                    .withId(42L)
+                    .markRunning()
+                    .markCompleted(emptyList())
 
             every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
@@ -799,10 +803,11 @@ class JdbcSimulationRepositoryTest : UnitTest() {
         fun `should update status to failed with error message`() {
             // Arrange
             val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
-                .withId(42L)
-                .markRunning()
-                .markFailed("Test error")
+            val request =
+                SimulationRequest.create(profile = profile)
+                    .withId(42L)
+                    .markRunning()
+                    .markFailed("Test error")
 
             every { jdbcTemplate.queryForObject(any<String>(), eq(Long::class.java), *anyVararg()) } returns 1L
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1

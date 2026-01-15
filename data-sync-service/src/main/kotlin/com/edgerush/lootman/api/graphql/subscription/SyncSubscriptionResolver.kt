@@ -17,7 +17,6 @@ import java.time.Instant
 class SyncSubscriptionResolver(
     private val syncEventPublisher: SyncEventPublisher,
 ) : Subscription {
-
     /**
      * Subscribe to sync completed events for a guild.
      *
@@ -109,7 +108,7 @@ class SyncEventPublisher {
                 recordsUpdated = recordsUpdated,
                 durationMs = durationMs,
                 completedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -132,7 +131,7 @@ class SyncEventPublisher {
                 guildId = guildId,
                 syncType = syncType,
                 startedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -159,7 +158,7 @@ class SyncEventPublisher {
                 errorMessage = errorMessage,
                 errorCode = errorCode,
                 failedAt = Instant.now(),
-            )
+            ),
         )
     }
 
@@ -190,7 +189,7 @@ class SyncEventPublisher {
                 totalCount = totalCount,
                 percentComplete = percentComplete,
                 timestamp = Instant.now(),
-            )
+            ),
         )
     }
 }

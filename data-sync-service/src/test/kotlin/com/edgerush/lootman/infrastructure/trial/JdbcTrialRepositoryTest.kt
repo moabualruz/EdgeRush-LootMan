@@ -8,7 +8,6 @@ import com.edgerush.lootman.domain.trial.model.TrialId
 import com.edgerush.lootman.domain.trial.model.TrialOutcome
 import com.edgerush.lootman.domain.trial.model.TrialStatus
 import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired
  * Integration tests for JdbcTrialRepository.
  */
 class JdbcTrialRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var repository: JdbcTrialRepository
 
@@ -35,7 +33,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new trial`() {
             // Arrange
@@ -55,12 +52,13 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
             val trial = createValidTrial()
             repository.save(trial)
 
-            val updated = trial.updateMetrics(
-                raidsAttended = 4,
-                attendanceRate = 0.85,
-                averagePerformance = 75.0,
-                deathsPerRaid = 1.2,
-            )
+            val updated =
+                trial.updateMetrics(
+                    raidsAttended = 4,
+                    attendanceRate = 0.85,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 1.2,
+                )
 
             // Act
             val saved = repository.save(updated)
@@ -75,9 +73,10 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
         @Test
         fun `should save trial with promoted status`() {
             // Arrange
-            val trial = createValidTrial()
-                .updateMetrics(raidsAttended = 8, attendanceRate = 0.9, averagePerformance = 80.0, deathsPerRaid = 0.5)
-                .promote("officer-123", "Excellent performance")
+            val trial =
+                createValidTrial()
+                    .updateMetrics(raidsAttended = 8, attendanceRate = 0.9, averagePerformance = 80.0, deathsPerRaid = 0.5)
+                    .promote("officer-123", "Excellent performance")
 
             // Act
             val saved = repository.save(trial)
@@ -94,8 +93,9 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
         @Test
         fun `should save trial with ended status`() {
             // Arrange
-            val trial = createValidTrial()
-                .endTrial("officer-123", TrialOutcome.FAILED, "Poor attendance")
+            val trial =
+                createValidTrial()
+                    .endTrial("officer-123", TrialOutcome.FAILED, "Poor attendance")
 
             // Act
             repository.save(trial)
@@ -110,7 +110,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should find existing trial by ID`() {
             // Arrange
@@ -139,7 +138,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByApplicationIdTests {
-
         @Test
         fun `should find trial by application ID`() {
             // Arrange
@@ -166,7 +164,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should find all trials for guild`() {
             // Arrange
@@ -213,13 +210,13 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByGuildIdAndStatusTests {
-
         @Test
         fun `should find trials by status`() {
             // Arrange
             val activeTrial = createValidTrial(applicationId = "app-active")
-            val promotedTrial = createValidTrial(applicationId = "app-promoted")
-                .promote("officer-123", "Great job")
+            val promotedTrial =
+                createValidTrial(applicationId = "app-promoted")
+                    .promote("officer-123", "Great job")
             repository.save(activeTrial)
             repository.save(promotedTrial)
 
@@ -237,15 +234,16 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindActiveTrialsTests {
-
         @Test
         fun `should find active and extended trials`() {
             // Arrange
             val activeTrial = createValidTrial(applicationId = "app-active")
-            val extendedTrial = createValidTrial(applicationId = "app-extended")
-                .extend("officer-123", 4, "Needs more time")
-            val promotedTrial = createValidTrial(applicationId = "app-promoted")
-                .promote("officer-123", "Great job")
+            val extendedTrial =
+                createValidTrial(applicationId = "app-extended")
+                    .extend("officer-123", 4, "Needs more time")
+            val promotedTrial =
+                createValidTrial(applicationId = "app-promoted")
+                    .promote("officer-123", "Great job")
             repository.save(activeTrial)
             repository.save(extendedTrial)
             repository.save(promotedTrial)
@@ -261,16 +259,16 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should find trial by raider ID`() {
             // Arrange
-            val trial = Trial.create(
-                applicationId = ApplicationId("app-123"),
-                guildId = guildId,
-                raidsRequired = 8,
-                raiderId = 12345L,
-            )
+            val trial =
+                Trial.create(
+                    applicationId = ApplicationId("app-123"),
+                    guildId = guildId,
+                    raidsRequired = 8,
+                    raiderId = 12345L,
+                )
             repository.save(trial)
 
             // Act
@@ -293,7 +291,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should count trials for guild`() {
             // Arrange
@@ -312,8 +309,9 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
         fun `should count trials by status`() {
             // Arrange
             val activeTrial = createValidTrial(applicationId = "app-1")
-            val promotedTrial = createValidTrial(applicationId = "app-2")
-                .promote("officer-123", "Good job")
+            val promotedTrial =
+                createValidTrial(applicationId = "app-2")
+                    .promote("officer-123", "Good job")
             repository.save(activeTrial)
             repository.save(promotedTrial)
 
@@ -329,7 +327,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete trial by ID`() {
             // Arrange
@@ -352,7 +349,6 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return true for existing trial`() {
             // Arrange
@@ -379,11 +375,12 @@ class JdbcTrialRepositoryTest : IntegrationTest() {
     private fun createValidTrial(
         applicationId: String = "app-${System.nanoTime()}",
         guildId: String = this.guildId.value,
-    ): Trial = Trial.create(
-        applicationId = ApplicationId(applicationId),
-        guildId = GuildId(guildId),
-        raidsRequired = 8,
-    )
+    ): Trial =
+        Trial.create(
+            applicationId = ApplicationId(applicationId),
+            guildId = GuildId(guildId),
+            raidsRequired = 8,
+        )
 
     private fun cleanupTestTrials() {
         // Clean up trials from test guild

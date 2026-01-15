@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the loot_award_bonus_ids table.
  */
 class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcLootAwardBonusIdRepository
 
@@ -35,7 +34,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return bonus id when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardBonusIdEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardBonusIdEntity>>()
@@ -70,7 +68,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardBonusIdEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,15 +88,16 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardBonusIdEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardBonusIdEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    bonusId = "6652"
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        bonusId = "6652",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -121,15 +120,16 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardBonusIdEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardBonusIdEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    bonusId = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        bonusId = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -144,7 +144,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated bonus ids`() {
             // Given
@@ -156,13 +155,13 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<LootAwardBonusIdEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardBonusIdEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -176,7 +175,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByLootAwardIdTests {
-
         @Test
         fun `should return bonus ids for loot award`() {
             // Given
@@ -188,13 +186,13 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardBonusIdEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardBonusIdEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, lootAwardId, "6652"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, "6653"), 1)
+                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, "6653"), 1),
                 )
             }
 
@@ -217,7 +215,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardBonusIdEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -231,14 +229,13 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_bonus_ids") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -255,7 +252,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -275,7 +272,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_id = ?") },
                     Long::class.java,
-                    eq(lootAwardId)
+                    eq(lootAwardId),
                 )
             } returns 3L
 
@@ -289,7 +286,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when bonus id exists`() {
             // Given
@@ -299,7 +295,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -319,7 +315,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -339,7 +335,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -353,7 +349,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new bonus id when id is null`() {
             // Given
@@ -394,7 +389,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -402,7 +397,6 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete bonus id by id`() {
             // Given
@@ -411,7 +405,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -422,7 +416,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -433,7 +427,7 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
     private fun mockResultSet(
         id: Long,
         lootAwardId: Long,
-        bonusId: String? = "6652"
+        bonusId: String? = "6652",
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -445,10 +439,11 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
     private fun createBonusIdEntity(
         id: Long? = 1L,
         lootAwardId: Long = 100L,
-        bonusId: String? = "6652"
-    ): LootAwardBonusIdEntity = LootAwardBonusIdEntity(
-        id = id,
-        lootAwardId = lootAwardId,
-        bonusId = bonusId
-    )
+        bonusId: String? = "6652",
+    ): LootAwardBonusIdEntity =
+        LootAwardBonusIdEntity(
+            id = id,
+            lootAwardId = lootAwardId,
+            bonusId = bonusId,
+        )
 }

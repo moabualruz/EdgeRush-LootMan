@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 /**
  * Unit tests for custom GraphQL scalars.
@@ -18,14 +17,12 @@ import java.time.ZoneOffset
  * Tests serialization and deserialization of custom date/time types.
  */
 class CustomScalarsTest {
-
     @Nested
     inner class InstantScalarCoercingTests {
         private val coercing = InstantScalarCoercing()
 
         @Nested
         inner class Serialize {
-
             @Test
             fun `should serialize Instant to ISO string`() {
                 // Arrange
@@ -49,7 +46,6 @@ class CustomScalarsTest {
 
         @Nested
         inner class ParseValue {
-
             @Test
             fun `should parse ISO string to Instant`() {
                 // Arrange
@@ -81,7 +77,6 @@ class CustomScalarsTest {
 
         @Nested
         inner class ParseLiteral {
-
             @Test
             fun `should parse StringValue to Instant`() {
                 // Arrange
@@ -110,7 +105,6 @@ class CustomScalarsTest {
 
         @Nested
         inner class Serialize {
-
             @Test
             fun `should serialize LocalDateTime to ISO string`() {
                 // Arrange - use non-zero seconds to ensure consistent ISO format
@@ -134,7 +128,6 @@ class CustomScalarsTest {
 
         @Nested
         inner class ParseValue {
-
             @Test
             fun `should parse ISO string to LocalDateTime`() {
                 // Arrange
@@ -158,7 +151,6 @@ class CustomScalarsTest {
 
         @Nested
         inner class ParseLiteral {
-
             @Test
             fun `should parse StringValue to LocalDateTime`() {
                 // Arrange

@@ -11,20 +11,19 @@ import org.junit.jupiter.api.Test
  * Unit tests for PlanMarker value object.
  */
 class PlanMarkerTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid marker with all fields`() {
             // Arrange & Act
-            val marker = PlanMarker(
-                type = MarkerType.SKULL,
-                x = 50.0,
-                y = 75.0,
-                label = "Main Tank",
-                color = "#FF0000",
-            )
+            val marker =
+                PlanMarker(
+                    type = MarkerType.SKULL,
+                    x = 50.0,
+                    y = 75.0,
+                    label = "Main Tank",
+                    color = "#FF0000",
+                )
 
             // Assert
             marker.type shouldBe MarkerType.SKULL
@@ -37,11 +36,12 @@ class PlanMarkerTest : UnitTest() {
         @Test
         fun `should create marker with minimal fields`() {
             // Arrange & Act
-            val marker = PlanMarker(
-                type = MarkerType.CROSS,
-                x = 0.0,
-                y = 0.0,
-            )
+            val marker =
+                PlanMarker(
+                    type = MarkerType.CROSS,
+                    x = 0.0,
+                    y = 0.0,
+                )
 
             // Assert
             marker.type shouldBe MarkerType.CROSS
@@ -54,13 +54,14 @@ class PlanMarkerTest : UnitTest() {
         @Test
         fun `should create marker with null optional fields`() {
             // Arrange & Act
-            val marker = PlanMarker(
-                type = MarkerType.MOON,
-                x = 25.5,
-                y = 30.5,
-                label = null,
-                color = null,
-            )
+            val marker =
+                PlanMarker(
+                    type = MarkerType.MOON,
+                    x = 25.5,
+                    y = 30.5,
+                    label = null,
+                    color = null,
+                )
 
             // Assert
             marker.label shouldBe null
@@ -70,40 +71,43 @@ class PlanMarkerTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when x is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanMarker(MarkerType.SKULL, -1.0, 50.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanMarker(MarkerType.SKULL, -1.0, 50.0)
+                }
             exception.message shouldBe "X coordinate cannot be negative"
         }
 
         @Test
         fun `should throw exception when y is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanMarker(MarkerType.SKULL, 50.0, -1.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanMarker(MarkerType.SKULL, 50.0, -1.0)
+                }
             exception.message shouldBe "Y coordinate cannot be negative"
         }
 
         @Test
         fun `should throw exception when x is greater than 100`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanMarker(MarkerType.SKULL, 101.0, 50.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanMarker(MarkerType.SKULL, 101.0, 50.0)
+                }
             exception.message shouldBe "X coordinate cannot exceed 100"
         }
 
         @Test
         fun `should throw exception when y is greater than 100`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanMarker(MarkerType.SKULL, 50.0, 101.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanMarker(MarkerType.SKULL, 50.0, 101.0)
+                }
             exception.message shouldBe "Y coordinate cannot exceed 100"
         }
 
@@ -123,7 +127,6 @@ class PlanMarkerTest : UnitTest() {
 
     @Nested
     inner class MarkerTypeTests {
-
         @Test
         fun `should have all raid marker types`() {
             // Assert - verify all WoW raid markers exist
@@ -154,7 +157,6 @@ class PlanMarkerTest : UnitTest() {
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when all fields match`() {
             // Arrange
@@ -188,7 +190,6 @@ class PlanMarkerTest : UnitTest() {
 
     @Nested
     inner class CopyTests {
-
         @Test
         fun `should create copy with updated position`() {
             // Arrange

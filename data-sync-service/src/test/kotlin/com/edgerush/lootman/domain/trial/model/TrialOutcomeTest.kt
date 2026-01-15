@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for TrialOutcome enum.
  */
 class TrialOutcomeTest : UnitTest() {
-
     @Test
     fun `should have PROMOTED outcome`() {
         // Assert

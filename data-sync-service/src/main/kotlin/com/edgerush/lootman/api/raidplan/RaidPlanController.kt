@@ -25,7 +25,6 @@ class RaidPlanController(
     private val raidPlanService: RaidPlanService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @Operation(summary = "Create a new raid plan")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Plan created successfully"),
@@ -35,16 +34,17 @@ class RaidPlanController(
     fun createPlan(
         @Valid @RequestBody request: CreateRaidPlanApiRequest,
     ): ResponseEntity<RaidPlanResponse> {
-        val plan = raidPlanService.createPlan(
-            CreateRaidPlanRequest(
-                guildId = request.guildId,
-                encounterId = request.encounterId,
-                encounterName = request.encounterName,
-                name = request.name,
-                createdBy = request.createdBy,
-                visibility = request.visibility ?: PlanVisibility.GUILD
+        val plan =
+            raidPlanService.createPlan(
+                CreateRaidPlanRequest(
+                    guildId = request.guildId,
+                    encounterId = request.encounterId,
+                    encounterName = request.encounterName,
+                    name = request.name,
+                    createdBy = request.createdBy,
+                    visibility = request.visibility ?: PlanVisibility.GUILD,
+                ),
             )
-        )
         return ResponseEntity.status(HttpStatus.CREATED).body(plan.toResponse())
     }
 
@@ -113,8 +113,8 @@ class RaidPlanController(
             id,
             UpdateRaidPlanRequest(
                 name = request.name,
-                visibility = request.visibility
-            )
+                visibility = request.visibility,
+            ),
         ).toResponse()
     }
 
@@ -242,42 +242,46 @@ data class PlanShapeResponse(
 
 // === Extension functions for mapping ===
 
-fun RaidPlan.toResponse(): RaidPlanResponse = RaidPlanResponse(
-    id = id,
-    guildId = guildId.value,
-    encounterId = encounterId,
-    encounterName = encounterName,
-    name = name,
-    steps = steps.map { it.toResponse() },
-    visibility = visibility,
-    shareToken = shareToken,
-    createdBy = createdBy,
-    createdAt = createdAt.toString(),
-    updatedAt = updatedAt.toString(),
-)
+fun RaidPlan.toResponse(): RaidPlanResponse =
+    RaidPlanResponse(
+        id = id,
+        guildId = guildId.value,
+        encounterId = encounterId,
+        encounterName = encounterName,
+        name = name,
+        steps = steps.map { it.toResponse() },
+        visibility = visibility,
+        shareToken = shareToken,
+        createdBy = createdBy,
+        createdAt = createdAt.toString(),
+        updatedAt = updatedAt.toString(),
+    )
 
-fun PlanStep.toResponse(): PlanStepResponse = PlanStepResponse(
-    order = order,
-    notes = notes,
-    markers = markers.map { it.toResponse() },
-    shapes = shapes.map { it.toResponse() },
-)
+fun PlanStep.toResponse(): PlanStepResponse =
+    PlanStepResponse(
+        order = order,
+        notes = notes,
+        markers = markers.map { it.toResponse() },
+        shapes = shapes.map { it.toResponse() },
+    )
 
-fun PlanMarker.toResponse(): PlanMarkerResponse = PlanMarkerResponse(
-    type = type,
-    x = x,
-    y = y,
-    label = label,
-    color = color,
-)
+fun PlanMarker.toResponse(): PlanMarkerResponse =
+    PlanMarkerResponse(
+        type = type,
+        x = x,
+        y = y,
+        label = label,
+        color = color,
+    )
 
-fun PlanShape.toResponse(): PlanShapeResponse = PlanShapeResponse(
-    shapeType = shapeType,
-    x1 = x1,
-    y1 = y1,
-    x2 = x2,
-    y2 = y2,
-    radius = radius,
-    color = color,
-    strokeWidth = strokeWidth,
-)
+fun PlanShape.toResponse(): PlanShapeResponse =
+    PlanShapeResponse(
+        shapeType = shapeType,
+        x1 = x1,
+        y1 = y1,
+        x2 = x2,
+        y2 = y2,
+        radius = radius,
+        color = color,
+        strokeWidth = strokeWidth,
+    )

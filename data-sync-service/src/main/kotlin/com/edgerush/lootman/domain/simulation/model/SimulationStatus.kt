@@ -14,5 +14,5 @@ enum class SimulationStatus {
     COMPLETED,
 
     /** Simulation failed with an error */
-    FAILED
+    FAILED,
 }

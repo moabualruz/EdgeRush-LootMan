@@ -22,17 +22,13 @@ import java.util.concurrent.TimeUnit
 class DockerSimulationExecutor(
     @Value("\${simulation.docker.image:simulationcraftorg/simc}")
     private val dockerImage: String,
-
     @Value("\${simulation.docker.profile-directory:./simc-profiles}")
     private val profileDirectory: String,
-
     @Value("\${simulation.docker.command:docker}")
     private val dockerCommand: String,
-
     @Value("\${simulation.docker.timeout-minutes:30}")
-    private val timeoutMinutes: Long = 30
+    private val timeoutMinutes: Long = 30,
 ) : SimulationExecutor {
-
     private val logger = LoggerFactory.getLogger(DockerSimulationExecutor::class.java)
     private val objectMapper = ObjectMapper()
 
@@ -48,9 +44,10 @@ class DockerSimulationExecutor(
             val command = buildDockerCommand(request, profileFile)
             logger.debug("Executing command: ${command.joinToString(" ")}")
 
-            val process = ProcessBuilder(command)
-                .redirectErrorStream(true)
-                .start()
+            val process =
+                ProcessBuilder(command)
+                    .redirectErrorStream(true)
+                    .start()
 
             val completed = process.waitFor(timeoutMinutes, TimeUnit.MINUTES)
 
@@ -105,7 +102,10 @@ class DockerSimulationExecutor(
     /**
      * Builds the Docker command for executing SimulationCraft.
      */
-    fun buildDockerCommand(request: SimulationRequest, profileFile: File): List<String> {
+    fun buildDockerCommand(
+        request: SimulationRequest,
+        profileFile: File,
+    ): List<String> {
         val outputFile = File(profileFile.parent, "${profileFile.nameWithoutExtension}_results.json")
         val profileDir = profileFile.parentFile.absolutePath
 
@@ -118,7 +118,7 @@ class DockerSimulationExecutor(
             "/simc/profiles/${profileFile.name}",
             "iterations=${request.iterations}",
             "max_time=${request.fightLengthSeconds}",
-            "json2=/simc/profiles/${outputFile.name}"
+            "json2=/simc/profiles/${outputFile.name}",
         )
     }
 
@@ -142,9 +142,10 @@ class DockerSimulationExecutor(
 
                     if (itemId != null && slot != null) {
                         // Calculate DPS gain from percentage (baseline from first player)
-                        val baseDps = root.path("sim").path("players").firstOrNull()
-                            ?.path("collected_data")?.path("dps")?.path("mean")?.asDouble(100000.0)
-                            ?: 100000.0
+                        val baseDps =
+                            root.path("sim").path("players").firstOrNull()
+                                ?.path("collected_data")?.path("dps")?.path("mean")?.asDouble(100000.0)
+                                ?: 100000.0
                         val dpsGain = baseDps * (meanPct / 100.0)
 
                         results.add(
@@ -154,8 +155,8 @@ class DockerSimulationExecutor(
                                 slot = slot,
                                 dpsGain = dpsGain,
                                 percentGain = meanPct,
-                                simulatedAt = Instant.now()
-                            )
+                                simulatedAt = Instant.now(),
+                            ),
                         )
                     }
                 }

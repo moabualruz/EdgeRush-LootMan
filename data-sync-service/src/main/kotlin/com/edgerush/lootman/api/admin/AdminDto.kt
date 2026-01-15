@@ -4,8 +4,6 @@ import com.edgerush.lootman.api.behavioral.BehavioralActionResponse
 import com.edgerush.lootman.api.loot.LootBanResponse
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -16,22 +14,16 @@ import java.time.format.DateTimeFormatter
 data class AdminBehavioralActionRequest(
     @field:NotNull(message = "Raider ID is required")
     val raiderId: Long,
-
     @field:NotBlank(message = "Character name is required")
     val characterName: String,
-
     @field:NotBlank(message = "Action type is required")
     val actionType: String, // PENALTY or BONUS
-
     @field:NotBlank(message = "Reason is required")
     val reason: String,
-
     @field:NotNull(message = "FLPS modifier is required")
     val flpsModifier: Double,
-
     @field:NotBlank(message = "Start date is required")
     val startDate: String, // ISO date string
-
     val endDate: String? = null, // ISO date string
 )
 
@@ -86,16 +78,12 @@ data class AdminBehavioralActionResponse(
 data class AdminLootBanRequest(
     @field:NotNull(message = "Raider ID is required")
     val raiderId: Long,
-
     @field:NotBlank(message = "Character name is required")
     val characterName: String,
-
     @field:NotBlank(message = "Reason is required")
     val reason: String,
-
     @field:NotBlank(message = "Start date is required")
     val startDate: String, // ISO date string
-
     val endDate: String? = null, // ISO date string
 )
 

@@ -31,7 +31,10 @@ interface TeamRaidDayRepository {
      * @param limit The maximum number of records to return
      * @return List of team raid day entities
      */
-    fun findAll(offset: Long, limit: Int): List<TeamRaidDayEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity>
 
     /**
      * Counts all team raid days.
@@ -48,7 +51,11 @@ interface TeamRaidDayRepository {
      * @param limit The maximum number of records to return
      * @return List of team raid day entities for the team
      */
-    fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<TeamRaidDayEntity>
+    fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity>
 
     /**
      * Counts team raid days for a team.

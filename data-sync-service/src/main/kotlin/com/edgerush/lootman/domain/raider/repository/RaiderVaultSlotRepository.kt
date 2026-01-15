@@ -31,7 +31,10 @@ interface RaiderVaultSlotRepository {
      * @param limit The maximum number of records to return
      * @return List of vault slot entities
      */
-    fun findAll(offset: Long, limit: Int): List<RaiderVaultSlotEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity>
 
     /**
      * Counts all vault slots.
@@ -48,7 +51,11 @@ interface RaiderVaultSlotRepository {
      * @param limit The maximum number of records to return
      * @return List of vault slot entities for the raider
      */
-    fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderVaultSlotEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity>
 
     /**
      * Counts vault slots for a raider.
@@ -66,7 +73,11 @@ interface RaiderVaultSlotRepository {
      * @param limit The maximum number of records to return
      * @return List of unlocked vault slot entities for the raider
      */
-    fun findUnlockedByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderVaultSlotEntity>
+    fun findUnlockedByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity>
 
     /**
      * Counts unlocked vault slots for a raider.

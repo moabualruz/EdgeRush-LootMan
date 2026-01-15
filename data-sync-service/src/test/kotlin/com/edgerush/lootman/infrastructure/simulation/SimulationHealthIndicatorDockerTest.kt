@@ -23,7 +23,6 @@ import java.time.Instant
  */
 @EnabledIfDockerAvailable
 class SimulationHealthIndicatorDockerTest : UnitTest() {
-
     private lateinit var simulationRepository: SimulationRepository
     private lateinit var dockerSimulationExecutor: DockerSimulationExecutor
     private lateinit var healthIndicator: SimulationHealthIndicator
@@ -36,13 +35,14 @@ class SimulationHealthIndicatorDockerTest : UnitTest() {
     }
 
     private fun createPendingRequest(): SimulationRequest {
-        val profile = SimulationProfile.create(
-            guildId = "guild-123",
-            characterName = "Testchar",
-            characterRealm = "TestRealm",
-            profileContent = """warrior="Testchar"""",
-            createdAt = Instant.now()
-        )
+        val profile =
+            SimulationProfile.create(
+                guildId = "guild-123",
+                characterName = "Testchar",
+                characterRealm = "TestRealm",
+                profileContent = """warrior="Testchar"""",
+                createdAt = Instant.now(),
+            )
         return SimulationRequest.create(profile = profile)
     }
 

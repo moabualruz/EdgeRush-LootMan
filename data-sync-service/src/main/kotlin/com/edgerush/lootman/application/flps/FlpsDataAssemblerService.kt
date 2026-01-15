@@ -26,7 +26,7 @@ class FlpsDataAssemblerService(
     private val lootAwardRepository: LootAwardRepository,
     private val wishlistRepository: WishlistRepository,
     private val gearRepository: GearRepository,
-    private val lootBanRepository: LootBanRepository
+    private val lootBanRepository: LootBanRepository,
 ) {
     /**
      * Assembles complete FLPS calculation data for all raiders in a guild.
@@ -37,7 +37,7 @@ class FlpsDataAssemblerService(
      */
     fun assembleFlpsData(
         guildId: GuildId,
-        lookbackDays: Int = 56
+        lookbackDays: Int = 56,
     ): List<RaiderFlpsData> {
         val endDate = LocalDate.now()
         val startDate = endDate.minusDays(lookbackDays.toLong())
@@ -49,13 +49,17 @@ class FlpsDataAssemblerService(
         return raiders.map { raider ->
             RaiderFlpsData(
                 raider = raider,
-                attendance = attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
-                    raider.id, guildId, startDate, endDate
-                ),
+                attendance =
+                    attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
+                        raider.id,
+                        guildId,
+                        startDate,
+                        endDate,
+                    ),
                 lootHistory = lootAwardRepository.findByRaiderId(raider.id),
                 wishlist = wishlistRepository.findByRaiderId(raider.id),
                 gear = gearRepository.findCurrentGear(raider.id),
-                activeBans = lootBanRepository.findActiveByRaiderId(raider.id, guildId)
+                activeBans = lootBanRepository.findActiveByRaiderId(raider.id, guildId),
             )
         }
     }
@@ -70,5 +74,5 @@ data class RaiderFlpsData(
     val lootHistory: List<com.edgerush.lootman.domain.loot.model.LootAward>,
     val wishlist: Wishlist?,
     val gear: GearSet?,
-    val activeBans: List<com.edgerush.lootman.domain.loot.model.LootBan>
+    val activeBans: List<com.edgerush.lootman.domain.loot.model.LootBan>,
 )

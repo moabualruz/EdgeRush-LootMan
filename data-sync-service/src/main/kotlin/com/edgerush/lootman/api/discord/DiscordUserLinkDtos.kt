@@ -13,13 +13,10 @@ data class CreateDiscordUserLinkRequest(
     @field:NotBlank(message = "Discord user ID is required")
     @field:Pattern(regexp = "\\d{17,20}", message = "Discord user ID must be 17-20 digits")
     val discordUserId: String,
-
     @field:Positive(message = "Raider ID must be positive")
     val raiderId: Long,
-
     val isPrimary: Boolean = false,
-
-    val linkedBy: String? = null
+    val linkedBy: String? = null,
 )
 
 /**
@@ -27,7 +24,7 @@ data class CreateDiscordUserLinkRequest(
  */
 data class UpdateDiscordUserLinkRequest(
     val isPrimary: Boolean? = null,
-    val linkedBy: String? = null
+    val linkedBy: String? = null,
 )
 
 /**
@@ -39,17 +36,18 @@ data class DiscordUserLinkResponse(
     val raiderId: Long,
     val isPrimary: Boolean,
     val linkedAt: Instant,
-    val linkedBy: String?
+    val linkedBy: String?,
 ) {
     companion object {
-        fun from(link: DiscordUserLink): DiscordUserLinkResponse = DiscordUserLinkResponse(
-            id = link.id!!.value,
-            discordUserId = link.discordUserId.value,
-            raiderId = link.raiderId.value,
-            isPrimary = link.isPrimary,
-            linkedAt = link.linkedAt,
-            linkedBy = link.linkedBy
-        )
+        fun from(link: DiscordUserLink): DiscordUserLinkResponse =
+            DiscordUserLinkResponse(
+                id = link.id!!.value,
+                discordUserId = link.discordUserId.value,
+                raiderId = link.raiderId.value,
+                isPrimary = link.isPrimary,
+                linkedAt = link.linkedAt,
+                linkedBy = link.linkedBy,
+            )
     }
 }
 
@@ -57,12 +55,12 @@ data class DiscordUserLinkResponse(
  * Response DTO for checking if a link exists.
  */
 data class DiscordUserLinkExistsResponse(
-    val exists: Boolean
+    val exists: Boolean,
 )
 
 /**
  * Response DTO for counting links.
  */
 data class DiscordUserLinkCountResponse(
-    val count: Long
+    val count: Long,
 )

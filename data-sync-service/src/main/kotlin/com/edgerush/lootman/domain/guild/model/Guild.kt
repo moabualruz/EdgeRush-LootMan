@@ -19,7 +19,7 @@ data class Guild(
     val syncStatus: SyncStatus,
     val isActive: Boolean,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 ) {
     init {
         require(name.isNotBlank()) { "Guild name cannot be blank" }
@@ -44,11 +44,11 @@ enum class Region {
     EU,
     KR,
     TW,
-    CN;
+    CN,
+    ;
 
     companion object {
-        fun fromString(value: String): Region? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): Region? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }
 
@@ -62,7 +62,7 @@ data class GuildSettings(
     val timezone: String = "UTC",
     val benchmarkMode: BenchmarkMode = BenchmarkMode.THEORETICAL,
     val customBenchmarkRms: Double? = null,
-    val customBenchmarkIpi: Double? = null
+    val customBenchmarkIpi: Double? = null,
 ) {
     companion object {
         fun default(): GuildSettings = GuildSettings()
@@ -73,13 +73,13 @@ data class GuildSettings(
  * How to calculate perfect score for FLPS benchmarking.
  */
 enum class BenchmarkMode {
-    THEORETICAL,    // Use mathematical perfect scores (1.0 for all components)
-    TOP_PERFORMER,  // Use the highest actual scores achieved by guild members
-    CUSTOM;         // Use manually set benchmark values
+    THEORETICAL, // Use mathematical perfect scores (1.0 for all components)
+    TOP_PERFORMER, // Use the highest actual scores achieved by guild members
+    CUSTOM, // Use manually set benchmark values
+    ;
 
     companion object {
-        fun fromString(value: String): BenchmarkMode? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): BenchmarkMode? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }
 
@@ -90,10 +90,10 @@ enum class SyncStatus {
     NEVER_RUN,
     SUCCESS,
     FAILED,
-    IN_PROGRESS;
+    IN_PROGRESS,
+    ;
 
     companion object {
-        fun fromString(value: String): SyncStatus? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): SyncStatus? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }

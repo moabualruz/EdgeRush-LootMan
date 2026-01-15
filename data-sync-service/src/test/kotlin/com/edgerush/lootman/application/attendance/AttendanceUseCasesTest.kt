@@ -6,7 +6,6 @@ import com.edgerush.lootman.domain.attendance.model.AttendanceRecordId
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -29,7 +28,6 @@ import java.time.LocalDate
  * - GetGuildAttendanceSummaryUseCase
  */
 class AttendanceUseCasesTest : UnitTest() {
-
     private lateinit var attendanceRepository: AttendanceRepository
 
     @BeforeEach
@@ -97,11 +95,12 @@ class AttendanceUseCasesTest : UnitTest() {
             val savedRecordSlot = slot<AttendanceRecord>()
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                instance = "NewInstance",
-                attendedRaids = 10
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    instance = "NewInstance",
+                    attendedRaids = 10,
+                )
 
             // When
             val result = useCase.execute(command)
@@ -120,10 +119,11 @@ class AttendanceUseCasesTest : UnitTest() {
             val recordId = "non-existent"
             every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns null
 
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                instance = "NewInstance"
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    instance = "NewInstance",
+                )
 
             // When
             val result = useCase.execute(command)
@@ -137,13 +137,14 @@ class AttendanceUseCasesTest : UnitTest() {
         fun `should preserve unchanged fields`() {
             // Given
             val recordId = "record-789"
-            val existingRecord = createAttendanceRecord(
-                recordId,
-                instance = "OldInstance",
-                encounter = "OldEncounter",
-                attendedRaids = 5,
-                totalRaids = 10
-            )
+            val existingRecord =
+                createAttendanceRecord(
+                    recordId,
+                    instance = "OldInstance",
+                    encounter = "OldEncounter",
+                    attendedRaids = 5,
+                    totalRaids = 10,
+                )
             every { attendanceRepository.findById(AttendanceRecordId(recordId)) } returns existingRecord
             every { attendanceRepository.delete(AttendanceRecordId(recordId)) } returns Unit
 
@@ -151,10 +152,11 @@ class AttendanceUseCasesTest : UnitTest() {
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
             // Only update instance
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                instance = "NewInstance"
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    instance = "NewInstance",
+                )
 
             // When
             useCase.execute(command)
@@ -177,10 +179,11 @@ class AttendanceUseCasesTest : UnitTest() {
             val savedRecordSlot = slot<AttendanceRecord>()
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                encounter = "NewEncounter"
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    encounter = "NewEncounter",
+                )
 
             // When
             val result = useCase.execute(command)
@@ -203,10 +206,11 @@ class AttendanceUseCasesTest : UnitTest() {
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
             val newStartDate = LocalDate.of(2023, 12, 1) // Earlier start date
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                startDate = newStartDate
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    startDate = newStartDate,
+                )
 
             // When
             val result = useCase.execute(command)
@@ -228,10 +232,11 @@ class AttendanceUseCasesTest : UnitTest() {
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
             val newEndDate = LocalDate.of(2025, 12, 31)
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                endDate = newEndDate
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    endDate = newEndDate,
+                )
 
             // When
             val result = useCase.execute(command)
@@ -252,10 +257,11 @@ class AttendanceUseCasesTest : UnitTest() {
             val savedRecordSlot = slot<AttendanceRecord>()
             every { attendanceRepository.save(capture(savedRecordSlot)) } answers { savedRecordSlot.captured }
 
-            val command = UpdateAttendanceCommand(
-                recordId = recordId,
-                totalRaids = 20
-            )
+            val command =
+                UpdateAttendanceCommand(
+                    recordId = recordId,
+                    totalRaids = 20,
+                )
 
             // When
             val result = useCase.execute(command)
@@ -322,24 +328,26 @@ class AttendanceUseCasesTest : UnitTest() {
             val guildId = "test-guild"
             val startDate = LocalDate.of(2024, 1, 1)
             val endDate = LocalDate.of(2024, 12, 31)
-            val records = listOf(
-                createAttendanceRecord("record-1", raiderId = raiderId),
-                createAttendanceRecord("record-2", raiderId = raiderId)
-            )
+            val records =
+                listOf(
+                    createAttendanceRecord("record-1", raiderId = raiderId),
+                    createAttendanceRecord("record-2", raiderId = raiderId),
+                )
 
             every {
                 attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
                     RaiderId(raiderId),
                     GuildId(guildId),
                     startDate,
-                    endDate
+                    endDate,
                 )
             } returns records
 
             // When
-            val result = useCase.execute(
-                ListRaiderAttendanceQuery(raiderId, guildId, startDate, endDate)
-            )
+            val result =
+                useCase.execute(
+                    ListRaiderAttendanceQuery(raiderId, guildId, startDate, endDate),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -359,14 +367,15 @@ class AttendanceUseCasesTest : UnitTest() {
                     RaiderId(raiderId),
                     GuildId(guildId),
                     startDate,
-                    endDate
+                    endDate,
                 )
             } returns emptyList()
 
             // When
-            val result = useCase.execute(
-                ListRaiderAttendanceQuery(raiderId, guildId, startDate, endDate)
-            )
+            val result =
+                useCase.execute(
+                    ListRaiderAttendanceQuery(raiderId, guildId, startDate, endDate),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -389,20 +398,22 @@ class AttendanceUseCasesTest : UnitTest() {
             val guildId = "test-guild"
             val startDate = LocalDate.of(2024, 1, 1)
             val endDate = LocalDate.of(2024, 12, 31)
-            val records = listOf(
-                createAttendanceRecord("record-1", raiderId = 1L, attendedRaids = 8, totalRaids = 10),
-                createAttendanceRecord("record-2", raiderId = 1L, attendedRaids = 9, totalRaids = 10),
-                createAttendanceRecord("record-3", raiderId = 2L, attendedRaids = 5, totalRaids = 10)
-            )
+            val records =
+                listOf(
+                    createAttendanceRecord("record-1", raiderId = 1L, attendedRaids = 8, totalRaids = 10),
+                    createAttendanceRecord("record-2", raiderId = 1L, attendedRaids = 9, totalRaids = 10),
+                    createAttendanceRecord("record-3", raiderId = 2L, attendedRaids = 5, totalRaids = 10),
+                )
 
             every {
                 attendanceRepository.findByGuildIdAndDateRange(GuildId(guildId), startDate, endDate)
             } returns records
 
             // When
-            val result = useCase.execute(
-                GetGuildAttendanceSummaryQuery(guildId, startDate, endDate)
-            )
+            val result =
+                useCase.execute(
+                    GetGuildAttendanceSummaryQuery(guildId, startDate, endDate),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -426,9 +437,10 @@ class AttendanceUseCasesTest : UnitTest() {
             } returns emptyList()
 
             // When
-            val result = useCase.execute(
-                GetGuildAttendanceSummaryQuery(guildId, startDate, endDate)
-            )
+            val result =
+                useCase.execute(
+                    GetGuildAttendanceSummaryQuery(guildId, startDate, endDate),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -445,19 +457,21 @@ class AttendanceUseCasesTest : UnitTest() {
             val guildId = "test-guild"
             val startDate = LocalDate.of(2024, 1, 1)
             val endDate = LocalDate.of(2024, 12, 31)
-            val records = listOf(
-                createAttendanceRecord("record-1", raiderId = 1L, attendedRaids = 10, totalRaids = 10),
-                createAttendanceRecord("record-2", raiderId = 2L, attendedRaids = 5, totalRaids = 10)
-            )
+            val records =
+                listOf(
+                    createAttendanceRecord("record-1", raiderId = 1L, attendedRaids = 10, totalRaids = 10),
+                    createAttendanceRecord("record-2", raiderId = 2L, attendedRaids = 5, totalRaids = 10),
+                )
 
             every {
                 attendanceRepository.findByGuildIdAndDateRange(GuildId(guildId), startDate, endDate)
             } returns records
 
             // When
-            val result = useCase.execute(
-                GetGuildAttendanceSummaryQuery(guildId, startDate, endDate)
-            )
+            val result =
+                useCase.execute(
+                    GetGuildAttendanceSummaryQuery(guildId, startDate, endDate),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -488,15 +502,16 @@ class AttendanceUseCasesTest : UnitTest() {
         instance: String = "Nerub-ar Palace",
         encounter: String = "Ulgrax",
         attendedRaids: Int = 10,
-        totalRaids: Int = 10
-    ): AttendanceRecord = AttendanceRecord.create(
-        raiderId = RaiderId(raiderId),
-        guildId = GuildId(guildId),
-        instance = instance,
-        encounter = encounter,
-        startDate = LocalDate.of(2024, 1, 1),
-        endDate = LocalDate.of(2024, 1, 7),
-        attendedRaids = attendedRaids,
-        totalRaids = totalRaids
-    )
+        totalRaids: Int = 10,
+    ): AttendanceRecord =
+        AttendanceRecord.create(
+            raiderId = RaiderId(raiderId),
+            guildId = GuildId(guildId),
+            instance = instance,
+            encounter = encounter,
+            startDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 1, 7),
+            attendedRaids = attendedRaids,
+            totalRaids = totalRaids,
+        )
 }

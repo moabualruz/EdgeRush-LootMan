@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test
  * Tests use case business logic by mocking the repository layer.
  */
 class WishlistUseCasesTest : UnitTest() {
-
     private lateinit var wishlistRepository: WishlistRepository
 
     @BeforeEach
@@ -86,24 +85,26 @@ class WishlistUseCasesTest : UnitTest() {
         @Test
         fun `should create new wishlist`() {
             // Given
-            val command = SaveWishlistCommand(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemCommand(
-                        itemId = 100L,
-                        itemName = "Epic Sword",
-                        priority = 1,
-                        upgradePercentage = 15.5,
-                        specName = "Arms"
-                    ),
-                    WishlistItemCommand(
-                        itemId = 200L,
-                        itemName = "Legendary Helm",
-                        priority = 2,
-                        upgradePercentage = 20.0
-                    )
+            val command =
+                SaveWishlistCommand(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemCommand(
+                                itemId = 100L,
+                                itemName = "Epic Sword",
+                                priority = 1,
+                                upgradePercentage = 15.5,
+                                specName = "Arms",
+                            ),
+                            WishlistItemCommand(
+                                itemId = 200L,
+                                itemName = "Legendary Helm",
+                                priority = 2,
+                                upgradePercentage = 20.0,
+                            ),
+                        ),
                 )
-            )
 
             val savedWishlistSlot = slot<Wishlist>()
             every { wishlistRepository.save(capture(savedWishlistSlot)) } answers { savedWishlistSlot.captured }
@@ -130,17 +131,19 @@ class WishlistUseCasesTest : UnitTest() {
         @Test
         fun `should update existing wishlist`() {
             // Given
-            val command = SaveWishlistCommand(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemCommand(
-                        itemId = 300L,
-                        itemName = "New Item",
-                        priority = 1,
-                        upgradePercentage = 25.0
-                    )
+            val command =
+                SaveWishlistCommand(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemCommand(
+                                itemId = 300L,
+                                itemName = "New Item",
+                                priority = 1,
+                                upgradePercentage = 25.0,
+                            ),
+                        ),
                 )
-            )
 
             val savedWishlistSlot = slot<Wishlist>()
             every { wishlistRepository.save(capture(savedWishlistSlot)) } answers { savedWishlistSlot.captured }
@@ -158,10 +161,11 @@ class WishlistUseCasesTest : UnitTest() {
         @Test
         fun `should create wishlist with empty items`() {
             // Given
-            val command = SaveWishlistCommand(
-                raiderId = 1L,
-                items = emptyList()
-            )
+            val command =
+                SaveWishlistCommand(
+                    raiderId = 1L,
+                    items = emptyList(),
+                )
 
             val savedWishlistSlot = slot<Wishlist>()
             every { wishlistRepository.save(capture(savedWishlistSlot)) } answers { savedWishlistSlot.captured }
@@ -224,23 +228,25 @@ class WishlistUseCasesTest : UnitTest() {
 
     private fun createWishlist(
         raiderId: RaiderId = RaiderId(1L),
-        items: List<WishlistItem> = listOf(createWishlistItem())
-    ): Wishlist = Wishlist(
-        raiderId = raiderId,
-        items = items
-    )
+        items: List<WishlistItem> = listOf(createWishlistItem()),
+    ): Wishlist =
+        Wishlist(
+            raiderId = raiderId,
+            items = items,
+        )
 
     private fun createWishlistItem(
         itemId: ItemId = ItemId(12345L),
         itemName: String = "Test Item",
         priority: Int = 1,
         upgradePercentage: Double = 10.0,
-        specName: String? = null
-    ): WishlistItem = WishlistItem(
-        itemId = itemId,
-        itemName = itemName,
-        priority = priority,
-        upgradePercentage = upgradePercentage,
-        specName = specName
-    )
+        specName: String? = null,
+    ): WishlistItem =
+        WishlistItem(
+            itemId = itemId,
+            itemName = itemName,
+            priority = priority,
+            upgradePercentage = upgradePercentage,
+            specName = specName,
+        )
 }

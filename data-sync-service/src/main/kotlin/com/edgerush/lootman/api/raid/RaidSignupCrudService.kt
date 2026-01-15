@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with raid-signup-specific query methods.
  */
 interface RaidSignupCrudService : CrudService<Long, CreateRaidSignupRequest, UpdateRaidSignupRequest, RaidSignupResponse> {
-
     /**
      * Find signups by raid with pagination.
      *
@@ -18,7 +17,10 @@ interface RaidSignupCrudService : CrudService<Long, CreateRaidSignupRequest, Upd
      * @param pageRequest Pagination parameters
      * @return Paginated list of signups for the raid
      */
-    fun findByRaid(raidId: Long, pageRequest: PageRequest): PagedResponse<RaidSignupResponse>
+    fun findByRaid(
+        raidId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidSignupResponse>
 
     /**
      * Find selected signups by raid with pagination.
@@ -27,7 +29,10 @@ interface RaidSignupCrudService : CrudService<Long, CreateRaidSignupRequest, Upd
      * @param pageRequest Pagination parameters
      * @return Paginated list of selected signups for the raid
      */
-    fun findSelectedByRaid(raidId: Long, pageRequest: PageRequest): PagedResponse<RaidSignupResponse>
+    fun findSelectedByRaid(
+        raidId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidSignupResponse>
 
     /**
      * Find signups by character with pagination.
@@ -36,7 +41,10 @@ interface RaidSignupCrudService : CrudService<Long, CreateRaidSignupRequest, Upd
      * @param pageRequest Pagination parameters
      * @return Paginated list of signups for the character
      */
-    fun findByCharacter(characterId: Long, pageRequest: PageRequest): PagedResponse<RaidSignupResponse>
+    fun findByCharacter(
+        characterId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaidSignupResponse>
 
     /**
      * Count signups for a raid.

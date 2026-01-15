@@ -10,14 +10,13 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class SimulationRequestTest : UnitTest() {
-
     private fun createValidProfile(): SimulationProfile {
         return SimulationProfile.create(
             guildId = "guild-123",
             characterName = "Testchar",
             characterRealm = "TestRealm",
             profileContent = "warrior=\"Testchar\"",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
@@ -31,11 +30,12 @@ class SimulationRequestTest : UnitTest() {
             val fightLength = 300
 
             // Act
-            val request = SimulationRequest.create(
-                profile = profile,
-                iterations = iterations,
-                fightLengthSeconds = fightLength
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = profile,
+                    iterations = iterations,
+                    fightLengthSeconds = fightLength,
+                )
 
             // Assert
             request.profile shouldBe profile
@@ -53,13 +53,14 @@ class SimulationRequestTest : UnitTest() {
             val profile = createValidProfile()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationRequest.create(
-                    profile = profile,
-                    iterations = 0,
-                    fightLengthSeconds = 300
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationRequest.create(
+                        profile = profile,
+                        iterations = 0,
+                        fightLengthSeconds = 300,
+                    )
+                }
             exception.message shouldContain "iterations"
         }
 
@@ -69,13 +70,14 @@ class SimulationRequestTest : UnitTest() {
             val profile = createValidProfile()
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationRequest.create(
-                    profile = profile,
-                    iterations = 10000,
-                    fightLengthSeconds = 0
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationRequest.create(
+                        profile = profile,
+                        iterations = 10000,
+                        fightLengthSeconds = 0,
+                    )
+                }
             exception.message shouldContain "fightLengthSeconds"
         }
     }
@@ -85,11 +87,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should transition from PENDING to RUNNING`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                )
 
             // Act
             val runningRequest = request.markRunning()
@@ -102,21 +105,23 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should transition from RUNNING to COMPLETED`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning()
-            val results = listOf(
-                SimulationResult.create(
-                    itemId = 12345L,
-                    itemName = "Test Item",
-                    slot = "head",
-                    dpsGain = 1000.0,
-                    percentGain = 1.0,
-                    simulatedAt = Instant.now()
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning()
+            val results =
+                listOf(
+                    SimulationResult.create(
+                        itemId = 12345L,
+                        itemName = "Test Item",
+                        slot = "head",
+                        dpsGain = 1000.0,
+                        percentGain = 1.0,
+                        simulatedAt = Instant.now(),
+                    ),
                 )
-            )
 
             // Act
             val completedRequest = request.markCompleted(results)
@@ -131,11 +136,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should transition from RUNNING to FAILED with error message`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning()
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning()
             val errorMessage = "Docker container exited with code 1"
 
             // Act
@@ -151,11 +157,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should throw exception when transitioning from PENDING to COMPLETED`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                )
 
             // Act & Assert
             shouldThrow<IllegalStateException> {
@@ -166,11 +173,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should throw exception when transitioning from COMPLETED to RUNNING`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning().markCompleted(emptyList())
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning().markCompleted(emptyList())
 
             // Act & Assert
             shouldThrow<IllegalStateException> {
@@ -181,16 +189,18 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should throw exception when transitioning from PENDING to FAILED`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                )
 
             // Act & Assert
-            val exception = shouldThrow<IllegalStateException> {
-                request.markFailed("Error message")
-            }
+            val exception =
+                shouldThrow<IllegalStateException> {
+                    request.markFailed("Error message")
+                }
             exception.message shouldContain "Cannot transition to FAILED from PENDING"
         }
     }
@@ -200,11 +210,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `isPending should return true for PENDING status`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                )
 
             // Assert
             request.isPending shouldBe true
@@ -216,11 +227,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `isRunning should return true for RUNNING status`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning()
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning()
 
             // Assert
             request.isPending shouldBe false
@@ -232,11 +244,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `isCompleted should return true for COMPLETED status`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning().markCompleted(emptyList())
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning().markCompleted(emptyList())
 
             // Assert
             request.isPending shouldBe false
@@ -248,11 +261,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `isFailed should return true for FAILED status`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 10000,
-                fightLengthSeconds = 300
-            ).markRunning().markFailed("Error")
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 10000,
+                    fightLengthSeconds = 300,
+                ).markRunning().markFailed("Error")
 
             // Assert
             request.isPending shouldBe false
@@ -267,9 +281,10 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should use default values for optional parameters`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile()
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                )
 
             // Assert
             request.iterations shouldBe SimulationRequest.DEFAULT_ITERATIONS
@@ -279,11 +294,12 @@ class SimulationRequestTest : UnitTest() {
         @Test
         fun `should allow custom iterations and fight length`() {
             // Arrange
-            val request = SimulationRequest.create(
-                profile = createValidProfile(),
-                iterations = 50000,
-                fightLengthSeconds = 600
-            )
+            val request =
+                SimulationRequest.create(
+                    profile = createValidProfile(),
+                    iterations = 50000,
+                    fightLengthSeconds = 600,
+                )
 
             // Assert
             request.iterations shouldBe 50000

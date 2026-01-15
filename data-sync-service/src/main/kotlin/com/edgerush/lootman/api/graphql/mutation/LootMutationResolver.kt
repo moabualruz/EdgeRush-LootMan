@@ -25,7 +25,6 @@ class LootMutationResolver(
     private val awardLootUseCase: AwardLootUseCase,
     private val revokeLootAwardUseCase: RevokeLootAwardUseCase,
 ) : Mutation {
-
     /**
      * Award loot to a raider.
      *
@@ -34,13 +33,14 @@ class LootMutationResolver(
      * @throws RuntimeException on errors (including active loot bans)
      */
     fun awardLoot(input: AwardLootInput): LootAwardType {
-        val command = AwardLootCommand(
-            itemId = ItemId(input.itemId.toLong()),
-            raiderId = RaiderId(input.raiderId.toLong()),
-            guildId = GuildId(input.guildId),
-            flpsScore = FlpsScore.of(input.flpsScore),
-            tier = LootTier.valueOf(input.tier.uppercase()),
-        )
+        val command =
+            AwardLootCommand(
+                itemId = ItemId(input.itemId.toLong()),
+                raiderId = RaiderId(input.raiderId.toLong()),
+                guildId = GuildId(input.guildId),
+                flpsScore = FlpsScore.of(input.flpsScore),
+                tier = LootTier.valueOf(input.tier.uppercase()),
+            )
         return awardLootUseCase.execute(command)
             .map { it.toGraphQLType() }
             .getOrThrow()
@@ -75,13 +75,14 @@ data class AwardLootInput(
 /**
  * Extension function to convert domain LootAward to GraphQL LootAwardType.
  */
-private fun LootAward.toGraphQLType(): LootAwardType = LootAwardType(
-    id = this.id.value,
-    raiderId = this.raiderId.value.toString(),
-    itemId = this.itemId.value.toString(),
-    guildId = this.guildId.value,
-    tier = this.tier,
-    flpsScore = this.flpsScore.value,
-    awardedAt = this.awardedAt,
-    isActive = this.isActive(),
-)
+private fun LootAward.toGraphQLType(): LootAwardType =
+    LootAwardType(
+        id = this.id.value,
+        raiderId = this.raiderId.value.toString(),
+        itemId = this.itemId.value.toString(),
+        guildId = this.guildId.value,
+        tier = this.tier,
+        flpsScore = this.flpsScore.value,
+        awardedAt = this.awardedAt,
+        isActive = this.isActive(),
+    )

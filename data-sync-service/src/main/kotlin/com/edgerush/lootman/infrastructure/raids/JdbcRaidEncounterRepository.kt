@@ -17,13 +17,13 @@ import java.sql.Statement
 class JdbcRaidEncounterRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : RaidEncounterRepository {
-
     override fun findById(id: Long): RaidEncounterEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, raid_id, encounter_id, name, enabled, extra, notes
             FROM raid_encounters
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, encounterRowMapper, id)
         return results.firstOrNull()
@@ -35,13 +35,17 @@ class JdbcRaidEncounterRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<RaidEncounterEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity> {
+        val sql =
+            """
             SELECT id, raid_id, encounter_id, name, enabled, extra, notes
             FROM raid_encounters
             ORDER BY raid_id, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, encounterRowMapper, limit, offset)
     }
@@ -51,14 +55,19 @@ class JdbcRaidEncounterRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidEncounterEntity> {
-        val sql = """
+    override fun findByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity> {
+        val sql =
+            """
             SELECT id, raid_id, encounter_id, name, enabled, extra, notes
             FROM raid_encounters
             WHERE raid_id = ?
             ORDER BY id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, encounterRowMapper, raidId, limit, offset)
     }
@@ -68,14 +77,19 @@ class JdbcRaidEncounterRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, raidId) ?: 0L
     }
 
-    override fun findEnabledByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidEncounterEntity> {
-        val sql = """
+    override fun findEnabledByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity> {
+        val sql =
+            """
             SELECT id, raid_id, encounter_id, name, enabled, extra, notes
             FROM raid_encounters
             WHERE raid_id = ? AND enabled = true
             ORDER BY id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, encounterRowMapper, raidId, limit, offset)
     }
@@ -100,10 +114,11 @@ class JdbcRaidEncounterRepository(
     }
 
     private fun insertEncounter(encounter: RaidEncounterEntity): RaidEncounterEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raid_encounters (raid_id, encounter_id, name, enabled, extra, notes)
             VALUES (?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -122,7 +137,8 @@ class JdbcRaidEncounterRepository(
     }
 
     private fun updateEncounter(encounter: RaidEncounterEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE raid_encounters SET
                 raid_id = ?,
                 encounter_id = ?,
@@ -131,7 +147,7 @@ class JdbcRaidEncounterRepository(
                 extra = ?,
                 notes = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -145,24 +161,25 @@ class JdbcRaidEncounterRepository(
         )
     }
 
-    private val encounterRowMapper = RowMapper { rs, _ ->
-        val encounterIdValue = rs.getLong("encounter_id")
-        val encounterId = if (rs.wasNull()) null else encounterIdValue
+    private val encounterRowMapper =
+        RowMapper { rs, _ ->
+            val encounterIdValue = rs.getLong("encounter_id")
+            val encounterId = if (rs.wasNull()) null else encounterIdValue
 
-        val enabledValue = rs.getBoolean("enabled")
-        val enabled = if (rs.wasNull()) null else enabledValue
+            val enabledValue = rs.getBoolean("enabled")
+            val enabled = if (rs.wasNull()) null else enabledValue
 
-        val extraValue = rs.getBoolean("extra")
-        val extra = if (rs.wasNull()) null else extraValue
+            val extraValue = rs.getBoolean("extra")
+            val extra = if (rs.wasNull()) null else extraValue
 
-        RaidEncounterEntity(
-            id = rs.getLong("id"),
-            raidId = rs.getLong("raid_id"),
-            encounterId = encounterId,
-            name = rs.getString("name"),
-            enabled = enabled,
-            extra = extra,
-            notes = rs.getString("notes"),
-        )
-    }
+            RaidEncounterEntity(
+                id = rs.getLong("id"),
+                raidId = rs.getLong("raid_id"),
+                encounterId = encounterId,
+                name = rs.getString("name"),
+                enabled = enabled,
+                extra = extra,
+                notes = rs.getString("notes"),
+            )
+        }
 }

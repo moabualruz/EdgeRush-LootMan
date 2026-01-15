@@ -20,19 +20,18 @@ import java.time.Instant
  * Tests DTO construction, mapping from domain models, and data integrity.
  */
 class LootDtoTest : UnitTest() {
-
     @Nested
     inner class AwardLootRequestTest {
-
         @Test
         fun `should create request with all fields`() {
-            val request = AwardLootRequest(
-                itemId = 12345L,
-                raiderId = "raider-123",
-                guildId = "guild-456",
-                flpsScore = 0.85,
-                tier = "MYTHIC"
-            )
+            val request =
+                AwardLootRequest(
+                    itemId = 12345L,
+                    raiderId = "raider-123",
+                    guildId = "guild-456",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
 
             request.itemId shouldBe 12345L
             request.raiderId shouldBe "raider-123"
@@ -43,20 +42,22 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should support equality`() {
-            val request1 = AwardLootRequest(
-                itemId = 12345L,
-                raiderId = "raider-123",
-                guildId = "guild-456",
-                flpsScore = 0.85,
-                tier = "MYTHIC"
-            )
-            val request2 = AwardLootRequest(
-                itemId = 12345L,
-                raiderId = "raider-123",
-                guildId = "guild-456",
-                flpsScore = 0.85,
-                tier = "MYTHIC"
-            )
+            val request1 =
+                AwardLootRequest(
+                    itemId = 12345L,
+                    raiderId = "raider-123",
+                    guildId = "guild-456",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
+            val request2 =
+                AwardLootRequest(
+                    itemId = 12345L,
+                    raiderId = "raider-123",
+                    guildId = "guild-456",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
 
             request1 shouldBe request2
         }
@@ -64,16 +65,16 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class CreateLootBanRequestTest {
-
         @Test
         fun `should create request with expiration`() {
             val expiresAt = Instant.now().plusSeconds(86400)
-            val request = CreateLootBanRequest(
-                raiderId = "raider-123",
-                guildId = "guild-456",
-                reason = "Repeated loot hoarding",
-                expiresAt = expiresAt
-            )
+            val request =
+                CreateLootBanRequest(
+                    raiderId = "raider-123",
+                    guildId = "guild-456",
+                    reason = "Repeated loot hoarding",
+                    expiresAt = expiresAt,
+                )
 
             request.raiderId shouldBe "raider-123"
             request.guildId shouldBe "guild-456"
@@ -83,12 +84,13 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should create permanent ban request`() {
-            val request = CreateLootBanRequest(
-                raiderId = "raider-123",
-                guildId = "guild-456",
-                reason = "Permanent loot ban",
-                expiresAt = null
-            )
+            val request =
+                CreateLootBanRequest(
+                    raiderId = "raider-123",
+                    guildId = "guild-456",
+                    reason = "Permanent loot ban",
+                    expiresAt = null,
+                )
 
             request.expiresAt shouldBe null
         }
@@ -96,14 +98,14 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class UpdateLootBanRequestTest {
-
         @Test
         fun `should create request with all fields`() {
             val newExpiry = Instant.now().plusSeconds(86400 * 7)
-            val request = UpdateLootBanRequest(
-                reason = "Updated reason",
-                expiresAt = newExpiry
-            )
+            val request =
+                UpdateLootBanRequest(
+                    reason = "Updated reason",
+                    expiresAt = newExpiry,
+                )
 
             request.reason shouldBe "Updated reason"
             request.expiresAt shouldBe newExpiry
@@ -119,9 +121,10 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should create request with only reason`() {
-            val request = UpdateLootBanRequest(
-                reason = "New reason only"
-            )
+            val request =
+                UpdateLootBanRequest(
+                    reason = "New reason only",
+                )
 
             request.reason shouldBe "New reason only"
             request.expiresAt shouldBe null
@@ -130,9 +133,10 @@ class LootDtoTest : UnitTest() {
         @Test
         fun `should create request with only expiresAt`() {
             val newExpiry = Instant.now().plusSeconds(86400)
-            val request = UpdateLootBanRequest(
-                expiresAt = newExpiry
-            )
+            val request =
+                UpdateLootBanRequest(
+                    expiresAt = newExpiry,
+                )
 
             request.reason shouldBe null
             request.expiresAt shouldBe newExpiry
@@ -159,16 +163,16 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootAwardDtoTest {
-
         @Test
         fun `should create from loot award`() {
-            val award = LootAward.create(
-                itemId = ItemId(12345L),
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC
-            )
+            val award =
+                LootAward.create(
+                    itemId = ItemId(12345L),
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                )
 
             val dto = LootAwardDto.from(award)
 
@@ -184,13 +188,14 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should create from revoked loot award`() {
-            val award = LootAward.create(
-                itemId = ItemId(12345L),
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                flpsScore = FlpsScore.of(0.75),
-                tier = LootTier.HEROIC
-            ).revoke("Item was traded to wrong player")
+            val award =
+                LootAward.create(
+                    itemId = ItemId(12345L),
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    flpsScore = FlpsScore.of(0.75),
+                    tier = LootTier.HEROIC,
+                ).revoke("Item was traded to wrong player")
 
             val dto = LootAwardDto.from(award)
 
@@ -203,13 +208,14 @@ class LootDtoTest : UnitTest() {
             val tiers = listOf(LootTier.NORMAL, LootTier.HEROIC, LootTier.MYTHIC)
 
             tiers.forEach { tier ->
-                val award = LootAward.create(
-                    itemId = ItemId(12345L),
-                    raiderId = RaiderId(999L),
-                    guildId = GuildId("guild-456"),
-                    flpsScore = FlpsScore.of(0.5),
-                    tier = tier
-                )
+                val award =
+                    LootAward.create(
+                        itemId = ItemId(12345L),
+                        raiderId = RaiderId(999L),
+                        guildId = GuildId("guild-456"),
+                        flpsScore = FlpsScore.of(0.5),
+                        tier = tier,
+                    )
 
                 val dto = LootAwardDto.from(award)
                 dto.tier shouldBe tier.name
@@ -219,16 +225,16 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootBanDtoTest {
-
         @Test
         fun `should create from loot ban`() {
             val expiresAt = Instant.now().plusSeconds(86400)
-            val ban = LootBan.create(
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                reason = "Test ban reason",
-                expiresAt = expiresAt
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Test ban reason",
+                    expiresAt = expiresAt,
+                )
 
             val dto = LootBanDto.from(ban)
 
@@ -243,12 +249,13 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should create from permanent ban`() {
-            val ban = LootBan.create(
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                reason = "Permanent ban",
-                expiresAt = null
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Permanent ban",
+                    expiresAt = null,
+                )
 
             val dto = LootBanDto.from(ban)
 
@@ -259,14 +266,15 @@ class LootDtoTest : UnitTest() {
         @Test
         fun `should create from expired ban`() {
             // Create a ban that already expired
-            val expiredBan = LootBan(
-                id = com.edgerush.lootman.domain.loot.model.LootBanId.generate(),
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                reason = "Expired ban",
-                bannedAt = Instant.now().minusSeconds(86400 * 7), // 7 days ago
-                expiresAt = Instant.now().minusSeconds(86400) // expired 1 day ago
-            )
+            val expiredBan =
+                LootBan(
+                    id = com.edgerush.lootman.domain.loot.model.LootBanId.generate(),
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Expired ban",
+                    bannedAt = Instant.now().minusSeconds(86400 * 7), // 7 days ago
+                    expiresAt = Instant.now().minusSeconds(86400), // expired 1 day ago
+                )
 
             val dto = LootBanDto.from(expiredBan)
 
@@ -276,25 +284,25 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootHistoryResponseTest {
-
         @Test
         fun `should create from awards list`() {
-            val awards = listOf(
-                LootAward.create(
-                    itemId = ItemId(111L),
-                    raiderId = RaiderId(999L),
-                    guildId = GuildId("guild-456"),
-                    flpsScore = FlpsScore.of(0.8),
-                    tier = LootTier.MYTHIC
-                ),
-                LootAward.create(
-                    itemId = ItemId(222L),
-                    raiderId = RaiderId(999L),
-                    guildId = GuildId("guild-456"),
-                    flpsScore = FlpsScore.of(0.7),
-                    tier = LootTier.HEROIC
+            val awards =
+                listOf(
+                    LootAward.create(
+                        itemId = ItemId(111L),
+                        raiderId = RaiderId(999L),
+                        guildId = GuildId("guild-456"),
+                        flpsScore = FlpsScore.of(0.8),
+                        tier = LootTier.MYTHIC,
+                    ),
+                    LootAward.create(
+                        itemId = ItemId(222L),
+                        raiderId = RaiderId(999L),
+                        guildId = GuildId("guild-456"),
+                        flpsScore = FlpsScore.of(0.7),
+                        tier = LootTier.HEROIC,
+                    ),
                 )
-            )
 
             val response = LootHistoryResponse.from(awards)
 
@@ -313,23 +321,23 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootBansResponseTest {
-
         @Test
         fun `should create from bans list`() {
-            val bans = listOf(
-                LootBan.create(
-                    raiderId = RaiderId(111L),
-                    guildId = GuildId("guild-456"),
-                    reason = "Ban 1",
-                    expiresAt = null
-                ),
-                LootBan.create(
-                    raiderId = RaiderId(222L),
-                    guildId = GuildId("guild-456"),
-                    reason = "Ban 2",
-                    expiresAt = Instant.now().plusSeconds(86400)
+            val bans =
+                listOf(
+                    LootBan.create(
+                        raiderId = RaiderId(111L),
+                        guildId = GuildId("guild-456"),
+                        reason = "Ban 1",
+                        expiresAt = null,
+                    ),
+                    LootBan.create(
+                        raiderId = RaiderId(222L),
+                        guildId = GuildId("guild-456"),
+                        reason = "Ban 2",
+                        expiresAt = Instant.now().plusSeconds(86400),
+                    ),
                 )
-            )
 
             val response = LootBansResponse.from(bans)
 
@@ -348,23 +356,24 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootAwardsListResponseTest {
-
         @Test
         fun `should create from awards with active count`() {
-            val activeAward = LootAward.create(
-                itemId = ItemId(111L),
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                flpsScore = FlpsScore.of(0.8),
-                tier = LootTier.MYTHIC
-            )
-            val revokedAward = LootAward.create(
-                itemId = ItemId(222L),
-                raiderId = RaiderId(999L),
-                guildId = GuildId("guild-456"),
-                flpsScore = FlpsScore.of(0.7),
-                tier = LootTier.HEROIC
-            ).revoke("Misassigned item")
+            val activeAward =
+                LootAward.create(
+                    itemId = ItemId(111L),
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    flpsScore = FlpsScore.of(0.8),
+                    tier = LootTier.MYTHIC,
+                )
+            val revokedAward =
+                LootAward.create(
+                    itemId = ItemId(222L),
+                    raiderId = RaiderId(999L),
+                    guildId = GuildId("guild-456"),
+                    flpsScore = FlpsScore.of(0.7),
+                    tier = LootTier.HEROIC,
+                ).revoke("Misassigned item")
 
             val awards = listOf(activeAward, revokedAward)
             val response = LootAwardsListResponse.from(awards)
@@ -385,15 +394,16 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should count all active awards`() {
-            val awards = (1..5).map { i ->
-                LootAward.create(
-                    itemId = ItemId(i.toLong()),
-                    raiderId = RaiderId(999L),
-                    guildId = GuildId("guild-456"),
-                    flpsScore = FlpsScore.of(0.5 + i * 0.05),
-                    tier = LootTier.MYTHIC
-                )
-            }
+            val awards =
+                (1..5).map { i ->
+                    LootAward.create(
+                        itemId = ItemId(i.toLong()),
+                        raiderId = RaiderId(999L),
+                        guildId = GuildId("guild-456"),
+                        flpsScore = FlpsScore.of(0.5 + i * 0.05),
+                        tier = LootTier.MYTHIC,
+                    )
+                }
 
             val response = LootAwardsListResponse.from(awards)
 
@@ -403,11 +413,12 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should support data class operations`() {
-            val response = LootAwardsListResponse(
-                awards = emptyList(),
-                totalCount = 10,
-                activeCount = 8
-            )
+            val response =
+                LootAwardsListResponse(
+                    awards = emptyList(),
+                    totalCount = 10,
+                    activeCount = 8,
+                )
 
             response.totalCount shouldBe 10
             response.activeCount shouldBe 8
@@ -416,24 +427,25 @@ class LootDtoTest : UnitTest() {
 
     @Nested
     inner class LootBansListResponseTest {
-
         @Test
         fun `should create from bans with active count`() {
-            val activeBan = LootBan.create(
-                raiderId = RaiderId(111L),
-                guildId = GuildId("guild-456"),
-                reason = "Active ban",
-                expiresAt = null
-            )
+            val activeBan =
+                LootBan.create(
+                    raiderId = RaiderId(111L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Active ban",
+                    expiresAt = null,
+                )
             // Create an expired ban (simulates inactive ban)
-            val expiredBan = LootBan(
-                id = com.edgerush.lootman.domain.loot.model.LootBanId.generate(),
-                raiderId = RaiderId(222L),
-                guildId = GuildId("guild-456"),
-                reason = "Expired ban",
-                bannedAt = Instant.now().minusSeconds(86400 * 7),
-                expiresAt = Instant.now().minusSeconds(86400) // expired yesterday
-            )
+            val expiredBan =
+                LootBan(
+                    id = com.edgerush.lootman.domain.loot.model.LootBanId.generate(),
+                    raiderId = RaiderId(222L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Expired ban",
+                    bannedAt = Instant.now().minusSeconds(86400 * 7),
+                    expiresAt = Instant.now().minusSeconds(86400), // expired yesterday
+                )
 
             val bans = listOf(activeBan, expiredBan)
             val response = LootBansListResponse.from(bans)
@@ -454,14 +466,15 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should count all active bans`() {
-            val bans = (1..3).map { i ->
-                LootBan.create(
-                    raiderId = RaiderId(i.toLong()),
-                    guildId = GuildId("guild-456"),
-                    reason = "Ban $i",
-                    expiresAt = null
-                )
-            }
+            val bans =
+                (1..3).map { i ->
+                    LootBan.create(
+                        raiderId = RaiderId(i.toLong()),
+                        guildId = GuildId("guild-456"),
+                        reason = "Ban $i",
+                        expiresAt = null,
+                    )
+                }
 
             val response = LootBansListResponse.from(bans)
 
@@ -471,11 +484,12 @@ class LootDtoTest : UnitTest() {
 
         @Test
         fun `should support data class operations`() {
-            val response = LootBansListResponse(
-                bans = emptyList(),
-                totalCount = 5,
-                activeCount = 3
-            )
+            val response =
+                LootBansListResponse(
+                    bans = emptyList(),
+                    totalCount = 5,
+                    activeCount = 3,
+                )
 
             response.totalCount shouldBe 5
             response.activeCount shouldBe 3

@@ -18,9 +18,8 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class JdbcGuildRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : GuildRepository {
-
     override fun save(guild: Guild): Guild {
         val exists = existsById(guild.id)
 
@@ -34,7 +33,8 @@ class JdbcGuildRepository(
     }
 
     override fun findById(id: GuildId): Guild? {
-        val sql = """
+        val sql =
+            """
             SELECT guild_id, guild_name, guild_description, realm, region,
                    sync_enabled, sync_cron_expression, sync_run_on_startup,
                    last_sync_status, timezone, benchmark_mode,
@@ -42,14 +42,15 @@ class JdbcGuildRepository(
                    is_active, created_at, updated_at
             FROM guild_configurations
             WHERE guild_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, guildRowMapper, id.value)
         return results.firstOrNull()
     }
 
     override fun findAllActive(): List<Guild> {
-        val sql = """
+        val sql =
+            """
             SELECT guild_id, guild_name, guild_description, realm, region,
                    sync_enabled, sync_cron_expression, sync_run_on_startup,
                    last_sync_status, timezone, benchmark_mode,
@@ -58,13 +59,14 @@ class JdbcGuildRepository(
             FROM guild_configurations
             WHERE is_active = true
             ORDER BY guild_name
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, guildRowMapper)
     }
 
     override fun findAll(): List<Guild> {
-        val sql = """
+        val sql =
+            """
             SELECT guild_id, guild_name, guild_description, realm, region,
                    sync_enabled, sync_cron_expression, sync_run_on_startup,
                    last_sync_status, timezone, benchmark_mode,
@@ -72,7 +74,7 @@ class JdbcGuildRepository(
                    is_active, created_at, updated_at
             FROM guild_configurations
             ORDER BY guild_name
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, guildRowMapper)
     }
@@ -90,14 +92,15 @@ class JdbcGuildRepository(
     }
 
     private fun insertGuild(guild: Guild) {
-        val sql = """
+        val sql =
+            """
             INSERT INTO guild_configurations (
                 guild_id, guild_name, guild_description, realm, region,
                 sync_enabled, sync_cron_expression, sync_run_on_startup,
                 last_sync_status, timezone, benchmark_mode,
                 custom_benchmark_rms, custom_benchmark_ipi, is_active
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -114,12 +117,13 @@ class JdbcGuildRepository(
             guild.settings.benchmarkMode.name,
             guild.settings.customBenchmarkRms,
             guild.settings.customBenchmarkIpi,
-            guild.isActive
+            guild.isActive,
         )
     }
 
     private fun updateGuild(guild: Guild) {
-        val sql = """
+        val sql =
+            """
             UPDATE guild_configurations SET
                 guild_name = ?,
                 guild_description = ?,
@@ -136,7 +140,7 @@ class JdbcGuildRepository(
                 is_active = ?,
                 updated_at = NOW()
             WHERE guild_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -153,49 +157,52 @@ class JdbcGuildRepository(
             guild.settings.customBenchmarkRms,
             guild.settings.customBenchmarkIpi,
             guild.isActive,
-            guild.id.value
+            guild.id.value,
         )
     }
 
-    private val guildRowMapper = RowMapper { rs, _ ->
-        val customRms = rs.getDouble("custom_benchmark_rms")
-        val customRmsValue = if (rs.wasNull()) null else customRms
+    private val guildRowMapper =
+        RowMapper { rs, _ ->
+            val customRms = rs.getDouble("custom_benchmark_rms")
+            val customRmsValue = if (rs.wasNull()) null else customRms
 
-        val customIpi = rs.getDouble("custom_benchmark_ipi")
-        val customIpiValue = if (rs.wasNull()) null else customIpi
+            val customIpi = rs.getDouble("custom_benchmark_ipi")
+            val customIpiValue = if (rs.wasNull()) null else customIpi
 
-        val syncStatusStr = rs.getString("last_sync_status")
-        val syncStatus = if (syncStatusStr != null) {
-            SyncStatus.fromString(syncStatusStr) ?: SyncStatus.NEVER_RUN
-        } else {
-            SyncStatus.NEVER_RUN
+            val syncStatusStr = rs.getString("last_sync_status")
+            val syncStatus =
+                if (syncStatusStr != null) {
+                    SyncStatus.fromString(syncStatusStr) ?: SyncStatus.NEVER_RUN
+                } else {
+                    SyncStatus.NEVER_RUN
+                }
+
+            val regionStr = rs.getString("region") ?: "US"
+            val region = Region.fromString(regionStr) ?: Region.US
+
+            val benchmarkModeStr = rs.getString("benchmark_mode") ?: "THEORETICAL"
+            val benchmarkMode = BenchmarkMode.fromString(benchmarkModeStr) ?: BenchmarkMode.THEORETICAL
+
+            Guild(
+                id = GuildId(rs.getString("guild_id")),
+                name = rs.getString("guild_name"),
+                description = rs.getString("guild_description"),
+                realm = rs.getString("realm"),
+                region = region,
+                settings =
+                    GuildSettings(
+                        syncEnabled = rs.getBoolean("sync_enabled"),
+                        syncCronExpression = rs.getString("sync_cron_expression") ?: "0 0 4 * * *",
+                        syncRunOnStartup = rs.getBoolean("sync_run_on_startup"),
+                        timezone = rs.getString("timezone") ?: "UTC",
+                        benchmarkMode = benchmarkMode,
+                        customBenchmarkRms = customRmsValue,
+                        customBenchmarkIpi = customIpiValue,
+                    ),
+                syncStatus = syncStatus,
+                isActive = rs.getBoolean("is_active"),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                updatedAt = rs.getTimestamp("updated_at").toInstant(),
+            )
         }
-
-        val regionStr = rs.getString("region") ?: "US"
-        val region = Region.fromString(regionStr) ?: Region.US
-
-        val benchmarkModeStr = rs.getString("benchmark_mode") ?: "THEORETICAL"
-        val benchmarkMode = BenchmarkMode.fromString(benchmarkModeStr) ?: BenchmarkMode.THEORETICAL
-
-        Guild(
-            id = GuildId(rs.getString("guild_id")),
-            name = rs.getString("guild_name"),
-            description = rs.getString("guild_description"),
-            realm = rs.getString("realm"),
-            region = region,
-            settings = GuildSettings(
-                syncEnabled = rs.getBoolean("sync_enabled"),
-                syncCronExpression = rs.getString("sync_cron_expression") ?: "0 0 4 * * *",
-                syncRunOnStartup = rs.getBoolean("sync_run_on_startup"),
-                timezone = rs.getString("timezone") ?: "UTC",
-                benchmarkMode = benchmarkMode,
-                customBenchmarkRms = customRmsValue,
-                customBenchmarkIpi = customIpiValue
-            ),
-            syncStatus = syncStatus,
-            isActive = rs.getBoolean("is_active"),
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            updatedAt = rs.getTimestamp("updated_at").toInstant()
-        )
-    }
 }

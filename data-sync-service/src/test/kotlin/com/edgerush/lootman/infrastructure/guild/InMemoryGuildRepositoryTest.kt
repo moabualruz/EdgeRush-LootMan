@@ -1,7 +1,6 @@
 package com.edgerush.lootman.infrastructure.guild
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.domain.guild.model.BenchmarkMode
 import com.edgerush.lootman.domain.guild.model.Guild
 import com.edgerush.lootman.domain.guild.model.GuildSettings
 import com.edgerush.lootman.domain.guild.model.Region
@@ -22,7 +21,6 @@ import java.time.Instant
  * Tests the in-memory storage and retrieval of guilds.
  */
 class InMemoryGuildRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemoryGuildRepository
 
     @BeforeEach
@@ -32,7 +30,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should save new guild`() {
             // Given
@@ -78,7 +75,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return guild when found`() {
             // Given
@@ -124,7 +120,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return all guilds`() {
             // Given
@@ -165,7 +160,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllActiveTests {
-
         @Test
         fun `should return only active guilds`() {
             // Given
@@ -206,7 +200,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteByIdTests {
-
         @Test
         fun `should return true when guild deleted`() {
             // Given
@@ -249,7 +242,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when guild exists`() {
             // Given
@@ -289,7 +281,6 @@ class InMemoryGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class ClearTests {
-
         @Test
         fun `should remove all guilds`() {
             // Given
@@ -326,17 +317,18 @@ class InMemoryGuildRepositoryTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

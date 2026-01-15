@@ -8,7 +8,6 @@ import com.edgerush.lootman.domain.auth.model.UserRefreshToken
  * Repository interface for UserRefreshToken operations.
  */
 interface RefreshTokenRepository {
-
     /**
      * Finds a refresh token by its ID.
      *

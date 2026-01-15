@@ -11,5 +11,5 @@ data class LootAwardBonusIdEntity(
     @Column("loot_award_id")
     val lootAwardId: Long,
     @Column("bonus_id")
-    val bonusId: String?
+    val bonusId: String?,
 )

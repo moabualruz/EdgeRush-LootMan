@@ -1,13 +1,12 @@
 package com.edgerush.lootman.api.flps
 
 import com.edgerush.datasync.test.base.UnitTest
-import com.edgerush.lootman.application.flps.CalculateFlpsScoreCommand
+import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.application.flps.CalculateFlpsScoreUseCase
 import com.edgerush.lootman.application.flps.FlpsCalculationResult
 import com.edgerush.lootman.application.flps.FlpsComponentCalculator
 import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.FlpsReport
-import com.edgerush.lootman.application.flps.GetFlpsReportQuery
 import com.edgerush.lootman.application.flps.GetFlpsReportUseCase
 import com.edgerush.lootman.application.flps.RaiderFlpsData
 import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
@@ -25,7 +24,6 @@ import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.Raider
 import com.edgerush.lootman.domain.shared.model.Role
-import com.edgerush.lootman.api.auth.CurrentUserService
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -58,24 +56,26 @@ class FlpsControllerTest : UnitTest() {
         componentCalculator = mockk()
         configPreviewService = mockk()
         currentUserService = mockk()
-        controller = FlpsController(
-            calculateFlpsScoreUseCase,
-            getFlpsReportUseCase,
-            flpsDataAssembler,
-            componentCalculator,
-            configPreviewService,
-            currentUserService,
-        )
+        controller =
+            FlpsController(
+                calculateFlpsScoreUseCase,
+                getFlpsReportUseCase,
+                flpsDataAssembler,
+                componentCalculator,
+                configPreviewService,
+                currentUserService,
+            )
     }
 
     @Test
     fun `getFlpsReportV1 should return report response from use case`() {
         // Given
         val guildId = "test-guild"
-        val flpsReport = FlpsReport(
-            guildId = GuildId(guildId),
-            calculations = emptyList(),
-        )
+        val flpsReport =
+            FlpsReport(
+                guildId = GuildId(guildId),
+                calculations = emptyList(),
+            )
 
         // Mock flpsDataAssembler to return empty list (no raiders)
         every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns emptyList()
@@ -103,9 +103,10 @@ class FlpsControllerTest : UnitTest() {
         every { getFlpsReportUseCase.execute(any()) } returns Result.failure(exception)
 
         // When / Then
-        val thrownException = assertThrows<RuntimeException> {
-            controller.getFlpsReportV1(guildId)
-        }
+        val thrownException =
+            assertThrows<RuntimeException> {
+                controller.getFlpsReportV1(guildId)
+            }
 
         thrownException.message shouldBe "Failed to generate FLPS report"
         verify(exactly = 1) { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) }
@@ -121,20 +122,22 @@ class FlpsControllerTest : UnitTest() {
         every { raider.characterName } returns "TestRaider"
         every { raider.role } returns Role.DPS
 
-        val raiderData = RaiderFlpsData(
-            raider = raider,
-            attendance = emptyList(),
-            lootHistory = emptyList(),
-            wishlist = null,
-            gear = null,
-            activeBans = emptyList(),
-        )
+        val raiderData =
+            RaiderFlpsData(
+                raider = raider,
+                attendance = emptyList(),
+                lootHistory = emptyList(),
+                wishlist = null,
+                gear = null,
+                activeBans = emptyList(),
+            )
 
         val calculation = createFlpsCalculationResult(guildId, 1L, 0.85)
-        val flpsReport = FlpsReport(
-            guildId = GuildId(guildId),
-            calculations = listOf(calculation),
-        )
+        val flpsReport =
+            FlpsReport(
+                guildId = GuildId(guildId),
+                calculations = listOf(calculation),
+            )
 
         every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns listOf(raiderData)
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
@@ -208,14 +211,15 @@ class FlpsControllerTest : UnitTest() {
         every { raider.characterName } returns "TestRaider"
         every { raider.role } returns Role.DPS
 
-        val raiderData = RaiderFlpsData(
-            raider = raider,
-            attendance = emptyList(),
-            lootHistory = emptyList(),
-            wishlist = null,
-            gear = null,
-            activeBans = emptyList(),
-        )
+        val raiderData =
+            RaiderFlpsData(
+                raider = raider,
+                attendance = emptyList(),
+                lootHistory = emptyList(),
+                wishlist = null,
+                gear = null,
+                activeBans = emptyList(),
+            )
 
         val calculationResult = createFlpsCalculationResult(guildId, 123L, 0.75)
 
@@ -258,23 +262,25 @@ class FlpsControllerTest : UnitTest() {
         every { raider2.characterName } returns "HighScoreRaider"
         every { raider2.role } returns Role.TANK
 
-        val raiderData1 = RaiderFlpsData(
-            raider = raider1,
-            attendance = emptyList(),
-            lootHistory = emptyList(),
-            wishlist = null,
-            gear = null,
-            activeBans = emptyList(),
-        )
+        val raiderData1 =
+            RaiderFlpsData(
+                raider = raider1,
+                attendance = emptyList(),
+                lootHistory = emptyList(),
+                wishlist = null,
+                gear = null,
+                activeBans = emptyList(),
+            )
 
-        val raiderData2 = RaiderFlpsData(
-            raider = raider2,
-            attendance = emptyList(),
-            lootHistory = emptyList(),
-            wishlist = null,
-            gear = null,
-            activeBans = emptyList(),
-        )
+        val raiderData2 =
+            RaiderFlpsData(
+                raider = raider2,
+                attendance = emptyList(),
+                lootHistory = emptyList(),
+                wishlist = null,
+                gear = null,
+                activeBans = emptyList(),
+            )
 
         val lowResult = createFlpsCalculationResult(guildId, 1L, 0.50)
         val highResult = createFlpsCalculationResult(guildId, 2L, 0.90)

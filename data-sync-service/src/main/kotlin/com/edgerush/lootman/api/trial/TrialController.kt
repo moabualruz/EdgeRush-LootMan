@@ -29,14 +29,17 @@ class TrialController(
 ) {
     @PostMapping
     @Operation(summary = "Create a new trial for an approved application")
-    fun createTrial(@RequestBody request: CreateTrialRequest): ResponseEntity<TrialDto> {
+    fun createTrial(
+        @RequestBody request: CreateTrialRequest,
+    ): ResponseEntity<TrialDto> {
         return try {
-            val trial = trialService.createTrial(
-                applicationId = ApplicationId(request.applicationId),
-                guildId = GuildId(request.guildId),
-                raidsRequired = request.raidsRequired,
-                raiderId = request.raiderId,
-            )
+            val trial =
+                trialService.createTrial(
+                    applicationId = ApplicationId(request.applicationId),
+                    guildId = GuildId(request.guildId),
+                    raidsRequired = request.raidsRequired,
+                    raiderId = request.raiderId,
+                )
             ResponseEntity.status(HttpStatus.CREATED).body(TrialDto.from(trial))
         } catch (e: IllegalStateException) {
             ResponseEntity.status(HttpStatus.CONFLICT).build()
@@ -45,7 +48,9 @@ class TrialController(
 
     @GetMapping("/{trialId}")
     @Operation(summary = "Get a trial by ID")
-    fun getTrial(@PathVariable trialId: String): ResponseEntity<TrialDto> {
+    fun getTrial(
+        @PathVariable trialId: String,
+    ): ResponseEntity<TrialDto> {
         val trial = trialService.getTrial(TrialId(trialId))
         return if (trial != null) {
             ResponseEntity.ok(TrialDto.from(trial))
@@ -64,17 +69,18 @@ class TrialController(
     ): ResponseEntity<TrialListResponse> {
         val guild = GuildId(guildId)
 
-        val (trials, total) = if (status != null) {
-            Pair(
-                trialService.listTrialsByStatus(guild, status, offset, limit),
-                trialService.countTrialsByStatus(guild, status),
-            )
-        } else {
-            Pair(
-                trialService.listTrials(guild, offset, limit),
-                trialService.countTrials(guild),
-            )
-        }
+        val (trials, total) =
+            if (status != null) {
+                Pair(
+                    trialService.listTrialsByStatus(guild, status, offset, limit),
+                    trialService.countTrialsByStatus(guild, status),
+                )
+            } else {
+                Pair(
+                    trialService.listTrials(guild, offset, limit),
+                    trialService.countTrials(guild),
+                )
+            }
 
         return ResponseEntity.ok(
             TrialListResponse(
@@ -88,7 +94,9 @@ class TrialController(
 
     @GetMapping("/active")
     @Operation(summary = "Get all active and extended trials for a guild")
-    fun getActiveTrials(@RequestParam guildId: String): ResponseEntity<List<TrialDto>> {
+    fun getActiveTrials(
+        @RequestParam guildId: String,
+    ): ResponseEntity<List<TrialDto>> {
         val trials = trialService.getActiveTrials(GuildId(guildId))
         return ResponseEntity.ok(trials.map { TrialDto.from(it) })
     }
@@ -100,13 +108,14 @@ class TrialController(
         @RequestBody request: UpdateMetricsRequest,
     ): ResponseEntity<TrialDto> {
         return try {
-            val trial = trialService.updateMetrics(
-                trialId = TrialId(trialId),
-                raidsAttended = request.raidsAttended,
-                attendanceRate = request.attendanceRate,
-                averagePerformance = request.averagePerformance,
-                deathsPerRaid = request.deathsPerRaid,
-            )
+            val trial =
+                trialService.updateMetrics(
+                    trialId = TrialId(trialId),
+                    raidsAttended = request.raidsAttended,
+                    attendanceRate = request.attendanceRate,
+                    averagePerformance = request.averagePerformance,
+                    deathsPerRaid = request.deathsPerRaid,
+                )
             ResponseEntity.ok(TrialDto.from(trial))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -122,11 +131,12 @@ class TrialController(
         @RequestBody request: PromoteTrialRequest,
     ): ResponseEntity<TrialDto> {
         return try {
-            val trial = trialService.promoteTrial(
-                trialId = TrialId(trialId),
-                promoterId = request.promoterId,
-                reason = request.reason,
-            )
+            val trial =
+                trialService.promoteTrial(
+                    trialId = TrialId(trialId),
+                    promoterId = request.promoterId,
+                    reason = request.reason,
+                )
             ResponseEntity.ok(TrialDto.from(trial))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -142,12 +152,13 @@ class TrialController(
         @RequestBody request: ExtendTrialRequest,
     ): ResponseEntity<TrialDto> {
         return try {
-            val trial = trialService.extendTrial(
-                trialId = TrialId(trialId),
-                extenderId = request.extenderId,
-                additionalRaids = request.additionalRaids,
-                reason = request.reason,
-            )
+            val trial =
+                trialService.extendTrial(
+                    trialId = TrialId(trialId),
+                    extenderId = request.extenderId,
+                    additionalRaids = request.additionalRaids,
+                    reason = request.reason,
+                )
             ResponseEntity.ok(TrialDto.from(trial))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -163,12 +174,13 @@ class TrialController(
         @RequestBody request: EndTrialRequest,
     ): ResponseEntity<TrialDto> {
         return try {
-            val trial = trialService.endTrial(
-                trialId = TrialId(trialId),
-                officerId = request.officerId,
-                outcome = request.outcome,
-                reason = request.reason,
-            )
+            val trial =
+                trialService.endTrial(
+                    trialId = TrialId(trialId),
+                    officerId = request.officerId,
+                    outcome = request.outcome,
+                    reason = request.reason,
+                )
             ResponseEntity.ok(TrialDto.from(trial))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -179,7 +191,9 @@ class TrialController(
 
     @DeleteMapping("/{trialId}")
     @Operation(summary = "Delete a trial")
-    fun deleteTrial(@PathVariable trialId: String): ResponseEntity<Void> {
+    fun deleteTrial(
+        @PathVariable trialId: String,
+    ): ResponseEntity<Void> {
         trialService.deleteTrial(TrialId(trialId))
         return ResponseEntity.noContent().build()
     }

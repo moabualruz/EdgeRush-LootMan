@@ -4,7 +4,6 @@ import com.edgerush.datasync.test.base.IntegrationTest
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
@@ -23,11 +22,11 @@ import org.springframework.http.MediaType
  * - HTTP status codes are correct for each scenario
  */
 class SimulationApiContractTest : IntegrationTest() {
-
     private val objectMapper = ObjectMapper()
 
     private fun createSubmitRequest(): HttpEntity<String> {
-        val json = """
+        val json =
+            """
             {
                 "characterRealm": "TestRealm",
                 "characterClass": "warrior",
@@ -37,7 +36,7 @@ class SimulationApiContractTest : IntegrationTest() {
                 "iterations": 1000,
                 "fightLengthSeconds": 300
             }
-        """.trimIndent()
+            """.trimIndent()
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(json, headers)
@@ -48,11 +47,12 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `POST simulation should return 202 Accepted with correct structure`() {
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/contract-guild/characters/ContractChar",
-                createSubmitRequest(),
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/contract-guild/characters/ContractChar",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.ACCEPTED
@@ -64,11 +64,12 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `POST simulation response should include all required fields`() {
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/required-fields-guild/characters/RequiredChar",
-                createSubmitRequest(),
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/required-fields-guild/characters/RequiredChar",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
 
             // Then
             val json = objectMapper.readTree(response.body)
@@ -90,23 +91,25 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `POST simulation should accept minimal request body`() {
             // Given - only required fields
-            val minimalJson = """
+            val minimalJson =
+                """
                 {
                     "characterRealm": "TestRealm",
                     "characterClass": "warrior",
                     "characterSpec": "fury"
                 }
-            """.trimIndent()
+                """.trimIndent()
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_JSON
             val entity = HttpEntity(minimalJson, headers)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/minimal-guild/characters/MinimalChar",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/minimal-guild/characters/MinimalChar",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.ACCEPTED
@@ -118,19 +121,21 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET request status should return correct structure when found`() {
             // Given - create a simulation first
-            val submitResponse = restTemplate.postForEntity(
-                "/api/v1/simulation/guilds/status-contract-guild/characters/StatusChar",
-                createSubmitRequest(),
-                String::class.java
-            )
+            val submitResponse =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/guilds/status-contract-guild/characters/StatusChar",
+                    createSubmitRequest(),
+                    String::class.java,
+                )
             val submitJson = objectMapper.readTree(submitResponse.body)
             val requestId = submitJson.get("id").asLong()
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/requests/$requestId",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/requests/$requestId",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -142,10 +147,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET request status should return 404 for unknown ID`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/requests/999999999",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/requests/999999999",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -157,10 +163,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET results should return correct structure`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/results-contract-guild/characters/ResultsChar/realms/TestRealm/results",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/results-contract-guild/characters/ResultsChar/realms/TestRealm/results",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -178,10 +185,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET results should return empty array when no results`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/empty-contract-guild/characters/EmptyChar/realms/TestRealm/results",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/empty-contract-guild/characters/EmptyChar/realms/TestRealm/results",
+                    String::class.java,
+                )
 
             // Then
             val json = objectMapper.readTree(response.body)
@@ -195,10 +203,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET pending should return array structure`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/pending-contract-guild/pending",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/pending-contract-guild/pending",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -213,14 +222,15 @@ class SimulationApiContractTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/pending-item-guild/characters/PendingItemChar",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/pending-item-guild/pending",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/pending-item-guild/pending",
+                    String::class.java,
+                )
 
             // Then
             val json = objectMapper.readTree(response.body)
@@ -234,11 +244,12 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `POST execute-pending should return execution summary`() {
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/simulation/execute-pending",
-                null,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/simulation/execute-pending",
+                    null,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -256,10 +267,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET status should return correct structure`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -277,10 +289,11 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `GET status endpoints should document all available endpoints`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/status",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/status",
+                    String::class.java,
+                )
 
             // Then
             val json = objectMapper.readTree(response.body)
@@ -299,11 +312,12 @@ class SimulationApiContractTest : IntegrationTest() {
         @Test
         fun `all endpoints should return application json`() {
             // Given
-            val endpoints = listOf(
-                "/api/v1/simulation/status",
-                "/api/v1/simulation/guilds/content-type-guild/pending",
-                "/api/v1/simulation/guilds/content-type-guild/characters/ContentChar/realms/TestRealm/results"
-            )
+            val endpoints =
+                listOf(
+                    "/api/v1/simulation/status",
+                    "/api/v1/simulation/guilds/content-type-guild/pending",
+                    "/api/v1/simulation/guilds/content-type-guild/characters/ContentChar/realms/TestRealm/results",
+                )
 
             // When/Then
             endpoints.forEach { endpoint ->
@@ -321,14 +335,15 @@ class SimulationApiContractTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/simulation/guilds/datetime-guild/characters/DateTimeChar",
                 createSubmitRequest(),
-                String::class.java
+                String::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/simulation/guilds/datetime-guild/characters/DateTimeChar/realms/TestRealm/results",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/simulation/guilds/datetime-guild/characters/DateTimeChar/realms/TestRealm/results",
+                    String::class.java,
+                )
 
             // Then
             val json = objectMapper.readTree(response.body)

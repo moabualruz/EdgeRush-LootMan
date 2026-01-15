@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi, beforeEach } from 'vitest'
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 

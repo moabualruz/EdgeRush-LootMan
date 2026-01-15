@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the application_questions table.
  */
 class JdbcApplicationQuestionRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcApplicationQuestionRepository
 
@@ -35,7 +34,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return application question when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
-                    eq(questionId)
+                    eq(questionId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationQuestionEntity>>()
@@ -70,7 +68,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
-                    eq(questionId)
+                    eq(questionId),
                 )
             } returns emptyList()
 
@@ -90,18 +88,19 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
-                    eq(questionId)
+                    eq(questionId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationQuestionEntity>>()
-                val rs = mockResultSet(
-                    id = questionId,
-                    applicationId = 100L,
-                    position = 1,
-                    question = "Why do you want to join?",
-                    answer = "I love raiding!",
-                    filesJson = "[\"file1.png\", \"file2.jpg\"]"
-                )
+                val rs =
+                    mockResultSet(
+                        id = questionId,
+                        applicationId = 100L,
+                        position = 1,
+                        question = "Why do you want to join?",
+                        answer = "I love raiding!",
+                        filesJson = "[\"file1.png\", \"file2.jpg\"]",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -127,18 +126,19 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
-                    eq(questionId)
+                    eq(questionId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationQuestionEntity>>()
-                val rs = mockResultSet(
-                    id = questionId,
-                    applicationId = 100L,
-                    position = null,
-                    question = null,
-                    answer = null,
-                    filesJson = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = questionId,
+                        applicationId = 100L,
+                        position = null,
+                        question = null,
+                        answer = null,
+                        filesJson = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -157,7 +157,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated application questions`() {
             // Given
@@ -169,13 +168,13 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationQuestionEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -194,7 +193,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") },
                     any<RowMapper<ApplicationQuestionEntity>>(),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -208,7 +207,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByApplicationIdTests {
-
         @Test
         fun `should return questions for application`() {
             // Given
@@ -220,13 +218,13 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                     any<RowMapper<ApplicationQuestionEntity>>(),
                     eq(applicationId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationQuestionEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, applicationId, position = 1), 0),
-                    rowMapper.mapRow(mockResultSet(2L, applicationId, position = 2), 1)
+                    rowMapper.mapRow(mockResultSet(2L, applicationId, position = 2), 1),
                 )
             }
 
@@ -249,7 +247,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                     any<RowMapper<ApplicationQuestionEntity>>(),
                     eq(applicationId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -263,14 +261,13 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_questions") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -287,7 +284,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -307,7 +304,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
                     Long::class.java,
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns 5L
 
@@ -321,7 +318,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when application question exists`() {
             // Given
@@ -331,7 +327,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(questionId)
+                    eq(questionId),
                 )
             } returns 1
 
@@ -351,7 +347,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(questionId)
+                    eq(questionId),
                 )
             } returns 0
 
@@ -371,7 +367,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(questionId)
+                    eq(questionId),
                 )
             } returns null
 
@@ -385,7 +381,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new application question when id is null`() {
             // Given
@@ -426,7 +421,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -434,7 +429,6 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete application question by id`() {
             // Given
@@ -443,7 +437,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(questionId)
+                    eq(questionId),
                 )
             } returns 1
 
@@ -454,7 +448,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    questionId
+                    questionId,
                 )
             }
         }
@@ -468,7 +462,7 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
         position: Int? = 1,
         question: String? = "Test question?",
         answer: String? = "Test answer",
-        filesJson: String? = null
+        filesJson: String? = null,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -487,13 +481,14 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
         position: Int? = 1,
         question: String? = "Test question?",
         answer: String? = "Test answer",
-        filesJson: String? = null
-    ): ApplicationQuestionEntity = ApplicationQuestionEntity(
-        id = id,
-        applicationId = applicationId,
-        position = position,
-        question = question,
-        answer = answer,
-        filesJson = filesJson
-    )
+        filesJson: String? = null,
+    ): ApplicationQuestionEntity =
+        ApplicationQuestionEntity(
+            id = id,
+            applicationId = applicationId,
+            position = position,
+            question = question,
+            answer = answer,
+            filesJson = filesJson,
+        )
 }

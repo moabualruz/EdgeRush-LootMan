@@ -19,7 +19,6 @@ import java.time.Instant
  * Unit tests for AuthController.
  */
 class AuthControllerTest : UnitTest() {
-
     private lateinit var authenticationService: AuthenticationService
     private lateinit var controller: AuthController
 
@@ -31,14 +30,14 @@ class AuthControllerTest : UnitTest() {
 
     @Nested
     inner class DiscordAuth {
-
         @Test
         fun `should return Discord authorization URL`() {
             // Given
-            val expected = OAuth2UrlResponse(
-                url = "https://discord.com/api/oauth2/authorize?client_id=123",
-                provider = "discord"
-            )
+            val expected =
+                OAuth2UrlResponse(
+                    url = "https://discord.com/api/oauth2/authorize?client_id=123",
+                    provider = "discord",
+                )
             every { authenticationService.getDiscordAuthUrl(any()) } returns expected
 
             // When
@@ -54,11 +53,12 @@ class AuthControllerTest : UnitTest() {
         fun `should exchange Discord code for tokens`() {
             // Given
             val request = OAuth2CallbackRequest(code = "auth-code-123")
-            val expected = TokenResponse(
-                accessToken = "access-token",
-                refreshToken = "refresh-token",
-                expiresIn = 900
-            )
+            val expected =
+                TokenResponse(
+                    accessToken = "access-token",
+                    refreshToken = "refresh-token",
+                    expiresIn = 900,
+                )
             every { authenticationService.authenticateWithDiscord(request.code) } returns expected
 
             // When
@@ -86,14 +86,14 @@ class AuthControllerTest : UnitTest() {
 
     @Nested
     inner class BattlenetAuth {
-
         @Test
         fun `should return Battlenet authorization URL`() {
             // Given
-            val expected = OAuth2UrlResponse(
-                url = "https://us.battle.net/oauth/authorize?client_id=123",
-                provider = "battlenet"
-            )
+            val expected =
+                OAuth2UrlResponse(
+                    url = "https://us.battle.net/oauth/authorize?client_id=123",
+                    provider = "battlenet",
+                )
             every { authenticationService.getBattlenetAuthUrl(any()) } returns expected
 
             // When
@@ -108,11 +108,12 @@ class AuthControllerTest : UnitTest() {
         fun `should exchange Battlenet code for tokens`() {
             // Given
             val request = OAuth2CallbackRequest(code = "auth-code-456")
-            val expected = TokenResponse(
-                accessToken = "access-token",
-                refreshToken = "refresh-token",
-                expiresIn = 900
-            )
+            val expected =
+                TokenResponse(
+                    accessToken = "access-token",
+                    refreshToken = "refresh-token",
+                    expiresIn = 900,
+                )
             every { authenticationService.authenticateWithBattlenet(request.code) } returns expected
 
             // When
@@ -126,22 +127,22 @@ class AuthControllerTest : UnitTest() {
 
     @Nested
     inner class CurrentUser {
-
         @Test
         fun `should return current user profile`() {
             // Given
-            val expected = UserProfileResponse(
-                id = 1L,
-                discordId = "123456789012345678",
-                battlenetId = null,
-                username = "testuser",
-                email = "test@example.com",
-                avatarUrl = "https://avatar.png",
-                role = "RAIDER",
-                guildId = "test-guild",
-                createdAt = Instant.now(),
-                lastLogin = Instant.now()
-            )
+            val expected =
+                UserProfileResponse(
+                    id = 1L,
+                    discordId = "123456789012345678",
+                    battlenetId = null,
+                    username = "testuser",
+                    email = "test@example.com",
+                    avatarUrl = "https://avatar.png",
+                    role = "RAIDER",
+                    guildId = "test-guild",
+                    createdAt = Instant.now(),
+                    lastLogin = Instant.now(),
+                )
             every { authenticationService.getCurrentUser("valid-token") } returns expected
 
             // When
@@ -163,16 +164,16 @@ class AuthControllerTest : UnitTest() {
 
     @Nested
     inner class RefreshToken {
-
         @Test
         fun `should refresh access token`() {
             // Given
             val request = RefreshTokenRequest(refreshToken = "old-refresh-token")
-            val expected = TokenResponse(
-                accessToken = "new-access-token",
-                refreshToken = "new-refresh-token",
-                expiresIn = 900
-            )
+            val expected =
+                TokenResponse(
+                    accessToken = "new-access-token",
+                    refreshToken = "new-refresh-token",
+                    expiresIn = 900,
+                )
             every { authenticationService.refreshAccessToken(request.refreshToken) } returns expected
 
             // When
@@ -199,7 +200,6 @@ class AuthControllerTest : UnitTest() {
 
     @Nested
     inner class Logout {
-
         @Test
         fun `should logout user`() {
             // Given

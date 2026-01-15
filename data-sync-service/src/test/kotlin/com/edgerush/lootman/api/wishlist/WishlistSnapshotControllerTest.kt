@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 
 class WishlistSnapshotControllerTest : UnitTest() {
-
     private lateinit var service: WishlistSnapshotCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: WishlistSnapshotController
@@ -109,6 +108,7 @@ class WishlistSnapshotControllerTest : UnitTest() {
         seasonId: Long? = 1L,
         periodId: Long? = 1L,
         rawPayload: String = "{}",
-        syncedAt: OffsetDateTime = OffsetDateTime.now()
-    ) = WishlistSnapshotResponse(id, raiderId, characterName, characterRealm, characterRegion, teamId, seasonId, periodId, rawPayload, syncedAt)
+        syncedAt: OffsetDateTime = OffsetDateTime.now(),
+    ) =
+        WishlistSnapshotResponse(id, raiderId, characterName, characterRealm, characterRegion, teamId, seasonId, periodId, rawPayload, syncedAt)
 }

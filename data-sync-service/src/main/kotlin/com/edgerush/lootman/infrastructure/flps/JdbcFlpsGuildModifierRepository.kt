@@ -17,13 +17,13 @@ import java.time.OffsetDateTime
 class JdbcFlpsGuildModifierRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : FlpsGuildModifierRepository {
-
     override fun findById(id: Long): FlpsGuildModifierEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_guild_modifiers
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, modifierRowMapper, id)
         return results.firstOrNull()
@@ -35,13 +35,17 @@ class JdbcFlpsGuildModifierRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<FlpsGuildModifierEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity> {
+        val sql =
+            """
             SELECT id, guild_id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_guild_modifiers
             ORDER BY guild_id, category, modifier_key
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, modifierRowMapper, limit, offset)
     }
@@ -51,14 +55,19 @@ class JdbcFlpsGuildModifierRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByGuildId(guildId: String, offset: Long, limit: Int): List<FlpsGuildModifierEntity> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity> {
+        val sql =
+            """
             SELECT id, guild_id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_guild_modifiers
             WHERE guild_id = ?
             ORDER BY category, modifier_key
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, modifierRowMapper, guildId, limit, offset)
     }
@@ -68,19 +77,28 @@ class JdbcFlpsGuildModifierRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId) ?: 0L
     }
 
-    override fun findByGuildIdAndCategory(guildId: String, category: String, offset: Long, limit: Int): List<FlpsGuildModifierEntity> {
-        val sql = """
+    override fun findByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity> {
+        val sql =
+            """
             SELECT id, guild_id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_guild_modifiers
             WHERE guild_id = ? AND category = ?
             ORDER BY modifier_key
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, modifierRowMapper, guildId, category, limit, offset)
     }
 
-    override fun countByGuildIdAndCategory(guildId: String, category: String): Long {
+    override fun countByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+    ): Long {
         val sql = "SELECT COUNT(*) FROM flps_guild_modifiers WHERE guild_id = ? AND category = ?"
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId, category) ?: 0L
     }
@@ -100,10 +118,11 @@ class JdbcFlpsGuildModifierRepository(
     }
 
     private fun insertModifier(modifier: FlpsGuildModifierEntity): FlpsGuildModifierEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO flps_guild_modifiers (guild_id, category, modifier_key, modifier_value, description, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val now = OffsetDateTime.now()
         val keyHolder = GeneratedKeyHolder()
@@ -124,7 +143,8 @@ class JdbcFlpsGuildModifierRepository(
     }
 
     private fun updateModifier(modifier: FlpsGuildModifierEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE flps_guild_modifiers SET
                 guild_id = ?,
                 category = ?,
@@ -133,7 +153,7 @@ class JdbcFlpsGuildModifierRepository(
                 description = ?,
                 updated_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -147,16 +167,17 @@ class JdbcFlpsGuildModifierRepository(
         )
     }
 
-    private val modifierRowMapper = RowMapper { rs, _ ->
-        FlpsGuildModifierEntity(
-            id = rs.getLong("id"),
-            guildId = rs.getString("guild_id"),
-            category = rs.getString("category"),
-            modifierKey = rs.getString("modifier_key"),
-            modifierValue = rs.getBigDecimal("modifier_value") ?: BigDecimal.ZERO,
-            description = rs.getString("description"),
-            createdAt = rs.getObject("created_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
-            updatedAt = rs.getObject("updated_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
-        )
-    }
+    private val modifierRowMapper =
+        RowMapper { rs, _ ->
+            FlpsGuildModifierEntity(
+                id = rs.getLong("id"),
+                guildId = rs.getString("guild_id"),
+                category = rs.getString("category"),
+                modifierKey = rs.getString("modifier_key"),
+                modifierValue = rs.getBigDecimal("modifier_value") ?: BigDecimal.ZERO,
+                description = rs.getString("description"),
+                createdAt = rs.getObject("created_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
+                updatedAt = rs.getObject("updated_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
+            )
+        }
 }

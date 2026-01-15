@@ -48,13 +48,14 @@ class GuildControllerTest : UnitTest() {
         deleteGuildUseCase = mockk()
         getGuildUseCase = mockk()
         listGuildsUseCase = mockk()
-        controller = GuildController(
-            createGuildUseCase,
-            updateGuildUseCase,
-            deleteGuildUseCase,
-            getGuildUseCase,
-            listGuildsUseCase
-        )
+        controller =
+            GuildController(
+                createGuildUseCase,
+                updateGuildUseCase,
+                deleteGuildUseCase,
+                getGuildUseCase,
+                listGuildsUseCase,
+            )
     }
 
     @Nested
@@ -62,13 +63,14 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return CREATED status with guild response`() {
             // Given
-            val request = CreateGuildRequest(
-                id = "test-guild",
-                name = "Test Guild",
-                description = "A test guild",
-                realm = "Area 52",
-                region = "US"
-            )
+            val request =
+                CreateGuildRequest(
+                    id = "test-guild",
+                    name = "Test Guild",
+                    description = "A test guild",
+                    realm = "Area 52",
+                    region = "US",
+                )
 
             val guild = createGuild(id = GuildId("test-guild"))
 
@@ -89,15 +91,16 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = CreateGuildRequest(
-                id = "my-guild",
-                name = "My Guild",
-                description = "Description",
-                realm = "Illidan",
-                region = "US",
-                syncEnabled = false,
-                benchmarkMode = "TOP_PERFORMER"
-            )
+            val request =
+                CreateGuildRequest(
+                    id = "my-guild",
+                    name = "My Guild",
+                    description = "Description",
+                    realm = "Illidan",
+                    region = "US",
+                    syncEnabled = false,
+                    benchmarkMode = "TOP_PERFORMER",
+                )
 
             val commandSlot = slot<CreateGuildCommand>()
             val guild = createGuild(id = GuildId("my-guild"), name = "My Guild")
@@ -120,15 +123,17 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = CreateGuildRequest(
-                id = "test-guild",
-                name = "",
-                region = "US"
-            )
+            val request =
+                CreateGuildRequest(
+                    id = "test-guild",
+                    name = "",
+                    region = "US",
+                )
 
-            every { createGuildUseCase.execute(any()) } returns Result.failure(
-                IllegalArgumentException("Guild name cannot be blank")
-            )
+            every { createGuildUseCase.execute(any()) } returns
+                Result.failure(
+                    IllegalArgumentException("Guild name cannot be blank"),
+                )
 
             // When/Then
             try {
@@ -178,9 +183,10 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should throw exception when guild not found`() {
             // Given
-            every { getGuildUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Guild not found with id: unknown-guild")
-            )
+            every { getGuildUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Guild not found with id: unknown-guild"),
+                )
 
             // When/Then
             try {
@@ -197,16 +203,18 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return updated guild`() {
             // Given
-            val request = UpdateGuildRequest(
-                name = "Updated Guild",
-                description = "New description"
-            )
+            val request =
+                UpdateGuildRequest(
+                    name = "Updated Guild",
+                    description = "New description",
+                )
 
-            val updatedGuild = createGuild(
-                id = GuildId("test-guild"),
-                name = "Updated Guild",
-                description = "New description"
-            )
+            val updatedGuild =
+                createGuild(
+                    id = GuildId("test-guild"),
+                    name = "Updated Guild",
+                    description = "New description",
+                )
 
             every { updateGuildUseCase.execute(any()) } returns Result.success(updatedGuild)
 
@@ -224,13 +232,14 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = UpdateGuildRequest(
-                name = "New Name",
-                syncEnabled = false,
-                benchmarkMode = "CUSTOM",
-                customBenchmarkRms = 0.95,
-                customBenchmarkIpi = 0.90
-            )
+            val request =
+                UpdateGuildRequest(
+                    name = "New Name",
+                    syncEnabled = false,
+                    benchmarkMode = "CUSTOM",
+                    customBenchmarkRms = 0.95,
+                    customBenchmarkIpi = 0.90,
+                )
 
             val commandSlot = slot<UpdateGuildCommand>()
             val updatedGuild = createGuild(id = GuildId("test-guild"), name = "New Name")
@@ -254,9 +263,10 @@ class GuildControllerTest : UnitTest() {
             // Given
             val request = UpdateGuildRequest(name = "New Name")
 
-            every { updateGuildUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Guild not found with id: unknown-guild")
-            )
+            every { updateGuildUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Guild not found with id: unknown-guild"),
+                )
 
             // When/Then
             try {
@@ -302,9 +312,10 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should throw exception when guild not found`() {
             // Given
-            every { deleteGuildUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Guild not found with id: unknown-guild")
-            )
+            every { deleteGuildUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Guild not found with id: unknown-guild"),
+                )
 
             // When/Then
             try {
@@ -321,11 +332,12 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return list of all guilds`() {
             // Given
-            val guilds = listOf(
-                createGuild(id = GuildId("guild-1"), name = "Guild One"),
-                createGuild(id = GuildId("guild-2"), name = "Guild Two"),
-                createGuild(id = GuildId("guild-3"), name = "Guild Three")
-            )
+            val guilds =
+                listOf(
+                    createGuild(id = GuildId("guild-1"), name = "Guild One"),
+                    createGuild(id = GuildId("guild-2"), name = "Guild Two"),
+                    createGuild(id = GuildId("guild-3"), name = "Guild Three"),
+                )
 
             every { listGuildsUseCase.execute() } returns Result.success(guilds)
 
@@ -358,10 +370,11 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return list of active guilds only`() {
             // Given
-            val activeGuilds = listOf(
-                createGuild(id = GuildId("active-1"), name = "Active Guild 1"),
-                createGuild(id = GuildId("active-2"), name = "Active Guild 2")
-            )
+            val activeGuilds =
+                listOf(
+                    createGuild(id = GuildId("active-1"), name = "Active Guild 1"),
+                    createGuild(id = GuildId("active-2"), name = "Active Guild 2"),
+                )
 
             every { listGuildsUseCase.executeActiveOnly() } returns Result.success(activeGuilds)
 
@@ -378,9 +391,10 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should throw exception when listGuilds use case fails`() {
             // Given
-            every { listGuildsUseCase.execute() } returns Result.failure(
-                RuntimeException("Database connection failed")
-            )
+            every { listGuildsUseCase.execute() } returns
+                Result.failure(
+                    RuntimeException("Database connection failed"),
+                )
 
             // When/Then
             try {
@@ -394,9 +408,10 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should throw exception when listActiveGuilds use case fails`() {
             // Given
-            every { listGuildsUseCase.executeActiveOnly() } returns Result.failure(
-                RuntimeException("Database query failed")
-            )
+            every { listGuildsUseCase.executeActiveOnly() } returns
+                Result.failure(
+                    RuntimeException("Database query failed"),
+                )
 
             // When/Then
             try {
@@ -415,26 +430,28 @@ class GuildControllerTest : UnitTest() {
             // Given
             val createdAt = Instant.parse("2024-01-01T00:00:00Z")
             val updatedAt = Instant.parse("2024-06-01T00:00:00Z")
-            val guild = Guild(
-                id = GuildId("full-guild"),
-                name = "Full Guild",
-                description = "Complete guild configuration",
-                realm = "Area 52",
-                region = Region.US,
-                settings = GuildSettings(
-                    syncEnabled = true,
-                    syncCronExpression = "0 0 5 * * *",
-                    syncRunOnStartup = true,
-                    timezone = "America/New_York",
-                    benchmarkMode = BenchmarkMode.CUSTOM,
-                    customBenchmarkRms = 0.95,
-                    customBenchmarkIpi = 0.90
-                ),
-                syncStatus = SyncStatus.SUCCESS,
-                isActive = true,
-                createdAt = createdAt,
-                updatedAt = updatedAt
-            )
+            val guild =
+                Guild(
+                    id = GuildId("full-guild"),
+                    name = "Full Guild",
+                    description = "Complete guild configuration",
+                    realm = "Area 52",
+                    region = Region.US,
+                    settings =
+                        GuildSettings(
+                            syncEnabled = true,
+                            syncCronExpression = "0 0 5 * * *",
+                            syncRunOnStartup = true,
+                            timezone = "America/New_York",
+                            benchmarkMode = BenchmarkMode.CUSTOM,
+                            customBenchmarkRms = 0.95,
+                            customBenchmarkIpi = 0.90,
+                        ),
+                    syncStatus = SyncStatus.SUCCESS,
+                    isActive = true,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt,
+                )
 
             every { getGuildUseCase.execute(any()) } returns Result.success(guild)
 
@@ -461,10 +478,11 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return canSync false when guild is inactive`() {
             // Given
-            val guild = createGuild(
-                id = GuildId("inactive-guild"),
-                isActive = false
-            )
+            val guild =
+                createGuild(
+                    id = GuildId("inactive-guild"),
+                    isActive = false,
+                )
 
             every { getGuildUseCase.execute(any()) } returns Result.success(guild)
 
@@ -479,10 +497,11 @@ class GuildControllerTest : UnitTest() {
         @Test
         fun `should return canSync false when sync is disabled`() {
             // Given
-            val guild = createGuild(
-                id = GuildId("sync-disabled"),
-                settings = GuildSettings(syncEnabled = false)
-            )
+            val guild =
+                createGuild(
+                    id = GuildId("sync-disabled"),
+                    settings = GuildSettings(syncEnabled = false),
+                )
 
             every { getGuildUseCase.execute(any()) } returns Result.success(guild)
 
@@ -505,17 +524,18 @@ class GuildControllerTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

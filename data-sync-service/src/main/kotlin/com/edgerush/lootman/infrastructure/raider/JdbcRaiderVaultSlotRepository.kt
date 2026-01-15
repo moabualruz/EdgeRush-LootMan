@@ -17,13 +17,13 @@ import java.sql.Statement
 class JdbcRaiderVaultSlotRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : RaiderVaultSlotRepository {
-
     override fun findById(id: Long): RaiderVaultSlotEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, raider_id, slot, unlocked
             FROM raider_vault_slots
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, vaultSlotRowMapper, id)
         return results.firstOrNull()
@@ -35,13 +35,17 @@ class JdbcRaiderVaultSlotRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<RaiderVaultSlotEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity> {
+        val sql =
+            """
             SELECT id, raider_id, slot, unlocked
             FROM raider_vault_slots
             ORDER BY raider_id, slot, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, vaultSlotRowMapper, limit, offset)
     }
@@ -51,14 +55,19 @@ class JdbcRaiderVaultSlotRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderVaultSlotEntity> {
-        val sql = """
+    override fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity> {
+        val sql =
+            """
             SELECT id, raider_id, slot, unlocked
             FROM raider_vault_slots
             WHERE raider_id = ?
             ORDER BY slot, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, vaultSlotRowMapper, raiderId, limit, offset)
     }
@@ -68,14 +77,19 @@ class JdbcRaiderVaultSlotRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, raiderId) ?: 0L
     }
 
-    override fun findUnlockedByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderVaultSlotEntity> {
-        val sql = """
+    override fun findUnlockedByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderVaultSlotEntity> {
+        val sql =
+            """
             SELECT id, raider_id, slot, unlocked
             FROM raider_vault_slots
             WHERE raider_id = ? AND unlocked = true
             ORDER BY slot, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, vaultSlotRowMapper, raiderId, limit, offset)
     }
@@ -100,10 +114,11 @@ class JdbcRaiderVaultSlotRepository(
     }
 
     private fun insertVaultSlot(entity: RaiderVaultSlotEntity): RaiderVaultSlotEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raider_vault_slots (raider_id, slot, unlocked)
             VALUES (?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -119,13 +134,14 @@ class JdbcRaiderVaultSlotRepository(
     }
 
     private fun updateVaultSlot(entity: RaiderVaultSlotEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE raider_vault_slots SET
                 raider_id = ?,
                 slot = ?,
                 unlocked = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -136,15 +152,16 @@ class JdbcRaiderVaultSlotRepository(
         )
     }
 
-    private val vaultSlotRowMapper = RowMapper { rs, _ ->
-        val unlockedValue = rs.getBoolean("unlocked")
-        val unlocked = if (rs.wasNull()) null else unlockedValue
+    private val vaultSlotRowMapper =
+        RowMapper { rs, _ ->
+            val unlockedValue = rs.getBoolean("unlocked")
+            val unlocked = if (rs.wasNull()) null else unlockedValue
 
-        RaiderVaultSlotEntity(
-            id = rs.getLong("id"),
-            raiderId = rs.getLong("raider_id"),
-            slot = rs.getString("slot"),
-            unlocked = unlocked,
-        )
-    }
+            RaiderVaultSlotEntity(
+                id = rs.getLong("id"),
+                raiderId = rs.getLong("raider_id"),
+                slot = rs.getString("slot"),
+                unlocked = unlocked,
+            )
+        }
 }

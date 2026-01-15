@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
  * and that data class copy/equality operations work correctly.
  */
 class FlpsDtoTest : UnitTest() {
-
     @Nested
     inner class ComprehensiveFlpsReportDtoTest {
-
         @Test
         fun `should create DTO with all properties`() {
             // Given
@@ -25,12 +23,13 @@ class FlpsDtoTest : UnitTest() {
             val eligible = true
 
             // When
-            val dto = ComprehensiveFlpsReportDto(
-                raiderId = raiderId,
-                raiderName = raiderName,
-                flpsScore = flpsScore,
-                eligible = eligible,
-            )
+            val dto =
+                ComprehensiveFlpsReportDto(
+                    raiderId = raiderId,
+                    raiderName = raiderName,
+                    flpsScore = flpsScore,
+                    eligible = eligible,
+                )
 
             // Then
             dto.raiderId shouldBe raiderId
@@ -42,12 +41,13 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct property access for ineligible raider`() {
             // Given
-            val dto = ComprehensiveFlpsReportDto(
-                raiderId = "inactive-raider",
-                raiderName = "InactivePlayer",
-                flpsScore = 0.25,
-                eligible = false,
-            )
+            val dto =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "inactive-raider",
+                    raiderName = "InactivePlayer",
+                    flpsScore = 0.25,
+                    eligible = false,
+                )
 
             // Then
             dto.raiderId shouldBe "inactive-raider"
@@ -59,12 +59,13 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should support data class copy operation`() {
             // Given
-            val original = ComprehensiveFlpsReportDto(
-                raiderId = "original",
-                raiderName = "OriginalName",
-                flpsScore = 0.5,
-                eligible = true,
-            )
+            val original =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "original",
+                    raiderName = "OriginalName",
+                    flpsScore = 0.5,
+                    eligible = true,
+                )
 
             // When
             val copy = original.copy(flpsScore = 0.75)
@@ -79,24 +80,27 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct equals and hashCode`() {
             // Given
-            val dto1 = ComprehensiveFlpsReportDto(
-                raiderId = "raider-1",
-                raiderName = "Raider",
-                flpsScore = 0.8,
-                eligible = true,
-            )
-            val dto2 = ComprehensiveFlpsReportDto(
-                raiderId = "raider-1",
-                raiderName = "Raider",
-                flpsScore = 0.8,
-                eligible = true,
-            )
-            val dto3 = ComprehensiveFlpsReportDto(
-                raiderId = "raider-2",
-                raiderName = "Other",
-                flpsScore = 0.5,
-                eligible = false,
-            )
+            val dto1 =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "raider-1",
+                    raiderName = "Raider",
+                    flpsScore = 0.8,
+                    eligible = true,
+                )
+            val dto2 =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "raider-1",
+                    raiderName = "Raider",
+                    flpsScore = 0.8,
+                    eligible = true,
+                )
+            val dto3 =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "raider-2",
+                    raiderName = "Other",
+                    flpsScore = 0.5,
+                    eligible = false,
+                )
 
             // Then
             (dto1 == dto2) shouldBe true
@@ -107,12 +111,13 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct toString`() {
             // Given
-            val dto = ComprehensiveFlpsReportDto(
-                raiderId = "raider-123",
-                raiderName = "TestRaider",
-                flpsScore = 0.85,
-                eligible = true,
-            )
+            val dto =
+                ComprehensiveFlpsReportDto(
+                    raiderId = "raider-123",
+                    raiderName = "TestRaider",
+                    flpsScore = 0.85,
+                    eligible = true,
+                )
 
             // When
             val str = dto.toString()
@@ -127,7 +132,6 @@ class FlpsDtoTest : UnitTest() {
 
     @Nested
     inner class FlpsDataStatusDtoTest {
-
         @Test
         fun `should create DTO with all properties`() {
             // Given
@@ -136,11 +140,12 @@ class FlpsDtoTest : UnitTest() {
             val endpoints = mapOf("endpoint1" to "/api/v1/endpoint1", "endpoint2" to "/api/v1/endpoint2")
 
             // When
-            val dto = FlpsDataStatusDto(
-                message = message,
-                features = features,
-                endpoints = endpoints,
-            )
+            val dto =
+                FlpsDataStatusDto(
+                    message = message,
+                    features = features,
+                    endpoints = endpoints,
+                )
 
             // Then
             dto.message shouldBe message
@@ -151,11 +156,12 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct property access for empty collections`() {
             // Given
-            val dto = FlpsDataStatusDto(
-                message = "Minimal status",
-                features = emptyList(),
-                endpoints = emptyMap(),
-            )
+            val dto =
+                FlpsDataStatusDto(
+                    message = "Minimal status",
+                    features = emptyList(),
+                    endpoints = emptyMap(),
+                )
 
             // Then
             dto.message shouldBe "Minimal status"
@@ -166,11 +172,12 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should support data class copy operation`() {
             // Given
-            val original = FlpsDataStatusDto(
-                message = "Original message",
-                features = listOf("Feature1"),
-                endpoints = mapOf("key" to "value"),
-            )
+            val original =
+                FlpsDataStatusDto(
+                    message = "Original message",
+                    features = listOf("Feature1"),
+                    endpoints = mapOf("key" to "value"),
+                )
 
             // When
             val copy = original.copy(message = "Updated message")
@@ -184,21 +191,24 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct equals and hashCode`() {
             // Given
-            val dto1 = FlpsDataStatusDto(
-                message = "Status",
-                features = listOf("F1"),
-                endpoints = mapOf("key" to "value"),
-            )
-            val dto2 = FlpsDataStatusDto(
-                message = "Status",
-                features = listOf("F1"),
-                endpoints = mapOf("key" to "value"),
-            )
-            val dto3 = FlpsDataStatusDto(
-                message = "Other",
-                features = emptyList(),
-                endpoints = emptyMap(),
-            )
+            val dto1 =
+                FlpsDataStatusDto(
+                    message = "Status",
+                    features = listOf("F1"),
+                    endpoints = mapOf("key" to "value"),
+                )
+            val dto2 =
+                FlpsDataStatusDto(
+                    message = "Status",
+                    features = listOf("F1"),
+                    endpoints = mapOf("key" to "value"),
+                )
+            val dto3 =
+                FlpsDataStatusDto(
+                    message = "Other",
+                    features = emptyList(),
+                    endpoints = emptyMap(),
+                )
 
             // Then
             (dto1 == dto2) shouldBe true
@@ -209,11 +219,12 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct toString`() {
             // Given
-            val dto = FlpsDataStatusDto(
-                message = "Test message",
-                features = listOf("Feature1"),
-                endpoints = mapOf("endpoint" to "/api/test"),
-            )
+            val dto =
+                FlpsDataStatusDto(
+                    message = "Test message",
+                    features = listOf("Feature1"),
+                    endpoints = mapOf("endpoint" to "/api/test"),
+                )
 
             // When
             val str = dto.toString()
@@ -227,7 +238,6 @@ class FlpsDtoTest : UnitTest() {
 
     @Nested
     inner class PerfectScoreBenchmarkDtoTest {
-
         @Test
         fun `should create DTO with all properties`() {
             // Given
@@ -235,10 +245,11 @@ class FlpsDtoTest : UnitTest() {
             val topPerformer = 0.95
 
             // When
-            val dto = PerfectScoreBenchmarkDto(
-                theoretical = theoretical,
-                topPerformer = topPerformer,
-            )
+            val dto =
+                PerfectScoreBenchmarkDto(
+                    theoretical = theoretical,
+                    topPerformer = topPerformer,
+                )
 
             // Then
             dto.theoretical shouldBe theoretical
@@ -248,10 +259,11 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct property access for different values`() {
             // Given
-            val dto = PerfectScoreBenchmarkDto(
-                theoretical = 0.99,
-                topPerformer = 0.85,
-            )
+            val dto =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 0.99,
+                    topPerformer = 0.85,
+                )
 
             // Then
             dto.theoretical shouldBe 0.99
@@ -261,10 +273,11 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should support data class copy operation`() {
             // Given
-            val original = PerfectScoreBenchmarkDto(
-                theoretical = 1.0,
-                topPerformer = 0.9,
-            )
+            val original =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 1.0,
+                    topPerformer = 0.9,
+                )
 
             // When
             val copy = original.copy(topPerformer = 0.88)
@@ -277,18 +290,21 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct equals and hashCode`() {
             // Given
-            val dto1 = PerfectScoreBenchmarkDto(
-                theoretical = 1.0,
-                topPerformer = 0.95,
-            )
-            val dto2 = PerfectScoreBenchmarkDto(
-                theoretical = 1.0,
-                topPerformer = 0.95,
-            )
-            val dto3 = PerfectScoreBenchmarkDto(
-                theoretical = 0.9,
-                topPerformer = 0.8,
-            )
+            val dto1 =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 1.0,
+                    topPerformer = 0.95,
+                )
+            val dto2 =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 1.0,
+                    topPerformer = 0.95,
+                )
+            val dto3 =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 0.9,
+                    topPerformer = 0.8,
+                )
 
             // Then
             (dto1 == dto2) shouldBe true
@@ -299,10 +315,11 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct toString`() {
             // Given
-            val dto = PerfectScoreBenchmarkDto(
-                theoretical = 1.0,
-                topPerformer = 0.95,
-            )
+            val dto =
+                PerfectScoreBenchmarkDto(
+                    theoretical = 1.0,
+                    topPerformer = 0.95,
+                )
 
             // When
             val str = dto.toString()
@@ -315,7 +332,6 @@ class FlpsDtoTest : UnitTest() {
 
     @Nested
     inner class FlpsStatusResponseTest {
-
         @Test
         fun `should create response with all properties`() {
             // Given
@@ -324,11 +340,12 @@ class FlpsDtoTest : UnitTest() {
             val endpoints = mapOf("report" to "/api/report", "status" to "/api/status")
 
             // When
-            val response = FlpsStatusResponse(
-                message = message,
-                features = features,
-                endpoints = endpoints,
-            )
+            val response =
+                FlpsStatusResponse(
+                    message = message,
+                    features = features,
+                    endpoints = endpoints,
+                )
 
             // Then
             response.message shouldBe message
@@ -339,11 +356,12 @@ class FlpsDtoTest : UnitTest() {
         @Test
         fun `should have correct property access`() {
             // Given
-            val response = FlpsStatusResponse(
-                message = "Test message",
-                features = listOf("Feature A"),
-                endpoints = mapOf("key" to "/api/endpoint"),
-            )
+            val response =
+                FlpsStatusResponse(
+                    message = "Test message",
+                    features = listOf("Feature A"),
+                    endpoints = mapOf("key" to "/api/endpoint"),
+                )
 
             // Then
             response.message shouldBe "Test message"

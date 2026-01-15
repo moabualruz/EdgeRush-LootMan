@@ -4,8 +4,6 @@ import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.application.model.ApplicationId
 import com.edgerush.lootman.domain.shared.GuildId
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.doubles.shouldBeGreaterThan
-import io.kotest.matchers.doubles.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
@@ -17,18 +15,17 @@ import java.time.temporal.ChronoUnit
  * Unit tests for Trial entity.
  */
 class TrialTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid trial with required fields`() {
             // Arrange & Act
-            val trial = Trial.create(
-                applicationId = ApplicationId("app-123"),
-                guildId = GuildId("guild-123"),
-                raidsRequired = 8,
-            )
+            val trial =
+                Trial.create(
+                    applicationId = ApplicationId("app-123"),
+                    guildId = GuildId("guild-123"),
+                    raidsRequired = 8,
+                )
 
             // Assert
             trial shouldNotBe null
@@ -83,11 +80,12 @@ class TrialTest : UnitTest() {
         @Test
         fun `should calculate expected end date based on raids required`() {
             // Arrange & Act
-            val trial = Trial.create(
-                applicationId = ApplicationId("app-123"),
-                guildId = GuildId("guild-123"),
-                raidsRequired = 8,
-            )
+            val trial =
+                Trial.create(
+                    applicationId = ApplicationId("app-123"),
+                    guildId = GuildId("guild-123"),
+                    raidsRequired = 8,
+                )
 
             // Assert - assuming ~2 raids per week, 8 raids = ~4 weeks
             val fourWeeksFromNow = Instant.now().plus(28, ChronoUnit.DAYS)
@@ -128,12 +126,13 @@ class TrialTest : UnitTest() {
         @Test
         fun `should allow optional raider ID`() {
             // Arrange & Act
-            val trial = Trial.create(
-                applicationId = ApplicationId("app-123"),
-                guildId = GuildId("guild-123"),
-                raidsRequired = 8,
-                raiderId = 12345L,
-            )
+            val trial =
+                Trial.create(
+                    applicationId = ApplicationId("app-123"),
+                    guildId = GuildId("guild-123"),
+                    raidsRequired = 8,
+                    raiderId = 12345L,
+                )
 
             // Assert
             trial.raiderId shouldBe 12345L
@@ -142,7 +141,6 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when raids required is zero`() {
             // Arrange, Act & Assert
@@ -170,19 +168,19 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class MetricsUpdateTests {
-
         @Test
         fun `should update attendance metrics`() {
             // Arrange
             val trial = createValidTrial()
 
             // Act
-            val updated = trial.updateMetrics(
-                raidsAttended = 4,
-                attendanceRate = 0.85,
-                averagePerformance = 72.5,
-                deathsPerRaid = 1.2,
-            )
+            val updated =
+                trial.updateMetrics(
+                    raidsAttended = 4,
+                    attendanceRate = 0.85,
+                    averagePerformance = 72.5,
+                    deathsPerRaid = 1.2,
+                )
 
             // Assert
             updated.raidsAttended shouldBe 4
@@ -281,12 +279,13 @@ class TrialTest : UnitTest() {
             Thread.sleep(10)
 
             // Act
-            val updated = trial.updateMetrics(
-                raidsAttended = 4,
-                attendanceRate = 0.85,
-                averagePerformance = 72.5,
-                deathsPerRaid = 1.2,
-            )
+            val updated =
+                trial.updateMetrics(
+                    raidsAttended = 4,
+                    attendanceRate = 0.85,
+                    averagePerformance = 72.5,
+                    deathsPerRaid = 1.2,
+                )
 
             // Assert
             updated.lastUpdated shouldNotBe originalUpdatedAt
@@ -296,7 +295,6 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class PromotionTests {
-
         @Test
         fun `should promote trial`() {
             // Arrange
@@ -343,7 +341,6 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class ExtensionTests {
-
         @Test
         fun `should extend trial`() {
             // Arrange
@@ -388,8 +385,9 @@ class TrialTest : UnitTest() {
         @Test
         fun `should allow extending already extended trial`() {
             // Arrange
-            val trial = createValidTrial()
-                .extend("officer-123", 4, "First extension")
+            val trial =
+                createValidTrial()
+                    .extend("officer-123", 4, "First extension")
 
             // Act
             val extendedAgain = trial.extend("officer-123", 2, "Second extension")
@@ -402,7 +400,6 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class EndTrialTests {
-
         @Test
         fun `should end trial with failed outcome`() {
             // Arrange
@@ -471,16 +468,16 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class ProgressTests {
-
         @Test
         fun `should calculate progress percentage`() {
             // Arrange
-            val trial = createValidTrial().updateMetrics(
-                raidsAttended = 4,
-                attendanceRate = 0.9,
-                averagePerformance = 75.0,
-                deathsPerRaid = 1.0,
-            )
+            val trial =
+                createValidTrial().updateMetrics(
+                    raidsAttended = 4,
+                    attendanceRate = 0.9,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 1.0,
+                )
 
             // Act
             val progress = trial.progressPercentage
@@ -492,12 +489,13 @@ class TrialTest : UnitTest() {
         @Test
         fun `should cap progress at 100 percent`() {
             // Arrange
-            val trial = createValidTrial().updateMetrics(
-                raidsAttended = 10, // More than required 8
-                attendanceRate = 0.95,
-                averagePerformance = 80.0,
-                deathsPerRaid = 0.5,
-            )
+            val trial =
+                createValidTrial().updateMetrics(
+                    raidsAttended = 10, // More than required 8
+                    attendanceRate = 0.95,
+                    averagePerformance = 80.0,
+                    deathsPerRaid = 0.5,
+                )
 
             // Act
             val progress = trial.progressPercentage
@@ -521,18 +519,20 @@ class TrialTest : UnitTest() {
         @Test
         fun `should check if trial is complete`() {
             // Arrange
-            val incomplete = createValidTrial().updateMetrics(
-                raidsAttended = 4,
-                attendanceRate = 0.85,
-                averagePerformance = 72.0,
-                deathsPerRaid = 1.0,
-            )
-            val complete = createValidTrial().updateMetrics(
-                raidsAttended = 8,
-                attendanceRate = 0.90,
-                averagePerformance = 75.0,
-                deathsPerRaid = 0.8,
-            )
+            val incomplete =
+                createValidTrial().updateMetrics(
+                    raidsAttended = 4,
+                    attendanceRate = 0.85,
+                    averagePerformance = 72.0,
+                    deathsPerRaid = 1.0,
+                )
+            val complete =
+                createValidTrial().updateMetrics(
+                    raidsAttended = 8,
+                    attendanceRate = 0.90,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 0.8,
+                )
 
             // Assert
             incomplete.isComplete shouldBe false
@@ -542,7 +542,6 @@ class TrialTest : UnitTest() {
 
     @Nested
     inner class ReconstructTests {
-
         @Test
         fun `should reconstruct trial from persisted data`() {
             // Arrange
@@ -554,27 +553,28 @@ class TrialTest : UnitTest() {
             val createdAt = startDate
 
             // Act
-            val trial = Trial.reconstruct(
-                id = id,
-                applicationId = applicationId,
-                raiderId = 12345L,
-                guildId = guildId,
-                status = TrialStatus.EXTENDED,
-                startDate = startDate,
-                endDate = null,
-                expectedEndDate = expectedEndDate,
-                raidsAttended = 6,
-                raidsRequired = 12,
-                attendanceRate = 0.85,
-                averagePerformance = 72.5,
-                deathsPerRaid = 1.2,
-                outcome = null,
-                outcomeReason = "Extended for additional evaluation",
-                promotedBy = null,
-                promotedAt = null,
-                createdAt = createdAt,
-                lastUpdated = Instant.now(),
-            )
+            val trial =
+                Trial.reconstruct(
+                    id = id,
+                    applicationId = applicationId,
+                    raiderId = 12345L,
+                    guildId = guildId,
+                    status = TrialStatus.EXTENDED,
+                    startDate = startDate,
+                    endDate = null,
+                    expectedEndDate = expectedEndDate,
+                    raidsAttended = 6,
+                    raidsRequired = 12,
+                    attendanceRate = 0.85,
+                    averagePerformance = 72.5,
+                    deathsPerRaid = 1.2,
+                    outcome = null,
+                    outcomeReason = "Extended for additional evaluation",
+                    promotedBy = null,
+                    promotedAt = null,
+                    createdAt = createdAt,
+                    lastUpdated = Instant.now(),
+                )
 
             // Assert
             trial.id shouldBe id
@@ -591,9 +591,10 @@ class TrialTest : UnitTest() {
         }
     }
 
-    private fun createValidTrial(): Trial = Trial.create(
-        applicationId = ApplicationId("app-123"),
-        guildId = GuildId("guild-123"),
-        raidsRequired = 8,
-    )
+    private fun createValidTrial(): Trial =
+        Trial.create(
+            applicationId = ApplicationId("app-123"),
+            guildId = GuildId("guild-123"),
+            raidsRequired = 8,
+        )
 }

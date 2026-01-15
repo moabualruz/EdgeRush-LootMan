@@ -25,7 +25,6 @@ import java.time.LocalDateTime
  * Tests use case business logic by mocking the repository layer.
  */
 class RaiderUseCasesTest : UnitTest() {
-
     private lateinit var raiderRepository: RaiderRepository
 
     @BeforeEach
@@ -45,16 +44,17 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should create raider with valid data`() {
             // Given
-            val command = CreateRaiderCommand(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "TestChar",
-                realm = "Area52",
-                characterClass = "WARRIOR",
-                role = "DPS",
-                rank = "Raider",
-                status = "ACTIVE"
-            )
+            val command =
+                CreateRaiderCommand(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    realm = "Area52",
+                    characterClass = "WARRIOR",
+                    role = "DPS",
+                    rank = "Raider",
+                    status = "ACTIVE",
+                )
 
             val savedRaiderSlot = slot<Raider>()
             every { raiderRepository.save(capture(savedRaiderSlot)) } answers { savedRaiderSlot.captured }
@@ -80,14 +80,15 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should fail with blank character name`() {
             // Given
-            val command = CreateRaiderCommand(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "",
-                realm = "Area52",
-                characterClass = "WARRIOR",
-                role = "DPS"
-            )
+            val command =
+                CreateRaiderCommand(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "",
+                    realm = "Area52",
+                    characterClass = "WARRIOR",
+                    role = "DPS",
+                )
 
             // When
             val result = useCase.execute(command)
@@ -103,14 +104,15 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should fail with invalid character class`() {
             // Given
-            val command = CreateRaiderCommand(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "TestChar",
-                realm = "Area52",
-                characterClass = "INVALID_CLASS",
-                role = "DPS"
-            )
+            val command =
+                CreateRaiderCommand(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    realm = "Area52",
+                    characterClass = "INVALID_CLASS",
+                    role = "DPS",
+                )
 
             // When
             val result = useCase.execute(command)
@@ -124,18 +126,19 @@ class RaiderUseCasesTest : UnitTest() {
         fun `should create raider with optional fields`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val command = CreateRaiderCommand(
-                id = 2L,
-                guildId = "test-guild",
-                characterName = "AltChar",
-                realm = "Illidan",
-                characterClass = "MAGE",
-                role = "DPS",
-                rank = null,
-                status = "TRIAL",
-                joinDate = joinDate,
-                wowauditId = 12345L
-            )
+            val command =
+                CreateRaiderCommand(
+                    id = 2L,
+                    guildId = "test-guild",
+                    characterName = "AltChar",
+                    realm = "Illidan",
+                    characterClass = "MAGE",
+                    role = "DPS",
+                    rank = null,
+                    status = "TRIAL",
+                    joinDate = joinDate,
+                    wowauditId = 12345L,
+                )
 
             val savedRaiderSlot = slot<Raider>()
             every { raiderRepository.save(capture(savedRaiderSlot)) } answers { savedRaiderSlot.captured }
@@ -166,11 +169,12 @@ class RaiderUseCasesTest : UnitTest() {
         fun `should update existing raider`() {
             // Given
             val existingRaider = createRaider(id = RaiderId(1L), characterName = "OldName")
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                characterName = "NewName",
-                status = "BENCHED"
-            )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    characterName = "NewName",
+                    status = "BENCHED",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
             val savedRaiderSlot = slot<Raider>()
@@ -194,10 +198,11 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should fail when raider not found`() {
             // Given
-            val command = UpdateRaiderCommand(
-                id = 999L,
-                characterName = "NewName"
-            )
+            val command =
+                UpdateRaiderCommand(
+                    id = 999L,
+                    characterName = "NewName",
+                )
 
             every { raiderRepository.findById(RaiderId(999L)) } returns null
 
@@ -215,16 +220,18 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should update only specified fields`() {
             // Given
-            val existingRaider = createRaider(
-                id = RaiderId(1L),
-                characterName = "TestChar",
-                role = Role.DPS,
-                rank = "Raider"
-            )
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                role = "TANK"
-            )
+            val existingRaider =
+                createRaider(
+                    id = RaiderId(1L),
+                    characterName = "TestChar",
+                    role = Role.DPS,
+                    rank = "Raider",
+                )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    role = "TANK",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
             val savedRaiderSlot = slot<Raider>()
@@ -244,14 +251,16 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should update character class`() {
             // Given
-            val existingRaider = createRaider(
-                id = RaiderId(1L),
-                characterClass = CharacterClass.WARRIOR
-            )
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                characterClass = "PALADIN"
-            )
+            val existingRaider =
+                createRaider(
+                    id = RaiderId(1L),
+                    characterClass = CharacterClass.WARRIOR,
+                )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    characterClass = "PALADIN",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
             val savedRaiderSlot = slot<Raider>()
@@ -269,14 +278,16 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should update realm`() {
             // Given
-            val existingRaider = createRaider(
-                id = RaiderId(1L),
-                realm = "OldRealm"
-            )
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                realm = "NewRealm"
-            )
+            val existingRaider =
+                createRaider(
+                    id = RaiderId(1L),
+                    realm = "OldRealm",
+                )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    realm = "NewRealm",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
             val savedRaiderSlot = slot<Raider>()
@@ -294,24 +305,26 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should update all fields at once`() {
             // Given
-            val existingRaider = createRaider(
-                id = RaiderId(1L),
-                characterName = "OldName",
-                realm = "OldRealm",
-                characterClass = CharacterClass.WARRIOR,
-                role = Role.DPS,
-                rank = "Member",
-                status = RaiderStatus.ACTIVE
-            )
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                characterName = "NewName",
-                realm = "NewRealm",
-                characterClass = "MAGE",
-                role = "HEALER",
-                rank = "Officer",
-                status = "INACTIVE"
-            )
+            val existingRaider =
+                createRaider(
+                    id = RaiderId(1L),
+                    characterName = "OldName",
+                    realm = "OldRealm",
+                    characterClass = CharacterClass.WARRIOR,
+                    role = Role.DPS,
+                    rank = "Member",
+                    status = RaiderStatus.ACTIVE,
+                )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    characterName = "NewName",
+                    realm = "NewRealm",
+                    characterClass = "MAGE",
+                    role = "HEALER",
+                    rank = "Officer",
+                    status = "INACTIVE",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
             val savedRaiderSlot = slot<Raider>()
@@ -335,10 +348,11 @@ class RaiderUseCasesTest : UnitTest() {
         fun `should fail with invalid role`() {
             // Given
             val existingRaider = createRaider(id = RaiderId(1L))
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                role = "INVALID_ROLE"
-            )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    role = "INVALID_ROLE",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
 
@@ -354,10 +368,11 @@ class RaiderUseCasesTest : UnitTest() {
         fun `should fail with invalid status`() {
             // Given
             val existingRaider = createRaider(id = RaiderId(1L))
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                status = "INVALID_STATUS"
-            )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    status = "INVALID_STATUS",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
 
@@ -373,10 +388,11 @@ class RaiderUseCasesTest : UnitTest() {
         fun `should fail with invalid character class`() {
             // Given
             val existingRaider = createRaider(id = RaiderId(1L))
-            val command = UpdateRaiderCommand(
-                id = 1L,
-                characterClass = "INVALID_CLASS"
-            )
+            val command =
+                UpdateRaiderCommand(
+                    id = 1L,
+                    characterClass = "INVALID_CLASS",
+                )
 
             every { raiderRepository.findById(RaiderId(1L)) } returns existingRaider
 
@@ -491,11 +507,12 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should return all raiders for guild`() {
             // Given
-            val raiders = listOf(
-                createRaider(id = RaiderId(1L), characterName = "Raider1"),
-                createRaider(id = RaiderId(2L), characterName = "Raider2"),
-                createRaider(id = RaiderId(3L), characterName = "Raider3")
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                    createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                    createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                )
             val query = ListRaidersByGuildQuery(guildId = "test-guild")
 
             every { raiderRepository.findByGuildId(GuildId("test-guild")) } returns raiders
@@ -530,15 +547,17 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should return paginated raiders for guild`() {
             // Given
-            val raiders = listOf(
-                createRaider(id = RaiderId(3L), characterName = "Raider3"),
-                createRaider(id = RaiderId(4L), characterName = "Raider4")
-            )
-            val query = ListRaidersByGuildPaginatedQuery(
-                guildId = "test-guild",
-                offset = 2L,
-                limit = 2
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                    createRaider(id = RaiderId(4L), characterName = "Raider4"),
+                )
+            val query =
+                ListRaidersByGuildPaginatedQuery(
+                    guildId = "test-guild",
+                    offset = 2L,
+                    limit = 2,
+                )
 
             every { raiderRepository.findByGuildId(GuildId("test-guild"), 2L, 2) } returns raiders
             every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 10L
@@ -558,11 +577,12 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should return empty paginated list when offset exceeds total`() {
             // Given
-            val query = ListRaidersByGuildPaginatedQuery(
-                guildId = "test-guild",
-                offset = 100L,
-                limit = 10
-            )
+            val query =
+                ListRaidersByGuildPaginatedQuery(
+                    guildId = "test-guild",
+                    offset = 100L,
+                    limit = 10,
+                )
 
             every { raiderRepository.findByGuildId(GuildId("test-guild"), 100L, 10) } returns emptyList()
             every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 5L
@@ -580,15 +600,17 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should return first page of paginated raiders`() {
             // Given
-            val raiders = listOf(
-                createRaider(id = RaiderId(1L), characterName = "Raider1"),
-                createRaider(id = RaiderId(2L), characterName = "Raider2")
-            )
-            val query = ListRaidersByGuildPaginatedQuery(
-                guildId = "test-guild",
-                offset = 0L,
-                limit = 2
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                    createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                )
+            val query =
+                ListRaidersByGuildPaginatedQuery(
+                    guildId = "test-guild",
+                    offset = 0L,
+                    limit = 2,
+                )
 
             every { raiderRepository.findByGuildId(GuildId("test-guild"), 0L, 2) } returns raiders
             every { raiderRepository.countByGuildId(GuildId("test-guild")) } returns 10L
@@ -606,11 +628,12 @@ class RaiderUseCasesTest : UnitTest() {
         @Test
         fun `should handle paginated query for guild with no raiders`() {
             // Given
-            val query = ListRaidersByGuildPaginatedQuery(
-                guildId = "empty-guild",
-                offset = 0L,
-                limit = 10
-            )
+            val query =
+                ListRaidersByGuildPaginatedQuery(
+                    guildId = "empty-guild",
+                    offset = 0L,
+                    limit = 10,
+                )
 
             every { raiderRepository.findByGuildId(GuildId("empty-guild"), 0L, 10) } returns emptyList()
             every { raiderRepository.countByGuildId(GuildId("empty-guild")) } returns 0L
@@ -636,17 +659,18 @@ class RaiderUseCasesTest : UnitTest() {
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
-        wowauditId: Long? = null
-    ): Raider = Raider(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId
-    )
+        wowauditId: Long? = null,
+    ): Raider =
+        Raider(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

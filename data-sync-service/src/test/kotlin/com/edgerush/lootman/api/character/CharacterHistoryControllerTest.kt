@@ -19,7 +19,6 @@ import java.time.OffsetDateTime
  * Unit tests for CharacterHistoryController.
  */
 class CharacterHistoryControllerTest : UnitTest() {
-
     private lateinit var characterHistoryService: CharacterHistoryCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: CharacterHistoryController
@@ -33,16 +32,16 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createCharacterHistoryResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createCharacterHistoryResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { characterHistoryService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class CharacterHistoryControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<CharacterHistoryResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<CharacterHistoryResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { characterHistoryService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return character history when found`() {
             // Given
@@ -110,27 +109,28 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created character history with 201 status`() {
             // Given
-            val request = CreateCharacterHistoryRequest(
-                characterId = 100L,
-                characterName = "Testchar",
-                characterRealm = "Silvermoon",
-                characterRegion = "EU",
-                teamId = 1L,
-                seasonId = 1L,
-                periodId = 1L,
-                historyJson = """{"level":80}""",
-                bestGearJson = """{"ilvl":619}""",
-            )
+            val request =
+                CreateCharacterHistoryRequest(
+                    characterId = 100L,
+                    characterName = "Testchar",
+                    characterRealm = "Silvermoon",
+                    characterRegion = "EU",
+                    teamId = 1L,
+                    seasonId = 1L,
+                    periodId = 1L,
+                    historyJson = """{"level":80}""",
+                    bestGearJson = """{"ilvl":619}""",
+                )
 
-            val created = createCharacterHistoryResponse(
-                id = 1L,
-                characterId = 100L,
-                characterName = "Testchar",
-            )
+            val created =
+                createCharacterHistoryResponse(
+                    id = 1L,
+                    characterId = 100L,
+                    characterName = "Testchar",
+                )
             every { characterHistoryService.create(request) } returns created
 
             // When
@@ -146,20 +146,21 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated character history`() {
             // Given
-            val request = UpdateCharacterHistoryRequest(
-                historyJson = """{"level":80,"updated":true}""",
-                bestGearJson = """{"ilvl":625}""",
-            )
+            val request =
+                UpdateCharacterHistoryRequest(
+                    historyJson = """{"level":80,"updated":true}""",
+                    bestGearJson = """{"ilvl":625}""",
+                )
 
-            val updated = createCharacterHistoryResponse(
-                id = 1L,
-                historyJson = """{"level":80,"updated":true}""",
-                bestGearJson = """{"ilvl":625}""",
-            )
+            val updated =
+                createCharacterHistoryResponse(
+                    id = 1L,
+                    historyJson = """{"level":80,"updated":true}""",
+                    bestGearJson = """{"ilvl":625}""",
+                )
             every { characterHistoryService.update(1L, request) } returns updated
 
             // When
@@ -190,7 +191,6 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -222,7 +222,6 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when character history exists`() {
             // Given
@@ -251,21 +250,22 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class FindByCharacterIdTests {
-
         @Test
         fun `should return character history for a character`() {
             // Given
             val characterId = 100L
-            val histories = listOf(
-                createCharacterHistoryResponse(id = 1L, characterId = characterId),
-                createCharacterHistoryResponse(id = 2L, characterId = characterId),
-            )
-            val expectedResponse = PagedResponse(
-                content = histories,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val histories =
+                listOf(
+                    createCharacterHistoryResponse(id = 1L, characterId = characterId),
+                    createCharacterHistoryResponse(id = 2L, characterId = characterId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = histories,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { characterHistoryService.findByCharacterId(characterId, any()) } returns expectedResponse
 
             // When
@@ -279,21 +279,22 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class FindByTeamIdTests {
-
         @Test
         fun `should return character history for a team`() {
             // Given
             val teamId = 1L
-            val histories = listOf(
-                createCharacterHistoryResponse(id = 1L, teamId = teamId),
-                createCharacterHistoryResponse(id = 2L, teamId = teamId),
-            )
-            val expectedResponse = PagedResponse(
-                content = histories,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val histories =
+                listOf(
+                    createCharacterHistoryResponse(id = 1L, teamId = teamId),
+                    createCharacterHistoryResponse(id = 2L, teamId = teamId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = histories,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { characterHistoryService.findByTeamId(teamId, any()) } returns expectedResponse
 
             // When
@@ -307,7 +308,6 @@ class CharacterHistoryControllerTest : UnitTest() {
 
     @Nested
     inner class CountByCharacterIdTests {
-
         @Test
         fun `should return count for character`() {
             // Given
@@ -335,17 +335,18 @@ class CharacterHistoryControllerTest : UnitTest() {
         historyJson: String = """{"level":80}""",
         bestGearJson: String? = """{"ilvl":619}""",
         syncedAt: OffsetDateTime = OffsetDateTime.now(),
-    ): CharacterHistoryResponse = CharacterHistoryResponse(
-        id = id,
-        characterId = characterId,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterRegion = characterRegion,
-        teamId = teamId,
-        seasonId = seasonId,
-        periodId = periodId,
-        historyJson = historyJson,
-        bestGearJson = bestGearJson,
-        syncedAt = syncedAt,
-    )
+    ): CharacterHistoryResponse =
+        CharacterHistoryResponse(
+            id = id,
+            characterId = characterId,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterRegion = characterRegion,
+            teamId = teamId,
+            seasonId = seasonId,
+            periodId = periodId,
+            historyJson = historyJson,
+            bestGearJson = bestGearJson,
+            syncedAt = syncedAt,
+        )
 }

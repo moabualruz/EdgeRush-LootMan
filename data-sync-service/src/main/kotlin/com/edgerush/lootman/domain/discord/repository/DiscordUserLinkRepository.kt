@@ -1,8 +1,8 @@
 package com.edgerush.lootman.domain.discord.repository
 
+import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.model.DiscordUserLink
 import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.shared.RaiderId
 
 /**
@@ -12,7 +12,6 @@ import com.edgerush.lootman.domain.shared.RaiderId
  * the Discord bot and web frontend for user identification.
  */
 interface DiscordUserLinkRepository {
-
     /**
      * Finds a link by its unique identifier.
      *
@@ -52,7 +51,10 @@ interface DiscordUserLinkRepository {
      * @param raiderId The raider's ID
      * @return true if the link exists, false otherwise
      */
-    fun existsByDiscordUserIdAndRaiderId(discordUserId: DiscordUserId, raiderId: RaiderId): Boolean
+    fun existsByDiscordUserIdAndRaiderId(
+        discordUserId: DiscordUserId,
+        raiderId: RaiderId,
+    ): Boolean
 
     /**
      * Saves a Discord user link.
@@ -101,7 +103,10 @@ interface DiscordUserLinkRepository {
      * @param limit The maximum number of records to return
      * @return Paginated list of links
      */
-    fun findAll(offset: Long, limit: Int): List<DiscordUserLink>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<DiscordUserLink>
 
     /**
      * Counts all links.

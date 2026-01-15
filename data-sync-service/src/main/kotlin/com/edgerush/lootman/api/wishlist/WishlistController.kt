@@ -62,7 +62,9 @@ class WishlistController(
      * @return 200 OK with the wishlist, or 404 if not found
      */
     @GetMapping("/raider/{raiderId}")
-    fun getWishlist(@PathVariable raiderId: Long): WishlistResponse {
+    fun getWishlist(
+        @PathVariable raiderId: Long,
+    ): WishlistResponse {
         return getWishlistUseCase.execute(GetWishlistQuery(raiderId))
             .map { wishlist -> WishlistResponse.from(wishlist) }
             .getOrThrow()
@@ -75,19 +77,23 @@ class WishlistController(
      * @return 201 Created with the created wishlist
      */
     @PostMapping
-    fun createWishlist(@RequestBody request: SaveWishlistRequest): ResponseEntity<WishlistResponse> {
-        val command = SaveWishlistCommand(
-            raiderId = request.raiderId,
-            items = request.items.map { item ->
-                WishlistItemCommand(
-                    itemId = item.itemId,
-                    itemName = item.itemName,
-                    priority = item.priority,
-                    upgradePercentage = item.upgradePercentage,
-                    specName = item.specName
-                )
-            }
-        )
+    fun createWishlist(
+        @RequestBody request: SaveWishlistRequest,
+    ): ResponseEntity<WishlistResponse> {
+        val command =
+            SaveWishlistCommand(
+                raiderId = request.raiderId,
+                items =
+                    request.items.map { item ->
+                        WishlistItemCommand(
+                            itemId = item.itemId,
+                            itemName = item.itemName,
+                            priority = item.priority,
+                            upgradePercentage = item.upgradePercentage,
+                            specName = item.specName,
+                        )
+                    },
+            )
 
         return saveWishlistUseCase.execute(command)
             .map { wishlist ->
@@ -108,20 +114,22 @@ class WishlistController(
     @PutMapping("/raider/{raiderId}")
     fun updateWishlist(
         @PathVariable raiderId: Long,
-        @RequestBody request: SaveWishlistRequest
+        @RequestBody request: SaveWishlistRequest,
     ): WishlistResponse {
-        val command = SaveWishlistCommand(
-            raiderId = raiderId,
-            items = request.items.map { item ->
-                WishlistItemCommand(
-                    itemId = item.itemId,
-                    itemName = item.itemName,
-                    priority = item.priority,
-                    upgradePercentage = item.upgradePercentage,
-                    specName = item.specName
-                )
-            }
-        )
+        val command =
+            SaveWishlistCommand(
+                raiderId = raiderId,
+                items =
+                    request.items.map { item ->
+                        WishlistItemCommand(
+                            itemId = item.itemId,
+                            itemName = item.itemName,
+                            priority = item.priority,
+                            upgradePercentage = item.upgradePercentage,
+                            specName = item.specName,
+                        )
+                    },
+            )
 
         return saveWishlistUseCase.execute(command)
             .map { wishlist -> WishlistResponse.from(wishlist) }
@@ -135,7 +143,9 @@ class WishlistController(
      * @return 204 No Content on success, or 404 if not found
      */
     @DeleteMapping("/raider/{raiderId}")
-    fun deleteWishlist(@PathVariable raiderId: Long): ResponseEntity<Void> {
+    fun deleteWishlist(
+        @PathVariable raiderId: Long,
+    ): ResponseEntity<Void> {
         return deleteWishlistUseCase.execute(DeleteWishlistCommand(raiderId))
             .map { ResponseEntity.noContent().build<Void>() }
             .getOrThrow()

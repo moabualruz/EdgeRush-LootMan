@@ -15,13 +15,10 @@ import java.time.OffsetDateTime
 data class CreateFlpsDefaultModifierRequest(
     @field:NotBlank(message = "Category is required")
     val category: String,
-
     @field:NotBlank(message = "Modifier key is required")
     val modifierKey: String,
-
     @field:NotNull(message = "Modifier value is required")
     val modifierValue: BigDecimal,
-
     val description: String? = null,
 )
 
@@ -48,15 +45,16 @@ data class FlpsDefaultModifierResponse(
     val updatedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(entity: FlpsDefaultModifierEntity): FlpsDefaultModifierResponse = FlpsDefaultModifierResponse(
-            id = entity.id ?: 0L,
-            category = entity.category,
-            modifierKey = entity.modifierKey,
-            modifierValue = entity.modifierValue,
-            description = entity.description,
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt,
-        )
+        fun from(entity: FlpsDefaultModifierEntity): FlpsDefaultModifierResponse =
+            FlpsDefaultModifierResponse(
+                id = entity.id ?: 0L,
+                category = entity.category,
+                modifierKey = entity.modifierKey,
+                modifierValue = entity.modifierValue,
+                description = entity.description,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt,
+            )
     }
 }
 
@@ -68,16 +66,12 @@ data class FlpsDefaultModifierResponse(
 data class CreateFlpsGuildModifierRequest(
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Category is required")
     val category: String,
-
     @field:NotBlank(message = "Modifier key is required")
     val modifierKey: String,
-
     @field:NotNull(message = "Modifier value is required")
     val modifierValue: BigDecimal,
-
     val description: String? = null,
 )
 
@@ -105,15 +99,16 @@ data class FlpsGuildModifierResponse(
     val updatedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(entity: FlpsGuildModifierEntity): FlpsGuildModifierResponse = FlpsGuildModifierResponse(
-            id = entity.id ?: 0L,
-            guildId = entity.guildId,
-            category = entity.category,
-            modifierKey = entity.modifierKey,
-            modifierValue = entity.modifierValue,
-            description = entity.description,
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt,
-        )
+        fun from(entity: FlpsGuildModifierEntity): FlpsGuildModifierResponse =
+            FlpsGuildModifierResponse(
+                id = entity.id ?: 0L,
+                guildId = entity.guildId,
+                category = entity.category,
+                modifierKey = entity.modifierKey,
+                modifierValue = entity.modifierValue,
+                description = entity.description,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt,
+            )
     }
 }

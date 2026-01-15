@@ -32,29 +32,30 @@ data class TrialDto(
     val lastUpdated: Instant,
 ) {
     companion object {
-        fun from(trial: Trial): TrialDto = TrialDto(
-            id = trial.id.value,
-            applicationId = trial.applicationId.value,
-            raiderId = trial.raiderId,
-            guildId = trial.guildId.value,
-            status = trial.status,
-            startDate = trial.startDate,
-            endDate = trial.endDate,
-            expectedEndDate = trial.expectedEndDate,
-            raidsAttended = trial.raidsAttended,
-            raidsRequired = trial.raidsRequired,
-            attendanceRate = trial.attendanceRate,
-            averagePerformance = trial.averagePerformance,
-            deathsPerRaid = trial.deathsPerRaid,
-            progressPercentage = trial.progressPercentage,
-            isComplete = trial.isComplete,
-            outcome = trial.outcome,
-            outcomeReason = trial.outcomeReason,
-            promotedBy = trial.promotedBy,
-            promotedAt = trial.promotedAt,
-            createdAt = trial.createdAt,
-            lastUpdated = trial.lastUpdated,
-        )
+        fun from(trial: Trial): TrialDto =
+            TrialDto(
+                id = trial.id.value,
+                applicationId = trial.applicationId.value,
+                raiderId = trial.raiderId,
+                guildId = trial.guildId.value,
+                status = trial.status,
+                startDate = trial.startDate,
+                endDate = trial.endDate,
+                expectedEndDate = trial.expectedEndDate,
+                raidsAttended = trial.raidsAttended,
+                raidsRequired = trial.raidsRequired,
+                attendanceRate = trial.attendanceRate,
+                averagePerformance = trial.averagePerformance,
+                deathsPerRaid = trial.deathsPerRaid,
+                progressPercentage = trial.progressPercentage,
+                isComplete = trial.isComplete,
+                outcome = trial.outcome,
+                outcomeReason = trial.outcomeReason,
+                promotedBy = trial.promotedBy,
+                promotedAt = trial.promotedAt,
+                createdAt = trial.createdAt,
+                lastUpdated = trial.lastUpdated,
+            )
     }
 }
 

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for InMemoryUserRepository.
  */
 class InMemoryUserRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemoryUserRepository
 
     private val discordId1 = "123456789012345678"
@@ -33,16 +32,16 @@ class InMemoryUserRepositoryTest : UnitTest() {
     private fun createUser(
         discordId: String? = discordId1,
         battlenetId: String? = null,
-        username: String = "testuser"
-    ): User = User(
-        discordId = discordId,
-        battlenetId = battlenetId,
-        username = username
-    )
+        username: String = "testuser",
+    ): User =
+        User(
+            discordId = discordId,
+            battlenetId = battlenetId,
+            username = username,
+        )
 
     @Nested
     inner class Save {
-
         @Test
         fun `should save user and assign ID`() {
             // Arrange
@@ -83,7 +82,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindById {
-
         @Test
         fun `should find saved user`() {
             // Arrange
@@ -109,7 +107,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByDiscordId {
-
         @Test
         fun `should find user by Discord ID`() {
             // Arrange
@@ -135,7 +132,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByBattlenetId {
-
         @Test
         fun `should find user by Battlenet ID`() {
             // Arrange
@@ -161,7 +157,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildId {
-
         @Test
         fun `should find users in guild`() {
             // Arrange
@@ -179,7 +174,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByDiscordId {
-
         @Test
         fun `should return true when Discord ID exists`() {
             // Arrange
@@ -198,7 +192,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByBattlenetId {
-
         @Test
         fun `should return true when Battlenet ID exists`() {
             // Arrange
@@ -217,7 +210,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteById {
-
         @Test
         fun `should delete user`() {
             // Arrange
@@ -233,7 +225,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllPaginated {
-
         @Test
         fun `should return paginated results`() {
             // Arrange
@@ -253,7 +244,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class Count {
-
         @Test
         fun `should count all users`() {
             // Arrange
@@ -267,7 +257,6 @@ class InMemoryUserRepositoryTest : UnitTest() {
 
     @Nested
     inner class Clear {
-
         @Test
         fun `should clear all data`() {
             // Arrange

@@ -1,11 +1,8 @@
 package com.edgerush.lootman.domain.application.client
 
 import com.edgerush.datasync.test.base.UnitTest
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.every
-import io.mockk.mockk
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -21,7 +18,6 @@ import reactor.test.StepVerifier
  * Unit tests for RaiderIOClient.
  */
 class RaiderIOClientTest : UnitTest() {
-
     private lateinit var mockWebServer: MockWebServer
     private lateinit var client: RaiderIOClient
 
@@ -42,11 +38,11 @@ class RaiderIOClientTest : UnitTest() {
 
     @Nested
     inner class FetchCharacterProfileTests {
-
         @Test
         fun `should fetch character profile successfully`() {
             // Arrange
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "name": "Arthas",
                     "race": "Human",
@@ -83,13 +79,13 @@ class RaiderIOClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(200)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .setBody(responseJson)
+                    .setBody(responseJson),
             )
 
             // Act
@@ -114,7 +110,7 @@ class RaiderIOClientTest : UnitTest() {
                 MockResponse()
                     .setResponseCode(400)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .setBody("""{"statusCode": 400, "error": "Bad Request", "message": "Character not found"}""")
+                    .setBody("""{"statusCode": 400, "error": "Bad Request", "message": "Character not found"}"""),
             )
 
             // Act
@@ -132,7 +128,7 @@ class RaiderIOClientTest : UnitTest() {
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(500)
-                    .setBody("Internal Server Error")
+                    .setBody("Internal Server Error"),
             )
 
             // Act
@@ -147,7 +143,8 @@ class RaiderIOClientTest : UnitTest() {
         @Test
         fun `should normalize realm name with spaces`() {
             // Arrange
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "name": "Test",
                     "race": "Human",
@@ -158,13 +155,13 @@ class RaiderIOClientTest : UnitTest() {
                     "realm": "Area 52",
                     "profile_url": "https://raider.io/characters/us/area-52/Test"
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(200)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .setBody(responseJson)
+                    .setBody(responseJson),
             )
 
             // Act
@@ -185,30 +182,41 @@ class RaiderIOClientTest : UnitTest() {
 
     @Nested
     inner class CharacterProfileDataTests {
-
         @Test
         fun `should get current mythic plus score from profile`() {
             // Arrange
-            val profile = RaiderIOCharacterProfile(
-                name = "Test",
-                race = "Human",
-                characterClass = "Warrior",
-                activeSpecName = "Arms",
-                activeSpecRole = "DPS",
-                gender = "male",
-                faction = "alliance",
-                region = "us",
-                realm = "Illidan",
-                profileUrl = "https://raider.io/characters/us/illidan/Test",
-                gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
-                mythicPlusScoresBySeason = listOf(
-                    RaiderIOMythicPlusSeasonScore(
-                        season = "season-tww-1",
-                        scores = RaiderIOScores(all = 2850.5, dps = 2800.0, healer = 0.0, tank = 0.0, spec0 = null, spec1 = null, spec2 = null, spec3 = null)
-                    )
-                ),
-                raidProgression = null
-            )
+            val profile =
+                RaiderIOCharacterProfile(
+                    name = "Test",
+                    race = "Human",
+                    characterClass = "Warrior",
+                    activeSpecName = "Arms",
+                    activeSpecRole = "DPS",
+                    gender = "male",
+                    faction = "alliance",
+                    region = "us",
+                    realm = "Illidan",
+                    profileUrl = "https://raider.io/characters/us/illidan/Test",
+                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
+                    mythicPlusScoresBySeason =
+                        listOf(
+                            RaiderIOMythicPlusSeasonScore(
+                                season = "season-tww-1",
+                                scores =
+                                    RaiderIOScores(
+                                        all = 2850.5,
+                                        dps = 2800.0,
+                                        healer = 0.0,
+                                        tank = 0.0,
+                                        spec0 = null,
+                                        spec1 = null,
+                                        spec2 = null,
+                                        spec3 = null,
+                                    ),
+                            ),
+                        ),
+                    raidProgression = null,
+                )
 
             // Act
             val score = profile.getCurrentMythicPlusScore()
@@ -220,21 +228,22 @@ class RaiderIOClientTest : UnitTest() {
         @Test
         fun `should return null when no mythic plus scores`() {
             // Arrange
-            val profile = RaiderIOCharacterProfile(
-                name = "Test",
-                race = "Human",
-                characterClass = "Warrior",
-                activeSpecName = "Arms",
-                activeSpecRole = "DPS",
-                gender = "male",
-                faction = "alliance",
-                region = "us",
-                realm = "Illidan",
-                profileUrl = "https://raider.io/characters/us/illidan/Test",
-                gear = null,
-                mythicPlusScoresBySeason = null,
-                raidProgression = null
-            )
+            val profile =
+                RaiderIOCharacterProfile(
+                    name = "Test",
+                    race = "Human",
+                    characterClass = "Warrior",
+                    activeSpecName = "Arms",
+                    activeSpecRole = "DPS",
+                    gender = "male",
+                    faction = "alliance",
+                    region = "us",
+                    realm = "Illidan",
+                    profileUrl = "https://raider.io/characters/us/illidan/Test",
+                    gear = null,
+                    mythicPlusScoresBySeason = null,
+                    raidProgression = null,
+                )
 
             // Act
             val score = profile.getCurrentMythicPlusScore()
@@ -246,21 +255,22 @@ class RaiderIOClientTest : UnitTest() {
         @Test
         fun `should get item level from gear`() {
             // Arrange
-            val profile = RaiderIOCharacterProfile(
-                name = "Test",
-                race = "Human",
-                characterClass = "Warrior",
-                activeSpecName = "Arms",
-                activeSpecRole = "DPS",
-                gender = "male",
-                faction = "alliance",
-                region = "us",
-                realm = "Illidan",
-                profileUrl = "https://raider.io/characters/us/illidan/Test",
-                gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
-                mythicPlusScoresBySeason = null,
-                raidProgression = null
-            )
+            val profile =
+                RaiderIOCharacterProfile(
+                    name = "Test",
+                    race = "Human",
+                    characterClass = "Warrior",
+                    activeSpecName = "Arms",
+                    activeSpecRole = "DPS",
+                    gender = "male",
+                    faction = "alliance",
+                    region = "us",
+                    realm = "Illidan",
+                    profileUrl = "https://raider.io/characters/us/illidan/Test",
+                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
+                    mythicPlusScoresBySeason = null,
+                    raidProgression = null,
+                )
 
             // Act
             val itemLevel = profile.getItemLevel()

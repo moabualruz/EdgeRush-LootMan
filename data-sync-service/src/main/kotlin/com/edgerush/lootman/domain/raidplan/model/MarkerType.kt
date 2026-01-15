@@ -7,7 +7,7 @@ package com.edgerush.lootman.domain.raidplan.model
 enum class MarkerType {
     // Standard WoW raid markers
     SKULL,
-    CROSS,      // X marker
+    CROSS, // X marker
     SQUARE,
     MOON,
     TRIANGLE,

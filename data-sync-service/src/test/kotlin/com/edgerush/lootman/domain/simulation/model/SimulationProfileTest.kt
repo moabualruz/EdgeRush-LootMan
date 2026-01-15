@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class SimulationProfileTest : UnitTest() {
-
     @Nested
     inner class Creation {
         @Test
@@ -19,22 +18,24 @@ class SimulationProfileTest : UnitTest() {
             val guildId = "test-guild-123"
             val characterName = "Testchar"
             val characterRealm = "TestRealm"
-            val profileContent = """
+            val profileContent =
+                """
                 warrior="Testchar"
                 level=80
                 race=human
                 spec=fury
-            """.trimIndent()
+                """.trimIndent()
             val createdAt = Instant.now()
 
             // Act
-            val profile = SimulationProfile.create(
-                guildId = guildId,
-                characterName = characterName,
-                characterRealm = characterRealm,
-                profileContent = profileContent,
-                createdAt = createdAt
-            )
+            val profile =
+                SimulationProfile.create(
+                    guildId = guildId,
+                    characterName = characterName,
+                    characterRealm = characterRealm,
+                    profileContent = profileContent,
+                    createdAt = createdAt,
+                )
 
             // Assert
             profile.guildId shouldBe guildId
@@ -47,60 +48,64 @@ class SimulationProfileTest : UnitTest() {
         @Test
         fun `should throw exception when guildId is blank`() {
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationProfile.create(
-                    guildId = "",
-                    characterName = "Testchar",
-                    characterRealm = "TestRealm",
-                    profileContent = "warrior=\"Testchar\"",
-                    createdAt = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationProfile.create(
+                        guildId = "",
+                        characterName = "Testchar",
+                        characterRealm = "TestRealm",
+                        profileContent = "warrior=\"Testchar\"",
+                        createdAt = Instant.now(),
+                    )
+                }
             exception.message shouldContain "guildId"
         }
 
         @Test
         fun `should throw exception when characterName is blank`() {
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationProfile.create(
-                    guildId = "guild-123",
-                    characterName = "  ",
-                    characterRealm = "TestRealm",
-                    profileContent = "warrior=\"Testchar\"",
-                    createdAt = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationProfile.create(
+                        guildId = "guild-123",
+                        characterName = "  ",
+                        characterRealm = "TestRealm",
+                        profileContent = "warrior=\"Testchar\"",
+                        createdAt = Instant.now(),
+                    )
+                }
             exception.message shouldContain "characterName"
         }
 
         @Test
         fun `should throw exception when characterRealm is blank`() {
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationProfile.create(
-                    guildId = "guild-123",
-                    characterName = "Testchar",
-                    characterRealm = "",
-                    profileContent = "warrior=\"Testchar\"",
-                    createdAt = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationProfile.create(
+                        guildId = "guild-123",
+                        characterName = "Testchar",
+                        characterRealm = "",
+                        profileContent = "warrior=\"Testchar\"",
+                        createdAt = Instant.now(),
+                    )
+                }
             exception.message shouldContain "characterRealm"
         }
 
         @Test
         fun `should throw exception when profileContent is blank`() {
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                SimulationProfile.create(
-                    guildId = "guild-123",
-                    characterName = "Testchar",
-                    characterRealm = "TestRealm",
-                    profileContent = "",
-                    createdAt = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    SimulationProfile.create(
+                        guildId = "guild-123",
+                        characterName = "Testchar",
+                        characterRealm = "TestRealm",
+                        profileContent = "",
+                        createdAt = Instant.now(),
+                    )
+                }
             exception.message shouldContain "profileContent"
         }
     }
@@ -110,13 +115,14 @@ class SimulationProfileTest : UnitTest() {
         @Test
         fun `should return correct character identifier`() {
             // Arrange
-            val profile = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                profileContent = "warrior=\"Testchar\"",
-                createdAt = Instant.now()
-            )
+            val profile =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    profileContent = "warrior=\"Testchar\"",
+                    createdAt = Instant.now(),
+                )
 
             // Act
             val identifier = profile.characterIdentifier
@@ -132,20 +138,22 @@ class SimulationProfileTest : UnitTest() {
         fun `profiles with same guildId, characterName, and characterRealm should be equal`() {
             // Arrange
             val now = Instant.now()
-            val profile1 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                profileContent = "warrior=\"Testchar\"",
-                createdAt = now
-            )
-            val profile2 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                profileContent = "warrior=\"Testchar\"",
-                createdAt = now
-            )
+            val profile1 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    profileContent = "warrior=\"Testchar\"",
+                    createdAt = now,
+                )
+            val profile2 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    profileContent = "warrior=\"Testchar\"",
+                    createdAt = now,
+                )
 
             // Assert
             profile1 shouldBe profile2
@@ -155,20 +163,22 @@ class SimulationProfileTest : UnitTest() {
         fun `profiles with different characterName should not be equal`() {
             // Arrange
             val now = Instant.now()
-            val profile1 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar1",
-                characterRealm = "TestRealm",
-                profileContent = "warrior=\"Testchar\"",
-                createdAt = now
-            )
-            val profile2 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar2",
-                characterRealm = "TestRealm",
-                profileContent = "warrior=\"Testchar\"",
-                createdAt = now
-            )
+            val profile1 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar1",
+                    characterRealm = "TestRealm",
+                    profileContent = "warrior=\"Testchar\"",
+                    createdAt = now,
+                )
+            val profile2 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar2",
+                    characterRealm = "TestRealm",
+                    profileContent = "warrior=\"Testchar\"",
+                    createdAt = now,
+                )
 
             // Assert
             profile1 shouldNotBe profile2
@@ -180,7 +190,8 @@ class SimulationProfileTest : UnitTest() {
         @Test
         fun `should preserve multiline profile content`() {
             // Arrange
-            val multilineContent = """
+            val multilineContent =
+                """
                 |warrior="Testchar"
                 |level=80
                 |race=human
@@ -190,16 +201,17 @@ class SimulationProfileTest : UnitTest() {
                 |# Gear
                 |head=,id=12345
                 |neck=,id=12346
-            """.trimMargin()
+                """.trimMargin()
 
             // Act
-            val profile = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                profileContent = multilineContent,
-                createdAt = Instant.now()
-            )
+            val profile =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    profileContent = multilineContent,
+                    createdAt = Instant.now(),
+                )
 
             // Assert
             profile.profileContent shouldBe multilineContent

@@ -242,7 +242,7 @@ async function fetchCharacterData() {
   }
 }
 
-// Watch for character field changes and debounce fetch
+// Watch for character field changes - debouncedLookup already handles debouncing
 watch(
   () => [formData.characterName, formData.realm, formData.region],
   () => {
@@ -257,8 +257,7 @@ watch(
         formData.characterName
       )
     }
-  },
-  { debounce: 500 }
+  }
 )
 
 // Update auto-fetched data when characterData changes

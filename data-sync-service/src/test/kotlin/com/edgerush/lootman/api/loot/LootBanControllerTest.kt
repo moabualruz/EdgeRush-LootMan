@@ -19,7 +19,6 @@ import java.time.LocalDateTime
  * Unit tests for LootBanController.
  */
 class LootBanControllerTest : UnitTest() {
-
     private lateinit var lootBanService: LootBanCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: LootBanController
@@ -33,16 +32,16 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createLootBanResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createLootBanResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { lootBanService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class LootBanControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<LootBanResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<LootBanResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { lootBanService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return loot ban when found`() {
             // Given
@@ -110,23 +109,24 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created loot ban with 201 status`() {
             // Given
-            val request = CreateLootBanEntityRequest(
-                guildId = "my-guild",
-                characterName = "Badplayer",
-                reason = "Ninja looting",
-                bannedBy = "GuildLeader",
-                expiresAt = LocalDateTime.now().plusDays(30),
-            )
+            val request =
+                CreateLootBanEntityRequest(
+                    guildId = "my-guild",
+                    characterName = "Badplayer",
+                    reason = "Ninja looting",
+                    bannedBy = "GuildLeader",
+                    expiresAt = LocalDateTime.now().plusDays(30),
+                )
 
-            val created = createLootBanResponse(
-                id = 1L,
-                characterName = "Badplayer",
-                reason = "Ninja looting",
-            )
+            val created =
+                createLootBanResponse(
+                    id = 1L,
+                    characterName = "Badplayer",
+                    reason = "Ninja looting",
+                )
             every { lootBanService.create(request) } returns created
 
             // When
@@ -143,19 +143,21 @@ class LootBanControllerTest : UnitTest() {
         @Test
         fun `should create permanent ban when expiresAt is null`() {
             // Given
-            val request = CreateLootBanEntityRequest(
-                guildId = "my-guild",
-                characterName = "Cheater",
-                reason = "Exploiting",
-                bannedBy = "Admin",
-                expiresAt = null,
-            )
+            val request =
+                CreateLootBanEntityRequest(
+                    guildId = "my-guild",
+                    characterName = "Cheater",
+                    reason = "Exploiting",
+                    bannedBy = "Admin",
+                    expiresAt = null,
+                )
 
-            val created = createLootBanResponse(
-                id = 1L,
-                characterName = "Cheater",
-                expiresAt = null,
-            )
+            val created =
+                createLootBanResponse(
+                    id = 1L,
+                    characterName = "Cheater",
+                    expiresAt = null,
+                )
             every { lootBanService.create(request) } returns created
 
             // When
@@ -168,20 +170,21 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated loot ban`() {
             // Given
-            val request = UpdateLootBanEntityRequest(
-                reason = "Updated reason",
-                isActive = false,
-            )
+            val request =
+                UpdateLootBanEntityRequest(
+                    reason = "Updated reason",
+                    isActive = false,
+                )
 
-            val updated = createLootBanResponse(
-                id = 1L,
-                reason = "Updated reason",
-                isActive = false,
-            )
+            val updated =
+                createLootBanResponse(
+                    id = 1L,
+                    reason = "Updated reason",
+                    isActive = false,
+                )
             every { lootBanService.update(1L, request) } returns updated
 
             // When
@@ -213,7 +216,6 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -245,7 +247,6 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when loot ban exists`() {
             // Given
@@ -274,21 +275,22 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class FindByGuildTests {
-
         @Test
         fun `should return loot bans for a guild`() {
             // Given
             val guildId = "my-guild"
-            val bans = listOf(
-                createLootBanResponse(id = 1L, guildId = guildId),
-                createLootBanResponse(id = 2L, guildId = guildId),
-            )
-            val expectedResponse = PagedResponse(
-                content = bans,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val bans =
+                listOf(
+                    createLootBanResponse(id = 1L, guildId = guildId),
+                    createLootBanResponse(id = 2L, guildId = guildId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = bans,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { lootBanService.findByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -302,21 +304,22 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class FindActiveByGuildTests {
-
         @Test
         fun `should return only active loot bans for a guild`() {
             // Given
             val guildId = "my-guild"
-            val bans = listOf(
-                createLootBanResponse(id = 1L, guildId = guildId, isActive = true),
-                createLootBanResponse(id = 2L, guildId = guildId, isActive = true),
-            )
-            val expectedResponse = PagedResponse(
-                content = bans,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val bans =
+                listOf(
+                    createLootBanResponse(id = 1L, guildId = guildId, isActive = true),
+                    createLootBanResponse(id = 2L, guildId = guildId, isActive = true),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = bans,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { lootBanService.findActiveByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -330,7 +333,6 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class CheckBanTests {
-
         @Test
         fun `should return true when character is banned`() {
             // Given
@@ -362,7 +364,6 @@ class LootBanControllerTest : UnitTest() {
 
     @Nested
     inner class CountByGuildTests {
-
         @Test
         fun `should return count for guild`() {
             // Given
@@ -387,14 +388,15 @@ class LootBanControllerTest : UnitTest() {
         bannedAt: LocalDateTime = LocalDateTime.now(),
         expiresAt: LocalDateTime? = LocalDateTime.now().plusDays(30),
         isActive: Boolean = true,
-    ): LootBanResponse = LootBanResponse(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        reason = reason,
-        bannedBy = bannedBy,
-        bannedAt = bannedAt,
-        expiresAt = expiresAt,
-        isActive = isActive,
-    )
+    ): LootBanResponse =
+        LootBanResponse(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            reason = reason,
+            bannedBy = bannedBy,
+            bannedAt = bannedAt,
+            expiresAt = expiresAt,
+            isActive = isActive,
+        )
 }

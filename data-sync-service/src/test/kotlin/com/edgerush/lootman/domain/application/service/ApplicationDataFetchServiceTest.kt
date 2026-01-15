@@ -26,7 +26,6 @@ import reactor.core.publisher.Mono
  * (Raider.IO and Warcraft Logs) for recruitment applications.
  */
 class ApplicationDataFetchServiceTest : UnitTest() {
-
     private lateinit var raiderIOClient: RaiderIOClient
     private lateinit var warcraftLogsClient: WarcraftLogsClient
     private lateinit var service: ApplicationDataFetchService
@@ -40,7 +39,6 @@ class ApplicationDataFetchServiceTest : UnitTest() {
 
     @Nested
     inner class FetchCharacterDataTests {
-
         @Test
         fun `should fetch data from both RaiderIO and WarcraftLogs`() {
             // Given
@@ -48,12 +46,14 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns Mono.just(
-                createRaiderIOProfile()
-            )
-            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.just(
-                createWarcraftLogsResult()
-            )
+            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns
+                Mono.just(
+                    createRaiderIOProfile(),
+                )
+            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns
+                Mono.just(
+                    createWarcraftLogsResult(),
+                )
 
             // When
             val result = service.fetchCharacterData(region, realm, name)
@@ -76,9 +76,10 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns Mono.just(
-                createRaiderIOProfile()
-            )
+            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns
+                Mono.just(
+                    createRaiderIOProfile(),
+                )
             every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.empty()
 
             // When
@@ -99,12 +100,14 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns Mono.just(
-                createRaiderIOProfile(mythicPlusScores = null)
-            )
-            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.just(
-                createWarcraftLogsResult()
-            )
+            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns
+                Mono.just(
+                    createRaiderIOProfile(mythicPlusScores = null),
+                )
+            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns
+                Mono.just(
+                    createWarcraftLogsResult(),
+                )
 
             // When
             val result = service.fetchCharacterData(region, realm, name)
@@ -126,9 +129,10 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.empty()
 
             // When / Then
-            val result = runCatching {
-                service.fetchCharacterData(region, realm, name)
-            }
+            val result =
+                runCatching {
+                    service.fetchCharacterData(region, realm, name)
+                }
 
             result.isFailure shouldBe true
             result.exceptionOrNull()?.message shouldBe "Character not found: $name-$realm-$region"
@@ -141,12 +145,14 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns Mono.just(
-                createRaiderIOProfile()
-            )
-            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.error(
-                RuntimeException("WCL API error")
-            )
+            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns
+                Mono.just(
+                    createRaiderIOProfile(),
+                )
+            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns
+                Mono.error(
+                    RuntimeException("WCL API error"),
+                )
 
             // When
             val result = service.fetchCharacterData(region, realm, name)
@@ -162,7 +168,6 @@ class ApplicationDataFetchServiceTest : UnitTest() {
 
     @Nested
     inner class FetchRaiderIOOnlyTests {
-
         @Test
         fun `should fetch RaiderIO data only`() {
             // Given
@@ -170,9 +175,10 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns Mono.just(
-                createRaiderIOProfile()
-            )
+            every { raiderIOClient.fetchCharacterProfile(region, realm, name) } returns
+                Mono.just(
+                    createRaiderIOProfile(),
+                )
 
             // When
             val result = service.fetchRaiderIOData(region, realm, name)
@@ -188,7 +194,6 @@ class ApplicationDataFetchServiceTest : UnitTest() {
 
     @Nested
     inner class FetchWarcraftLogsOnlyTests {
-
         @Test
         fun `should fetch WarcraftLogs data only`() {
             // Given
@@ -196,9 +201,10 @@ class ApplicationDataFetchServiceTest : UnitTest() {
             val realm = "Illidan"
             val name = "Arthas"
 
-            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns Mono.just(
-                createWarcraftLogsResult()
-            )
+            every { warcraftLogsClient.fetchCharacterParses(region, realm, name) } returns
+                Mono.just(
+                    createWarcraftLogsResult(),
+                )
 
             // When
             val result = service.fetchWarcraftLogsData(region, realm, name)
@@ -213,21 +219,23 @@ class ApplicationDataFetchServiceTest : UnitTest() {
     // Helper methods
 
     private fun createRaiderIOProfile(
-        mythicPlusScores: List<RaiderIOMythicPlusSeasonScore>? = listOf(
-            RaiderIOMythicPlusSeasonScore(
-                season = "season-tww-1",
-                scores = RaiderIOScores(
-                    all = 2850.0,
-                    dps = 2800.0,
-                    healer = 0.0,
-                    tank = 0.0,
-                    spec0 = null,
-                    spec1 = null,
-                    spec2 = null,
-                    spec3 = null,
+        mythicPlusScores: List<RaiderIOMythicPlusSeasonScore>? =
+            listOf(
+                RaiderIOMythicPlusSeasonScore(
+                    season = "season-tww-1",
+                    scores =
+                        RaiderIOScores(
+                            all = 2850.0,
+                            dps = 2800.0,
+                            healer = 0.0,
+                            tank = 0.0,
+                            spec0 = null,
+                            spec1 = null,
+                            spec2 = null,
+                            spec3 = null,
+                        ),
                 ),
-            )
-        ),
+            ),
     ) = RaiderIOCharacterProfile(
         name = "Arthas",
         race = "Human",
@@ -244,15 +252,17 @@ class ApplicationDataFetchServiceTest : UnitTest() {
         raidProgression = null,
     )
 
-    private fun createWarcraftLogsResult() = WarcraftLogsParseResult(
-        characterName = "Arthas",
-        serverName = "Illidan",
-        region = "us",
-        bestPerformanceAverage = 85.5,
-        medianPerformanceAverage = 78.2,
-        encounterParses = listOf(
-            EncounterParse("Ulgrax", 90.5),
-            EncounterParse("Bloodbound Horror", 82.3),
-        ),
-    )
+    private fun createWarcraftLogsResult() =
+        WarcraftLogsParseResult(
+            characterName = "Arthas",
+            serverName = "Illidan",
+            region = "us",
+            bestPerformanceAverage = 85.5,
+            medianPerformanceAverage = 78.2,
+            encounterParses =
+                listOf(
+                    EncounterParse("Ulgrax", 90.5),
+                    EncounterParse("Bloodbound Horror", 82.3),
+                ),
+        )
 }

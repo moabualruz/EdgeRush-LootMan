@@ -17,56 +17,63 @@ import java.sql.Timestamp
  */
 @Repository
 class JdbcUserCharacterMappingRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : UserCharacterMappingRepository {
-
     override fun findById(id: UserCharacterMappingId): UserCharacterMapping? {
-        val sql = """
+        val sql =
+            """
             SELECT id, user_id, raider_id, is_primary, linked_at, verified, verified_at
             FROM user_character_mappings
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, id.value).firstOrNull()
     }
 
     override fun findByUserId(userId: UserId): List<UserCharacterMapping> {
-        val sql = """
+        val sql =
+            """
             SELECT id, user_id, raider_id, is_primary, linked_at, verified, verified_at
             FROM user_character_mappings
             WHERE user_id = ?
             ORDER BY is_primary DESC, linked_at ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, userId.value)
     }
 
     override fun findPrimaryByUserId(userId: UserId): UserCharacterMapping? {
-        val sql = """
+        val sql =
+            """
             SELECT id, user_id, raider_id, is_primary, linked_at, verified, verified_at
             FROM user_character_mappings
             WHERE user_id = ? AND is_primary = true
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, userId.value).firstOrNull()
     }
 
     override fun findByRaiderId(raiderId: RaiderId): List<UserCharacterMapping> {
-        val sql = """
+        val sql =
+            """
             SELECT id, user_id, raider_id, is_primary, linked_at, verified, verified_at
             FROM user_character_mappings
             WHERE raider_id = ?
             ORDER BY linked_at ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, raiderId.value)
     }
 
-    override fun existsByUserIdAndRaiderId(userId: UserId, raiderId: RaiderId): Boolean {
-        val sql = """
+    override fun existsByUserIdAndRaiderId(
+        userId: UserId,
+        raiderId: RaiderId,
+    ): Boolean {
+        val sql =
+            """
             SELECT COUNT(*) FROM user_character_mappings
             WHERE user_id = ? AND raider_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val count = jdbcTemplate.queryForObject(sql, Long::class.java, userId.value, raiderId.value)
         return (count ?: 0) > 0
@@ -81,10 +88,11 @@ class JdbcUserCharacterMappingRepository(
     }
 
     private fun insert(mapping: UserCharacterMapping): UserCharacterMapping {
-        val sql = """
+        val sql =
+            """
             INSERT INTO user_character_mappings (user_id, raider_id, is_primary, linked_at, verified, verified_at)
             VALUES (?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
 
@@ -99,18 +107,20 @@ class JdbcUserCharacterMappingRepository(
             ps
         }, keyHolder)
 
-        val generatedId = keyHolder.keys?.get("id") as? Long
-            ?: throw IllegalStateException("Failed to retrieve generated ID for user_character_mapping")
+        val generatedId =
+            keyHolder.keys?.get("id") as? Long
+                ?: throw IllegalStateException("Failed to retrieve generated ID for user_character_mapping")
 
         return mapping.withId(UserCharacterMappingId(generatedId))
     }
 
     private fun update(mapping: UserCharacterMapping): UserCharacterMapping {
-        val sql = """
+        val sql =
+            """
             UPDATE user_character_mappings
             SET user_id = ?, raider_id = ?, is_primary = ?, linked_at = ?, verified = ?, verified_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -120,7 +130,7 @@ class JdbcUserCharacterMappingRepository(
             Timestamp.from(mapping.linkedAt),
             mapping.verified,
             mapping.verifiedAt?.let { Timestamp.from(it) },
-            mapping.id!!.value
+            mapping.id!!.value,
         )
 
         return mapping
@@ -137,11 +147,12 @@ class JdbcUserCharacterMappingRepository(
     }
 
     override fun clearPrimaryForUser(userId: UserId) {
-        val sql = """
+        val sql =
+            """
             UPDATE user_character_mappings
             SET is_primary = false
             WHERE user_id = ? AND is_primary = true
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(sql, userId.value)
     }
@@ -151,15 +162,16 @@ class JdbcUserCharacterMappingRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, userId.value) ?: 0
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        UserCharacterMapping(
-            id = UserCharacterMappingId(rs.getLong("id")),
-            userId = UserId(rs.getLong("user_id")),
-            raiderId = RaiderId(rs.getLong("raider_id")),
-            isPrimary = rs.getBoolean("is_primary"),
-            linkedAt = rs.getTimestamp("linked_at").toInstant(),
-            verified = rs.getBoolean("verified"),
-            verifiedAt = rs.getTimestamp("verified_at")?.toInstant()
-        )
-    }
+    private val rowMapper =
+        RowMapper { rs, _ ->
+            UserCharacterMapping(
+                id = UserCharacterMappingId(rs.getLong("id")),
+                userId = UserId(rs.getLong("user_id")),
+                raiderId = RaiderId(rs.getLong("raider_id")),
+                isPrimary = rs.getBoolean("is_primary"),
+                linkedAt = rs.getTimestamp("linked_at").toInstant(),
+                verified = rs.getBoolean("verified"),
+                verifiedAt = rs.getTimestamp("verified_at")?.toInstant(),
+            )
+        }
 }

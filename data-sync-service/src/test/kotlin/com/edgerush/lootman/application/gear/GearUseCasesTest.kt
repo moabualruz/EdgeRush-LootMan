@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test
  * Tests use case business logic by mocking the repository layer.
  */
 class GearUseCasesTest : UnitTest() {
-
     private lateinit var gearRepository: GearRepository
 
     @BeforeEach
@@ -145,30 +144,32 @@ class GearUseCasesTest : UnitTest() {
         @Test
         fun `should save gear set`() {
             // Given
-            val command = SaveGearCommand(
-                raiderId = 1L,
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemCommand(
-                        itemId = 100L,
-                        name = "Epic Sword",
-                        itemLevel = 489,
-                        quality = "EPIC",
-                        slot = "MAIN_HAND",
-                        isTierPiece = false
-                    ),
-                    GearItemCommand(
-                        itemId = 200L,
-                        name = "Tier Helm",
-                        itemLevel = 489,
-                        quality = "EPIC",
-                        slot = "HEAD",
-                        isTierPiece = true,
-                        enchant = "Incandescent Essence",
-                        sockets = 1
-                    )
+            val command =
+                SaveGearCommand(
+                    raiderId = 1L,
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemCommand(
+                                itemId = 100L,
+                                name = "Epic Sword",
+                                itemLevel = 489,
+                                quality = "EPIC",
+                                slot = "MAIN_HAND",
+                                isTierPiece = false,
+                            ),
+                            GearItemCommand(
+                                itemId = 200L,
+                                name = "Tier Helm",
+                                itemLevel = 489,
+                                quality = "EPIC",
+                                slot = "HEAD",
+                                isTierPiece = true,
+                                enchant = "Incandescent Essence",
+                                sockets = 1,
+                            ),
+                        ),
                 )
-            )
 
             val savedGearSlot = slot<GearSet>()
             every { gearRepository.save(RaiderId(1L), capture(savedGearSlot)) } answers { savedGearSlot.captured }
@@ -192,11 +193,12 @@ class GearUseCasesTest : UnitTest() {
         @Test
         fun `should save empty gear set`() {
             // Given
-            val command = SaveGearCommand(
-                raiderId = 1L,
-                gearSetType = "BEST",
-                items = emptyList()
-            )
+            val command =
+                SaveGearCommand(
+                    raiderId = 1L,
+                    gearSetType = "BEST",
+                    items = emptyList(),
+                )
 
             val savedGearSlot = slot<GearSet>()
             every { gearRepository.save(RaiderId(1L), capture(savedGearSlot)) } answers { savedGearSlot.captured }
@@ -214,11 +216,12 @@ class GearUseCasesTest : UnitTest() {
         @Test
         fun `should fail with invalid gear type`() {
             // Given
-            val command = SaveGearCommand(
-                raiderId = 1L,
-                gearSetType = "INVALID_TYPE",
-                items = emptyList()
-            )
+            val command =
+                SaveGearCommand(
+                    raiderId = 1L,
+                    gearSetType = "INVALID_TYPE",
+                    items = emptyList(),
+                )
 
             // When
             val result = useCase.execute(command)
@@ -231,19 +234,21 @@ class GearUseCasesTest : UnitTest() {
         @Test
         fun `should fail with invalid equipment slot`() {
             // Given
-            val command = SaveGearCommand(
-                raiderId = 1L,
-                gearSetType = "EQUIPPED",
-                items = listOf(
-                    GearItemCommand(
-                        itemId = 100L,
-                        name = "Test Item",
-                        itemLevel = 489,
-                        quality = "EPIC",
-                        slot = "INVALID_SLOT"
-                    )
+            val command =
+                SaveGearCommand(
+                    raiderId = 1L,
+                    gearSetType = "EQUIPPED",
+                    items =
+                        listOf(
+                            GearItemCommand(
+                                itemId = 100L,
+                                name = "Test Item",
+                                itemLevel = 489,
+                                quality = "EPIC",
+                                slot = "INVALID_SLOT",
+                            ),
+                        ),
                 )
-            )
 
             // When
             val result = useCase.execute(command)
@@ -256,13 +261,15 @@ class GearUseCasesTest : UnitTest() {
 
     private fun createGearSet(
         gearSetType: GearSetType = GearSetType.EQUIPPED,
-        items: Map<EquipmentSlot, GearItem> = mapOf(
-            EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD)
+        items: Map<EquipmentSlot, GearItem> =
+            mapOf(
+                EquipmentSlot.HEAD to createGearItem(slot = EquipmentSlot.HEAD),
+            ),
+    ): GearSet =
+        GearSet(
+            items = items,
+            gearSetType = gearSetType,
         )
-    ): GearSet = GearSet(
-        items = items,
-        gearSetType = gearSetType
-    )
 
     private fun createGearItem(
         itemId: ItemId = ItemId(12345L),
@@ -272,15 +279,16 @@ class GearUseCasesTest : UnitTest() {
         slot: EquipmentSlot = EquipmentSlot.HEAD,
         isTierPiece: Boolean = false,
         enchant: String? = null,
-        sockets: Int = 0
-    ): GearItem = GearItem(
-        itemId = itemId,
-        name = name,
-        itemLevel = itemLevel,
-        quality = quality,
-        slot = slot,
-        isTierPiece = isTierPiece,
-        enchant = enchant,
-        sockets = sockets
-    )
+        sockets: Int = 0,
+    ): GearItem =
+        GearItem(
+            itemId = itemId,
+            name = name,
+            itemLevel = itemLevel,
+            quality = quality,
+            slot = slot,
+            isTierPiece = isTierPiece,
+            enchant = enchant,
+            sockets = sockets,
+        )
 }

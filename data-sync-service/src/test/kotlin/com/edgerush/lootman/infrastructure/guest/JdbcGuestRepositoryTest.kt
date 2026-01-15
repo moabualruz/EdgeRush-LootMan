@@ -22,7 +22,6 @@ import java.time.ZoneOffset
  * Unit tests for JdbcGuestRepository.
  */
 class JdbcGuestRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcGuestRepository
 
@@ -36,11 +35,17 @@ class JdbcGuestRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return guest when found`() {
             val guestId = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("guest_id = ?") }, any<RowMapper<GuestEntity>>(), eq(guestId)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("guest_id = ?")
+                    },
+                    any<RowMapper<GuestEntity>>(), eq(guestId),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<GuestEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(guestId), 0))
             }
@@ -52,14 +57,28 @@ class JdbcGuestRepositoryTest : UnitTest() {
         @Test
         fun `should return null when guest not found`() {
             val guestId = 999L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("guest_id = ?") }, any<RowMapper<GuestEntity>>(), eq(guestId)) } returns emptyList()
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("guest_id = ?")
+                    },
+                    any<RowMapper<GuestEntity>>(), eq(guestId),
+                )
+            } returns emptyList()
             repository.findById(guestId) shouldBe null
         }
 
         @Test
         fun `should map all database fields to entity`() {
             val guestId = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("guest_id = ?") }, any<RowMapper<GuestEntity>>(), eq(guestId)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("guest_id = ?")
+                    },
+                    any<RowMapper<GuestEntity>>(), eq(guestId),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<GuestEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(guestId, name = "TestGuest", realm = "Illidan", clazz = "Mage", role = "DPS", blizzardId = 12345L), 0))
             }
@@ -75,7 +94,14 @@ class JdbcGuestRepositoryTest : UnitTest() {
         @Test
         fun `should handle null optional fields`() {
             val guestId = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("guest_id = ?") }, any<RowMapper<GuestEntity>>(), eq(guestId)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("guest_id = ?")
+                    },
+                    any<RowMapper<GuestEntity>>(), eq(guestId),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<GuestEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(guestId, realm = null, clazz = null, role = null, blizzardId = null, trackingSince = null), 0))
             }
@@ -91,12 +117,18 @@ class JdbcGuestRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated guests`() {
             val offset = 10L
             val limit = 5
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") }, any<RowMapper<GuestEntity>>(), eq(limit), eq(offset)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET")
+                    },
+                    any<RowMapper<GuestEntity>>(), eq(limit), eq(offset),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<GuestEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L), 0), rowMapper.mapRow(mockResultSet(2L), 1))
             }
@@ -106,14 +138,20 @@ class JdbcGuestRepositoryTest : UnitTest() {
 
         @Test
         fun `should return empty list when no guests`() {
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("LIMIT") }, any<RowMapper<GuestEntity>>(), any<Int>(), any<Long>()) } returns emptyList()
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("LIMIT")
+                    },
+                    any<RowMapper<GuestEntity>>(), any<Int>(), any<Long>(),
+                )
+            } returns emptyList()
             repository.findAll(0L, 10) shouldBe emptyList()
         }
     }
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("guests") }, Long::class.java) } returns 42L
@@ -129,32 +167,51 @@ class JdbcGuestRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when guest exists`() {
             val guestId = 1L
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("guest_id = ?") }, Int::class.java, eq(guestId)) } returns 1
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> {
+                        it.contains("COUNT(*)") && it.contains("guest_id = ?")
+                    },
+                    Int::class.java, eq(guestId),
+                )
+            } returns 1
             repository.existsById(guestId) shouldBe true
         }
 
         @Test
         fun `should return false when guest does not exist`() {
             val guestId = 999L
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("guest_id = ?") }, Int::class.java, eq(guestId)) } returns 0
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> {
+                        it.contains("COUNT(*)") && it.contains("guest_id = ?")
+                    },
+                    Int::class.java, eq(guestId),
+                )
+            } returns 0
             repository.existsById(guestId) shouldBe false
         }
 
         @Test
         fun `should handle null count result as false`() {
             val guestId = 1L
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("guest_id = ?") }, Int::class.java, eq(guestId)) } returns null
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> {
+                        it.contains("COUNT(*)") && it.contains("guest_id = ?")
+                    },
+                    Int::class.java, eq(guestId),
+                )
+            } returns null
             repository.existsById(guestId) shouldBe false
         }
     }
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new guest when not exists`() {
             val entity = createEntity()
@@ -198,7 +255,15 @@ class JdbcGuestRepositoryTest : UnitTest() {
         }
     }
 
-    private fun mockResultSet(guestId: Long, name: String = "TestGuest", realm: String? = "Illidan", clazz: String? = "Mage", role: String? = "DPS", blizzardId: Long? = 12345L, trackingSince: OffsetDateTime? = now): ResultSet {
+    private fun mockResultSet(
+        guestId: Long,
+        name: String = "TestGuest",
+        realm: String? = "Illidan",
+        clazz: String? = "Mage",
+        role: String? = "DPS",
+        blizzardId: Long? = 12345L,
+        trackingSince: OffsetDateTime? = now,
+    ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("guest_id") } returns guestId
         every { rs.getString("name") } returns name
@@ -212,6 +277,14 @@ class JdbcGuestRepositoryTest : UnitTest() {
         return rs
     }
 
-    private fun createEntity(guestId: Long = 1L, name: String = "TestGuest", realm: String? = "Illidan", clazz: String? = "Mage", role: String? = "DPS", blizzardId: Long? = 12345L, trackingSince: OffsetDateTime? = now, syncedAt: OffsetDateTime = now) =
-        GuestEntity(guestId, name, realm, clazz, role, blizzardId, trackingSince, syncedAt)
+    private fun createEntity(
+        guestId: Long = 1L,
+        name: String = "TestGuest",
+        realm: String? = "Illidan",
+        clazz: String? = "Mage",
+        role: String? = "DPS",
+        blizzardId: Long? = 12345L,
+        trackingSince: OffsetDateTime? = now,
+        syncedAt: OffsetDateTime = now,
+    ) = GuestEntity(guestId, name, realm, clazz, role, blizzardId, trackingSince, syncedAt)
 }

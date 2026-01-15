@@ -13,5 +13,5 @@ data class RaiderCrestCountEntity(
     @Column("crest_type")
     val crestType: String,
     @Column("crest_count")
-    val crestCount: Int?
+    val crestCount: Int?,
 )

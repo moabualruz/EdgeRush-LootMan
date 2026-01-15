@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with vault-slot-specific query methods.
  */
 interface RaiderVaultSlotCrudService : CrudService<Long, CreateRaiderVaultSlotRequest, UpdateRaiderVaultSlotRequest, RaiderVaultSlotResponse> {
-
     /**
      * Find vault slots by raider with pagination.
      *
@@ -18,7 +17,10 @@ interface RaiderVaultSlotCrudService : CrudService<Long, CreateRaiderVaultSlotRe
      * @param pageRequest Pagination parameters
      * @return Paginated list of vault slots for the raider
      */
-    fun findByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderVaultSlotResponse>
+    fun findByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderVaultSlotResponse>
 
     /**
      * Find unlocked vault slots by raider with pagination.
@@ -27,7 +29,10 @@ interface RaiderVaultSlotCrudService : CrudService<Long, CreateRaiderVaultSlotRe
      * @param pageRequest Pagination parameters
      * @return Paginated list of unlocked vault slots for the raider
      */
-    fun findUnlockedByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderVaultSlotResponse>
+    fun findUnlockedByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderVaultSlotResponse>
 
     /**
      * Count vault slots for a raider.

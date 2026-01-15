@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 
 class ApplicationControllerTest : UnitTest() {
-
     private lateinit var service: ApplicationCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: ApplicationController
@@ -107,10 +106,10 @@ class ApplicationControllerTest : UnitTest() {
         mainCharacterFaction: String? = "Alliance",
         mainCharacterLevel: Int? = 70,
         mainCharacterRegion: String? = "US",
-        syncedAt: OffsetDateTime = OffsetDateTime.now()
+        syncedAt: OffsetDateTime = OffsetDateTime.now(),
     ) = ApplicationResponse(
         applicationId, appliedAt, status, role, age, country, battletag, discordId,
         mainCharacterName, mainCharacterRealm, mainCharacterClass, mainCharacterRole,
-        mainCharacterRace, mainCharacterFaction, mainCharacterLevel, mainCharacterRegion, syncedAt
+        mainCharacterRace, mainCharacterFaction, mainCharacterLevel, mainCharacterRegion, syncedAt,
     )
 }

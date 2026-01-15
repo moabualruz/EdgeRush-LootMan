@@ -34,7 +34,6 @@ import java.time.LocalDateTime
  * Tests the orchestration of FLPS calculation for a specific raider and item.
  */
 class GetRaiderFlpsUseCaseTest : UnitTest() {
-
     @MockK
     private lateinit var flpsDataAssembler: FlpsDataAssemblerService
 
@@ -49,7 +48,6 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
 
     @Nested
     inner class ExecuteQuery {
-
         @Test
         fun `should return FLPS result when raider is found`() {
             // Arrange
@@ -144,11 +142,12 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
         @Test
         fun `should propagate exception from data assembler`() {
             // Arrange
-            val query = GetRaiderFlpsQuery(
-                guildId = GuildId("test-guild"),
-                raiderId = RaiderId(42L),
-                itemId = ItemId(100L),
-            )
+            val query =
+                GetRaiderFlpsQuery(
+                    guildId = GuildId("test-guild"),
+                    raiderId = RaiderId(42L),
+                    itemId = ItemId(100L),
+                )
 
             every { flpsDataAssembler.assembleFlpsData(any()) } throws RuntimeException("Database error")
 
@@ -191,27 +190,29 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
         id: Long = 1L,
         guildId: String = "test-guild",
         name: String = "TestRaider",
-    ): Raider = Raider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        characterName = name,
-        realm = "TestRealm",
-        characterClass = CharacterClass.WARRIOR,
-        role = Role.DPS,
-        rank = "Raider",
-        status = RaiderStatus.ACTIVE,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        Raider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            characterName = name,
+            realm = "TestRealm",
+            characterClass = CharacterClass.WARRIOR,
+            role = Role.DPS,
+            rank = "Raider",
+            status = RaiderStatus.ACTIVE,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 
-    private fun createTestRaiderData(raider: Raider): RaiderFlpsData = RaiderFlpsData(
-        raider = raider,
-        attendance = emptyList(),
-        lootHistory = emptyList(),
-        wishlist = null,
-        gear = null,
-        activeBans = emptyList(),
-    )
+    private fun createTestRaiderData(raider: Raider): RaiderFlpsData =
+        RaiderFlpsData(
+            raider = raider,
+            attendance = emptyList(),
+            lootHistory = emptyList(),
+            wishlist = null,
+            gear = null,
+            activeBans = emptyList(),
+        )
 
     @Suppress("DEPRECATION")
     private fun setupComponentCalculatorMocks() {
@@ -239,20 +240,21 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
         raiderId: Long = 1L,
         itemId: Long = 100L,
         flpsValue: Double = 0.80,
-    ): FlpsCalculationResult = FlpsCalculationResult(
-        guildId = GuildId(guildId),
-        raiderId = RaiderId(raiderId),
-        itemId = ItemId(itemId),
-        acs = AttendanceCommitmentScore.of(0.9),
-        mas = MechanicalAdherenceScore.of(0.8),
-        eps = ExternalPreparationScore.of(0.7),
-        rms = RaiderMeritScore.of(0.85),
-        uv = UpgradeValue.of(0.6),
-        tb = TierBonus.of(0.5),
-        rm = RoleMultiplier.of(1.0),
-        ipi = ItemPriorityIndex.of(0.65),
-        rdf = RecencyDecayFactor.of(0.95),
-        flps = FlpsScore.of(flpsValue),
-        eligible = true,
-    )
+    ): FlpsCalculationResult =
+        FlpsCalculationResult(
+            guildId = GuildId(guildId),
+            raiderId = RaiderId(raiderId),
+            itemId = ItemId(itemId),
+            acs = AttendanceCommitmentScore.of(0.9),
+            mas = MechanicalAdherenceScore.of(0.8),
+            eps = ExternalPreparationScore.of(0.7),
+            rms = RaiderMeritScore.of(0.85),
+            uv = UpgradeValue.of(0.6),
+            tb = TierBonus.of(0.5),
+            rm = RoleMultiplier.of(1.0),
+            ipi = ItemPriorityIndex.of(0.65),
+            rdf = RecencyDecayFactor.of(0.95),
+            flps = FlpsScore.of(flpsValue),
+            eligible = true,
+        )
 }

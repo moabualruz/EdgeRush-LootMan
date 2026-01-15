@@ -14,7 +14,7 @@ data class SimulationResult private constructor(
     val slot: String,
     val dpsGain: Double,
     val percentGain: Double,
-    val simulatedAt: Instant
+    val simulatedAt: Instant,
 ) {
     /**
      * Returns true if this item represents an upgrade (positive DPS gain).
@@ -54,7 +54,7 @@ data class SimulationResult private constructor(
             slot: String,
             dpsGain: Double,
             percentGain: Double,
-            simulatedAt: Instant
+            simulatedAt: Instant,
         ): SimulationResult {
             require(itemId >= 0) { "itemId must not be negative" }
             require(itemName.isNotBlank()) { "itemName must not be blank" }
@@ -66,7 +66,7 @@ data class SimulationResult private constructor(
                 slot = slot.trim().lowercase(),
                 dpsGain = dpsGain,
                 percentGain = percentGain,
-                simulatedAt = simulatedAt
+                simulatedAt = simulatedAt,
             )
         }
     }

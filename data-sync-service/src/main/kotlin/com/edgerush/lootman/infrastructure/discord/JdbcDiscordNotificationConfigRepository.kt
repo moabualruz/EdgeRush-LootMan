@@ -17,57 +17,67 @@ import java.sql.Timestamp
  */
 @Repository
 class JdbcDiscordNotificationConfigRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : DiscordNotificationConfigRepository {
-
     override fun findById(id: DiscordNotificationConfigId): DiscordNotificationConfig? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at
             FROM discord_notification_configs
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, id.value).firstOrNull()
     }
 
     override fun findByGuildId(guildId: GuildId): List<DiscordNotificationConfig> {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at
             FROM discord_notification_configs
             WHERE guild_id = ?
             ORDER BY notification_type ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value)
     }
 
-    override fun findByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): DiscordNotificationConfig? {
-        val sql = """
+    override fun findByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): DiscordNotificationConfig? {
+        val sql =
+            """
             SELECT id, guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at
             FROM discord_notification_configs
             WHERE guild_id = ? AND notification_type = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value, type.name).firstOrNull()
     }
 
     override fun findEnabledByGuildId(guildId: GuildId): List<DiscordNotificationConfig> {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at
             FROM discord_notification_configs
             WHERE guild_id = ? AND enabled = true
             ORDER BY notification_type ASC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value)
     }
 
-    override fun findEnabledByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): DiscordNotificationConfig? {
-        val sql = """
+    override fun findEnabledByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): DiscordNotificationConfig? {
+        val sql =
+            """
             SELECT id, guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at
             FROM discord_notification_configs
             WHERE guild_id = ? AND notification_type = ? AND enabled = true
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, rowMapper, guildId.value, type.name).firstOrNull()
     }
@@ -81,10 +91,11 @@ class JdbcDiscordNotificationConfigRepository(
     }
 
     private fun insert(config: DiscordNotificationConfig): DiscordNotificationConfig {
-        val sql = """
+        val sql =
+            """
             INSERT INTO discord_notification_configs (guild_id, discord_server_id, notification_type, channel_id, enabled, mention_role_id, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
 
@@ -101,18 +112,20 @@ class JdbcDiscordNotificationConfigRepository(
             ps
         }, keyHolder)
 
-        val generatedId = keyHolder.keys?.get("id") as? Long
-            ?: throw IllegalStateException("Failed to retrieve generated ID for discord_notification_config")
+        val generatedId =
+            keyHolder.keys?.get("id") as? Long
+                ?: throw IllegalStateException("Failed to retrieve generated ID for discord_notification_config")
 
         return config.withId(DiscordNotificationConfigId(generatedId))
     }
 
     private fun update(config: DiscordNotificationConfig): DiscordNotificationConfig {
-        val sql = """
+        val sql =
+            """
             UPDATE discord_notification_configs
             SET guild_id = ?, discord_server_id = ?, notification_type = ?, channel_id = ?, enabled = ?, mention_role_id = ?, updated_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -123,7 +136,7 @@ class JdbcDiscordNotificationConfigRepository(
             config.enabled,
             config.mentionRoleId,
             config.updatedAt?.let { Timestamp.from(it) },
-            config.id!!.value
+            config.id!!.value,
         )
 
         return config
@@ -139,27 +152,32 @@ class JdbcDiscordNotificationConfigRepository(
         return jdbcTemplate.update(sql, guildId.value)
     }
 
-    override fun existsByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): Boolean {
-        val sql = """
+    override fun existsByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): Boolean {
+        val sql =
+            """
             SELECT COUNT(*) FROM discord_notification_configs
             WHERE guild_id = ? AND notification_type = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val count = jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value, type.name)
         return (count ?: 0) > 0
     }
 
-    private val rowMapper = RowMapper { rs, _ ->
-        DiscordNotificationConfig(
-            id = DiscordNotificationConfigId(rs.getLong("id")),
-            guildId = GuildId(rs.getString("guild_id")),
-            discordServerId = rs.getString("discord_server_id"),
-            notificationType = DiscordNotificationType.valueOf(rs.getString("notification_type")),
-            channelId = rs.getString("channel_id"),
-            enabled = rs.getBoolean("enabled"),
-            mentionRoleId = rs.getString("mention_role_id"),
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            updatedAt = rs.getTimestamp("updated_at")?.toInstant()
-        )
-    }
+    private val rowMapper =
+        RowMapper { rs, _ ->
+            DiscordNotificationConfig(
+                id = DiscordNotificationConfigId(rs.getLong("id")),
+                guildId = GuildId(rs.getString("guild_id")),
+                discordServerId = rs.getString("discord_server_id"),
+                notificationType = DiscordNotificationType.valueOf(rs.getString("notification_type")),
+                channelId = rs.getString("channel_id"),
+                enabled = rs.getBoolean("enabled"),
+                mentionRoleId = rs.getString("mention_role_id"),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                updatedAt = rs.getTimestamp("updated_at")?.toInstant(),
+            )
+        }
 }

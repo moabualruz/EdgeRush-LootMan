@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class AuditLogServiceTest : UnitTest() {
-
     private lateinit var auditLogRepository: AuditLogRepository
     private lateinit var service: AuditLogService
 
@@ -32,10 +31,11 @@ class AuditLogServiceTest : UnitTest() {
         // Given
         val entityType = "Raider"
         val entityId = "123"
-        val auditLogs = listOf(
-            createAuditLog(1, entityType, entityId, AuditOperation.CREATE),
-            createAuditLog(2, entityType, entityId, AuditOperation.UPDATE),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, entityType, entityId, AuditOperation.CREATE),
+                createAuditLog(2, entityType, entityId, AuditOperation.UPDATE),
+            )
         every { auditLogRepository.findByEntity(entityType, entityId) } returns auditLogs
 
         // When
@@ -68,10 +68,11 @@ class AuditLogServiceTest : UnitTest() {
     fun `findByUserId should return audit logs for user`() {
         // Given
         val userId = "user-123"
-        val auditLogs = listOf(
-            createAuditLog(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
-            createAuditLog(2, "Raider", "5", AuditOperation.DELETE, userId = userId),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
+                createAuditLog(2, "Raider", "5", AuditOperation.DELETE, userId = userId),
+            )
         every { auditLogRepository.findByUserId(userId) } returns auditLogs
 
         // When
@@ -88,10 +89,11 @@ class AuditLogServiceTest : UnitTest() {
         // Given
         val from = Instant.parse("2025-01-01T00:00:00Z")
         val to = Instant.parse("2025-01-15T23:59:59Z")
-        val auditLogs = listOf(
-            createAuditLog(1, "Guild", "1", AuditOperation.CREATE, timestamp = Instant.parse("2025-01-05T12:00:00Z")),
-            createAuditLog(2, "Raider", "2", AuditOperation.UPDATE, timestamp = Instant.parse("2025-01-10T15:30:00Z")),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, "Guild", "1", AuditOperation.CREATE, timestamp = Instant.parse("2025-01-05T12:00:00Z")),
+                createAuditLog(2, "Raider", "2", AuditOperation.UPDATE, timestamp = Instant.parse("2025-01-10T15:30:00Z")),
+            )
         every { auditLogRepository.findByTimeRange(from, to) } returns auditLogs
 
         // When
@@ -118,10 +120,11 @@ class AuditLogServiceTest : UnitTest() {
     fun `findByOperation should return audit logs for operation type`() {
         // Given
         val operation = AuditOperation.DELETE
-        val auditLogs = listOf(
-            createAuditLog(1, "Guild", "1", operation),
-            createAuditLog(2, "Raider", "5", operation),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, "Guild", "1", operation),
+                createAuditLog(2, "Raider", "5", operation),
+            )
         every { auditLogRepository.findByOperation(operation) } returns auditLogs
 
         // When
@@ -138,11 +141,12 @@ class AuditLogServiceTest : UnitTest() {
         // Given
         val entityType = "Guild"
         val entityId = "42"
-        val auditLogs = listOf(
-            createAuditLog(1, entityType, entityId, AuditOperation.CREATE),
-            createAuditLog(2, entityType, entityId, AuditOperation.UPDATE),
-            createAuditLog(3, entityType, entityId, AuditOperation.UPDATE),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, entityType, entityId, AuditOperation.CREATE),
+                createAuditLog(2, entityType, entityId, AuditOperation.UPDATE),
+                createAuditLog(3, entityType, entityId, AuditOperation.UPDATE),
+            )
         every { auditLogRepository.findByEntity(entityType, entityId) } returns auditLogs
 
         // When
@@ -156,10 +160,11 @@ class AuditLogServiceTest : UnitTest() {
     fun `countByUserId should return count of audit logs for user`() {
         // Given
         val userId = "user-456"
-        val auditLogs = listOf(
-            createAuditLog(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
-            createAuditLog(2, "Raider", "2", AuditOperation.UPDATE, userId = userId),
-        )
+        val auditLogs =
+            listOf(
+                createAuditLog(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
+                createAuditLog(2, "Raider", "2", AuditOperation.UPDATE, userId = userId),
+            )
         every { auditLogRepository.findByUserId(userId) } returns auditLogs
 
         // When

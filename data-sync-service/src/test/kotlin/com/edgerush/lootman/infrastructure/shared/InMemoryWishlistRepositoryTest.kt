@@ -5,7 +5,6 @@ import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import com.edgerush.lootman.domain.shared.model.WishlistItem
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
@@ -56,15 +55,25 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
         fun `should replace existing wishlist for same raider`() {
             // Arrange
             val raiderId = RaiderId(1L)
-            val originalWishlist = createWishlist(raiderId = raiderId, items = listOf(
-                createWishlistItem(itemId = ItemId(100L), itemName = "Original Item")
-            ))
+            val originalWishlist =
+                createWishlist(
+                    raiderId = raiderId,
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = ItemId(100L), itemName = "Original Item"),
+                        ),
+                )
             repository.save(originalWishlist)
 
-            val newWishlist = createWishlist(raiderId = raiderId, items = listOf(
-                createWishlistItem(itemId = ItemId(200L), itemName = "New Item 1"),
-                createWishlistItem(itemId = ItemId(201L), itemName = "New Item 2", priority = 2)
-            ))
+            val newWishlist =
+                createWishlist(
+                    raiderId = raiderId,
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = ItemId(200L), itemName = "New Item 1"),
+                            createWishlistItem(itemId = ItemId(201L), itemName = "New Item 2", priority = 2),
+                        ),
+                )
 
             // Act
             repository.save(newWishlist)
@@ -140,12 +149,22 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
         @Test
         fun `should return correct wishlist for specific raider`() {
             // Arrange
-            val wishlist1 = createWishlist(raiderId = RaiderId(1L), items = listOf(
-                createWishlistItem(itemName = "Raider1 Item")
-            ))
-            val wishlist2 = createWishlist(raiderId = RaiderId(2L), items = listOf(
-                createWishlistItem(itemName = "Raider2 Item")
-            ))
+            val wishlist1 =
+                createWishlist(
+                    raiderId = RaiderId(1L),
+                    items =
+                        listOf(
+                            createWishlistItem(itemName = "Raider1 Item"),
+                        ),
+                )
+            val wishlist2 =
+                createWishlist(
+                    raiderId = RaiderId(2L),
+                    items =
+                        listOf(
+                            createWishlistItem(itemName = "Raider2 Item"),
+                        ),
+                )
 
             repository.save(wishlist1)
             repository.save(wishlist2)
@@ -208,9 +227,10 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
         @Test
         fun `should handle concurrent saves without data loss`() {
             // Arrange
-            val wishlists = (1..100).map { index ->
-                createWishlist(raiderId = RaiderId(index.toLong()))
-            }
+            val wishlists =
+                (1..100).map { index ->
+                    createWishlist(raiderId = RaiderId(index.toLong()))
+                }
 
             // Act - simulate concurrent saves
             wishlists.parallelStream().forEach { wishlist ->
@@ -229,11 +249,12 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
         @Test
         fun `should correctly store and retrieve wishlist with multiple items`() {
             // Arrange
-            val items = listOf(
-                createWishlistItem(itemId = ItemId(100L), itemName = "Item 1", priority = 1),
-                createWishlistItem(itemId = ItemId(200L), itemName = "Item 2", priority = 2),
-                createWishlistItem(itemId = ItemId(300L), itemName = "Item 3", priority = 3)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(itemId = ItemId(100L), itemName = "Item 1", priority = 1),
+                    createWishlistItem(itemId = ItemId(200L), itemName = "Item 2", priority = 2),
+                    createWishlistItem(itemId = ItemId(300L), itemName = "Item 3", priority = 3),
+                )
             val wishlist = createWishlist(items = items)
 
             // Act
@@ -262,10 +283,11 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
         @Test
         fun `should preserve upgrade percentage values`() {
             // Arrange
-            val items = listOf(
-                createWishlistItem(upgradePercentage = 5.5),
-                createWishlistItem(itemId = ItemId(200L), upgradePercentage = 15.75, priority = 2)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(upgradePercentage = 5.5),
+                    createWishlistItem(itemId = ItemId(200L), upgradePercentage = 15.75, priority = 2),
+                )
             val wishlist = createWishlist(items = items)
 
             // Act
@@ -280,23 +302,25 @@ class InMemoryWishlistRepositoryTest : UnitTest() {
 
     private fun createWishlist(
         raiderId: RaiderId = RaiderId(1L),
-        items: List<WishlistItem> = listOf(createWishlistItem())
-    ): Wishlist = Wishlist(
-        raiderId = raiderId,
-        items = items
-    )
+        items: List<WishlistItem> = listOf(createWishlistItem()),
+    ): Wishlist =
+        Wishlist(
+            raiderId = raiderId,
+            items = items,
+        )
 
     private fun createWishlistItem(
         itemId: ItemId = ItemId(12345L),
         itemName: String = "Test Item",
         priority: Int = 1,
         upgradePercentage: Double = 10.0,
-        specName: String? = null
-    ): WishlistItem = WishlistItem(
-        itemId = itemId,
-        itemName = itemName,
-        priority = priority,
-        upgradePercentage = upgradePercentage,
-        specName = specName
-    )
+        specName: String? = null,
+    ): WishlistItem =
+        WishlistItem(
+            itemId = itemId,
+            itemName = itemName,
+            priority = priority,
+            upgradePercentage = upgradePercentage,
+            specName = specName,
+        )
 }

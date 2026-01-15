@@ -60,9 +60,10 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateACS should calculate perfect attendance as 1_0`() {
         // Arrange
-        val attendance = listOf(
-            createAttendanceRecord(attendedRaids = 10, totalRaids = 10),
-        )
+        val attendance =
+            listOf(
+                createAttendanceRecord(attendedRaids = 10, totalRaids = 10),
+            )
 
         // Act
         val result = calculator.calculateACS(attendance)
@@ -74,9 +75,10 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateACS should calculate 50 percent attendance correctly`() {
         // Arrange
-        val attendance = listOf(
-            createAttendanceRecord(attendedRaids = 5, totalRaids = 10),
-        )
+        val attendance =
+            listOf(
+                createAttendanceRecord(attendedRaids = 5, totalRaids = 10),
+            )
 
         // Act
         val result = calculator.calculateACS(attendance)
@@ -88,10 +90,11 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateACS should aggregate multiple attendance records`() {
         // Arrange
-        val attendance = listOf(
-            createAttendanceRecord(attendedRaids = 8, totalRaids = 10),
-            createAttendanceRecord(attendedRaids = 6, totalRaids = 10),
-        )
+        val attendance =
+            listOf(
+                createAttendanceRecord(attendedRaids = 8, totalRaids = 10),
+                createAttendanceRecord(attendedRaids = 6, totalRaids = 10),
+            )
 
         // Act
         val result = calculator.calculateACS(attendance)
@@ -104,9 +107,10 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateACS should cap value at 1_0`() {
         // Arrange - edge case where attended equals total
-        val attendance = listOf(
-            createAttendanceRecord(attendedRaids = 20, totalRaids = 20),
-        )
+        val attendance =
+            listOf(
+                createAttendanceRecord(attendedRaids = 20, totalRaids = 20),
+            )
 
         // Act
         val result = calculator.calculateACS(attendance)
@@ -118,9 +122,10 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateACS should handle low attendance correctly`() {
         // Arrange
-        val attendance = listOf(
-            createAttendanceRecord(attendedRaids = 1, totalRaids = 20),
-        )
+        val attendance =
+            listOf(
+                createAttendanceRecord(attendedRaids = 1, totalRaids = 20),
+            )
 
         // Act
         val result = calculator.calculateACS(attendance)
@@ -147,11 +152,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should return perfect score for zero deaths and low avoidable damage`() {
         // Arrange
-        val performanceData = createPerformanceData(
-            totalDeaths = 0,
-            totalFights = 10,
-            avoidableDamagePercentage = 0.0, // Perfect avoidable damage
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 0,
+                totalFights = 10,
+                avoidableDamagePercentage = 0.0, // Perfect avoidable damage
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -163,11 +169,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should return high score for zero deaths and minimal avoidable damage`() {
         // Arrange
-        val performanceData = createPerformanceData(
-            totalDeaths = 0,
-            totalFights = 10,
-            avoidableDamagePercentage = 5.0, // Low but non-zero
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 0,
+                totalFights = 10,
+                avoidableDamagePercentage = 5.0, // Low but non-zero
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -179,11 +186,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should return lower score for moderate deaths`() {
         // Arrange - 0.5 deaths per attempt (5 deaths in 10 fights)
-        val performanceData = createPerformanceData(
-            totalDeaths = 5,
-            totalFights = 10,
-            avoidableDamagePercentage = 20.0,
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 5,
+                totalFights = 10,
+                avoidableDamagePercentage = 20.0,
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -198,11 +206,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateMAS should handle deaths per attempt between 0_5 and 1_0`() {
         // Arrange - 0.75 deaths per attempt (15 deaths in 20 fights)
         // This tests the dpa <= 1.0 branch specifically
-        val performanceData = createPerformanceData(
-            totalDeaths = 15,
-            totalFights = 20,
-            avoidableDamagePercentage = 10.0,
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 15,
+                totalFights = 20,
+                avoidableDamagePercentage = 10.0,
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -217,11 +226,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should return low score for high deaths`() {
         // Arrange - 2 deaths per attempt (high death rate)
-        val performanceData = createPerformanceData(
-            totalDeaths = 20,
-            totalFights = 10,
-            avoidableDamagePercentage = 50.0,
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 20,
+                totalFights = 10,
+                avoidableDamagePercentage = 50.0,
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -234,11 +244,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should floor at zero for extremely bad performance`() {
         // Arrange - extremely high deaths and avoidable damage
-        val performanceData = createPerformanceData(
-            totalDeaths = 50,
-            totalFights = 10,
-            avoidableDamagePercentage = 200.0,
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 50,
+                totalFights = 10,
+                avoidableDamagePercentage = 200.0,
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -250,11 +261,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should return zero when no fights analyzed`() {
         // Arrange
-        val performanceData = createPerformanceData(
-            totalDeaths = 0,
-            totalFights = 0,
-            avoidableDamagePercentage = 0.0,
-        )
+        val performanceData =
+            createPerformanceData(
+                totalDeaths = 0,
+                totalFights = 0,
+                avoidableDamagePercentage = 0.0,
+            )
 
         // Act
         val result = calculator.calculateMAS(performanceData)
@@ -266,18 +278,20 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateMAS should weight deaths per attempt more than avoidable damage`() {
         // Arrange - high deaths, low avoidable damage
-        val highDeathsData = createPerformanceData(
-            totalDeaths = 15,
-            totalFights = 10,
-            avoidableDamagePercentage = 10.0,
-        )
+        val highDeathsData =
+            createPerformanceData(
+                totalDeaths = 15,
+                totalFights = 10,
+                avoidableDamagePercentage = 10.0,
+            )
 
         // Arrange - low deaths, high avoidable damage
-        val highDamageData = createPerformanceData(
-            totalDeaths = 2,
-            totalFights = 10,
-            avoidableDamagePercentage = 80.0,
-        )
+        val highDamageData =
+            createPerformanceData(
+                totalDeaths = 2,
+                totalFights = 10,
+                avoidableDamagePercentage = 80.0,
+            )
 
         // Act
         val highDeathsResult = calculator.calculateMAS(highDeathsData)
@@ -326,14 +340,15 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateEPS should return perfect score for full vault and high M+ rating`() {
         // Arrange
         val gear = createGearSet(tierPieces = 4)
-        val preparation = createPreparationData(
-            raidVaultSlots = 3,
-            mythicPlusVaultSlots = 3,
-            pvpVaultSlots = 3,
-            mythicPlusRating = 2500,
-            hasHeroicClear = true,
-            hasNormalClear = true,
-        )
+        val preparation =
+            createPreparationData(
+                raidVaultSlots = 3,
+                mythicPlusVaultSlots = 3,
+                pvpVaultSlots = 3,
+                mythicPlusRating = 2500,
+                hasHeroicClear = true,
+                hasNormalClear = true,
+            )
 
         // Act
         val result = calculator.calculateEPS(gear, preparation)
@@ -348,15 +363,17 @@ class FlpsComponentCalculatorTest : UnitTest() {
         // Arrange
         val gear = createGearSet(tierPieces = 0)
 
-        val raidVaultOnly = createPreparationData(
-            raidVaultSlots = 3,
-            mythicPlusVaultSlots = 0,
-        )
+        val raidVaultOnly =
+            createPreparationData(
+                raidVaultSlots = 3,
+                mythicPlusVaultSlots = 0,
+            )
 
-        val mplusVaultOnly = createPreparationData(
-            raidVaultSlots = 0,
-            mythicPlusVaultSlots = 3,
-        )
+        val mplusVaultOnly =
+            createPreparationData(
+                raidVaultSlots = 0,
+                mythicPlusVaultSlots = 3,
+            )
 
         // Act
         val raidResult = calculator.calculateEPS(gear, raidVaultOnly)
@@ -370,13 +387,14 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateEPS should return moderate score for partial preparation`() {
         // Arrange
         val gear = createGearSet(tierPieces = 2)
-        val preparation = createPreparationData(
-            raidVaultSlots = 2,
-            mythicPlusVaultSlots = 1,
-            mythicPlusRating = 1500,
-            hasHeroicClear = false,
-            hasNormalClear = true,
-        )
+        val preparation =
+            createPreparationData(
+                raidVaultSlots = 2,
+                mythicPlusVaultSlots = 1,
+                mythicPlusRating = 1500,
+                hasHeroicClear = false,
+                hasNormalClear = true,
+            )
 
         // Act
         val result = calculator.calculateEPS(gear, preparation)
@@ -391,13 +409,15 @@ class FlpsComponentCalculatorTest : UnitTest() {
         // Arrange
         val gear = createGearSet(tierPieces = 0)
 
-        val lowRating = createPreparationData(
-            mythicPlusRating = 500,
-        )
+        val lowRating =
+            createPreparationData(
+                mythicPlusRating = 500,
+            )
 
-        val highRating = createPreparationData(
-            mythicPlusRating = 2500,
-        )
+        val highRating =
+            createPreparationData(
+                mythicPlusRating = 2500,
+            )
 
         // Act
         val lowResult = calculator.calculateEPS(gear, lowRating)
@@ -412,15 +432,17 @@ class FlpsComponentCalculatorTest : UnitTest() {
         // Arrange
         val gear = createGearSet(tierPieces = 0)
 
-        val noClears = createPreparationData(
-            hasHeroicClear = false,
-            hasNormalClear = false,
-        )
+        val noClears =
+            createPreparationData(
+                hasHeroicClear = false,
+                hasNormalClear = false,
+            )
 
-        val heroicClear = createPreparationData(
-            hasHeroicClear = true,
-            hasNormalClear = true,
-        )
+        val heroicClear =
+            createPreparationData(
+                hasHeroicClear = true,
+                hasNormalClear = true,
+            )
 
         // Act
         val noResult = calculator.calculateEPS(gear, noClears)
@@ -471,17 +493,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateUV should return zero when item not on wishlist`() {
         // Arrange
-        val wishlist = Wishlist(
-            raiderId = RaiderId(1),
-            items = listOf(
-                WishlistItem(
-                    itemId = ItemId(99999),
-                    itemName = "Other Item",
-                    priority = 1,
-                    upgradePercentage = 10.0,
-                ),
-            ),
-        )
+        val wishlist =
+            Wishlist(
+                raiderId = RaiderId(1),
+                items =
+                    listOf(
+                        WishlistItem(
+                            itemId = ItemId(99999),
+                            itemName = "Other Item",
+                            priority = 1,
+                            upgradePercentage = 10.0,
+                        ),
+                    ),
+            )
         val itemId = ItemId(12345)
 
         // Act
@@ -495,17 +519,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateUV should normalize upgrade percentage to 0-1 range`() {
         // Arrange
         val itemId = ItemId(12345)
-        val wishlist = Wishlist(
-            raiderId = RaiderId(1),
-            items = listOf(
-                WishlistItem(
-                    itemId = itemId,
-                    itemName = "Test Item",
-                    priority = 1,
-                    upgradePercentage = 50.0, // 50% should become 0.5
-                ),
-            ),
-        )
+        val wishlist =
+            Wishlist(
+                raiderId = RaiderId(1),
+                items =
+                    listOf(
+                        WishlistItem(
+                            itemId = itemId,
+                            itemName = "Test Item",
+                            priority = 1,
+                            upgradePercentage = 50.0, // 50% should become 0.5
+                        ),
+                    ),
+            )
 
         // Act
         val result = calculator.calculateUV(wishlist, itemId)
@@ -518,17 +544,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateUV should cap value at 1_0 for high upgrade percentages`() {
         // Arrange
         val itemId = ItemId(12345)
-        val wishlist = Wishlist(
-            raiderId = RaiderId(1),
-            items = listOf(
-                WishlistItem(
-                    itemId = itemId,
-                    itemName = "Best Upgrade",
-                    priority = 1,
-                    upgradePercentage = 150.0, // More than 100%, should cap at 1.0
-                ),
-            ),
-        )
+        val wishlist =
+            Wishlist(
+                raiderId = RaiderId(1),
+                items =
+                    listOf(
+                        WishlistItem(
+                            itemId = itemId,
+                            itemName = "Best Upgrade",
+                            priority = 1,
+                            upgradePercentage = 150.0, // More than 100%, should cap at 1.0
+                        ),
+                    ),
+            )
 
         // Act
         val result = calculator.calculateUV(wishlist, itemId)
@@ -541,17 +569,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateUV should handle small upgrade percentages`() {
         // Arrange
         val itemId = ItemId(12345)
-        val wishlist = Wishlist(
-            raiderId = RaiderId(1),
-            items = listOf(
-                WishlistItem(
-                    itemId = itemId,
-                    itemName = "Minor Upgrade",
-                    priority = 1,
-                    upgradePercentage = 5.0,
-                ),
-            ),
-        )
+        val wishlist =
+            Wishlist(
+                raiderId = RaiderId(1),
+                items =
+                    listOf(
+                        WishlistItem(
+                            itemId = itemId,
+                            itemName = "Minor Upgrade",
+                            priority = 1,
+                            upgradePercentage = 5.0,
+                        ),
+                    ),
+            )
 
         // Act
         val result = calculator.calculateUV(wishlist, itemId)
@@ -578,18 +608,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
                     characterName = "TestChar",
                     characterRealm = "TestRealm",
                     itemId = itemId,
-                    wishlistFallback = null
+                    wishlistFallback = null,
                 )
             } returns expectedValue
 
             // Act
-            val result = calculatorWithSim.calculateUVWithSimulation(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlist = null
-            )
+            val result =
+                calculatorWithSim.calculateUVWithSimulation(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlist = null,
+                )
 
             // Assert
             result shouldBe expectedValue
@@ -599,7 +630,7 @@ class FlpsComponentCalculatorTest : UnitTest() {
                     characterName = "TestChar",
                     characterRealm = "TestRealm",
                     itemId = itemId,
-                    wishlistFallback = null
+                    wishlistFallback = null,
                 )
             }
         }
@@ -610,17 +641,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
             val mockUpgradeValueCalculator = mockk<UpgradeValueCalculator>()
             val calculatorWithSim = FlpsComponentCalculator(mockUpgradeValueCalculator)
             val itemId = ItemId(12345)
-            val wishlist = Wishlist(
-                raiderId = RaiderId(1),
-                items = listOf(
-                    WishlistItem(
-                        itemId = itemId,
-                        itemName = "Test Item",
-                        priority = 1,
-                        upgradePercentage = 50.0
-                    )
+            val wishlist =
+                Wishlist(
+                    raiderId = RaiderId(1),
+                    items =
+                        listOf(
+                            WishlistItem(
+                                itemId = itemId,
+                                itemName = "Test Item",
+                                priority = 1,
+                                upgradePercentage = 50.0,
+                            ),
+                        ),
                 )
-            )
             val expectedValue = UpgradeValue.of(0.85)
 
             every {
@@ -629,18 +662,19 @@ class FlpsComponentCalculatorTest : UnitTest() {
                     characterName = "TestChar",
                     characterRealm = "TestRealm",
                     itemId = itemId,
-                    wishlistFallback = wishlist
+                    wishlistFallback = wishlist,
                 )
             } returns expectedValue
 
             // Act
-            val result = calculatorWithSim.calculateUVWithSimulation(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlist = wishlist
-            )
+            val result =
+                calculatorWithSim.calculateUVWithSimulation(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlist = wishlist,
+                )
 
             // Assert
             result shouldBe expectedValue
@@ -650,26 +684,29 @@ class FlpsComponentCalculatorTest : UnitTest() {
         fun `should fall back to wishlist when simulation calculator is null`() {
             // Arrange - using default calculator which has null upgradeValueCalculator
             val itemId = ItemId(12345)
-            val wishlist = Wishlist(
-                raiderId = RaiderId(1),
-                items = listOf(
-                    WishlistItem(
-                        itemId = itemId,
-                        itemName = "Test Item",
-                        priority = 1,
-                        upgradePercentage = 60.0
-                    )
+            val wishlist =
+                Wishlist(
+                    raiderId = RaiderId(1),
+                    items =
+                        listOf(
+                            WishlistItem(
+                                itemId = itemId,
+                                itemName = "Test Item",
+                                priority = 1,
+                                upgradePercentage = 60.0,
+                            ),
+                        ),
                 )
-            )
 
             // Act
-            val result = calculator.calculateUVWithSimulation(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlist = wishlist
-            )
+            val result =
+                calculator.calculateUVWithSimulation(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlist = wishlist,
+                )
 
             // Assert - should use wishlist fallback (60% = 0.6)
             result.value shouldBe 0.6
@@ -681,13 +718,14 @@ class FlpsComponentCalculatorTest : UnitTest() {
             val itemId = ItemId(12345)
 
             // Act
-            val result = calculator.calculateUVWithSimulation(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                itemId = itemId,
-                wishlist = null
-            )
+            val result =
+                calculator.calculateUVWithSimulation(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    itemId = itemId,
+                    wishlist = null,
+                )
 
             // Assert
             result.value shouldBe 0.0
@@ -708,16 +746,17 @@ class FlpsComponentCalculatorTest : UnitTest() {
                 mockUpgradeValueCalculator.hasSimulationData(
                     guildId = "test-guild",
                     characterName = "TestChar",
-                    characterRealm = "TestRealm"
+                    characterRealm = "TestRealm",
                 )
             } returns true
 
             // Act
-            val result = calculatorWithSim.hasSimulationData(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm"
-            )
+            val result =
+                calculatorWithSim.hasSimulationData(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             result shouldBe true
@@ -733,16 +772,17 @@ class FlpsComponentCalculatorTest : UnitTest() {
                 mockUpgradeValueCalculator.hasSimulationData(
                     guildId = "test-guild",
                     characterName = "TestChar",
-                    characterRealm = "TestRealm"
+                    characterRealm = "TestRealm",
                 )
             } returns false
 
             // Act
-            val result = calculatorWithSim.hasSimulationData(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm"
-            )
+            val result =
+                calculatorWithSim.hasSimulationData(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             result shouldBe false
@@ -753,11 +793,12 @@ class FlpsComponentCalculatorTest : UnitTest() {
             // Arrange - using default calculator which has null upgradeValueCalculator
 
             // Act
-            val result = calculator.hasSimulationData(
-                guildId = "test-guild",
-                characterName = "TestChar",
-                characterRealm = "TestRealm"
-            )
+            val result =
+                calculator.hasSimulationData(
+                    guildId = "test-guild",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                )
 
             // Assert
             result shouldBe false
@@ -882,9 +923,10 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateRDF should return zero when banned`() {
         // Arrange
         val lootHistory = emptyList<LootAward>()
-        val activeBans = listOf(
-            createLootBan(),
-        )
+        val activeBans =
+            listOf(
+                createLootBan(),
+            )
 
         // Act
         val result = calculator.calculateRDF(lootHistory, activeBans)
@@ -909,12 +951,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 0_8 for recent mythic loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.MYTHIC,
-                awardedAt = Instant.now().minus(7, ChronoUnit.DAYS), // Within 2 weeks
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.MYTHIC,
+                    awardedAt = Instant.now().minus(7, ChronoUnit.DAYS), // Within 2 weeks
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -927,12 +970,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 0_9 for recent heroic loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.HEROIC,
-                awardedAt = Instant.now().minus(3, ChronoUnit.DAYS), // Within 1 week
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.HEROIC,
+                    awardedAt = Instant.now().minus(3, ChronoUnit.DAYS), // Within 1 week
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -945,12 +989,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 1_0 for old mythic loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.MYTHIC,
-                awardedAt = Instant.now().minus(30, ChronoUnit.DAYS), // Over 2 weeks ago
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.MYTHIC,
+                    awardedAt = Instant.now().minus(30, ChronoUnit.DAYS), // Over 2 weeks ago
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -963,12 +1008,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 1_0 for old heroic loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.HEROIC,
-                awardedAt = Instant.now().minus(10, ChronoUnit.DAYS), // Over 1 week ago
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.HEROIC,
+                    awardedAt = Instant.now().minus(10, ChronoUnit.DAYS), // Over 1 week ago
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -981,16 +1027,17 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should prioritize mythic penalty over heroic`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.MYTHIC,
-                awardedAt = Instant.now().minus(5, ChronoUnit.DAYS),
-            ),
-            createLootAward(
-                tier = LootTier.HEROIC,
-                awardedAt = Instant.now().minus(3, ChronoUnit.DAYS),
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.MYTHIC,
+                    awardedAt = Instant.now().minus(5, ChronoUnit.DAYS),
+                ),
+                createLootAward(
+                    tier = LootTier.HEROIC,
+                    awardedAt = Instant.now().minus(3, ChronoUnit.DAYS),
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -1003,12 +1050,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 1_0 for normal tier loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.NORMAL,
-                awardedAt = Instant.now().minus(1, ChronoUnit.DAYS),
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.NORMAL,
+                    awardedAt = Instant.now().minus(1, ChronoUnit.DAYS),
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -1021,12 +1069,13 @@ class FlpsComponentCalculatorTest : UnitTest() {
     @Test
     fun `calculateRDF should return 1_0 for LFR tier loot`() {
         // Arrange
-        val lootHistory = listOf(
-            createLootAward(
-                tier = LootTier.LFR,
-                awardedAt = Instant.now().minus(1, ChronoUnit.DAYS),
-            ),
-        )
+        val lootHistory =
+            listOf(
+                createLootAward(
+                    tier = LootTier.LFR,
+                    awardedAt = Instant.now().minus(1, ChronoUnit.DAYS),
+                ),
+            )
         val activeBans = emptyList<LootBan>()
 
         // Act
@@ -1040,10 +1089,11 @@ class FlpsComponentCalculatorTest : UnitTest() {
     fun `calculateRDF should return zero when multiple bans exist`() {
         // Arrange
         val lootHistory = emptyList<LootAward>()
-        val activeBans = listOf(
-            createLootBan(),
-            createLootBan(),
-        )
+        val activeBans =
+            listOf(
+                createLootBan(),
+                createLootBan(),
+            )
 
         // Act
         val result = calculator.calculateRDF(lootHistory, activeBans)
@@ -1070,38 +1120,41 @@ class FlpsComponentCalculatorTest : UnitTest() {
         )
 
     private fun createGearSet(tierPieces: Int): GearSet {
-        val tierSlots = listOf(
-            EquipmentSlot.HEAD,
-            EquipmentSlot.SHOULDER,
-            EquipmentSlot.CHEST,
-            EquipmentSlot.HANDS,
-            EquipmentSlot.LEGS,
-        )
+        val tierSlots =
+            listOf(
+                EquipmentSlot.HEAD,
+                EquipmentSlot.SHOULDER,
+                EquipmentSlot.CHEST,
+                EquipmentSlot.HANDS,
+                EquipmentSlot.LEGS,
+            )
 
         val items = mutableMapOf<EquipmentSlot, GearItem>()
         var itemIdCounter = 1L
 
         tierSlots.take(tierPieces).forEach { slot ->
-            items[slot] = GearItem(
-                itemId = ItemId(itemIdCounter++),
-                name = "Tier ${slot.name}",
-                itemLevel = 639,
-                quality = ItemQuality.EPIC,
-                slot = slot,
-                isTierPiece = true,
-            )
+            items[slot] =
+                GearItem(
+                    itemId = ItemId(itemIdCounter++),
+                    name = "Tier ${slot.name}",
+                    itemLevel = 639,
+                    quality = ItemQuality.EPIC,
+                    slot = slot,
+                    isTierPiece = true,
+                )
         }
 
         // Add non-tier items to fill remaining slots
         if (items.isEmpty()) {
-            items[EquipmentSlot.NECK] = GearItem(
-                itemId = ItemId(itemIdCounter),
-                name = "Non-tier Neck",
-                itemLevel = 630,
-                quality = ItemQuality.EPIC,
-                slot = EquipmentSlot.NECK,
-                isTierPiece = false,
-            )
+            items[EquipmentSlot.NECK] =
+                GearItem(
+                    itemId = ItemId(itemIdCounter),
+                    name = "Non-tier Neck",
+                    itemLevel = 630,
+                    quality = ItemQuality.EPIC,
+                    slot = EquipmentSlot.NECK,
+                    isTierPiece = false,
+                )
         }
 
         return GearSet(items = items, gearSetType = GearSetType.EQUIPPED)

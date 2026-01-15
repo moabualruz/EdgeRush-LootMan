@@ -1,17 +1,25 @@
 package com.edgerush.lootman.api.loot
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.auth.CurrentUserService
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.loot.AwardLootUseCase
 import com.edgerush.lootman.application.loot.GetActiveBansQuery
+import com.edgerush.lootman.application.loot.GetLootAwardQuery
 import com.edgerush.lootman.application.loot.GetLootAwardUseCase
+import com.edgerush.lootman.application.loot.GetLootBanQuery
 import com.edgerush.lootman.application.loot.GetLootBanUseCase
 import com.edgerush.lootman.application.loot.GetLootHistoryByGuildQuery
 import com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery
 import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
+import com.edgerush.lootman.application.loot.ListLootAwardsByGuildPaginatedQuery
+import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
 import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
-import com.edgerush.lootman.api.common.PaginationProperties
+import com.edgerush.lootman.application.loot.PaginatedLootAwards
+import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
 import com.edgerush.lootman.application.loot.RevokeLootAwardUseCase
+import com.edgerush.lootman.application.loot.UpdateLootBanCommand
 import com.edgerush.lootman.application.loot.UpdateLootBanUseCase
 import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.loot.model.LootAward
@@ -20,14 +28,6 @@ import com.edgerush.lootman.domain.loot.model.LootTier
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
-import com.edgerush.lootman.application.loot.GetLootAwardQuery
-import com.edgerush.lootman.application.loot.GetLootBanQuery
-import com.edgerush.lootman.application.loot.ListLootAwardsByGuildPaginatedQuery
-import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
-import com.edgerush.lootman.application.loot.PaginatedLootAwards
-import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
-import com.edgerush.lootman.application.loot.UpdateLootBanCommand
-import com.edgerush.lootman.api.auth.CurrentUserService
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -71,38 +71,41 @@ class LootControllerTest : UnitTest() {
         updateLootBanUseCase = mockk()
         paginationProperties = PaginationProperties(defaultPageSize = 20, maxPageSize = 100)
         currentUserService = mockk()
-        controller = LootController(
-            awardLootUseCase,
-            getLootHistoryUseCase,
-            manageLootBansUseCase,
-            getLootAwardUseCase,
-            listLootAwardsUseCase,
-            revokeLootAwardUseCase,
-            getLootBanUseCase,
-            updateLootBanUseCase,
-            paginationProperties,
-            currentUserService,
-        )
+        controller =
+            LootController(
+                awardLootUseCase,
+                getLootHistoryUseCase,
+                manageLootBansUseCase,
+                getLootAwardUseCase,
+                listLootAwardsUseCase,
+                revokeLootAwardUseCase,
+                getLootBanUseCase,
+                updateLootBanUseCase,
+                paginationProperties,
+                currentUserService,
+            )
     }
 
     @Test
     fun `awardLoot should return CREATED status with loot award dto`() {
         // Given
-        val request = AwardLootRequest(
-            itemId = 12345L,
-            raiderId = "456",
-            guildId = "guild-789",
-            flpsScore = 0.85,
-            tier = "MYTHIC",
-        )
+        val request =
+            AwardLootRequest(
+                itemId = 12345L,
+                raiderId = "456",
+                guildId = "guild-789",
+                flpsScore = 0.85,
+                tier = "MYTHIC",
+            )
 
-        val lootAward = LootAward.create(
-            itemId = ItemId(12345L),
-            raiderId = RaiderId(456L),
-            guildId = GuildId("guild-789"),
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC,
-        )
+        val lootAward =
+            LootAward.create(
+                itemId = ItemId(12345L),
+                raiderId = RaiderId(456L),
+                guildId = GuildId("guild-789"),
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
 
         every { awardLootUseCase.execute(any()) } returns Result.success(lootAward)
 
@@ -124,23 +127,25 @@ class LootControllerTest : UnitTest() {
     @Test
     fun `awardLoot should pass correct command to use case`() {
         // Given
-        val request = AwardLootRequest(
-            itemId = 99999L,
-            raiderId = "123",
-            guildId = "test-guild",
-            flpsScore = 0.72,
-            tier = "HEROIC",
-        )
+        val request =
+            AwardLootRequest(
+                itemId = 99999L,
+                raiderId = "123",
+                guildId = "test-guild",
+                flpsScore = 0.72,
+                tier = "HEROIC",
+            )
 
         val commandSlot = slot<com.edgerush.lootman.application.loot.AwardLootCommand>()
 
-        val lootAward = LootAward.create(
-            itemId = ItemId(99999L),
-            raiderId = RaiderId(123L),
-            guildId = GuildId("test-guild"),
-            flpsScore = FlpsScore.of(0.72),
-            tier = LootTier.HEROIC,
-        )
+        val lootAward =
+            LootAward.create(
+                itemId = ItemId(99999L),
+                raiderId = RaiderId(123L),
+                guildId = GuildId("test-guild"),
+                flpsScore = FlpsScore.of(0.72),
+                tier = LootTier.HEROIC,
+            )
 
         every { awardLootUseCase.execute(capture(commandSlot)) } returns Result.success(lootAward)
 
@@ -158,13 +163,14 @@ class LootControllerTest : UnitTest() {
     @Test
     fun `awardLoot should throw exception when use case fails`() {
         // Given
-        val request = AwardLootRequest(
-            itemId = 12345L,
-            raiderId = "456",
-            guildId = "guild-789",
-            flpsScore = 0.85,
-            tier = "MYTHIC",
-        )
+        val request =
+            AwardLootRequest(
+                itemId = 12345L,
+                raiderId = "456",
+                guildId = "guild-789",
+                flpsScore = 0.85,
+                tier = "MYTHIC",
+            )
 
         every { awardLootUseCase.execute(any()) } returns Result.failure(RuntimeException("Award failed"))
 
@@ -181,13 +187,14 @@ class LootControllerTest : UnitTest() {
     fun `getGuildLootHistory should return loot history for guild`() {
         // Given
         val guildId = "test-guild"
-        val lootAward = LootAward.create(
-            itemId = ItemId(12345L),
-            raiderId = RaiderId(456L),
-            guildId = GuildId(guildId),
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC,
-        )
+        val lootAward =
+            LootAward.create(
+                itemId = ItemId(12345L),
+                raiderId = RaiderId(456L),
+                guildId = GuildId(guildId),
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
 
         every { getLootHistoryUseCase.getByGuild(any()) } returns Result.success(listOf(lootAward))
 
@@ -237,9 +244,10 @@ class LootControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
 
-        every { getLootHistoryUseCase.getByGuild(any()) } returns Result.failure(
-            RuntimeException("Database error")
-        )
+        every { getLootHistoryUseCase.getByGuild(any()) } returns
+            Result.failure(
+                RuntimeException("Database error"),
+            )
 
         // When/Then
         try {
@@ -254,13 +262,14 @@ class LootControllerTest : UnitTest() {
     fun `getRaiderLootHistory should return loot history for raider`() {
         // Given
         val raiderId = "456"
-        val lootAward = LootAward.create(
-            itemId = ItemId(12345L),
-            raiderId = RaiderId(456L),
-            guildId = GuildId("test-guild"),
-            flpsScore = FlpsScore.of(0.85),
-            tier = LootTier.MYTHIC,
-        )
+        val lootAward =
+            LootAward.create(
+                itemId = ItemId(12345L),
+                raiderId = RaiderId(456L),
+                guildId = GuildId("test-guild"),
+                flpsScore = FlpsScore.of(0.85),
+                tier = LootTier.MYTHIC,
+            )
 
         every { getLootHistoryUseCase.getByRaider(any()) } returns Result.success(listOf(lootAward))
 
@@ -295,9 +304,10 @@ class LootControllerTest : UnitTest() {
         // Given
         val raiderId = "456"
 
-        every { getLootHistoryUseCase.getByRaider(any()) } returns Result.failure(
-            RuntimeException("Raider lookup failed")
-        )
+        every { getLootHistoryUseCase.getByRaider(any()) } returns
+            Result.failure(
+                RuntimeException("Raider lookup failed"),
+            )
 
         // When/Then
         try {
@@ -312,19 +322,21 @@ class LootControllerTest : UnitTest() {
     fun `createBan should return CREATED status with loot ban dto`() {
         // Given
         val expiresAt = Instant.now().plusSeconds(86400)
-        val request = CreateLootBanRequest(
-            raiderId = "456",
-            guildId = "guild-789",
-            reason = "Behavioral issues",
-            expiresAt = expiresAt,
-        )
+        val request =
+            CreateLootBanRequest(
+                raiderId = "456",
+                guildId = "guild-789",
+                reason = "Behavioral issues",
+                expiresAt = expiresAt,
+            )
 
-        val lootBan = LootBan.create(
-            raiderId = RaiderId(456L),
-            guildId = GuildId("guild-789"),
-            reason = "Behavioral issues",
-            expiresAt = expiresAt,
-        )
+        val lootBan =
+            LootBan.create(
+                raiderId = RaiderId(456L),
+                guildId = GuildId("guild-789"),
+                reason = "Behavioral issues",
+                expiresAt = expiresAt,
+            )
 
         every { manageLootBansUseCase.createBan(any()) } returns Result.success(lootBan)
 
@@ -344,19 +356,21 @@ class LootControllerTest : UnitTest() {
     @Test
     fun `createBan should handle permanent ban with null expiresAt`() {
         // Given
-        val request = CreateLootBanRequest(
-            raiderId = "456",
-            guildId = "guild-789",
-            reason = "Permanent ban reason",
-            expiresAt = null,
-        )
+        val request =
+            CreateLootBanRequest(
+                raiderId = "456",
+                guildId = "guild-789",
+                reason = "Permanent ban reason",
+                expiresAt = null,
+            )
 
-        val lootBan = LootBan.create(
-            raiderId = RaiderId(456L),
-            guildId = GuildId("guild-789"),
-            reason = "Permanent ban reason",
-            expiresAt = null,
-        )
+        val lootBan =
+            LootBan.create(
+                raiderId = RaiderId(456L),
+                guildId = GuildId("guild-789"),
+                reason = "Permanent ban reason",
+                expiresAt = null,
+            )
 
         every { manageLootBansUseCase.createBan(any()) } returns Result.success(lootBan)
 
@@ -372,16 +386,18 @@ class LootControllerTest : UnitTest() {
     @Test
     fun `createBan should throw exception when use case fails`() {
         // Given
-        val request = CreateLootBanRequest(
-            raiderId = "456",
-            guildId = "guild-789",
-            reason = "Test ban",
-            expiresAt = null,
-        )
+        val request =
+            CreateLootBanRequest(
+                raiderId = "456",
+                guildId = "guild-789",
+                reason = "Test ban",
+                expiresAt = null,
+            )
 
-        every { manageLootBansUseCase.createBan(any()) } returns Result.failure(
-            RuntimeException("Ban creation failed")
-        )
+        every { manageLootBansUseCase.createBan(any()) } returns
+            Result.failure(
+                RuntimeException("Ban creation failed"),
+            )
 
         // When/Then
         try {
@@ -413,9 +429,10 @@ class LootControllerTest : UnitTest() {
         // Given
         val banId = "non-existent-ban"
 
-        every { manageLootBansUseCase.removeBan(any()) } returns Result.failure(
-            NoSuchElementException("Ban not found")
-        )
+        every { manageLootBansUseCase.removeBan(any()) } returns
+            Result.failure(
+                NoSuchElementException("Ban not found"),
+            )
 
         // When/Then
         try {
@@ -431,12 +448,13 @@ class LootControllerTest : UnitTest() {
         // Given
         val raiderId = "456"
         val guildId = "guild-789"
-        val lootBan = LootBan.create(
-            raiderId = RaiderId(456L),
-            guildId = GuildId(guildId),
-            reason = "Test ban",
-            expiresAt = Instant.now().plusSeconds(86400),
-        )
+        val lootBan =
+            LootBan.create(
+                raiderId = RaiderId(456L),
+                guildId = GuildId(guildId),
+                reason = "Test ban",
+                expiresAt = Instant.now().plusSeconds(86400),
+            )
 
         every { manageLootBansUseCase.getActiveBans(any()) } returns Result.success(listOf(lootBan))
 
@@ -490,9 +508,10 @@ class LootControllerTest : UnitTest() {
         val raiderId = "456"
         val guildId = "guild-789"
 
-        every { manageLootBansUseCase.getActiveBans(any()) } returns Result.failure(
-            RuntimeException("Failed to get active bans")
-        )
+        every { manageLootBansUseCase.getActiveBans(any()) } returns
+            Result.failure(
+                RuntimeException("Failed to get active bans"),
+            )
 
         // When/Then
         try {
@@ -505,27 +524,27 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class ListAllLootAwardsTest {
-
         @Test
         fun `listAllLootAwards should return all awards for guild`() {
             // Given
             val guildId = "test-guild"
-            val awards = listOf(
-                LootAward.create(
-                    itemId = ItemId(111L),
-                    raiderId = RaiderId(123L),
-                    guildId = GuildId(guildId),
-                    flpsScore = FlpsScore.of(0.8),
-                    tier = LootTier.MYTHIC
-                ),
-                LootAward.create(
-                    itemId = ItemId(222L),
-                    raiderId = RaiderId(456L),
-                    guildId = GuildId(guildId),
-                    flpsScore = FlpsScore.of(0.7),
-                    tier = LootTier.HEROIC
+            val awards =
+                listOf(
+                    LootAward.create(
+                        itemId = ItemId(111L),
+                        raiderId = RaiderId(123L),
+                        guildId = GuildId(guildId),
+                        flpsScore = FlpsScore.of(0.8),
+                        tier = LootTier.MYTHIC,
+                    ),
+                    LootAward.create(
+                        itemId = ItemId(222L),
+                        raiderId = RaiderId(456L),
+                        guildId = GuildId(guildId),
+                        flpsScore = FlpsScore.of(0.7),
+                        tier = LootTier.HEROIC,
+                    ),
                 )
-            )
 
             every { listLootAwardsUseCase.executeByGuild(any()) } returns Result.success(awards)
 
@@ -576,9 +595,10 @@ class LootControllerTest : UnitTest() {
             // Given
             val guildId = "test-guild"
 
-            every { listLootAwardsUseCase.executeByGuild(any()) } returns Result.failure(
-                RuntimeException("Database error")
-            )
+            every { listLootAwardsUseCase.executeByGuild(any()) } returns
+                Result.failure(
+                    RuntimeException("Database error"),
+                )
 
             // When/Then
             try {
@@ -592,22 +612,22 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class ListLootAwardsPaginatedTest {
-
         @Test
         fun `listLootAwards should return paginated awards`() {
             // Given
             val guildId = "test-guild"
             val page = 0
             val size = 10
-            val awards = listOf(
-                LootAward.create(
-                    itemId = ItemId(111L),
-                    raiderId = RaiderId(123L),
-                    guildId = GuildId(guildId),
-                    flpsScore = FlpsScore.of(0.8),
-                    tier = LootTier.MYTHIC
+            val awards =
+                listOf(
+                    LootAward.create(
+                        itemId = ItemId(111L),
+                        raiderId = RaiderId(123L),
+                        guildId = GuildId(guildId),
+                        flpsScore = FlpsScore.of(0.8),
+                        tier = LootTier.MYTHIC,
+                    ),
                 )
-            )
             val paginatedResult = PaginatedLootAwards(awards, 25L)
 
             every { listLootAwardsUseCase.executeByGuildPaginated(any()) } returns Result.success(paginatedResult)
@@ -632,9 +652,10 @@ class LootControllerTest : UnitTest() {
             val page = 0
             val querySlot = slot<ListLootAwardsByGuildPaginatedQuery>()
 
-            every { listLootAwardsUseCase.executeByGuildPaginated(capture(querySlot)) } returns Result.success(
-                PaginatedLootAwards(emptyList(), 0L)
-            )
+            every { listLootAwardsUseCase.executeByGuildPaginated(capture(querySlot)) } returns
+                Result.success(
+                    PaginatedLootAwards(emptyList(), 0L),
+                )
 
             // When
             controller.listLootAwards(guildId, page, null)
@@ -652,9 +673,10 @@ class LootControllerTest : UnitTest() {
             val size = 10
             val querySlot = slot<ListLootAwardsByGuildPaginatedQuery>()
 
-            every { listLootAwardsUseCase.executeByGuildPaginated(capture(querySlot)) } returns Result.success(
-                PaginatedLootAwards(emptyList(), 0L)
-            )
+            every { listLootAwardsUseCase.executeByGuildPaginated(capture(querySlot)) } returns
+                Result.success(
+                    PaginatedLootAwards(emptyList(), 0L),
+                )
 
             // When
             controller.listLootAwards(guildId, page, size)
@@ -669,9 +691,10 @@ class LootControllerTest : UnitTest() {
             // Given
             val guildId = "test-guild"
 
-            every { listLootAwardsUseCase.executeByGuildPaginated(any()) } returns Result.failure(
-                RuntimeException("Query failed")
-            )
+            every { listLootAwardsUseCase.executeByGuildPaginated(any()) } returns
+                Result.failure(
+                    RuntimeException("Query failed"),
+                )
 
             // When/Then
             try {
@@ -685,18 +708,18 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class GetLootAwardTest {
-
         @Test
         fun `getLootAward should return award when found`() {
             // Given
             val awardId = "award-123"
-            val award = LootAward.create(
-                itemId = ItemId(12345L),
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC
-            )
+            val award =
+                LootAward.create(
+                    itemId = ItemId(12345L),
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                )
 
             every { getLootAwardUseCase.execute(any()) } returns Result.success(award)
 
@@ -719,13 +742,14 @@ class LootControllerTest : UnitTest() {
             // Given
             val awardId = "award-123"
             val querySlot = slot<GetLootAwardQuery>()
-            val award = LootAward.create(
-                itemId = ItemId(12345L),
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC
-            )
+            val award =
+                LootAward.create(
+                    itemId = ItemId(12345L),
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                )
 
             every { getLootAwardUseCase.execute(capture(querySlot)) } returns Result.success(award)
 
@@ -741,9 +765,10 @@ class LootControllerTest : UnitTest() {
             // Given
             val awardId = "non-existent"
 
-            every { getLootAwardUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Award not found: $awardId")
-            )
+            every { getLootAwardUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Award not found: $awardId"),
+                )
 
             // When/Then
             try {
@@ -757,7 +782,6 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class RevokeLootAwardTest {
-
         @Test
         fun `revokeLootAward should return NO_CONTENT when successful`() {
             // Given
@@ -794,9 +818,10 @@ class LootControllerTest : UnitTest() {
             // Given
             val awardId = "non-existent"
 
-            every { revokeLootAwardUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Award not found: $awardId")
-            )
+            every { revokeLootAwardUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Award not found: $awardId"),
+                )
 
             // When/Then
             try {
@@ -810,18 +835,18 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class GetLootBanTest {
-
         @Test
         fun `getLootBan should return ban when found`() {
             // Given
             val banId = "ban-123"
             val expiresAt = Instant.now().plusSeconds(86400)
-            val ban = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "Test ban reason",
-                expiresAt = expiresAt
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "Test ban reason",
+                    expiresAt = expiresAt,
+                )
 
             every { getLootBanUseCase.execute(any()) } returns Result.success(ban)
 
@@ -842,12 +867,13 @@ class LootControllerTest : UnitTest() {
             // Given
             val banId = "ban-123"
             val querySlot = slot<GetLootBanQuery>()
-            val ban = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "Test ban",
-                expiresAt = null
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "Test ban",
+                    expiresAt = null,
+                )
 
             every { getLootBanUseCase.execute(capture(querySlot)) } returns Result.success(ban)
 
@@ -863,9 +889,10 @@ class LootControllerTest : UnitTest() {
             // Given
             val banId = "non-existent"
 
-            every { getLootBanUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Ban not found: $banId")
-            )
+            every { getLootBanUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Ban not found: $banId"),
+                )
 
             // When/Then
             try {
@@ -879,22 +906,23 @@ class LootControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateLootBanTest {
-
         @Test
         fun `updateLootBan should return updated ban`() {
             // Given
             val banId = "ban-123"
             val newExpiry = Instant.now().plusSeconds(86400 * 7)
-            val request = UpdateLootBanRequest(
-                reason = "Updated reason",
-                expiresAt = newExpiry
-            )
-            val updatedBan = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "Updated reason",
-                expiresAt = newExpiry
-            )
+            val request =
+                UpdateLootBanRequest(
+                    reason = "Updated reason",
+                    expiresAt = newExpiry,
+                )
+            val updatedBan =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "Updated reason",
+                    expiresAt = newExpiry,
+                )
 
             every { updateLootBanUseCase.execute(any()) } returns Result.success(updatedBan)
 
@@ -915,17 +943,19 @@ class LootControllerTest : UnitTest() {
             // Given
             val banId = "ban-123"
             val newExpiry = Instant.now().plusSeconds(86400)
-            val request = UpdateLootBanRequest(
-                reason = "New reason",
-                expiresAt = newExpiry
-            )
+            val request =
+                UpdateLootBanRequest(
+                    reason = "New reason",
+                    expiresAt = newExpiry,
+                )
             val commandSlot = slot<UpdateLootBanCommand>()
-            val ban = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "New reason",
-                expiresAt = newExpiry
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "New reason",
+                    expiresAt = newExpiry,
+                )
 
             every { updateLootBanUseCase.execute(capture(commandSlot)) } returns Result.success(ban)
 
@@ -942,17 +972,19 @@ class LootControllerTest : UnitTest() {
         fun `updateLootBan should handle partial update with only reason`() {
             // Given
             val banId = "ban-123"
-            val request = UpdateLootBanRequest(
-                reason = "Only reason updated",
-                expiresAt = null
-            )
+            val request =
+                UpdateLootBanRequest(
+                    reason = "Only reason updated",
+                    expiresAt = null,
+                )
             val commandSlot = slot<UpdateLootBanCommand>()
-            val ban = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "Only reason updated",
-                expiresAt = null
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "Only reason updated",
+                    expiresAt = null,
+                )
 
             every { updateLootBanUseCase.execute(capture(commandSlot)) } returns Result.success(ban)
 
@@ -970,9 +1002,10 @@ class LootControllerTest : UnitTest() {
             val banId = "non-existent"
             val request = UpdateLootBanRequest(reason = "New reason")
 
-            every { updateLootBanUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Ban not found: $banId")
-            )
+            every { updateLootBanUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Ban not found: $banId"),
+                )
 
             // When/Then
             try {

@@ -13,7 +13,6 @@ import java.time.Instant
  * Unit tests for RaiderPerformanceData value object.
  */
 class RaiderPerformanceDataTest : UnitTest() {
-
     @Nested
     inner class ConstructorValidationTests {
         @Test
@@ -24,17 +23,18 @@ class RaiderPerformanceDataTest : UnitTest() {
             val periodEnd = Instant.now()
 
             // When
-            val data = RaiderPerformanceData(
-                raiderId = raiderId,
-                characterName = "TestChar",
-                characterRealm = "Area52",
-                totalDeaths = 5,
-                totalFights = 20,
-                deathsPerAttempt = 0.25,
-                avoidableDamagePercentage = 15.5,
-                periodStart = periodStart,
-                periodEnd = periodEnd
-            )
+            val data =
+                RaiderPerformanceData(
+                    raiderId = raiderId,
+                    characterName = "TestChar",
+                    characterRealm = "Area52",
+                    totalDeaths = 5,
+                    totalFights = 20,
+                    deathsPerAttempt = 0.25,
+                    avoidableDamagePercentage = 15.5,
+                    periodStart = periodStart,
+                    periodEnd = periodEnd,
+                )
 
             // Then
             data.raiderId shouldBe raiderId
@@ -51,93 +51,98 @@ class RaiderPerformanceDataTest : UnitTest() {
         @Test
         fun `should fail when total deaths is negative`() {
             // When/Then
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderPerformanceData(
-                    raiderId = RaiderId(1L),
-                    characterName = "TestChar",
-                    characterRealm = "Area52",
-                    totalDeaths = -1,
-                    totalFights = 10,
-                    deathsPerAttempt = 0.0,
-                    avoidableDamagePercentage = 10.0,
-                    periodStart = Instant.now(),
-                    periodEnd = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderPerformanceData(
+                        raiderId = RaiderId(1L),
+                        characterName = "TestChar",
+                        characterRealm = "Area52",
+                        totalDeaths = -1,
+                        totalFights = 10,
+                        deathsPerAttempt = 0.0,
+                        avoidableDamagePercentage = 10.0,
+                        periodStart = Instant.now(),
+                        periodEnd = Instant.now(),
+                    )
+                }
             exception.message shouldBe "Total deaths cannot be negative"
         }
 
         @Test
         fun `should fail when total fights is negative`() {
             // When/Then
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderPerformanceData(
-                    raiderId = RaiderId(1L),
-                    characterName = "TestChar",
-                    characterRealm = "Area52",
-                    totalDeaths = 0,
-                    totalFights = -1,
-                    deathsPerAttempt = 0.0,
-                    avoidableDamagePercentage = 10.0,
-                    periodStart = Instant.now(),
-                    periodEnd = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderPerformanceData(
+                        raiderId = RaiderId(1L),
+                        characterName = "TestChar",
+                        characterRealm = "Area52",
+                        totalDeaths = 0,
+                        totalFights = -1,
+                        deathsPerAttempt = 0.0,
+                        avoidableDamagePercentage = 10.0,
+                        periodStart = Instant.now(),
+                        periodEnd = Instant.now(),
+                    )
+                }
             exception.message shouldBe "Total fights cannot be negative"
         }
 
         @Test
         fun `should fail when deaths per attempt is negative`() {
             // When/Then
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderPerformanceData(
-                    raiderId = RaiderId(1L),
-                    characterName = "TestChar",
-                    characterRealm = "Area52",
-                    totalDeaths = 0,
-                    totalFights = 10,
-                    deathsPerAttempt = -0.5,
-                    avoidableDamagePercentage = 10.0,
-                    periodStart = Instant.now(),
-                    periodEnd = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderPerformanceData(
+                        raiderId = RaiderId(1L),
+                        characterName = "TestChar",
+                        characterRealm = "Area52",
+                        totalDeaths = 0,
+                        totalFights = 10,
+                        deathsPerAttempt = -0.5,
+                        avoidableDamagePercentage = 10.0,
+                        periodStart = Instant.now(),
+                        periodEnd = Instant.now(),
+                    )
+                }
             exception.message shouldBe "Deaths per attempt cannot be negative"
         }
 
         @Test
         fun `should fail when avoidable damage percentage is negative`() {
             // When/Then
-            val exception = shouldThrow<IllegalArgumentException> {
-                RaiderPerformanceData(
-                    raiderId = RaiderId(1L),
-                    characterName = "TestChar",
-                    characterRealm = "Area52",
-                    totalDeaths = 0,
-                    totalFights = 10,
-                    deathsPerAttempt = 0.0,
-                    avoidableDamagePercentage = -5.0,
-                    periodStart = Instant.now(),
-                    periodEnd = Instant.now()
-                )
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    RaiderPerformanceData(
+                        raiderId = RaiderId(1L),
+                        characterName = "TestChar",
+                        characterRealm = "Area52",
+                        totalDeaths = 0,
+                        totalFights = 10,
+                        deathsPerAttempt = 0.0,
+                        avoidableDamagePercentage = -5.0,
+                        periodStart = Instant.now(),
+                        periodEnd = Instant.now(),
+                    )
+                }
             exception.message shouldBe "Avoidable damage percentage cannot be negative"
         }
 
         @Test
         fun `should allow zero values for all metrics`() {
             // When
-            val data = RaiderPerformanceData(
-                raiderId = RaiderId(1L),
-                characterName = "TestChar",
-                characterRealm = "Area52",
-                totalDeaths = 0,
-                totalFights = 0,
-                deathsPerAttempt = 0.0,
-                avoidableDamagePercentage = 0.0,
-                periodStart = Instant.now(),
-                periodEnd = Instant.now()
-            )
+            val data =
+                RaiderPerformanceData(
+                    raiderId = RaiderId(1L),
+                    characterName = "TestChar",
+                    characterRealm = "Area52",
+                    totalDeaths = 0,
+                    totalFights = 0,
+                    deathsPerAttempt = 0.0,
+                    avoidableDamagePercentage = 0.0,
+                    periodStart = Instant.now(),
+                    periodEnd = Instant.now(),
+                )
 
             // Then
             data.totalDeaths shouldBe 0
@@ -156,16 +161,17 @@ class RaiderPerformanceDataTest : UnitTest() {
             val periodEnd = Instant.now()
 
             // When
-            val data = RaiderPerformanceData.create(
-                raiderId = RaiderId(1L),
-                characterName = "TestChar",
-                characterRealm = "Area52",
-                totalDeaths = 10,
-                totalFights = 20,
-                avoidableDamagePercentage = 25.0,
-                periodStart = periodStart,
-                periodEnd = periodEnd
-            )
+            val data =
+                RaiderPerformanceData.create(
+                    raiderId = RaiderId(1L),
+                    characterName = "TestChar",
+                    characterRealm = "Area52",
+                    totalDeaths = 10,
+                    totalFights = 20,
+                    avoidableDamagePercentage = 25.0,
+                    periodStart = periodStart,
+                    periodEnd = periodEnd,
+                )
 
             // Then
             data.deathsPerAttempt shouldBe (0.5 plusOrMinus 0.001)
@@ -176,16 +182,17 @@ class RaiderPerformanceDataTest : UnitTest() {
         @Test
         fun `create should handle zero fights gracefully`() {
             // When
-            val data = RaiderPerformanceData.create(
-                raiderId = RaiderId(1L),
-                characterName = "TestChar",
-                characterRealm = "Area52",
-                totalDeaths = 0,
-                totalFights = 0,
-                avoidableDamagePercentage = 0.0,
-                periodStart = Instant.now(),
-                periodEnd = Instant.now()
-            )
+            val data =
+                RaiderPerformanceData.create(
+                    raiderId = RaiderId(1L),
+                    characterName = "TestChar",
+                    characterRealm = "Area52",
+                    totalDeaths = 0,
+                    totalFights = 0,
+                    avoidableDamagePercentage = 0.0,
+                    periodStart = Instant.now(),
+                    periodEnd = Instant.now(),
+                )
 
             // Then
             data.deathsPerAttempt shouldBe 0.0
@@ -195,11 +202,12 @@ class RaiderPerformanceDataTest : UnitTest() {
         @Test
         fun `empty should create data with zero metrics`() {
             // When
-            val data = RaiderPerformanceData.empty(
-                raiderId = RaiderId(1L),
-                characterName = "TestChar",
-                characterRealm = "Area52"
-            )
+            val data =
+                RaiderPerformanceData.empty(
+                    raiderId = RaiderId(1L),
+                    characterName = "TestChar",
+                    characterRealm = "Area52",
+                )
 
             // Then
             data.raiderId.value shouldBe 1L

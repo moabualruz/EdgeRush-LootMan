@@ -24,7 +24,6 @@ import org.springframework.http.MediaType
  * - Guild settings management
  */
 class GuildControllerIntegrationTest : IntegrationTest() {
-
     private fun createRequest(
         id: String = "test-guild",
         name: String = "Test Guild",
@@ -32,17 +31,18 @@ class GuildControllerIntegrationTest : IntegrationTest() {
         realm: String? = "TestRealm",
         region: String = "US",
         syncEnabled: Boolean = true,
-        benchmarkMode: String = "THEORETICAL"
+        benchmarkMode: String = "THEORETICAL",
     ): HttpEntity<CreateGuildRequest> {
-        val request = CreateGuildRequest(
-            id = id,
-            name = name,
-            description = description,
-            realm = realm,
-            region = region,
-            syncEnabled = syncEnabled,
-            benchmarkMode = benchmarkMode
-        )
+        val request =
+            CreateGuildRequest(
+                id = id,
+                name = name,
+                description = description,
+                realm = realm,
+                region = region,
+                syncEnabled = syncEnabled,
+                benchmarkMode = benchmarkMode,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -53,15 +53,16 @@ class GuildControllerIntegrationTest : IntegrationTest() {
         description: String? = null,
         syncEnabled: Boolean? = null,
         benchmarkMode: String? = null,
-        isActive: Boolean? = null
+        isActive: Boolean? = null,
     ): HttpEntity<UpdateGuildRequest> {
-        val request = UpdateGuildRequest(
-            name = name,
-            description = description,
-            syncEnabled = syncEnabled,
-            benchmarkMode = benchmarkMode,
-            isActive = isActive
-        )
+        val request =
+            UpdateGuildRequest(
+                name = name,
+                description = description,
+                syncEnabled = syncEnabled,
+                benchmarkMode = benchmarkMode,
+                isActive = isActive,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -75,11 +76,12 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = "new-guild", name = "New Guild")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/guilds",
-                entity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/guilds",
+                    entity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -99,15 +101,16 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 entity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // Then - verify in database
-            val guildCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM guilds WHERE id = ?",
-                Long::class.java,
-                "persist-guild"
-            )
+            val guildCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM guilds WHERE id = ?",
+                    Long::class.java,
+                    "persist-guild",
+                )
             guildCount shouldBe 1L
         }
 
@@ -117,11 +120,12 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = "sync-guild", name = "Sync Guild", syncEnabled = true)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/guilds",
-                entity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/guilds",
+                    entity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -132,22 +136,24 @@ class GuildControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should create guild with all settings`() {
             // Given
-            val entity = createRequest(
-                id = "full-guild",
-                name = "Full Guild",
-                description = "Full description",
-                realm = "FullRealm",
-                region = "EU",
-                syncEnabled = false,
-                benchmarkMode = "TOP_PERFORMER"
-            )
+            val entity =
+                createRequest(
+                    id = "full-guild",
+                    name = "Full Guild",
+                    description = "Full description",
+                    realm = "FullRealm",
+                    region = "EU",
+                    syncEnabled = false,
+                    benchmarkMode = "TOP_PERFORMER",
+                )
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/guilds",
-                entity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/guilds",
+                    entity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -168,14 +174,15 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds/get-guild",
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds/get-guild",
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -186,10 +193,11 @@ class GuildControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return 404 when guild not found`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds/non-existent-guild",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds/non-existent-guild",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -205,18 +213,19 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(name = "Updated Name", description = "Updated description")
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/update-guild",
-                HttpMethod.PUT,
-                updateEntity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/update-guild",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -231,18 +240,19 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(syncEnabled = false, benchmarkMode = "TOP_PERFORMER")
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/settings-guild",
-                HttpMethod.PUT,
-                updateEntity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/settings-guild",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -257,7 +267,7 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(name = "Persisted Update")
@@ -267,15 +277,16 @@ class GuildControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/guilds/persist-update-guild",
                 HttpMethod.PUT,
                 updateEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // Then - verify in database
-            val name = jdbcTemplate.queryForObject(
-                "SELECT name FROM guilds WHERE id = ?",
-                String::class.java,
-                "persist-update-guild"
-            )
+            val name =
+                jdbcTemplate.queryForObject(
+                    "SELECT name FROM guilds WHERE id = ?",
+                    String::class.java,
+                    "persist-update-guild",
+                )
             name shouldBe "Persisted Update"
         }
 
@@ -285,12 +296,13 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             val updateEntity = createUpdateRequest(name = "Updated")
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/non-existent-guild",
-                HttpMethod.PUT,
-                updateEntity,
-                String::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/non-existent-guild",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -303,23 +315,24 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(isActive = false)
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/deactivate-guild",
-                HttpMethod.PUT,
-                updateEntity,
-                TestGuildResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/deactivate-guild",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestGuildResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
             response.body?.isActive shouldBe false
-            response.body?.canSync shouldBe false  // canSync should be false when inactive
+            response.body?.canSync shouldBe false // canSync should be false when inactive
         }
     }
 
@@ -332,16 +345,17 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/delete-guild",
-                HttpMethod.DELETE,
-                null,
-                Void::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/delete-guild",
+                    HttpMethod.DELETE,
+                    null,
+                    Void::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NO_CONTENT
@@ -354,7 +368,7 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 createEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // When
@@ -362,27 +376,29 @@ class GuildControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/guilds/remove-guild",
                 HttpMethod.DELETE,
                 null,
-                Void::class.java
+                Void::class.java,
             )
 
             // Then - verify removed from database
-            val guildCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM guilds WHERE id = ?",
-                Long::class.java,
-                "remove-guild"
-            )
+            val guildCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM guilds WHERE id = ?",
+                    Long::class.java,
+                    "remove-guild",
+                )
             guildCount shouldBe 0L
         }
 
         @Test
         fun `should return 404 when deleting non-existent guild`() {
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/guilds/non-existent-guild",
-                HttpMethod.DELETE,
-                null,
-                String::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/guilds/non-existent-guild",
+                    HttpMethod.DELETE,
+                    null,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -399,15 +415,16 @@ class GuildControllerIntegrationTest : IntegrationTest() {
                 restTemplate.postForEntity(
                     "/api/v1/guilds",
                     entity,
-                    TestGuildResponse::class.java
+                    TestGuildResponse::class.java,
                 )
             }
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds",
-                TestGuildListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds",
+                    TestGuildListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -419,10 +436,11 @@ class GuildControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return empty list when no guilds exist`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds",
-                TestGuildListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds",
+                    TestGuildListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -440,14 +458,14 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 activeEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val inactiveEntity = createRequest(id = "inactive-guild", name = "Inactive Guild")
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 inactiveEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // Deactivate the second guild
@@ -456,14 +474,15 @@ class GuildControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/guilds/inactive-guild",
                 HttpMethod.PUT,
                 updateEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds/active",
-                TestGuildListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds/active",
+                    TestGuildListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -478,7 +497,7 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/guilds",
                 entity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(isActive = false)
@@ -486,14 +505,15 @@ class GuildControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/guilds/all-inactive-guild",
                 HttpMethod.PUT,
                 updateEntity,
-                TestGuildResponse::class.java
+                TestGuildResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds/active",
-                TestGuildListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds/active",
+                    TestGuildListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -509,11 +529,12 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = "json-guild", name = "JSON Guild")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/guilds",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/guilds",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -537,10 +558,11 @@ class GuildControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity("/api/v1/guilds", entity, TestGuildResponse::class.java)
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/guilds",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/guilds",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -568,10 +590,10 @@ data class TestGuildResponse(
     val isActive: Boolean,
     val canSync: Boolean,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
 )
 
 data class TestGuildListResponse(
     val guilds: List<TestGuildResponse>,
-    val count: Int
+    val count: Int,
 )

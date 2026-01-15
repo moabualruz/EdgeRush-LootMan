@@ -91,6 +91,6 @@ class ApplicationQuestionFileControllerTest : UnitTest() {
         questionPosition: Int? = 1,
         question: String? = "What is your experience?",
         originalFilename: String? = "screenshot.png",
-        url: String? = "https://example.com/file.png"
+        url: String? = "https://example.com/file.png",
     ) = ApplicationQuestionFileResponse(id, applicationId, questionPosition, question, originalFilename, url)
 }

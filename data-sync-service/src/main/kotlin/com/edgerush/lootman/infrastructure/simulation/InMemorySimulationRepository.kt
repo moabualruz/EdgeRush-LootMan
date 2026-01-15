@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicLong
  */
 @Repository("inMemorySimulationRepository")
 class InMemorySimulationRepository : SimulationRepository {
-
     private val profileIdGenerator = AtomicLong(1)
     private val requestIdGenerator = AtomicLong(1)
 
@@ -54,7 +53,7 @@ class InMemorySimulationRepository : SimulationRepository {
     override fun findProfileByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): SimulationProfile? {
         val characterKey = buildCharacterKey(guildId, characterName, characterRealm)
         val profileId = profilesByCharacter[characterKey] ?: return null
@@ -64,19 +63,20 @@ class InMemorySimulationRepository : SimulationRepository {
     override fun findProfileIdByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long? {
         val characterKey = buildCharacterKey(guildId, characterName, characterRealm)
         return profilesByCharacter[characterKey]
     }
 
     override fun saveRequest(request: SimulationRequest): SimulationRequest {
-        val savedRequest = if (request.id == null) {
-            val newId = requestIdGenerator.getAndIncrement()
-            request.withId(newId)
-        } else {
-            request
-        }
+        val savedRequest =
+            if (request.id == null) {
+                val newId = requestIdGenerator.getAndIncrement()
+                request.withId(newId)
+            } else {
+                request
+            }
 
         requests[savedRequest.id!!] = savedRequest
         return savedRequest
@@ -88,11 +88,17 @@ class InMemorySimulationRepository : SimulationRepository {
         return requests.values.filter { it.status == SimulationStatus.PENDING }
     }
 
-    override fun saveResult(profileId: Long, result: SimulationResult) {
+    override fun saveResult(
+        profileId: Long,
+        result: SimulationResult,
+    ) {
         results.computeIfAbsent(profileId) { mutableListOf() }.add(result)
     }
 
-    override fun findLatestResultForItem(profileId: Long, itemId: Long): SimulationResult? {
+    override fun findLatestResultForItem(
+        profileId: Long,
+        itemId: Long,
+    ): SimulationResult? {
         return results[profileId]
             ?.filter { it.itemId == itemId }
             ?.maxByOrNull { it.simulatedAt }
@@ -114,7 +120,11 @@ class InMemorySimulationRepository : SimulationRepository {
         requestIdGenerator.set(1)
     }
 
-    private fun buildCharacterKey(guildId: String, characterName: String, characterRealm: String): String {
+    private fun buildCharacterKey(
+        guildId: String,
+        characterName: String,
+        characterRealm: String,
+    ): String {
         return "${guildId.lowercase()}-${characterName.lowercase()}-${characterRealm.lowercase()}"
     }
 }

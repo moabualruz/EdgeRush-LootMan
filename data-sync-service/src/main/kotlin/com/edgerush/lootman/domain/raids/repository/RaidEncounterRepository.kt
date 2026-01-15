@@ -31,7 +31,10 @@ interface RaidEncounterRepository {
      * @param limit The maximum number of records to return
      * @return List of encounter entities
      */
-    fun findAll(offset: Long, limit: Int): List<RaidEncounterEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity>
 
     /**
      * Counts all encounters.
@@ -48,7 +51,11 @@ interface RaidEncounterRepository {
      * @param limit The maximum number of records to return
      * @return List of encounter entities for the raid
      */
-    fun findByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidEncounterEntity>
+    fun findByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity>
 
     /**
      * Counts encounters for a raid.
@@ -66,7 +73,11 @@ interface RaidEncounterRepository {
      * @param limit The maximum number of records to return
      * @return List of enabled encounter entities for the raid
      */
-    fun findEnabledByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidEncounterEntity>
+    fun findEnabledByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEncounterEntity>
 
     /**
      * Counts enabled encounters for a raid.

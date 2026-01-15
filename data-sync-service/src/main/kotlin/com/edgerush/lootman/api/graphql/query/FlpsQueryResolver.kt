@@ -23,7 +23,6 @@ class FlpsQueryResolver(
     private val getRaiderFlpsUseCase: GetRaiderFlpsUseCase,
     private val getFlpsReportUseCase: GetFlpsReportUseCase,
 ) : Query {
-
     /**
      * Calculate FLPS score for a specific raider and item.
      *
@@ -33,12 +32,17 @@ class FlpsQueryResolver(
      * @return The FLPS score with breakdown if calculation succeeds, null if raider not found
      * @throws RuntimeException for non-NotFound errors
      */
-    fun flpsScore(guildId: String, raiderId: String, itemId: String): FlpsScoreType? {
-        val query = GetRaiderFlpsQuery(
-            guildId = GuildId(guildId),
-            raiderId = RaiderId(raiderId.toLong()),
-            itemId = ItemId(itemId.toLong()),
-        )
+    fun flpsScore(
+        guildId: String,
+        raiderId: String,
+        itemId: String,
+    ): FlpsScoreType? {
+        val query =
+            GetRaiderFlpsQuery(
+                guildId = GuildId(guildId),
+                raiderId = RaiderId(raiderId.toLong()),
+                itemId = ItemId(itemId.toLong()),
+            )
         return getRaiderFlpsUseCase.execute(query)
             .map { it.toGraphQLType() }
             .getOrElse { exception ->
@@ -58,10 +62,11 @@ class FlpsQueryResolver(
      * @throws RuntimeException on errors
      */
     fun flpsReport(guildId: String): FlpsReportType {
-        val query = GetFlpsReportQuery(
-            guildId = GuildId(guildId),
-            calculations = emptyList(), // Calculations are populated by the use case or upstream
-        )
+        val query =
+            GetFlpsReportQuery(
+                guildId = GuildId(guildId),
+                calculations = emptyList(), // Calculations are populated by the use case or upstream
+            )
         return getFlpsReportUseCase.execute(query)
             .map { it.toGraphQLType() }
             .getOrThrow()
@@ -88,15 +93,15 @@ data class FlpsScoreType(
  * - Time factor: RDF (Recency Decay Factor)
  */
 data class FlpsBreakdownType(
-    val acs: Double,  // Attendance Commitment Score
-    val mas: Double,  // Mechanical Adherence Score
-    val eps: Double,  // External Preparation Score
-    val rms: Double,  // Raider Merit Score (aggregated)
-    val uv: Double,   // Upgrade Value
-    val tb: Double,   // Tier Bonus
-    val rm: Double,   // Role Multiplier
-    val ipi: Double,  // Item Priority Index (aggregated)
-    val rdf: Double,  // Recency Decay Factor
+    val acs: Double, // Attendance Commitment Score
+    val mas: Double, // Mechanical Adherence Score
+    val eps: Double, // External Preparation Score
+    val rms: Double, // Raider Merit Score (aggregated)
+    val uv: Double, // Upgrade Value
+    val tb: Double, // Tier Bonus
+    val rm: Double, // Role Multiplier
+    val ipi: Double, // Item Priority Index (aggregated)
+    val rdf: Double, // Recency Decay Factor
 )
 
 /**
@@ -110,28 +115,31 @@ data class FlpsReportType(
 /**
  * Extension function to convert FlpsCalculationResult to GraphQL FlpsScoreType.
  */
-private fun FlpsCalculationResult.toGraphQLType(): FlpsScoreType = FlpsScoreType(
-    value = this.flps.value,
-    raiderId = this.raiderId.value.toString(),
-    itemId = this.itemId.value.toString(),
-    eligible = this.eligible,
-    breakdown = FlpsBreakdownType(
-        acs = this.acs.value,
-        mas = this.mas.value,
-        eps = this.eps.value,
-        rms = this.rms.value,
-        uv = this.uv.value,
-        tb = this.tb.value,
-        rm = this.rm.value,
-        ipi = this.ipi.value,
-        rdf = this.rdf.value,
-    ),
-)
+private fun FlpsCalculationResult.toGraphQLType(): FlpsScoreType =
+    FlpsScoreType(
+        value = this.flps.value,
+        raiderId = this.raiderId.value.toString(),
+        itemId = this.itemId.value.toString(),
+        eligible = this.eligible,
+        breakdown =
+            FlpsBreakdownType(
+                acs = this.acs.value,
+                mas = this.mas.value,
+                eps = this.eps.value,
+                rms = this.rms.value,
+                uv = this.uv.value,
+                tb = this.tb.value,
+                rm = this.rm.value,
+                ipi = this.ipi.value,
+                rdf = this.rdf.value,
+            ),
+    )
 
 /**
  * Extension function to convert FlpsReport to GraphQL FlpsReportType.
  */
-private fun FlpsReport.toGraphQLType(): FlpsReportType = FlpsReportType(
-    guildId = this.guildId.value,
-    scores = this.calculations.map { it.toGraphQLType() },
-)
+private fun FlpsReport.toGraphQLType(): FlpsReportType =
+    FlpsReportType(
+        guildId = this.guildId.value,
+        scores = this.calculations.map { it.toGraphQLType() },
+    )

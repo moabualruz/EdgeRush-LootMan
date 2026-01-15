@@ -31,7 +31,6 @@ class TeamRaidDayController(
     private val teamRaidDayService: TeamRaidDayCrudService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @GetMapping
     @Operation(summary = "Find all team raid days with pagination")
     fun findAll(
@@ -40,12 +39,13 @@ class TeamRaidDayController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<TeamRaidDayResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return teamRaidDayService.findAll(pageRequest)
     }
 
@@ -106,12 +106,13 @@ class TeamRaidDayController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<TeamRaidDayResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return teamRaidDayService.findByTeamId(teamId, pageRequest)
     }
 

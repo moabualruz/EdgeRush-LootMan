@@ -19,14 +19,14 @@ import java.time.LocalDateTime
 class JdbcBehavioralActionRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : BehavioralActionRepository {
-
     override fun findById(id: Long): BehavioralActionEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, character_name, action_type, deduction_amount,
                    reason, applied_by, applied_at, expires_at, is_active
             FROM behavioral_actions
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, behavioralActionRowMapper, id)
         return results.firstOrNull()
@@ -38,14 +38,18 @@ class JdbcBehavioralActionRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<BehavioralActionEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, action_type, deduction_amount,
                    reason, applied_by, applied_at, expires_at, is_active
             FROM behavioral_actions
             ORDER BY applied_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, behavioralActionRowMapper, limit, offset)
     }
@@ -55,15 +59,20 @@ class JdbcBehavioralActionRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByGuildId(guildId: String, offset: Long, limit: Int): List<BehavioralActionEntity> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, action_type, deduction_amount,
                    reason, applied_by, applied_at, expires_at, is_active
             FROM behavioral_actions
             WHERE guild_id = ?
             ORDER BY applied_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, behavioralActionRowMapper, guildId, limit, offset)
     }
@@ -73,8 +82,13 @@ class JdbcBehavioralActionRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId) ?: 0L
     }
 
-    override fun findActiveByGuildId(guildId: String, offset: Long, limit: Int): List<BehavioralActionEntity> {
-        val sql = """
+    override fun findActiveByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, action_type, deduction_amount,
                    reason, applied_by, applied_at, expires_at, is_active
             FROM behavioral_actions
@@ -82,40 +96,54 @@ class JdbcBehavioralActionRepository(
             AND (expires_at IS NULL OR expires_at > ?)
             ORDER BY applied_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, behavioralActionRowMapper, guildId, Timestamp.valueOf(LocalDateTime.now()), limit, offset)
     }
 
     override fun countActiveByGuildId(guildId: String): Long {
-        val sql = """
+        val sql =
+            """
             SELECT COUNT(*) FROM behavioral_actions
             WHERE guild_id = ? AND is_active = true
             AND (expires_at IS NULL OR expires_at > ?)
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId, Timestamp.valueOf(LocalDateTime.now())) ?: 0L
     }
 
-    override fun findByCharacter(guildId: String, characterName: String, offset: Long, limit: Int): List<BehavioralActionEntity> {
-        val sql = """
+    override fun findByCharacter(
+        guildId: String,
+        characterName: String,
+        offset: Long,
+        limit: Int,
+    ): List<BehavioralActionEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, action_type, deduction_amount,
                    reason, applied_by, applied_at, expires_at, is_active
             FROM behavioral_actions
             WHERE guild_id = ? AND character_name = ?
             ORDER BY applied_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, behavioralActionRowMapper, guildId, characterName, limit, offset)
     }
 
-    override fun countByCharacter(guildId: String, characterName: String): Long {
+    override fun countByCharacter(
+        guildId: String,
+        characterName: String,
+    ): Long {
         val sql = "SELECT COUNT(*) FROM behavioral_actions WHERE guild_id = ? AND character_name = ?"
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId, characterName) ?: 0L
     }
 
-    override fun getTotalActiveDeduction(guildId: String, characterName: String): Double {
-        val sql = """
+    override fun getTotalActiveDeduction(
+        guildId: String,
+        characterName: String,
+    ): Double {
+        val sql =
+            """
             SELECT COALESCE(SUM(
                 CASE WHEN action_type = 'DEDUCTION' THEN deduction_amount
                      WHEN action_type = 'RESTORATION' THEN -deduction_amount
@@ -125,7 +153,7 @@ class JdbcBehavioralActionRepository(
             FROM behavioral_actions
             WHERE guild_id = ? AND character_name = ? AND is_active = true
             AND (expires_at IS NULL OR expires_at > ?)
-        """.trimIndent()
+            """.trimIndent()
         val total = jdbcTemplate.queryForObject(sql, Double::class.java, guildId, characterName, Timestamp.valueOf(LocalDateTime.now())) ?: 0.0
         return maxOf(0.0, minOf(1.0, total))
     }
@@ -145,12 +173,13 @@ class JdbcBehavioralActionRepository(
     }
 
     private fun insertBehavioralAction(entity: BehavioralActionEntity): BehavioralActionEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO behavioral_actions (
                 guild_id, character_name, action_type, deduction_amount,
                 reason, applied_by, applied_at, expires_at, is_active
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -172,7 +201,8 @@ class JdbcBehavioralActionRepository(
     }
 
     private fun updateBehavioralAction(entity: BehavioralActionEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE behavioral_actions SET
                 guild_id = ?,
                 character_name = ?,
@@ -184,7 +214,7 @@ class JdbcBehavioralActionRepository(
                 expires_at = ?,
                 is_active = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -201,21 +231,22 @@ class JdbcBehavioralActionRepository(
         )
     }
 
-    private val behavioralActionRowMapper = RowMapper { rs, _ ->
-        val expiresAtTimestamp = rs.getTimestamp("expires_at")
-        val expiresAt = expiresAtTimestamp?.toLocalDateTime()
+    private val behavioralActionRowMapper =
+        RowMapper { rs, _ ->
+            val expiresAtTimestamp = rs.getTimestamp("expires_at")
+            val expiresAt = expiresAtTimestamp?.toLocalDateTime()
 
-        BehavioralActionEntity(
-            id = rs.getLong("id"),
-            guildId = rs.getString("guild_id"),
-            characterName = rs.getString("character_name"),
-            actionType = rs.getString("action_type"),
-            deductionAmount = rs.getDouble("deduction_amount"),
-            reason = rs.getString("reason"),
-            appliedBy = rs.getString("applied_by"),
-            appliedAt = rs.getTimestamp("applied_at").toLocalDateTime(),
-            expiresAt = expiresAt,
-            isActive = rs.getBoolean("is_active"),
-        )
-    }
+            BehavioralActionEntity(
+                id = rs.getLong("id"),
+                guildId = rs.getString("guild_id"),
+                characterName = rs.getString("character_name"),
+                actionType = rs.getString("action_type"),
+                deductionAmount = rs.getDouble("deduction_amount"),
+                reason = rs.getString("reason"),
+                appliedBy = rs.getString("applied_by"),
+                appliedAt = rs.getTimestamp("applied_at").toLocalDateTime(),
+                expiresAt = expiresAt,
+                isActive = rs.getBoolean("is_active"),
+            )
+        }
 }

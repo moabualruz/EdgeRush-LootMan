@@ -31,7 +31,6 @@ class RaiderVaultSlotController(
     private val vaultSlotService: RaiderVaultSlotCrudService,
     private val paginationProperties: PaginationProperties,
 ) {
-
     @GetMapping
     @Operation(summary = "Find all vault slots with pagination")
     fun findAll(
@@ -40,12 +39,13 @@ class RaiderVaultSlotController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaiderVaultSlotResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return vaultSlotService.findAll(pageRequest)
     }
 
@@ -106,12 +106,13 @@ class RaiderVaultSlotController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaiderVaultSlotResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return vaultSlotService.findByRaider(raiderId, pageRequest)
     }
 
@@ -125,12 +126,13 @@ class RaiderVaultSlotController(
         @Parameter(description = "Page size")
         @RequestParam(required = false) size: Int?,
     ): PagedResponse<RaiderVaultSlotResponse> {
-        val pageRequest = PageRequest.withDefaults(
-            page = page,
-            size = size,
-            defaultSize = paginationProperties.defaultPageSize,
-            maxPageSize = paginationProperties.maxPageSize,
-        )
+        val pageRequest =
+            PageRequest.withDefaults(
+                page = page,
+                size = size,
+                defaultSize = paginationProperties.defaultPageSize,
+                maxPageSize = paginationProperties.maxPageSize,
+            )
         return vaultSlotService.findUnlockedByRaider(raiderId, pageRequest)
     }
 

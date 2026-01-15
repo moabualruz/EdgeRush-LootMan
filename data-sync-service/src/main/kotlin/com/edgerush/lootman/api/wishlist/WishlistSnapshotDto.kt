@@ -35,12 +35,14 @@ data class WishlistSnapshotResponse(
     val syncedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(e: WishlistSnapshotEntity) = WishlistSnapshotResponse(
-            e.id!!, e.raiderId, e.characterName, e.characterRealm, e.characterRegion,
-            e.teamId, e.seasonId, e.periodId, e.rawPayload, e.syncedAt
-        )
+        fun from(e: WishlistSnapshotEntity) =
+            WishlistSnapshotResponse(
+                e.id!!, e.raiderId, e.characterName, e.characterRealm, e.characterRegion,
+                e.teamId, e.seasonId, e.periodId, e.rawPayload, e.syncedAt,
+            )
     }
 }
 
 data class WishlistSnapshotExistsResponse(val exists: Boolean)
+
 data class WishlistSnapshotCountResponse(val count: Long)

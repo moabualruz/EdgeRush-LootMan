@@ -6,7 +6,6 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.Status
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -14,10 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate
  * Unit tests for custom health indicators.
  */
 class HealthIndicatorTest : UnitTest() {
-
     @Nested
     inner class DatabaseHealthIndicatorTests {
-
         @Test
         fun `should return UP when database is accessible`() {
             // Given
@@ -51,7 +48,6 @@ class HealthIndicatorTest : UnitTest() {
 
     @Nested
     inner class WarcraftLogsHealthIndicatorTests {
-
         @Test
         fun `should return UP when WarcraftLogs API is available`() {
             // Given
@@ -94,7 +90,6 @@ class HealthIndicatorTest : UnitTest() {
 
     @Nested
     inner class WoWAuditHealthIndicatorTests {
-
         @Test
         fun `should return UP when WoWAudit API is available`() {
             // Given
@@ -137,7 +132,6 @@ class HealthIndicatorTest : UnitTest() {
 
     @Nested
     inner class DatabaseHealthIndicatorErrorHandlingTests {
-
         @Test
         fun `should handle exception with null message`() {
             // Given

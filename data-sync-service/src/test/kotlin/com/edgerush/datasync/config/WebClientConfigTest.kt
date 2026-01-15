@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +23,6 @@ import java.util.function.Consumer
  * authentication headers, and memory settings.
  */
 class WebClientConfigTest : UnitTest() {
-
     @MockK(relaxed = true)
     private lateinit var webClientBuilder: WebClient.Builder
 
@@ -44,7 +42,6 @@ class WebClientConfigTest : UnitTest() {
 
     @Nested
     inner class WowauditWebClientBean {
-
         @Test
         fun `should configure base URL from properties`() {
             // Arrange
@@ -100,7 +97,6 @@ class WebClientConfigTest : UnitTest() {
 
     @Nested
     inner class DefaultHeaders {
-
         @Test
         fun `should set bearer auth when API key is provided`() {
             // Arrange
@@ -235,7 +231,6 @@ class WebClientConfigTest : UnitTest() {
 
     @Nested
     inner class ExchangeStrategiesConfiguration {
-
         @Test
         fun `should configure exchange strategies`() {
             // Arrange
@@ -251,20 +246,21 @@ class WebClientConfigTest : UnitTest() {
 
     @Nested
     inner class EdgeCases {
-
         @Test
         fun `should handle properties with all nullable fields as null`() {
             // Arrange
-            val wowAuditProperties = WoWAuditProperties(
-                baseUrl = "https://wowaudit.com",
-                guildProfileUri = null,
-                apiKey = null,
-            )
-            val properties = SyncProperties(
-                cron = "0 0 4 * * *",
-                runOnStartup = false,
-                wowaudit = wowAuditProperties,
-            )
+            val wowAuditProperties =
+                WoWAuditProperties(
+                    baseUrl = "https://wowaudit.com",
+                    guildProfileUri = null,
+                    apiKey = null,
+                )
+            val properties =
+                SyncProperties(
+                    cron = "0 0 4 * * *",
+                    runOnStartup = false,
+                    wowaudit = wowAuditProperties,
+                )
 
             // Act & Assert - should not throw
             webClientConfig.wowauditWebClient(webClientBuilder, properties)
@@ -274,10 +270,11 @@ class WebClientConfigTest : UnitTest() {
         @Test
         fun `should work with minimal configuration`() {
             // Arrange
-            val properties = createSyncProperties(
-                baseUrl = "https://minimal.test",
-                apiKey = null,
-            )
+            val properties =
+                createSyncProperties(
+                    baseUrl = "https://minimal.test",
+                    apiKey = null,
+                )
 
             // Act
             val result = webClientConfig.wowauditWebClient(webClientBuilder, properties)
@@ -295,11 +292,12 @@ class WebClientConfigTest : UnitTest() {
         cron: String = "0 0 4 * * *",
         runOnStartup: Boolean = false,
     ): SyncProperties {
-        val wowAuditProperties = WoWAuditProperties(
-            baseUrl = baseUrl,
-            guildProfileUri = guildProfileUri,
-            apiKey = apiKey,
-        )
+        val wowAuditProperties =
+            WoWAuditProperties(
+                baseUrl = baseUrl,
+                guildProfileUri = guildProfileUri,
+                apiKey = apiKey,
+            )
         return SyncProperties(
             cron = cron,
             runOnStartup = runOnStartup,

@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
  * function is exercised by integration tests which use @SpringBootTest.
  */
 class DataSyncApplicationTest : UnitTest() {
-
     @Test
     fun `DataSyncApplication class should be instantiable`() {
         // Act

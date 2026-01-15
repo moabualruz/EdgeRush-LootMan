@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @Repository
 class InMemoryGuildRepository : GuildRepository {
-
     private val guilds = ConcurrentHashMap<String, Guild>()
 
     override fun save(guild: Guild): Guild {

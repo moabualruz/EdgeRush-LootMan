@@ -1,9 +1,9 @@
 package com.edgerush.lootman.application.attendance
 
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
+import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
-import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 

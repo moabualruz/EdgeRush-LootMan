@@ -15,10 +15,9 @@ import jakarta.validation.constraints.Size
 data class SaveGearRequest(
     @field:NotBlank(message = "Gear set type is required")
     val gearSetType: String,
-
     @field:NotEmpty(message = "Gear set must contain at least one item")
     @field:Valid
-    val items: List<GearItemRequest>
+    val items: List<GearItemRequest>,
 )
 
 /**
@@ -27,27 +26,21 @@ data class SaveGearRequest(
 data class GearItemRequest(
     @field:Min(value = 1, message = "Item ID must be positive")
     val itemId: Long,
-
     @field:NotBlank(message = "Item name is required")
     @field:Size(max = 100, message = "Item name cannot exceed 100 characters")
     val name: String,
-
     @field:Min(value = 1, message = "Item level must be at least 1")
     @field:Max(value = 1000, message = "Item level cannot exceed 1000")
     val itemLevel: Int,
-
     @field:NotBlank(message = "Quality is required")
     val quality: String,
-
     @field:NotBlank(message = "Slot is required")
     val slot: String,
-
     val isTierPiece: Boolean = false,
     val enchant: String? = null,
-
     @field:Min(value = 0, message = "Sockets must be non-negative")
     @field:Max(value = 3, message = "Sockets cannot exceed 3")
-    val sockets: Int = 0
+    val sockets: Int = 0,
 )
 
 /**
@@ -60,13 +53,14 @@ data class GearSetResponse(
     val tierPieceCount: Int,
     val has2PieceBonus: Boolean,
     val has4PieceBonus: Boolean,
-    val totalSlots: Int
+    val totalSlots: Int,
 ) {
     companion object {
         fun from(gearSet: GearSet): GearSetResponse {
-            val itemResponses = gearSet.items.map { (slot, item) ->
-                GearItemResponse.from(item)
-            }
+            val itemResponses =
+                gearSet.items.map { (slot, item) ->
+                    GearItemResponse.from(item)
+                }
             return GearSetResponse(
                 gearSetType = gearSet.gearSetType.name,
                 items = itemResponses,
@@ -74,7 +68,7 @@ data class GearSetResponse(
                 tierPieceCount = gearSet.getTierPieceCount(),
                 has2PieceBonus = gearSet.hasTierBonus(2),
                 has4PieceBonus = gearSet.hasTierBonus(4),
-                totalSlots = gearSet.items.size
+                totalSlots = gearSet.items.size,
             )
         }
     }
@@ -91,18 +85,19 @@ data class GearItemResponse(
     val slot: String,
     val isTierPiece: Boolean,
     val enchant: String?,
-    val sockets: Int
+    val sockets: Int,
 ) {
     companion object {
-        fun from(item: GearItem): GearItemResponse = GearItemResponse(
-            itemId = item.itemId.value,
-            name = item.name,
-            itemLevel = item.itemLevel,
-            quality = item.quality.name,
-            slot = item.slot.name,
-            isTierPiece = item.isTierPiece,
-            enchant = item.enchant,
-            sockets = item.sockets
-        )
+        fun from(item: GearItem): GearItemResponse =
+            GearItemResponse(
+                itemId = item.itemId.value,
+                name = item.name,
+                itemLevel = item.itemLevel,
+                quality = item.quality.name,
+                slot = item.slot.name,
+                isTierPiece = item.isTierPiece,
+                enchant = item.enchant,
+                sockets = item.sockets,
+            )
     }
 }

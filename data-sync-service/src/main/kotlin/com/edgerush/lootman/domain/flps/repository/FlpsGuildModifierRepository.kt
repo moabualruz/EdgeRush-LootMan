@@ -31,7 +31,10 @@ interface FlpsGuildModifierRepository {
      * @param limit The maximum number of records to return
      * @return List of modifier entities
      */
-    fun findAll(offset: Long, limit: Int): List<FlpsGuildModifierEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity>
 
     /**
      * Counts all modifiers.
@@ -48,7 +51,11 @@ interface FlpsGuildModifierRepository {
      * @param limit The maximum number of records to return
      * @return List of modifier entities for the guild
      */
-    fun findByGuildId(guildId: String, offset: Long, limit: Int): List<FlpsGuildModifierEntity>
+    fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity>
 
     /**
      * Counts modifiers for a guild.
@@ -67,7 +74,12 @@ interface FlpsGuildModifierRepository {
      * @param limit The maximum number of records to return
      * @return List of modifier entities for the guild and category
      */
-    fun findByGuildIdAndCategory(guildId: String, category: String, offset: Long, limit: Int): List<FlpsGuildModifierEntity>
+    fun findByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsGuildModifierEntity>
 
     /**
      * Counts modifiers for a guild and category.
@@ -76,7 +88,10 @@ interface FlpsGuildModifierRepository {
      * @param category The modifier category
      * @return The count of modifiers for the guild and category
      */
-    fun countByGuildIdAndCategory(guildId: String, category: String): Long
+    fun countByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+    ): Long
 
     /**
      * Saves a modifier entity.

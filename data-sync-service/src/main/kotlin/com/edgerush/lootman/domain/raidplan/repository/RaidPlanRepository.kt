@@ -7,7 +7,6 @@ import com.edgerush.lootman.domain.shared.GuildId
  * Repository interface for RaidPlan aggregate.
  */
 interface RaidPlanRepository {
-
     /**
      * Finds a raid plan by its ID.
      */
@@ -26,7 +25,11 @@ interface RaidPlanRepository {
     /**
      * Finds all raid plans for a guild with pagination.
      */
-    fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<RaidPlan>
+    fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<RaidPlan>
 
     /**
      * Counts raid plans for a guild.
@@ -36,7 +39,10 @@ interface RaidPlanRepository {
     /**
      * Finds raid plans for a specific encounter within a guild.
      */
-    fun findByGuildIdAndEncounterId(guildId: GuildId, encounterId: Int): List<RaidPlan>
+    fun findByGuildIdAndEncounterId(
+        guildId: GuildId,
+        encounterId: Int,
+    ): List<RaidPlan>
 
     /**
      * Finds raid plans created by a specific user.

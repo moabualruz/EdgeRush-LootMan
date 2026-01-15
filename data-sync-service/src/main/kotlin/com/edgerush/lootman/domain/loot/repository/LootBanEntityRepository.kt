@@ -31,7 +31,10 @@ interface LootBanEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot ban entities
      */
-    fun findAll(offset: Long, limit: Int): List<LootBanEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity>
 
     /**
      * Counts all loot bans.
@@ -48,7 +51,11 @@ interface LootBanEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot ban entities for the guild
      */
-    fun findByGuildId(guildId: String, offset: Long, limit: Int): List<LootBanEntity>
+    fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity>
 
     /**
      * Counts loot bans for a guild.
@@ -66,7 +73,11 @@ interface LootBanEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of active loot ban entities for the guild
      */
-    fun findActiveByGuildId(guildId: String, offset: Long, limit: Int): List<LootBanEntity>
+    fun findActiveByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity>
 
     /**
      * Counts active loot bans for a guild.
@@ -83,7 +94,10 @@ interface LootBanEntityRepository {
      * @param characterName The character name to check
      * @return true if the character has an active ban, false otherwise
      */
-    fun isCharacterBanned(guildId: String, characterName: String): Boolean
+    fun isCharacterBanned(
+        guildId: String,
+        characterName: String,
+    ): Boolean
 
     /**
      * Saves a loot ban entity.

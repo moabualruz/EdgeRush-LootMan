@@ -3,6 +3,7 @@ package com.edgerush.lootman.application.flps
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
+import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootAwardId
 import com.edgerush.lootman.domain.loot.model.LootBan
@@ -10,7 +11,6 @@ import com.edgerush.lootman.domain.loot.model.LootBanId
 import com.edgerush.lootman.domain.loot.model.LootTier
 import com.edgerush.lootman.domain.loot.repository.LootAwardRepository
 import com.edgerush.lootman.domain.loot.repository.LootBanRepository
-import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -54,14 +54,15 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
     private val gearRepository = mockk<GearRepository>()
     private val lootBanRepository = mockk<LootBanRepository>()
 
-    private val service = FlpsDataAssemblerService(
-        raiderRepository = raiderRepository,
-        attendanceRepository = attendanceRepository,
-        lootAwardRepository = lootAwardRepository,
-        wishlistRepository = wishlistRepository,
-        gearRepository = gearRepository,
-        lootBanRepository = lootBanRepository,
-    )
+    private val service =
+        FlpsDataAssemblerService(
+            raiderRepository = raiderRepository,
+            attendanceRepository = attendanceRepository,
+            lootAwardRepository = lootAwardRepository,
+            wishlistRepository = wishlistRepository,
+            gearRepository = gearRepository,
+            lootBanRepository = lootBanRepository,
+        )
 
     @Test
     fun `should assemble FLPS data for all raiders in guild`() {
@@ -262,7 +263,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
 
     // ===== Helper Functions =====
 
-    private fun createRaider(raiderId: RaiderId, guildId: GuildId): Raider =
+    private fun createRaider(
+        raiderId: RaiderId,
+        guildId: GuildId,
+    ): Raider =
         Raider(
             id = raiderId,
             guildId = guildId,
@@ -276,7 +280,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
             wowauditId = 12345L + raiderId.value,
         )
 
-    private fun createAttendanceRecord(raiderId: RaiderId, guildId: GuildId): AttendanceRecord =
+    private fun createAttendanceRecord(
+        raiderId: RaiderId,
+        guildId: GuildId,
+    ): AttendanceRecord =
         AttendanceRecord.create(
             raiderId = raiderId,
             guildId = guildId,
@@ -288,7 +295,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
             totalRaids = 10,
         )
 
-    private fun createLootAward(raiderId: RaiderId, guildId: GuildId): LootAward =
+    private fun createLootAward(
+        raiderId: RaiderId,
+        guildId: GuildId,
+    ): LootAward =
         LootAward(
             id = LootAwardId.generate(),
             itemId = ItemId(12345),
@@ -302,32 +312,38 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
     private fun createWishlist(raiderId: RaiderId): Wishlist =
         Wishlist(
             raiderId = raiderId,
-            items = listOf(
-                WishlistItem(
-                    itemId = ItemId(12345),
-                    itemName = "Best Upgrade",
-                    priority = 1,
-                    upgradePercentage = 25.0,
+            items =
+                listOf(
+                    WishlistItem(
+                        itemId = ItemId(12345),
+                        itemName = "Best Upgrade",
+                        priority = 1,
+                        upgradePercentage = 25.0,
+                    ),
                 ),
-            ),
         )
 
     private fun createGearSet(): GearSet =
         GearSet(
-            items = mapOf(
-                EquipmentSlot.HEAD to GearItem(
-                    itemId = ItemId(1),
-                    name = "Tier Helm",
-                    itemLevel = 639,
-                    quality = ItemQuality.EPIC,
-                    slot = EquipmentSlot.HEAD,
-                    isTierPiece = true,
+            items =
+                mapOf(
+                    EquipmentSlot.HEAD to
+                        GearItem(
+                            itemId = ItemId(1),
+                            name = "Tier Helm",
+                            itemLevel = 639,
+                            quality = ItemQuality.EPIC,
+                            slot = EquipmentSlot.HEAD,
+                            isTierPiece = true,
+                        ),
                 ),
-            ),
             gearSetType = GearSetType.EQUIPPED,
         )
 
-    private fun createLootBan(raiderId: RaiderId, guildId: GuildId): LootBan =
+    private fun createLootBan(
+        raiderId: RaiderId,
+        guildId: GuildId,
+    ): LootBan =
         LootBan(
             id = LootBanId.generate(),
             raiderId = raiderId,

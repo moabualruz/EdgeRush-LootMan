@@ -53,26 +53,27 @@ class ApplicationService(
             throw IllegalStateException("An application already exists for this Battle.net account")
         }
 
-        val application = Application.create(
-            guildId = guildId,
-            battleNetId = battleNetId,
-            discordId = discordId,
-            email = email,
-            characterName = characterName,
-            characterRealm = characterRealm,
-            characterClass = characterClass,
-            specialization = specialization,
-            itemLevel = itemLevel,
-            raiderIOScore = raiderIOScore,
-            bestParseAverage = bestParseAverage,
-            age = age,
-            location = location,
-            timezone = timezone,
-            raidDaysAvailable = raidDaysAvailable,
-            previousGuilds = previousGuilds,
-            reasonForLeaving = reasonForLeaving,
-            whyThisGuild = whyThisGuild,
-        )
+        val application =
+            Application.create(
+                guildId = guildId,
+                battleNetId = battleNetId,
+                discordId = discordId,
+                email = email,
+                characterName = characterName,
+                characterRealm = characterRealm,
+                characterClass = characterClass,
+                specialization = specialization,
+                itemLevel = itemLevel,
+                raiderIOScore = raiderIOScore,
+                bestParseAverage = bestParseAverage,
+                age = age,
+                location = location,
+                timezone = timezone,
+                raidDaysAvailable = raidDaysAvailable,
+                previousGuilds = previousGuilds,
+                reasonForLeaving = reasonForLeaving,
+                whyThisGuild = whyThisGuild,
+            )
 
         return repository.save(application)
     }
@@ -80,7 +81,10 @@ class ApplicationService(
     /**
      * Starts the review process for an application.
      */
-    fun startReview(applicationId: ApplicationId, reviewerId: String): Application {
+    fun startReview(
+        applicationId: ApplicationId,
+        reviewerId: String,
+    ): Application {
         val application = findApplicationOrThrow(applicationId)
         val updated = application.startReview(reviewerId)
         return repository.save(updated)
@@ -89,7 +93,10 @@ class ApplicationService(
     /**
      * Approves an application.
      */
-    fun approveApplication(applicationId: ApplicationId, reviewerId: String): Application {
+    fun approveApplication(
+        applicationId: ApplicationId,
+        reviewerId: String,
+    ): Application {
         val application = findApplicationOrThrow(applicationId)
         val approved = application.approve(reviewerId)
         return repository.save(approved)
@@ -98,7 +105,10 @@ class ApplicationService(
     /**
      * Rejects an application.
      */
-    fun rejectApplication(applicationId: ApplicationId, reviewerId: String): Application {
+    fun rejectApplication(
+        applicationId: ApplicationId,
+        reviewerId: String,
+    ): Application {
         val application = findApplicationOrThrow(applicationId)
         val rejected = application.reject(reviewerId)
         return repository.save(rejected)
@@ -123,21 +133,34 @@ class ApplicationService(
     /**
      * Gets all applications for a guild.
      */
-    fun getApplicationsByGuild(guildId: GuildId, offset: Long = 0, limit: Int = 50): List<Application> {
+    fun getApplicationsByGuild(
+        guildId: GuildId,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Application> {
         return repository.findByGuildId(guildId, offset, limit)
     }
 
     /**
      * Gets pending applications for a guild.
      */
-    fun getPendingApplications(guildId: GuildId, offset: Long = 0, limit: Int = 50): List<Application> {
+    fun getPendingApplications(
+        guildId: GuildId,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Application> {
         return repository.findByGuildIdAndStatus(guildId, ApplicationStatus.PENDING, offset, limit)
     }
 
     /**
      * Gets applications by status for a guild.
      */
-    fun getApplicationsByStatus(guildId: GuildId, status: ApplicationStatus, offset: Long = 0, limit: Int = 50): List<Application> {
+    fun getApplicationsByStatus(
+        guildId: GuildId,
+        status: ApplicationStatus,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Application> {
         return repository.findByGuildIdAndStatus(guildId, status, offset, limit)
     }
 
@@ -151,7 +174,10 @@ class ApplicationService(
     /**
      * Counts applications by status for a guild.
      */
-    fun countApplicationsByStatus(guildId: GuildId, status: ApplicationStatus): Long {
+    fun countApplicationsByStatus(
+        guildId: GuildId,
+        status: ApplicationStatus,
+    ): Long {
         return repository.countByGuildIdAndStatus(guildId, status)
     }
 

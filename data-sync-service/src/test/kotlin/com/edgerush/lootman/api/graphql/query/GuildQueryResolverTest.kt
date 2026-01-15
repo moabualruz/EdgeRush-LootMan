@@ -28,7 +28,6 @@ import java.time.Instant
  * Tests the GraphQL query resolver for guild operations following TDD principles.
  */
 class GuildQueryResolverTest : UnitTest() {
-
     @MockK
     private lateinit var getGuildUseCase: GetGuildUseCase
 
@@ -40,7 +39,6 @@ class GuildQueryResolverTest : UnitTest() {
 
     @Nested
     inner class GuildByIdQuery {
-
         @Test
         fun `should return guild when found by id`() {
             // Arrange
@@ -79,24 +77,25 @@ class GuildQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database error"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.guild(id = "guild-123")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.guild(id = "guild-123")
+                }
             exception.message shouldBe "Database error"
         }
     }
 
     @Nested
     inner class GuildsListQuery {
-
         @Test
         fun `should return all guilds`() {
             // Arrange
-            val guilds = listOf(
-                createTestGuild(id = "guild-1", name = "Guild One"),
-                createTestGuild(id = "guild-2", name = "Guild Two"),
-                createTestGuild(id = "guild-3", name = "Guild Three"),
-            )
+            val guilds =
+                listOf(
+                    createTestGuild(id = "guild-1", name = "Guild One"),
+                    createTestGuild(id = "guild-2", name = "Guild Two"),
+                    createTestGuild(id = "guild-3", name = "Guild Three"),
+                )
             every { listGuildsUseCase.execute() } returns Result.success(guilds)
 
             // Act
@@ -128,26 +127,27 @@ class GuildQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database connection failed"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.guilds()
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.guilds()
+                }
             exception.message shouldBe "Database connection failed"
         }
     }
 
     @Nested
     inner class GuildTypeConversion {
-
         @Test
         fun `should correctly convert all guild fields`() {
             // Arrange
-            val guild = createTestGuild(
-                id = "guild-42",
-                name = "Elite Raiders",
-                region = Region.EU,
-                realm = "Silvermoon",
-                isActive = true,
-            )
+            val guild =
+                createTestGuild(
+                    id = "guild-42",
+                    name = "Elite Raiders",
+                    region = Region.EU,
+                    realm = "Silvermoon",
+                    isActive = true,
+                )
             every { getGuildUseCase.execute(any()) } returns Result.success(guild)
 
             // Act
@@ -180,10 +180,11 @@ class GuildQueryResolverTest : UnitTest() {
         @Test
         fun `should include settings in guild type`() {
             // Arrange
-            val guild = createTestGuild(
-                syncEnabled = true,
-                benchmarkMode = BenchmarkMode.TOP_PERFORMER,
-            )
+            val guild =
+                createTestGuild(
+                    syncEnabled = true,
+                    benchmarkMode = BenchmarkMode.TOP_PERFORMER,
+                )
             every { getGuildUseCase.execute(any()) } returns Result.success(guild)
 
             // Act
@@ -206,19 +207,21 @@ class GuildQueryResolverTest : UnitTest() {
         isActive: Boolean = true,
         syncEnabled: Boolean = true,
         benchmarkMode: BenchmarkMode = BenchmarkMode.THEORETICAL,
-    ): Guild = Guild(
-        id = GuildId(id),
-        name = name,
-        description = "A test guild",
-        realm = realm,
-        region = region,
-        settings = GuildSettings(
-            syncEnabled = syncEnabled,
-            benchmarkMode = benchmarkMode,
-        ),
-        syncStatus = SyncStatus.SUCCESS,
-        isActive = isActive,
-        createdAt = Instant.now(),
-        updatedAt = Instant.now(),
-    )
+    ): Guild =
+        Guild(
+            id = GuildId(id),
+            name = name,
+            description = "A test guild",
+            realm = realm,
+            region = region,
+            settings =
+                GuildSettings(
+                    syncEnabled = syncEnabled,
+                    benchmarkMode = benchmarkMode,
+                ),
+            syncStatus = SyncStatus.SUCCESS,
+            isActive = isActive,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now(),
+        )
 }

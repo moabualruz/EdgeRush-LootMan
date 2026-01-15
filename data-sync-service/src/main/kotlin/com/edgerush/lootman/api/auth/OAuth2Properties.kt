@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class OAuth2Properties(
     val discord: DiscordOAuth2Properties = DiscordOAuth2Properties(),
     val battlenet: BattlenetOAuth2Properties = BattlenetOAuth2Properties(),
-    val jwt: JwtProperties = JwtProperties()
+    val jwt: JwtProperties = JwtProperties(),
 )
 
 /**
@@ -19,7 +19,7 @@ data class DiscordOAuth2Properties(
     val clientId: String = "",
     val clientSecret: String = "",
     val redirectUri: String = "",
-    val scopes: String = "identify,guilds"
+    val scopes: String = "identify,guilds",
 ) {
     val authorizationUrl: String
         get() = "https://discord.com/api/oauth2/authorize"
@@ -38,14 +38,14 @@ data class BattlenetOAuth2Properties(
     val clientId: String = "",
     val clientSecret: String = "",
     val redirectUri: String = "",
-    val region: String = "us"
+    val region: String = "us",
 ) {
     val authorizationUrl: String
-        get() = "https://${region}.battle.net/oauth/authorize"
+        get() = "https://$region.battle.net/oauth/authorize"
     val tokenUrl: String
-        get() = "https://${region}.battle.net/oauth/token"
+        get() = "https://$region.battle.net/oauth/token"
     val userInfoUrl: String
-        get() = "https://${region}.battle.net/oauth/userinfo"
+        get() = "https://$region.battle.net/oauth/userinfo"
 
     fun isConfigured(): Boolean = clientId.isNotBlank() && clientSecret.isNotBlank()
 }
@@ -57,5 +57,5 @@ data class JwtProperties(
     val secret: String = "",
     val accessTokenValidityMinutes: Long = 15,
     val refreshTokenValidityDays: Long = 30,
-    val issuer: String = "edgerush-lootman"
+    val issuer: String = "edgerush-lootman",
 )

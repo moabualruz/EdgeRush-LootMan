@@ -17,24 +17,25 @@ import java.sql.Timestamp
  */
 @Repository
 class JdbcRaidPlanRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : RaidPlanRepository {
-
     override fun findById(id: String): RaidPlan? {
-        val plans = jdbcTemplate.query(
-            "SELECT * FROM raid_plans WHERE id = ?",
-            planRowMapper,
-            id
-        )
+        val plans =
+            jdbcTemplate.query(
+                "SELECT * FROM raid_plans WHERE id = ?",
+                planRowMapper,
+                id,
+            )
         return plans.firstOrNull()?.let { loadSteps(it) }
     }
 
     override fun findByShareToken(shareToken: String): RaidPlan? {
-        val plans = jdbcTemplate.query(
-            "SELECT * FROM raid_plans WHERE share_token = ?",
-            planRowMapper,
-            shareToken
-        )
+        val plans =
+            jdbcTemplate.query(
+                "SELECT * FROM raid_plans WHERE share_token = ?",
+                planRowMapper,
+                shareToken,
+            )
         return plans.firstOrNull()?.let { loadSteps(it) }
     }
 
@@ -42,17 +43,21 @@ class JdbcRaidPlanRepository(
         return jdbcTemplate.query(
             "SELECT * FROM raid_plans WHERE guild_id = ? ORDER BY updated_at DESC",
             planRowMapper,
-            guildId.value
+            guildId.value,
         ).map { loadSteps(it) }
     }
 
-    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<RaidPlan> {
+    override fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<RaidPlan> {
         return jdbcTemplate.query(
             "SELECT * FROM raid_plans WHERE guild_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?",
             planRowMapper,
             guildId.value,
             limit,
-            offset
+            offset,
         ).map { loadSteps(it) }
     }
 
@@ -60,16 +65,19 @@ class JdbcRaidPlanRepository(
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM raid_plans WHERE guild_id = ?",
             Long::class.java,
-            guildId.value
+            guildId.value,
         ) ?: 0
     }
 
-    override fun findByGuildIdAndEncounterId(guildId: GuildId, encounterId: Int): List<RaidPlan> {
+    override fun findByGuildIdAndEncounterId(
+        guildId: GuildId,
+        encounterId: Int,
+    ): List<RaidPlan> {
         return jdbcTemplate.query(
             "SELECT * FROM raid_plans WHERE guild_id = ? AND encounter_id = ? ORDER BY updated_at DESC",
             planRowMapper,
             guildId.value,
-            encounterId
+            encounterId,
         ).map { loadSteps(it) }
     }
 
@@ -77,7 +85,7 @@ class JdbcRaidPlanRepository(
         return jdbcTemplate.query(
             "SELECT * FROM raid_plans WHERE created_by = ? ORDER BY updated_at DESC",
             planRowMapper,
-            userId
+            userId,
         ).map { loadSteps(it) }
     }
 
@@ -96,11 +104,12 @@ class JdbcRaidPlanRepository(
     }
 
     override fun existsById(id: String): Boolean {
-        val count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM raid_plans WHERE id = ?",
-            Int::class.java,
-            id
-        ) ?: 0
+        val count =
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM raid_plans WHERE id = ?",
+                Int::class.java,
+                id,
+            ) ?: 0
         return count > 0
     }
 
@@ -119,7 +128,7 @@ class JdbcRaidPlanRepository(
             plan.shareToken,
             plan.createdBy,
             Timestamp.from(plan.createdAt),
-            Timestamp.from(plan.updatedAt)
+            Timestamp.from(plan.updatedAt),
         )
         saveSteps(plan)
     }
@@ -138,7 +147,7 @@ class JdbcRaidPlanRepository(
             plan.visibility.name,
             plan.shareToken,
             Timestamp.from(plan.updatedAt),
-            plan.id
+            plan.id,
         )
 
         // Delete existing steps and re-insert (simpler than diffing)
@@ -154,7 +163,10 @@ class JdbcRaidPlanRepository(
         }
     }
 
-    private fun insertStep(planId: String, step: PlanStep): Long {
+    private fun insertStep(
+        planId: String,
+        step: PlanStep,
+    ): Long {
         jdbcTemplate.update(
             """
             INSERT INTO raid_plan_steps (plan_id, step_order, notes)
@@ -162,18 +174,21 @@ class JdbcRaidPlanRepository(
             """.trimIndent(),
             planId,
             step.order,
-            step.notes
+            step.notes,
         )
 
         return jdbcTemplate.queryForObject(
             "SELECT id FROM raid_plan_steps WHERE plan_id = ? AND step_order = ?",
             Long::class.java,
             planId,
-            step.order
+            step.order,
         ) ?: throw IllegalStateException("Failed to retrieve step ID after insert")
     }
 
-    private fun saveMarkers(stepId: Long, markers: List<PlanMarker>) {
+    private fun saveMarkers(
+        stepId: Long,
+        markers: List<PlanMarker>,
+    ) {
         for (marker in markers) {
             jdbcTemplate.update(
                 """
@@ -185,12 +200,15 @@ class JdbcRaidPlanRepository(
                 marker.x,
                 marker.y,
                 marker.label,
-                marker.color
+                marker.color,
             )
         }
     }
 
-    private fun saveShapes(stepId: Long, shapes: List<PlanShape>) {
+    private fun saveShapes(
+        stepId: Long,
+        shapes: List<PlanShape>,
+    ) {
         for (shape in shapes) {
             jdbcTemplate.update(
                 """
@@ -205,21 +223,22 @@ class JdbcRaidPlanRepository(
                 shape.y2,
                 shape.radius,
                 shape.color,
-                shape.strokeWidth
+                shape.strokeWidth,
             )
         }
     }
 
     private fun loadSteps(plan: RaidPlan): RaidPlan {
-        val steps = jdbcTemplate.query(
-            "SELECT * FROM raid_plan_steps WHERE plan_id = ? ORDER BY step_order",
-            stepRowMapper,
-            plan.id
-        ).map { (stepId, step) ->
-            val markers = loadMarkers(stepId)
-            val shapes = loadShapes(stepId)
-            step.withMarkers(markers).withShapes(shapes)
-        }
+        val steps =
+            jdbcTemplate.query(
+                "SELECT * FROM raid_plan_steps WHERE plan_id = ? ORDER BY step_order",
+                stepRowMapper,
+                plan.id,
+            ).map { (stepId, step) ->
+                val markers = loadMarkers(stepId)
+                val shapes = loadShapes(stepId)
+                step.withMarkers(markers).withShapes(shapes)
+            }
 
         return RaidPlan.reconstitute(
             id = plan.id,
@@ -232,7 +251,7 @@ class JdbcRaidPlanRepository(
             shareToken = plan.shareToken,
             createdBy = plan.createdBy,
             createdAt = plan.createdAt,
-            updatedAt = plan.updatedAt
+            updatedAt = plan.updatedAt,
         )
     }
 
@@ -240,7 +259,7 @@ class JdbcRaidPlanRepository(
         return jdbcTemplate.query(
             "SELECT * FROM raid_plan_markers WHERE step_id = ?",
             markerRowMapper,
-            stepId
+            stepId,
         )
     }
 
@@ -248,55 +267,60 @@ class JdbcRaidPlanRepository(
         return jdbcTemplate.query(
             "SELECT * FROM raid_plan_shapes WHERE step_id = ?",
             shapeRowMapper,
-            stepId
+            stepId,
         )
     }
 
-    private val planRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        RaidPlan.reconstitute(
-            id = rs.getString("id"),
-            guildId = GuildId(rs.getString("guild_id")),
-            encounterId = rs.getInt("encounter_id"),
-            encounterName = rs.getString("encounter_name"),
-            name = rs.getString("name"),
-            steps = emptyList(), // Loaded separately
-            visibility = PlanVisibility.valueOf(rs.getString("visibility")),
-            shareToken = rs.getString("share_token"),
-            createdBy = rs.getLong("created_by"),
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            updatedAt = rs.getTimestamp("updated_at").toInstant()
-        )
-    }
+    private val planRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            RaidPlan.reconstitute(
+                id = rs.getString("id"),
+                guildId = GuildId(rs.getString("guild_id")),
+                encounterId = rs.getInt("encounter_id"),
+                encounterName = rs.getString("encounter_name"),
+                name = rs.getString("name"),
+                steps = emptyList(), // Loaded separately
+                visibility = PlanVisibility.valueOf(rs.getString("visibility")),
+                shareToken = rs.getString("share_token"),
+                createdBy = rs.getLong("created_by"),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                updatedAt = rs.getTimestamp("updated_at").toInstant(),
+            )
+        }
 
-    private val stepRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        val stepId = rs.getLong("id")
-        val step = PlanStep.create(
-            order = rs.getInt("step_order"),
-            notes = rs.getString("notes")
-        )
-        stepId to step
-    }
+    private val stepRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            val stepId = rs.getLong("id")
+            val step =
+                PlanStep.create(
+                    order = rs.getInt("step_order"),
+                    notes = rs.getString("notes"),
+                )
+            stepId to step
+        }
 
-    private val markerRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        PlanMarker(
-            type = MarkerType.valueOf(rs.getString("marker_type")),
-            x = rs.getDouble("x"),
-            y = rs.getDouble("y"),
-            label = rs.getString("label"),
-            color = rs.getString("color")
-        )
-    }
+    private val markerRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            PlanMarker(
+                type = MarkerType.valueOf(rs.getString("marker_type")),
+                x = rs.getDouble("x"),
+                y = rs.getDouble("y"),
+                label = rs.getString("label"),
+                color = rs.getString("color"),
+            )
+        }
 
-    private val shapeRowMapper = RowMapper { rs: ResultSet, _: Int ->
-        PlanShape(
-            shapeType = ShapeType.valueOf(rs.getString("shape_type")),
-            x1 = rs.getDouble("x1"),
-            y1 = rs.getDouble("y1"),
-            x2 = rs.getDouble("x2").takeIf { !rs.wasNull() },
-            y2 = rs.getDouble("y2").takeIf { !rs.wasNull() },
-            radius = rs.getDouble("radius").takeIf { !rs.wasNull() },
-            color = rs.getString("color"),
-            strokeWidth = rs.getInt("stroke_width")
-        )
-    }
+    private val shapeRowMapper =
+        RowMapper { rs: ResultSet, _: Int ->
+            PlanShape(
+                shapeType = ShapeType.valueOf(rs.getString("shape_type")),
+                x1 = rs.getDouble("x1"),
+                y1 = rs.getDouble("y1"),
+                x2 = rs.getDouble("x2").takeIf { !rs.wasNull() },
+                y2 = rs.getDouble("y2").takeIf { !rs.wasNull() },
+                radius = rs.getDouble("radius").takeIf { !rs.wasNull() },
+                color = rs.getString("color"),
+                strokeWidth = rs.getInt("stroke_width"),
+            )
+        }
 }

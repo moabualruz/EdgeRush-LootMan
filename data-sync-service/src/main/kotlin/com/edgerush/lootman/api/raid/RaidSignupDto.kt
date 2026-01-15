@@ -11,7 +11,6 @@ data class CreateRaidSignupRequest(
     @field:NotNull(message = "Raid ID is required")
     @field:Positive(message = "Raid ID must be positive")
     val raidId: Long,
-
     val characterId: Long? = null,
     val characterName: String? = null,
     val characterRealm: String? = null,
@@ -58,19 +57,20 @@ data class RaidSignupResponse(
     val selected: Boolean?,
 ) {
     companion object {
-        fun from(entity: RaidSignupEntity): RaidSignupResponse = RaidSignupResponse(
-            id = entity.id ?: 0L,
-            raidId = entity.raidId,
-            characterId = entity.characterId,
-            characterName = entity.characterName,
-            characterRealm = entity.characterRealm,
-            characterRegion = entity.characterRegion,
-            characterClass = entity.characterClass,
-            characterRole = entity.characterRole,
-            characterGuest = entity.characterGuest,
-            status = entity.status,
-            comment = entity.comment,
-            selected = entity.selected,
-        )
+        fun from(entity: RaidSignupEntity): RaidSignupResponse =
+            RaidSignupResponse(
+                id = entity.id ?: 0L,
+                raidId = entity.raidId,
+                characterId = entity.characterId,
+                characterName = entity.characterName,
+                characterRealm = entity.characterRealm,
+                characterRegion = entity.characterRegion,
+                characterClass = entity.characterClass,
+                characterRole = entity.characterRole,
+                characterGuest = entity.characterGuest,
+                status = entity.status,
+                comment = entity.comment,
+                selected = entity.selected,
+            )
     }
 }

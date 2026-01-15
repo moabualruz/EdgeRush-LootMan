@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
-import java.math.BigDecimal
 import java.sql.Statement
 import java.sql.Timestamp
 import java.time.OffsetDateTime
@@ -21,9 +20,9 @@ import java.time.ZoneOffset
 class JdbcGuildConfigurationRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : GuildConfigurationRepository {
-
     override fun findById(id: Long): GuildConfigurationEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, guild_name, guild_description, wowaudit_api_key_encrypted,
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
@@ -31,14 +30,15 @@ class JdbcGuildConfigurationRepository(
                    custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
             FROM guild_configurations
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, guildConfigurationRowMapper, id)
         return results.firstOrNull()
     }
 
     override fun findByGuildId(guildId: String): GuildConfigurationEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, guild_name, guild_description, wowaudit_api_key_encrypted,
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
@@ -46,7 +46,7 @@ class JdbcGuildConfigurationRepository(
                    custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
             FROM guild_configurations
             WHERE guild_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, guildConfigurationRowMapper, guildId)
         return results.firstOrNull()
@@ -58,8 +58,12 @@ class JdbcGuildConfigurationRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<GuildConfigurationEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<GuildConfigurationEntity> {
+        val sql =
+            """
             SELECT id, guild_id, guild_name, guild_description, wowaudit_api_key_encrypted,
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
@@ -68,7 +72,7 @@ class JdbcGuildConfigurationRepository(
             FROM guild_configurations
             ORDER BY guild_name, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, guildConfigurationRowMapper, limit, offset)
     }
@@ -78,8 +82,12 @@ class JdbcGuildConfigurationRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findActive(offset: Long, limit: Int): List<GuildConfigurationEntity> {
-        val sql = """
+    override fun findActive(
+        offset: Long,
+        limit: Int,
+    ): List<GuildConfigurationEntity> {
+        val sql =
+            """
             SELECT id, guild_id, guild_name, guild_description, wowaudit_api_key_encrypted,
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
@@ -89,7 +97,7 @@ class JdbcGuildConfigurationRepository(
             WHERE is_active = true
             ORDER BY guild_name, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, guildConfigurationRowMapper, limit, offset)
     }
@@ -114,7 +122,8 @@ class JdbcGuildConfigurationRepository(
     }
 
     private fun insertGuildConfiguration(entity: GuildConfigurationEntity): GuildConfigurationEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO guild_configurations (
                 guild_id, guild_name, guild_description, wowaudit_api_key_encrypted,
                 wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
@@ -122,7 +131,7 @@ class JdbcGuildConfigurationRepository(
                 timezone, is_active, created_at, updated_at, benchmark_mode,
                 custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -155,7 +164,8 @@ class JdbcGuildConfigurationRepository(
     }
 
     private fun updateGuildConfiguration(entity: GuildConfigurationEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE guild_configurations SET
                 guild_id = ?,
                 guild_name = ?,
@@ -177,7 +187,7 @@ class JdbcGuildConfigurationRepository(
                 custom_benchmark_ipi = ?,
                 benchmark_updated_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -204,29 +214,30 @@ class JdbcGuildConfigurationRepository(
         )
     }
 
-    private val guildConfigurationRowMapper = RowMapper { rs, _ ->
-        GuildConfigurationEntity(
-            id = rs.getLong("id"),
-            guildId = rs.getString("guild_id"),
-            guildName = rs.getString("guild_name"),
-            guildDescription = rs.getString("guild_description"),
-            wowauditApiKeyEncrypted = rs.getString("wowaudit_api_key_encrypted"),
-            wowauditGuildUri = rs.getString("wowaudit_guild_uri"),
-            wowauditBaseUrl = rs.getString("wowaudit_base_url") ?: "https://wowaudit.com",
-            syncEnabled = rs.getBoolean("sync_enabled"),
-            syncCronExpression = rs.getString("sync_cron_expression") ?: "0 0 4 * * *",
-            syncRunOnStartup = rs.getBoolean("sync_run_on_startup"),
-            lastSyncAt = rs.getTimestamp("last_sync_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            lastSyncStatus = rs.getString("last_sync_status"),
-            lastSyncError = rs.getString("last_sync_error"),
-            timezone = rs.getString("timezone") ?: "UTC",
-            isActive = rs.getBoolean("is_active"),
-            createdAt = rs.getTimestamp("created_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-            updatedAt = rs.getTimestamp("updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-            benchmarkMode = rs.getString("benchmark_mode") ?: "THEORETICAL",
-            customBenchmarkRms = rs.getBigDecimal("custom_benchmark_rms"),
-            customBenchmarkIpi = rs.getBigDecimal("custom_benchmark_ipi"),
-            benchmarkUpdatedAt = rs.getTimestamp("benchmark_updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
-        )
-    }
+    private val guildConfigurationRowMapper =
+        RowMapper { rs, _ ->
+            GuildConfigurationEntity(
+                id = rs.getLong("id"),
+                guildId = rs.getString("guild_id"),
+                guildName = rs.getString("guild_name"),
+                guildDescription = rs.getString("guild_description"),
+                wowauditApiKeyEncrypted = rs.getString("wowaudit_api_key_encrypted"),
+                wowauditGuildUri = rs.getString("wowaudit_guild_uri"),
+                wowauditBaseUrl = rs.getString("wowaudit_base_url") ?: "https://wowaudit.com",
+                syncEnabled = rs.getBoolean("sync_enabled"),
+                syncCronExpression = rs.getString("sync_cron_expression") ?: "0 0 4 * * *",
+                syncRunOnStartup = rs.getBoolean("sync_run_on_startup"),
+                lastSyncAt = rs.getTimestamp("last_sync_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                lastSyncStatus = rs.getString("last_sync_status"),
+                lastSyncError = rs.getString("last_sync_error"),
+                timezone = rs.getString("timezone") ?: "UTC",
+                isActive = rs.getBoolean("is_active"),
+                createdAt = rs.getTimestamp("created_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+                updatedAt = rs.getTimestamp("updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+                benchmarkMode = rs.getString("benchmark_mode") ?: "THEORETICAL",
+                customBenchmarkRms = rs.getBigDecimal("custom_benchmark_rms"),
+                customBenchmarkIpi = rs.getBigDecimal("custom_benchmark_ipi"),
+                benchmarkUpdatedAt = rs.getTimestamp("benchmark_updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+            )
+        }
 }

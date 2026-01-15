@@ -25,14 +25,11 @@ import com.edgerush.lootman.domain.flps.service.FlpsCalculationService
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootBan
 import com.edgerush.lootman.domain.shared.GuildId
-import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
 import com.edgerush.lootman.domain.shared.model.Raider
 import com.edgerush.lootman.domain.shared.model.RaiderStatus
 import com.edgerush.lootman.domain.shared.model.Role
-import io.kotest.matchers.doubles.shouldBeGreaterThan
-import io.kotest.matchers.doubles.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -47,7 +44,6 @@ import org.junit.jupiter.api.Test
  * Tests the configuration preview functionality following TDD principles.
  */
 class FlpsConfigPreviewServiceTest : UnitTest() {
-
     private val modifierRepository = mockk<FlpsModifierRepository>()
     private val flpsDataAssembler = mockk<FlpsDataAssemblerService>()
     private val componentCalculator = mockk<FlpsComponentCalculator>()
@@ -60,17 +56,17 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
 
     @BeforeEach
     fun setUp() {
-        service = FlpsConfigPreviewService(
-            modifierRepository = modifierRepository,
-            flpsDataAssembler = flpsDataAssembler,
-            componentCalculator = componentCalculator,
-            flpsCalculationService = flpsCalculationService,
-        )
+        service =
+            FlpsConfigPreviewService(
+                modifierRepository = modifierRepository,
+                flpsDataAssembler = flpsDataAssembler,
+                componentCalculator = componentCalculator,
+                flpsCalculationService = flpsCalculationService,
+            )
     }
 
     @Nested
     inner class GetCurrentConfig {
-
         @Test
         fun `should return current configuration for guild`() {
             // Arrange
@@ -91,7 +87,6 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
 
     @Nested
     inner class PreviewConfigChanges {
-
         @Test
         fun `should return preview with current and proposed configs`() {
             // Arrange
@@ -99,9 +94,10 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
             every { modifierRepository.findByGuildId(guildIdObj) } returns modifiers
             every { flpsDataAssembler.assembleFlpsData(guildIdObj) } returns emptyList()
 
-            val request = ConfigPreviewRequest(
-                rmsWeights = RmsWeightsRequest(attendance = 0.5),
-            )
+            val request =
+                ConfigPreviewRequest(
+                    rmsWeights = RmsWeightsRequest(attendance = 0.5),
+                )
 
             // Act
             val result = service.previewConfigChanges(guildId, request)
@@ -119,10 +115,11 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
             every { modifierRepository.findByGuildId(guildIdObj) } returns modifiers
             every { flpsDataAssembler.assembleFlpsData(guildIdObj) } returns emptyList()
 
-            val request = ConfigPreviewRequest(
-                rmsWeights = RmsWeightsRequest(attendance = 0.5),
-                // Other values are null, should preserve current values
-            )
+            val request =
+                ConfigPreviewRequest(
+                    rmsWeights = RmsWeightsRequest(attendance = 0.5),
+                    // Other values are null, should preserve current values
+                )
 
             // Act
             val result = service.previewConfigChanges(guildId, request)
@@ -144,9 +141,10 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
             setupComponentCalculatorMocks()
             setupFlpsCalculationMocks()
 
-            val request = ConfigPreviewRequest(
-                rmsWeights = RmsWeightsRequest(attendance = 0.6), // Increase attendance weight
-            )
+            val request =
+                ConfigPreviewRequest(
+                    rmsWeights = RmsWeightsRequest(attendance = 0.6), // Increase attendance weight
+                )
 
             // Act
             val result = service.previewConfigChanges(guildId, request)
@@ -189,9 +187,10 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
             setupFlpsCalculationMocks()
 
             // Raise eligibility threshold above raider's attendance
-            val request = ConfigPreviewRequest(
-                thresholds = ThresholdsRequest(eligibilityAttendance = 0.95),
-            )
+            val request =
+                ConfigPreviewRequest(
+                    thresholds = ThresholdsRequest(eligibilityAttendance = 0.95),
+                )
 
             // Act
             val result = service.previewConfigChanges(guildId, request)
@@ -204,14 +203,14 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
 
     @Nested
     inner class MergeWithExtension {
-
         @Test
         fun `should merge partial request with current modifiers`() {
             // Arrange
             val modifiers = createDefaultModifiers()
-            val request = ConfigPreviewRequest(
-                rmsWeights = RmsWeightsRequest(attendance = 0.6),
-            )
+            val request =
+                ConfigPreviewRequest(
+                    rmsWeights = RmsWeightsRequest(attendance = 0.6),
+                )
 
             // Act
             val merged = modifiers.mergeWith(request)
@@ -226,27 +225,32 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
         fun `should merge all fields when provided`() {
             // Arrange
             val modifiers = createDefaultModifiers()
-            val request = ConfigPreviewRequest(
-                rmsWeights = RmsWeightsRequest(
-                    attendance = 0.5,
-                    mechanical = 0.3,
-                    preparation = 0.2,
-                ),
-                ipiWeights = IpiWeightsRequest(
-                    upgradeValue = 0.5,
-                    tierBonus = 0.3,
-                    roleMultiplier = 0.2,
-                ),
-                roleMultipliers = RoleMultipliersRequest(
-                    dps = 1.0,
-                    tank = 1.3,
-                    healer = 1.2,
-                ),
-                thresholds = ThresholdsRequest(
-                    eligibilityAttendance = 0.9,
-                    eligibilityActivity = 0.1,
-                ),
-            )
+            val request =
+                ConfigPreviewRequest(
+                    rmsWeights =
+                        RmsWeightsRequest(
+                            attendance = 0.5,
+                            mechanical = 0.3,
+                            preparation = 0.2,
+                        ),
+                    ipiWeights =
+                        IpiWeightsRequest(
+                            upgradeValue = 0.5,
+                            tierBonus = 0.3,
+                            roleMultiplier = 0.2,
+                        ),
+                    roleMultipliers =
+                        RoleMultipliersRequest(
+                            dps = 1.0,
+                            tank = 1.3,
+                            healer = 1.2,
+                        ),
+                    thresholds =
+                        ThresholdsRequest(
+                            eligibilityAttendance = 0.9,
+                            eligibilityActivity = 0.1,
+                        ),
+                )
 
             // Act
             val merged = modifiers.mergeWith(request)
@@ -274,48 +278,55 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
     }
 
     // Helper methods
-    private fun createDefaultModifiers(): FlpsModifiers = FlpsModifiers(
-        guildId = guildIdObj,
-        rmsWeights = RmsWeights(
-            attendance = 0.4,
-            mechanical = 0.4,
-            preparation = 0.2,
-        ),
-        ipiWeights = IpiWeights(
-            upgradeValue = 0.45,
-            tierBonus = 0.35,
-            roleMultiplier = 0.20,
-        ),
-        roleMultipliers = RoleMultipliers(
-            dps = 1.0,
-            tank = 0.8,
-            healer = 0.7,
-        ),
-        thresholds = FlpsThresholds(
-            eligibilityAttendance = 0.8,
-            eligibilityActivity = 0.0,
-        ),
-    )
-
-    private fun createTestRaiderData(): RaiderFlpsData = RaiderFlpsData(
-        raider = Raider(
-            id = RaiderId(42L),
+    private fun createDefaultModifiers(): FlpsModifiers =
+        FlpsModifiers(
             guildId = guildIdObj,
-            characterName = "TestRaider",
-            realm = "TestRealm",
-            characterClass = CharacterClass.WARRIOR,
-            role = Role.DPS,
-            rank = "Raider",
-            status = RaiderStatus.ACTIVE,
-            joinDate = null,
-            wowauditId = null,
-        ),
-        attendance = emptyList<AttendanceRecord>(),
-        gear = null,
-        wishlist = null,
-        lootHistory = emptyList<LootAward>(),
-        activeBans = emptyList<LootBan>(),
-    )
+            rmsWeights =
+                RmsWeights(
+                    attendance = 0.4,
+                    mechanical = 0.4,
+                    preparation = 0.2,
+                ),
+            ipiWeights =
+                IpiWeights(
+                    upgradeValue = 0.45,
+                    tierBonus = 0.35,
+                    roleMultiplier = 0.20,
+                ),
+            roleMultipliers =
+                RoleMultipliers(
+                    dps = 1.0,
+                    tank = 0.8,
+                    healer = 0.7,
+                ),
+            thresholds =
+                FlpsThresholds(
+                    eligibilityAttendance = 0.8,
+                    eligibilityActivity = 0.0,
+                ),
+        )
+
+    private fun createTestRaiderData(): RaiderFlpsData =
+        RaiderFlpsData(
+            raider =
+                Raider(
+                    id = RaiderId(42L),
+                    guildId = guildIdObj,
+                    characterName = "TestRaider",
+                    realm = "TestRealm",
+                    characterClass = CharacterClass.WARRIOR,
+                    role = Role.DPS,
+                    rank = "Raider",
+                    status = RaiderStatus.ACTIVE,
+                    joinDate = null,
+                    wowauditId = null,
+                ),
+            attendance = emptyList<AttendanceRecord>(),
+            gear = null,
+            wishlist = null,
+            lootHistory = emptyList<LootAward>(),
+            activeBans = emptyList<LootBan>(),
+        )
 
     private fun setupComponentCalculatorMocks() {
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.85)

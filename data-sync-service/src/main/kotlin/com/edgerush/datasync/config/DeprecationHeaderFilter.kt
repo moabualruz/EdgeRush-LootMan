@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono
 class DeprecationHeaderFilter(
     private val handlerMapping: RequestMappingHandlerMapping,
 ) : WebFilter {
-
     override fun filter(
         exchange: ServerWebExchange,
         chain: WebFilterChain,
@@ -46,8 +45,9 @@ class DeprecationHeaderFilter(
         exchange: ServerWebExchange,
         handler: HandlerMethod,
     ) {
-        val annotation = handler.getMethodAnnotation(DeprecatedEndpoint::class.java)
-            ?: return
+        val annotation =
+            handler.getMethodAnnotation(DeprecatedEndpoint::class.java)
+                ?: return
 
         val headers = exchange.response.headers
 

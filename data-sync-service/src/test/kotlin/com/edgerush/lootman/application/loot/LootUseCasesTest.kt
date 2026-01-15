@@ -34,7 +34,6 @@ import java.time.Instant
  * - UpdateLootBanUseCase
  */
 class LootUseCasesTest : UnitTest() {
-
     private lateinit var lootAwardRepository: LootAwardRepository
     private lateinit var lootBanRepository: LootBanRepository
 
@@ -97,10 +96,11 @@ class LootUseCasesTest : UnitTest() {
         fun `should return loot awards for guild`() {
             // Given
             val guildId = "test-guild"
-            val awards = listOf(
-                createLootAward("award-1"),
-                createLootAward("award-2")
-            )
+            val awards =
+                listOf(
+                    createLootAward("award-1"),
+                    createLootAward("award-2"),
+                )
             every { lootAwardRepository.findByGuildId(GuildId(guildId)) } returns awards
 
             // When
@@ -129,17 +129,19 @@ class LootUseCasesTest : UnitTest() {
         fun `should return paginated loot awards`() {
             // Given
             val guildId = "test-guild"
-            val awards = listOf(
-                createLootAward("award-1"),
-                createLootAward("award-2")
-            )
+            val awards =
+                listOf(
+                    createLootAward("award-1"),
+                    createLootAward("award-2"),
+                )
             every { lootAwardRepository.findByGuildId(GuildId(guildId), 0, 10) } returns awards
             every { lootAwardRepository.countByGuildId(GuildId(guildId)) } returns 50L
 
             // When
-            val result = useCase.executeByGuildPaginated(
-                ListLootAwardsByGuildPaginatedQuery(guildId, offset = 0, limit = 10)
-            )
+            val result =
+                useCase.executeByGuildPaginated(
+                    ListLootAwardsByGuildPaginatedQuery(guildId, offset = 0, limit = 10),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -157,9 +159,10 @@ class LootUseCasesTest : UnitTest() {
             every { lootAwardRepository.countByGuildId(GuildId(guildId)) } returns 25L
 
             // When
-            val result = useCase.executeByGuildPaginated(
-                ListLootAwardsByGuildPaginatedQuery(guildId, offset = 20, limit = 10)
-            )
+            val result =
+                useCase.executeByGuildPaginated(
+                    ListLootAwardsByGuildPaginatedQuery(guildId, offset = 20, limit = 10),
+                )
 
             // Then
             result.isSuccess shouldBe true
@@ -269,11 +272,12 @@ class LootUseCasesTest : UnitTest() {
             every { lootBanRepository.save(capture(savedBanSlot)) } answers { savedBanSlot.captured }
 
             val newExpiry = Instant.now().plusSeconds(86400 * 7)
-            val command = UpdateLootBanCommand(
-                banId = banId,
-                reason = "Updated reason",
-                expiresAt = newExpiry
-            )
+            val command =
+                UpdateLootBanCommand(
+                    banId = banId,
+                    reason = "Updated reason",
+                    expiresAt = newExpiry,
+                )
 
             // When
             val result = useCase.execute(command)
@@ -291,10 +295,11 @@ class LootUseCasesTest : UnitTest() {
             val banId = "non-existent"
             every { lootBanRepository.findById(LootBanId(banId)) } returns null
 
-            val command = UpdateLootBanCommand(
-                banId = banId,
-                reason = "New reason"
-            )
+            val command =
+                UpdateLootBanCommand(
+                    banId = banId,
+                    reason = "New reason",
+                )
 
             // When
             val result = useCase.execute(command)
@@ -316,10 +321,11 @@ class LootUseCasesTest : UnitTest() {
             every { lootBanRepository.save(capture(savedBanSlot)) } answers { savedBanSlot.captured }
 
             // Only update reason
-            val command = UpdateLootBanCommand(
-                banId = banId,
-                reason = "Updated reason"
-            )
+            val command =
+                UpdateLootBanCommand(
+                    banId = banId,
+                    reason = "Updated reason",
+                )
 
             // When
             useCase.execute(command)
@@ -340,10 +346,11 @@ class LootUseCasesTest : UnitTest() {
             every { lootBanRepository.save(capture(savedBanSlot)) } answers { savedBanSlot.captured }
 
             val newExpiry = Instant.now().plusSeconds(86400 * 14)
-            val command = UpdateLootBanCommand(
-                banId = banId,
-                expiresAt = newExpiry
-            )
+            val command =
+                UpdateLootBanCommand(
+                    banId = banId,
+                    expiresAt = newExpiry,
+                )
 
             // When
             useCase.execute(command)
@@ -360,29 +367,31 @@ class LootUseCasesTest : UnitTest() {
         itemId: Long = 12345L,
         raiderId: Long = 1L,
         guildId: String = "test-guild",
-        tier: LootTier = LootTier.MYTHIC
-    ): LootAward = LootAward(
-        id = LootAwardId(id),
-        itemId = ItemId(itemId),
-        raiderId = RaiderId(raiderId),
-        guildId = GuildId(guildId),
-        awardedAt = Instant.now(),
-        flpsScore = FlpsScore.of(0.85),
-        tier = tier
-    )
+        tier: LootTier = LootTier.MYTHIC,
+    ): LootAward =
+        LootAward(
+            id = LootAwardId(id),
+            itemId = ItemId(itemId),
+            raiderId = RaiderId(raiderId),
+            guildId = GuildId(guildId),
+            awardedAt = Instant.now(),
+            flpsScore = FlpsScore.of(0.85),
+            tier = tier,
+        )
 
     private fun createLootBan(
         id: String = "ban-1",
         raiderId: Long = 1L,
         guildId: String = "test-guild",
         reason: String = "Test ban reason",
-        expiresAt: Instant? = Instant.now().plusSeconds(86400)
-    ): LootBan = LootBan(
-        id = LootBanId(id),
-        raiderId = RaiderId(raiderId),
-        guildId = GuildId(guildId),
-        reason = reason,
-        bannedAt = Instant.now(),
-        expiresAt = expiresAt
-    )
+        expiresAt: Instant? = Instant.now().plusSeconds(86400),
+    ): LootBan =
+        LootBan(
+            id = LootBanId(id),
+            raiderId = RaiderId(raiderId),
+            guildId = GuildId(guildId),
+            reason = reason,
+            bannedAt = Instant.now(),
+            expiresAt = expiresAt,
+        )
 }

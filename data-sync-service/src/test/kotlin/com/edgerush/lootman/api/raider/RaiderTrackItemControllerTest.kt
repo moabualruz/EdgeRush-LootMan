@@ -89,6 +89,6 @@ class RaiderTrackItemControllerTest : UnitTest() {
         id: Long = 1L,
         raiderId: Long = 1L,
         tier: String = "hero",
-        itemCount: Int? = 5
+        itemCount: Int? = 5,
     ) = RaiderTrackItemResponse(id, raiderId, tier, itemCount)
 }

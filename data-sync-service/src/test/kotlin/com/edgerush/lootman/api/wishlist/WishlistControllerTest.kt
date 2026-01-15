@@ -41,12 +41,13 @@ class WishlistControllerTest : UnitTest() {
         saveWishlistUseCase = mockk()
         deleteWishlistUseCase = mockk()
         currentUserService = mockk()
-        controller = WishlistController(
-            getWishlistUseCase,
-            saveWishlistUseCase,
-            deleteWishlistUseCase,
-            currentUserService,
-        )
+        controller =
+            WishlistController(
+                getWishlistUseCase,
+                saveWishlistUseCase,
+                deleteWishlistUseCase,
+                currentUserService,
+            )
     }
 
     @Nested
@@ -87,9 +88,10 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should throw exception when wishlist not found`() {
             // Given
-            every { getWishlistUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Wishlist not found for raider: 999")
-            )
+            every { getWishlistUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Wishlist not found for raider: 999"),
+                )
 
             // When/Then
             try {
@@ -103,11 +105,12 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should return top priority item in response`() {
             // Given
-            val items = listOf(
-                createWishlistItem(itemId = ItemId(100L), itemName = "Low Priority", priority = 1),
-                createWishlistItem(itemId = ItemId(200L), itemName = "High Priority", priority = 5),
-                createWishlistItem(itemId = ItemId(300L), itemName = "Medium Priority", priority = 3)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(itemId = ItemId(100L), itemName = "Low Priority", priority = 1),
+                    createWishlistItem(itemId = ItemId(200L), itemName = "High Priority", priority = 5),
+                    createWishlistItem(itemId = ItemId(300L), itemName = "Medium Priority", priority = 3),
+                )
             val wishlist = createWishlist(items = items)
 
             every { getWishlistUseCase.execute(any()) } returns Result.success(wishlist)
@@ -126,17 +129,19 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should return CREATED status with wishlist response`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "Test Item",
-                        priority = 1,
-                        upgradePercentage = 15.5
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "Test Item",
+                                priority = 1,
+                                upgradePercentage = 15.5,
+                            ),
+                        ),
                 )
-            )
 
             val wishlist = createWishlist()
 
@@ -155,24 +160,26 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should pass correct command to use case`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 42L,
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "Item 1",
-                        priority = 1,
-                        upgradePercentage = 10.0,
-                        specName = "Arms"
-                    ),
-                    WishlistItemRequest(
-                        itemId = 200L,
-                        itemName = "Item 2",
-                        priority = 2,
-                        upgradePercentage = 20.0
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 42L,
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "Item 1",
+                                priority = 1,
+                                upgradePercentage = 10.0,
+                                specName = "Arms",
+                            ),
+                            WishlistItemRequest(
+                                itemId = 200L,
+                                itemName = "Item 2",
+                                priority = 2,
+                                upgradePercentage = 20.0,
+                            ),
+                        ),
                 )
-            )
 
             val commandSlot = slot<SaveWishlistCommand>()
             val wishlist = createWishlist(raiderId = RaiderId(42L))
@@ -194,21 +201,24 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "",
-                        priority = 0,
-                        upgradePercentage = -1.0
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "",
+                                priority = 0,
+                                upgradePercentage = -1.0,
+                            ),
+                        ),
                 )
-            )
 
-            every { saveWishlistUseCase.execute(any()) } returns Result.failure(
-                IllegalArgumentException("Priority must be positive")
-            )
+            every { saveWishlistUseCase.execute(any()) } returns
+                Result.failure(
+                    IllegalArgumentException("Priority must be positive"),
+                )
 
             // When/Then
             try {
@@ -225,23 +235,27 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should return updated wishlist`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "Updated Item",
-                        priority = 3,
-                        upgradePercentage = 25.0
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "Updated Item",
+                                priority = 3,
+                                upgradePercentage = 25.0,
+                            ),
+                        ),
                 )
-            )
 
-            val updatedWishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = ItemId(100L), itemName = "Updated Item", priority = 3, upgradePercentage = 25.0)
+            val updatedWishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = ItemId(100L), itemName = "Updated Item", priority = 3, upgradePercentage = 25.0),
+                        ),
                 )
-            )
 
             every { saveWishlistUseCase.execute(any()) } returns Result.success(updatedWishlist)
 
@@ -259,17 +273,19 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should use path variable raiderId instead of request body`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 999L, // This should be ignored
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "Test Item",
-                        priority = 1,
-                        upgradePercentage = 10.0
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 999L, // This should be ignored
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "Test Item",
+                                priority = 1,
+                                upgradePercentage = 10.0,
+                            ),
+                        ),
                 )
-            )
 
             val commandSlot = slot<SaveWishlistCommand>()
             val wishlist = createWishlist(raiderId = RaiderId(42L))
@@ -286,21 +302,24 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should throw exception when use case fails`() {
             // Given
-            val request = SaveWishlistRequest(
-                raiderId = 1L,
-                items = listOf(
-                    WishlistItemRequest(
-                        itemId = 100L,
-                        itemName = "Test Item",
-                        priority = 1,
-                        upgradePercentage = 10.0
-                    )
+            val request =
+                SaveWishlistRequest(
+                    raiderId = 1L,
+                    items =
+                        listOf(
+                            WishlistItemRequest(
+                                itemId = 100L,
+                                itemName = "Test Item",
+                                priority = 1,
+                                upgradePercentage = 10.0,
+                            ),
+                        ),
                 )
-            )
 
-            every { saveWishlistUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Raider not found: 999")
-            )
+            every { saveWishlistUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Raider not found: 999"),
+                )
 
             // When/Then
             try {
@@ -346,9 +365,10 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should throw exception when wishlist not found`() {
             // Given
-            every { deleteWishlistUseCase.execute(any()) } returns Result.failure(
-                NoSuchElementException("Wishlist not found for raider: 999")
-            )
+            every { deleteWishlistUseCase.execute(any()) } returns
+                Result.failure(
+                    NoSuchElementException("Wishlist not found for raider: 999"),
+                )
 
             // When/Then
             try {
@@ -365,22 +385,23 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should correctly map all wishlist fields to response`() {
             // Given
-            val items = listOf(
-                createWishlistItem(
-                    itemId = ItemId(100L),
-                    itemName = "Legendary Sword",
-                    priority = 1,
-                    upgradePercentage = 15.5,
-                    specName = "Fury"
-                ),
-                createWishlistItem(
-                    itemId = ItemId(200L),
-                    itemName = "Epic Helm",
-                    priority = 2,
-                    upgradePercentage = 8.2,
-                    specName = "Protection"
+            val items =
+                listOf(
+                    createWishlistItem(
+                        itemId = ItemId(100L),
+                        itemName = "Legendary Sword",
+                        priority = 1,
+                        upgradePercentage = 15.5,
+                        specName = "Fury",
+                    ),
+                    createWishlistItem(
+                        itemId = ItemId(200L),
+                        itemName = "Epic Helm",
+                        priority = 2,
+                        upgradePercentage = 8.2,
+                        specName = "Protection",
+                    ),
                 )
-            )
             val wishlist = createWishlist(raiderId = RaiderId(123L), items = items)
 
             every { getWishlistUseCase.execute(any()) } returns Result.success(wishlist)
@@ -403,9 +424,10 @@ class WishlistControllerTest : UnitTest() {
         @Test
         fun `should calculate normalized upgrade value correctly`() {
             // Given
-            val items = listOf(
-                createWishlistItem(upgradePercentage = 50.0)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(upgradePercentage = 50.0),
+                )
             val wishlist = createWishlist(items = items)
 
             every { getWishlistUseCase.execute(any()) } returns Result.success(wishlist)
@@ -435,23 +457,25 @@ class WishlistControllerTest : UnitTest() {
 
     private fun createWishlist(
         raiderId: RaiderId = RaiderId(1L),
-        items: List<WishlistItem> = listOf(createWishlistItem())
-    ): Wishlist = Wishlist(
-        raiderId = raiderId,
-        items = items
-    )
+        items: List<WishlistItem> = listOf(createWishlistItem()),
+    ): Wishlist =
+        Wishlist(
+            raiderId = raiderId,
+            items = items,
+        )
 
     private fun createWishlistItem(
         itemId: ItemId = ItemId(12345L),
         itemName: String = "Test Item",
         priority: Int = 1,
         upgradePercentage: Double = 10.0,
-        specName: String? = null
-    ): WishlistItem = WishlistItem(
-        itemId = itemId,
-        itemName = itemName,
-        priority = priority,
-        upgradePercentage = upgradePercentage,
-        specName = specName
-    )
+        specName: String? = null,
+    ): WishlistItem =
+        WishlistItem(
+            itemId = itemId,
+            itemName = itemName,
+            priority = priority,
+            upgradePercentage = upgradePercentage,
+            specName = specName,
+        )
 }

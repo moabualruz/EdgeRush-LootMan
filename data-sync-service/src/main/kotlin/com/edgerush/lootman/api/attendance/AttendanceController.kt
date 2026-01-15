@@ -76,14 +76,15 @@ class AttendanceController(
         val now = LocalDate.now()
         val startDate = now.minusDays(90)
 
-        val query = GetAttendanceReportQuery(
-            raiderId = raiderId.value,
-            guildId = guildId,
-            startDate = startDate,
-            endDate = now,
-            instance = null,
-            encounter = null,
-        )
+        val query =
+            GetAttendanceReportQuery(
+                raiderId = raiderId.value,
+                guildId = guildId,
+                startDate = startDate,
+                endDate = now,
+                instance = null,
+                encounter = null,
+            )
 
         return getAttendanceReportUseCase.execute(query)
             .map { report -> AttendanceReportResponse.from(report) }
@@ -174,7 +175,9 @@ class AttendanceController(
      * @return 200 OK with the attendance record, or 404 if not found
      */
     @GetMapping("/{recordId}")
-    fun getAttendanceRecord(@PathVariable recordId: String): TrackAttendanceResponse {
+    fun getAttendanceRecord(
+        @PathVariable recordId: String,
+    ): TrackAttendanceResponse {
         return getAttendanceRecordUseCase.execute(GetAttendanceRecordQuery(recordId))
             .map { record -> TrackAttendanceResponse.from(record) }
             .getOrThrow()
@@ -190,17 +193,18 @@ class AttendanceController(
     @PutMapping("/{recordId}")
     fun updateAttendanceRecord(
         @PathVariable recordId: String,
-        @RequestBody request: UpdateAttendanceRequest
+        @RequestBody request: UpdateAttendanceRequest,
     ): TrackAttendanceResponse {
-        val command = UpdateAttendanceCommand(
-            recordId = recordId,
-            instance = request.instance,
-            encounter = request.encounter,
-            startDate = request.startDate,
-            endDate = request.endDate,
-            attendedRaids = request.attendedRaids,
-            totalRaids = request.totalRaids
-        )
+        val command =
+            UpdateAttendanceCommand(
+                recordId = recordId,
+                instance = request.instance,
+                encounter = request.encounter,
+                startDate = request.startDate,
+                endDate = request.endDate,
+                attendedRaids = request.attendedRaids,
+                totalRaids = request.totalRaids,
+            )
 
         return updateAttendanceUseCase.execute(command)
             .map { record -> TrackAttendanceResponse.from(record) }
@@ -214,7 +218,9 @@ class AttendanceController(
      * @return 204 No Content on success, or 404 if not found
      */
     @DeleteMapping("/{recordId}")
-    fun deleteAttendanceRecord(@PathVariable recordId: String): ResponseEntity<Void> {
+    fun deleteAttendanceRecord(
+        @PathVariable recordId: String,
+    ): ResponseEntity<Void> {
         return deleteAttendanceUseCase.execute(DeleteAttendanceCommand(recordId))
             .map { ResponseEntity.noContent().build<Void>() }
             .getOrThrow()
@@ -234,15 +240,15 @@ class AttendanceController(
         @PathVariable raiderId: Long,
         @RequestParam guildId: String,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate,
     ): RaiderAttendanceHistoryResponse {
         return listRaiderAttendanceUseCase.execute(
             ListRaiderAttendanceQuery(
                 raiderId = raiderId,
                 guildId = guildId,
                 startDate = startDate,
-                endDate = endDate
-            )
+                endDate = endDate,
+            ),
         )
             .map { records ->
                 RaiderAttendanceHistoryResponse(
@@ -251,7 +257,7 @@ class AttendanceController(
                     startDate = startDate,
                     endDate = endDate,
                     records = records.map { TrackAttendanceResponse.from(it) },
-                    totalRecords = records.size
+                    totalRecords = records.size,
                 )
             }
             .getOrThrow()
@@ -269,14 +275,14 @@ class AttendanceController(
     fun getGuildAttendanceSummary(
         @PathVariable guildId: String,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate,
     ): GuildAttendanceSummaryResponse {
         return getGuildAttendanceSummaryUseCase.execute(
             GetGuildAttendanceSummaryQuery(
                 guildId = guildId,
                 startDate = startDate,
-                endDate = endDate
-            )
+                endDate = endDate,
+            ),
         )
             .map { summary -> GuildAttendanceSummaryResponse.from(summary) }
             .getOrThrow()

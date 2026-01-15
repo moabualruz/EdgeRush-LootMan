@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.recruitment
 
 import com.edgerush.lootman.api.common.CountResponse
-import com.edgerush.lootman.api.common.ExistsResponse
 import com.edgerush.lootman.domain.application.client.RaiderIOCharacterProfile
 import com.edgerush.lootman.domain.application.client.RaiderIOClient
 import com.edgerush.lootman.domain.application.model.Application
@@ -23,7 +22,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -47,7 +45,6 @@ class RecruitmentApplicationController(
     private val raiderIOClient: RaiderIOClient,
     private val dataFetchService: ApplicationDataFetchService,
 ) {
-
     @Operation(summary = "Get all applications for a guild", description = "Returns applications for a guild with optional status filter")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Successfully retrieved applications"),
@@ -63,11 +60,12 @@ class RecruitmentApplicationController(
         @Parameter(description = "Page size")
         @RequestParam(defaultValue = "50") limit: Int,
     ): List<ApplicationResponse> {
-        val applications = if (status != null) {
-            applicationService.getApplicationsByStatus(GuildId(guildId), status, offset, limit)
-        } else {
-            applicationService.getApplicationsByGuild(GuildId(guildId), offset, limit)
-        }
+        val applications =
+            if (status != null) {
+                applicationService.getApplicationsByStatus(GuildId(guildId), status, offset, limit)
+            } else {
+                applicationService.getApplicationsByGuild(GuildId(guildId), offset, limit)
+            }
         return applications.map { it.toResponse() }
     }
 
@@ -116,26 +114,27 @@ class RecruitmentApplicationController(
         @Valid @RequestBody request: SubmitApplicationRequest,
     ): ResponseEntity<ApplicationResponse> {
         return try {
-            val application = applicationService.submitApplication(
-                guildId = GuildId(guildId),
-                battleNetId = request.battleNetId,
-                discordId = request.discordId,
-                email = request.email,
-                characterName = request.characterName,
-                characterRealm = request.characterRealm,
-                characterClass = request.characterClass,
-                specialization = request.specialization,
-                itemLevel = request.itemLevel,
-                raiderIOScore = request.raiderIOScore,
-                bestParseAverage = request.bestParseAverage,
-                age = request.age,
-                location = request.location,
-                timezone = request.timezone,
-                raidDaysAvailable = request.raidDaysAvailable,
-                previousGuilds = request.previousGuilds,
-                reasonForLeaving = request.reasonForLeaving,
-                whyThisGuild = request.whyThisGuild,
-            )
+            val application =
+                applicationService.submitApplication(
+                    guildId = GuildId(guildId),
+                    battleNetId = request.battleNetId,
+                    discordId = request.discordId,
+                    email = request.email,
+                    characterName = request.characterName,
+                    characterRealm = request.characterRealm,
+                    characterClass = request.characterClass,
+                    specialization = request.specialization,
+                    itemLevel = request.itemLevel,
+                    raiderIOScore = request.raiderIOScore,
+                    bestParseAverage = request.bestParseAverage,
+                    age = request.age,
+                    location = request.location,
+                    timezone = request.timezone,
+                    raidDaysAvailable = request.raidDaysAvailable,
+                    previousGuilds = request.previousGuilds,
+                    reasonForLeaving = request.reasonForLeaving,
+                    whyThisGuild = request.whyThisGuild,
+                )
             ResponseEntity.status(HttpStatus.CREATED).body(application.toResponse())
         } catch (e: IllegalStateException) {
             ResponseEntity.status(HttpStatus.CONFLICT).build()
@@ -217,11 +216,12 @@ class RecruitmentApplicationController(
         @Parameter(description = "Filter by status")
         @RequestParam(required = false) status: ApplicationStatus?,
     ): CountResponse {
-        val count = if (status != null) {
-            applicationService.countApplicationsByStatus(GuildId(guildId), status)
-        } else {
-            applicationService.countApplicationsByGuild(GuildId(guildId))
-        }
+        val count =
+            if (status != null) {
+                applicationService.countApplicationsByStatus(GuildId(guildId), status)
+            } else {
+                applicationService.countApplicationsByGuild(GuildId(guildId))
+            }
         return CountResponse(count)
     }
 
@@ -279,7 +279,7 @@ class RecruitmentApplicationController(
                     bestParseAverage = result.bestParseAverage,
                     medianParseAverage = result.medianParseAverage,
                     profileUrl = result.profileUrl,
-                )
+                ),
             )
         } catch (e: CharacterNotFoundException) {
             ResponseEntity.notFound().build()
@@ -288,44 +288,46 @@ class RecruitmentApplicationController(
         }
     }
 
-    private fun Application.toResponse() = ApplicationResponse(
-        id = id.value,
-        guildId = guildId.value,
-        battleNetId = battleNetId,
-        discordId = discordId,
-        email = email,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterClass = characterClass,
-        specialization = specialization,
-        itemLevel = itemLevel,
-        raiderIOScore = raiderIOScore,
-        bestParseAverage = bestParseAverage,
-        age = age,
-        location = location,
-        timezone = timezone,
-        raidDaysAvailable = raidDaysAvailable,
-        previousGuilds = previousGuilds,
-        reasonForLeaving = reasonForLeaving,
-        whyThisGuild = whyThisGuild,
-        status = status,
-        reviewedBy = reviewedBy,
-        reviewedAt = reviewedAt,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-    )
+    private fun Application.toResponse() =
+        ApplicationResponse(
+            id = id.value,
+            guildId = guildId.value,
+            battleNetId = battleNetId,
+            discordId = discordId,
+            email = email,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterClass = characterClass,
+            specialization = specialization,
+            itemLevel = itemLevel,
+            raiderIOScore = raiderIOScore,
+            bestParseAverage = bestParseAverage,
+            age = age,
+            location = location,
+            timezone = timezone,
+            raidDaysAvailable = raidDaysAvailable,
+            previousGuilds = previousGuilds,
+            reasonForLeaving = reasonForLeaving,
+            whyThisGuild = whyThisGuild,
+            status = status,
+            reviewedBy = reviewedBy,
+            reviewedAt = reviewedAt,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 
-    private fun RaiderIOCharacterProfile.toLookupResponse() = CharacterLookupResponse(
-        name = name,
-        realm = realm,
-        region = region,
-        characterClass = characterClass,
-        specialization = activeSpecName,
-        role = activeSpecRole,
-        itemLevel = getItemLevel(),
-        raiderIOScore = getCurrentMythicPlusScore(),
-        profileUrl = profileUrl,
-    )
+    private fun RaiderIOCharacterProfile.toLookupResponse() =
+        CharacterLookupResponse(
+            name = name,
+            realm = realm,
+            region = region,
+            characterClass = characterClass,
+            specialization = activeSpecName,
+            role = activeSpecRole,
+            itemLevel = getItemLevel(),
+            raiderIOScore = getCurrentMythicPlusScore(),
+            profileUrl = profileUrl,
+        )
 }
 
 data class SubmitApplicationRequest(

@@ -9,14 +9,12 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
 import org.springframework.mock.web.server.MockServerWebExchange
 import org.springframework.security.config.web.server.ServerHttpSecurity
-import org.springframework.web.cors.CorsConfiguration
 
 /**
  * Comprehensive unit tests for SecurityConfig.
@@ -32,7 +30,6 @@ import org.springframework.web.cors.CorsConfiguration
  * configuration logic that can be tested in isolation.
  */
 class SecurityConfigTest : UnitTest() {
-
     private lateinit var jwtAuthenticationFilter: JwtAuthenticationFilter
     private lateinit var adminModeConfig: AdminModeConfig
 
@@ -49,7 +46,6 @@ class SecurityConfigTest : UnitTest() {
 
     @Nested
     inner class `CORS configuration` {
-
         @Test
         fun `should allow all origins when admin mode is enabled`() {
             // Arrange
@@ -181,7 +177,6 @@ class SecurityConfigTest : UnitTest() {
 
     @Nested
     inner class `admin mode behavior` {
-
         @Test
         fun `should create security config with admin mode enabled`() {
             // Arrange
@@ -209,7 +204,6 @@ class SecurityConfigTest : UnitTest() {
 
     @Nested
     inner class `configuration instantiation` {
-
         @Test
         fun `should accept JwtAuthenticationFilter dependency`() {
             // Arrange
@@ -239,7 +233,6 @@ class SecurityConfigTest : UnitTest() {
 
     @Nested
     inner class `CORS configuration edge cases` {
-
         @Test
         fun `should return config for root path`() {
             // Arrange
@@ -291,7 +284,6 @@ class SecurityConfigTest : UnitTest() {
 
     @Nested
     inner class `security rules documentation` {
-
         /**
          * These tests document the expected security rules based on the SecurityConfig.
          * They verify the configuration intent without requiring a full Spring context.
@@ -307,15 +299,16 @@ class SecurityConfigTest : UnitTest() {
             // - /swagger-ui/**
             // - /swagger-ui.html
             // - /webjars/**
-            val publicEndpoints = listOf(
-                "/actuator/health",
-                "/actuator/metrics",
-                "/actuator/info",
-                "/v3/api-docs/**",
-                "/swagger-ui/**",
-                "/swagger-ui.html",
-                "/webjars/**",
-            )
+            val publicEndpoints =
+                listOf(
+                    "/actuator/health",
+                    "/actuator/metrics",
+                    "/actuator/info",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/webjars/**",
+                )
 
             // This is a documentation test - actual enforcement is tested in integration tests
             publicEndpoints.size shouldBe 7
@@ -349,7 +342,6 @@ class SecurityConfigTest : UnitTest() {
  * This tests the interaction between the two components.
  */
 class SecurityConfigAdminModeIntegrationTest : UnitTest() {
-
     private fun createExchange(path: String): MockServerWebExchange {
         val request = MockServerHttpRequest.get(path).build()
         return MockServerWebExchange.from(request)
@@ -357,7 +349,6 @@ class SecurityConfigAdminModeIntegrationTest : UnitTest() {
 
     @Nested
     inner class `AdminModeConfig and SecurityConfig interaction` {
-
         @Test
         fun `should use AdminModeConfig enabled state for CORS decisions`() {
             // Arrange
@@ -425,7 +416,6 @@ class SecurityConfigAdminModeIntegrationTest : UnitTest() {
  * authorization rules, and JWT filter integration.
  */
 class SecurityConfigFilterChainTest : UnitTest() {
-
     private lateinit var jwtAuthenticationFilter: JwtAuthenticationFilter
     private lateinit var adminModeConfig: AdminModeConfig
 
@@ -437,7 +427,6 @@ class SecurityConfigFilterChainTest : UnitTest() {
 
     @Nested
     inner class `securityWebFilterChain with admin mode enabled` {
-
         @Test
         fun `should create security filter chain when admin mode is enabled`() {
             // Arrange
@@ -470,7 +459,6 @@ class SecurityConfigFilterChainTest : UnitTest() {
 
     @Nested
     inner class `securityWebFilterChain with admin mode disabled` {
-
         @Test
         fun `should create security filter chain when admin mode is disabled`() {
             // Arrange
@@ -521,7 +509,6 @@ class SecurityConfigFilterChainTest : UnitTest() {
 
     @Nested
     inner class `securityWebFilterChain CSRF and security context configuration` {
-
         @Test
         fun `should disable CSRF protection`() {
             // Arrange
@@ -570,7 +557,6 @@ class SecurityConfigFilterChainTest : UnitTest() {
 
     @Nested
     inner class `securityWebFilterChain authorization exchange rules` {
-
         @Test
         fun `should permit actuator health endpoint`() {
             // Arrange

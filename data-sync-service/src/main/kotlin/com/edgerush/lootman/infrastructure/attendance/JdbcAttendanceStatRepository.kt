@@ -21,9 +21,9 @@ import java.time.ZoneOffset
 class JdbcAttendanceStatRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : AttendanceStatRepository {
-
     override fun findById(id: Long): AttendanceStatEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, instance, encounter, start_date, end_date, character_id, character_name,
                    character_realm, character_class, character_role, character_region,
                    attended_amount_of_raids, total_amount_of_raids, attended_percentage,
@@ -31,7 +31,7 @@ class JdbcAttendanceStatRepository(
                    team_id, season_id, period_id, synced_at
             FROM attendance_stats
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, attendanceStatRowMapper, id)
         return results.firstOrNull()
@@ -43,8 +43,12 @@ class JdbcAttendanceStatRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<AttendanceStatEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity> {
+        val sql =
+            """
             SELECT id, instance, encounter, start_date, end_date, character_id, character_name,
                    character_realm, character_class, character_role, character_region,
                    attended_amount_of_raids, total_amount_of_raids, attended_percentage,
@@ -53,7 +57,7 @@ class JdbcAttendanceStatRepository(
             FROM attendance_stats
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, attendanceStatRowMapper, limit, offset)
     }
@@ -63,8 +67,13 @@ class JdbcAttendanceStatRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<AttendanceStatEntity> {
-        val sql = """
+    override fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity> {
+        val sql =
+            """
             SELECT id, instance, encounter, start_date, end_date, character_id, character_name,
                    character_realm, character_class, character_role, character_region,
                    attended_amount_of_raids, total_amount_of_raids, attended_percentage,
@@ -74,7 +83,7 @@ class JdbcAttendanceStatRepository(
             WHERE character_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, attendanceStatRowMapper, characterId, limit, offset)
     }
@@ -84,8 +93,13 @@ class JdbcAttendanceStatRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, characterId) ?: 0L
     }
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<AttendanceStatEntity> {
-        val sql = """
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity> {
+        val sql =
+            """
             SELECT id, instance, encounter, start_date, end_date, character_id, character_name,
                    character_realm, character_class, character_role, character_region,
                    attended_amount_of_raids, total_amount_of_raids, attended_percentage,
@@ -95,7 +109,7 @@ class JdbcAttendanceStatRepository(
             WHERE team_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, attendanceStatRowMapper, teamId, limit, offset)
     }
@@ -105,8 +119,13 @@ class JdbcAttendanceStatRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, teamId) ?: 0L
     }
 
-    override fun findBySeasonId(seasonId: Long, offset: Long, limit: Int): List<AttendanceStatEntity> {
-        val sql = """
+    override fun findBySeasonId(
+        seasonId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity> {
+        val sql =
+            """
             SELECT id, instance, encounter, start_date, end_date, character_id, character_name,
                    character_realm, character_class, character_role, character_region,
                    attended_amount_of_raids, total_amount_of_raids, attended_percentage,
@@ -116,7 +135,7 @@ class JdbcAttendanceStatRepository(
             WHERE season_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, attendanceStatRowMapper, seasonId, limit, offset)
     }
@@ -141,7 +160,8 @@ class JdbcAttendanceStatRepository(
     }
 
     private fun insertAttendanceStat(entity: AttendanceStatEntity): AttendanceStatEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO attendance_stats (
                 instance, encounter, start_date, end_date, character_id, character_name,
                 character_realm, character_class, character_role, character_region,
@@ -149,7 +169,7 @@ class JdbcAttendanceStatRepository(
                 selected_amount_of_encounters, total_amount_of_encounters, selected_percentage,
                 team_id, season_id, period_id, synced_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -182,7 +202,8 @@ class JdbcAttendanceStatRepository(
     }
 
     private fun updateAttendanceStat(entity: AttendanceStatEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE attendance_stats SET
                 instance = ?, encounter = ?, start_date = ?, end_date = ?, character_id = ?,
                 character_name = ?, character_realm = ?, character_class = ?, character_role = ?,
@@ -190,7 +211,7 @@ class JdbcAttendanceStatRepository(
                 attended_percentage = ?, selected_amount_of_encounters = ?, total_amount_of_encounters = ?,
                 selected_percentage = ?, team_id = ?, season_id = ?, period_id = ?, synced_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -218,59 +239,60 @@ class JdbcAttendanceStatRepository(
         )
     }
 
-    private val attendanceStatRowMapper = RowMapper { rs, _ ->
-        val characterIdValue = rs.getLong("character_id")
-        val characterId = if (rs.wasNull()) null else characterIdValue
+    private val attendanceStatRowMapper =
+        RowMapper { rs, _ ->
+            val characterIdValue = rs.getLong("character_id")
+            val characterId = if (rs.wasNull()) null else characterIdValue
 
-        val attendedAmountOfRaidsValue = rs.getInt("attended_amount_of_raids")
-        val attendedAmountOfRaids = if (rs.wasNull()) null else attendedAmountOfRaidsValue
+            val attendedAmountOfRaidsValue = rs.getInt("attended_amount_of_raids")
+            val attendedAmountOfRaids = if (rs.wasNull()) null else attendedAmountOfRaidsValue
 
-        val totalAmountOfRaidsValue = rs.getInt("total_amount_of_raids")
-        val totalAmountOfRaids = if (rs.wasNull()) null else totalAmountOfRaidsValue
+            val totalAmountOfRaidsValue = rs.getInt("total_amount_of_raids")
+            val totalAmountOfRaids = if (rs.wasNull()) null else totalAmountOfRaidsValue
 
-        val attendedPercentageValue = rs.getDouble("attended_percentage")
-        val attendedPercentage = if (rs.wasNull()) null else attendedPercentageValue
+            val attendedPercentageValue = rs.getDouble("attended_percentage")
+            val attendedPercentage = if (rs.wasNull()) null else attendedPercentageValue
 
-        val selectedAmountOfEncountersValue = rs.getInt("selected_amount_of_encounters")
-        val selectedAmountOfEncounters = if (rs.wasNull()) null else selectedAmountOfEncountersValue
+            val selectedAmountOfEncountersValue = rs.getInt("selected_amount_of_encounters")
+            val selectedAmountOfEncounters = if (rs.wasNull()) null else selectedAmountOfEncountersValue
 
-        val totalAmountOfEncountersValue = rs.getInt("total_amount_of_encounters")
-        val totalAmountOfEncounters = if (rs.wasNull()) null else totalAmountOfEncountersValue
+            val totalAmountOfEncountersValue = rs.getInt("total_amount_of_encounters")
+            val totalAmountOfEncounters = if (rs.wasNull()) null else totalAmountOfEncountersValue
 
-        val selectedPercentageValue = rs.getDouble("selected_percentage")
-        val selectedPercentage = if (rs.wasNull()) null else selectedPercentageValue
+            val selectedPercentageValue = rs.getDouble("selected_percentage")
+            val selectedPercentage = if (rs.wasNull()) null else selectedPercentageValue
 
-        val teamIdValue = rs.getLong("team_id")
-        val teamId = if (rs.wasNull()) null else teamIdValue
+            val teamIdValue = rs.getLong("team_id")
+            val teamId = if (rs.wasNull()) null else teamIdValue
 
-        val seasonIdValue = rs.getLong("season_id")
-        val seasonId = if (rs.wasNull()) null else seasonIdValue
+            val seasonIdValue = rs.getLong("season_id")
+            val seasonId = if (rs.wasNull()) null else seasonIdValue
 
-        val periodIdValue = rs.getLong("period_id")
-        val periodId = if (rs.wasNull()) null else periodIdValue
+            val periodIdValue = rs.getLong("period_id")
+            val periodId = if (rs.wasNull()) null else periodIdValue
 
-        AttendanceStatEntity(
-            id = rs.getLong("id"),
-            instance = rs.getString("instance"),
-            encounter = rs.getString("encounter"),
-            startDate = rs.getDate("start_date")?.toLocalDate(),
-            endDate = rs.getDate("end_date")?.toLocalDate(),
-            characterId = characterId,
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            characterClass = rs.getString("character_class"),
-            characterRole = rs.getString("character_role"),
-            characterRegion = rs.getString("character_region"),
-            attendedAmountOfRaids = attendedAmountOfRaids,
-            totalAmountOfRaids = totalAmountOfRaids,
-            attendedPercentage = attendedPercentage,
-            selectedAmountOfEncounters = selectedAmountOfEncounters,
-            totalAmountOfEncounters = totalAmountOfEncounters,
-            selectedPercentage = selectedPercentage,
-            teamId = teamId,
-            seasonId = seasonId,
-            periodId = periodId,
-            syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-        )
-    }
+            AttendanceStatEntity(
+                id = rs.getLong("id"),
+                instance = rs.getString("instance"),
+                encounter = rs.getString("encounter"),
+                startDate = rs.getDate("start_date")?.toLocalDate(),
+                endDate = rs.getDate("end_date")?.toLocalDate(),
+                characterId = characterId,
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                characterClass = rs.getString("character_class"),
+                characterRole = rs.getString("character_role"),
+                characterRegion = rs.getString("character_region"),
+                attendedAmountOfRaids = attendedAmountOfRaids,
+                totalAmountOfRaids = totalAmountOfRaids,
+                attendedPercentage = attendedPercentage,
+                selectedAmountOfEncounters = selectedAmountOfEncounters,
+                totalAmountOfEncounters = totalAmountOfEncounters,
+                selectedPercentage = selectedPercentage,
+                teamId = teamId,
+                seasonId = seasonId,
+                periodId = periodId,
+                syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            )
+        }
 }

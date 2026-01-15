@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus
  * Unit tests for TrialController.
  */
 class TrialControllerTest : UnitTest() {
-
     private lateinit var trialService: TrialService
     private lateinit var controller: TrialController
 
@@ -36,15 +35,15 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTrialTests {
-
         @Test
         fun `should create new trial and return 201`() {
             // Arrange
-            val request = CreateTrialRequest(
-                applicationId = "app-123",
-                guildId = guildId,
-                raidsRequired = 8,
-            )
+            val request =
+                CreateTrialRequest(
+                    applicationId = "app-123",
+                    guildId = guildId,
+                    raidsRequired = 8,
+                )
             val trial = createValidTrial(applicationId = "app-123")
             every { trialService.createTrial(any(), any(), any(), any()) } returns trial
 
@@ -60,11 +59,12 @@ class TrialControllerTest : UnitTest() {
         @Test
         fun `should return 409 when trial already exists`() {
             // Arrange
-            val request = CreateTrialRequest(
-                applicationId = "app-123",
-                guildId = guildId,
-                raidsRequired = 8,
-            )
+            val request =
+                CreateTrialRequest(
+                    applicationId = "app-123",
+                    guildId = guildId,
+                    raidsRequired = 8,
+                )
             every { trialService.createTrial(any(), any(), any(), any()) } throws
                 IllegalStateException("Trial already exists")
 
@@ -78,7 +78,6 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class GetTrialTests {
-
         @Test
         fun `should get trial by ID`() {
             // Arrange
@@ -108,14 +107,14 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class ListTrialsTests {
-
         @Test
         fun `should list trials for guild`() {
             // Arrange
-            val trials = listOf(
-                createValidTrial(applicationId = "app-1"),
-                createValidTrial(applicationId = "app-2"),
-            )
+            val trials =
+                listOf(
+                    createValidTrial(applicationId = "app-1"),
+                    createValidTrial(applicationId = "app-2"),
+                )
             every { trialService.listTrials(GuildId(guildId), 0, 50) } returns trials
             every { trialService.countTrials(GuildId(guildId)) } returns 2L
 
@@ -160,23 +159,24 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateMetricsTests {
-
         @Test
         fun `should update trial metrics`() {
             // Arrange
             val trial = createValidTrial()
-            val updated = trial.updateMetrics(
-                raidsAttended = 5,
-                attendanceRate = 0.85,
-                averagePerformance = 75.0,
-                deathsPerRaid = 1.2,
-            )
-            val request = UpdateMetricsRequest(
-                raidsAttended = 5,
-                attendanceRate = 0.85,
-                averagePerformance = 75.0,
-                deathsPerRaid = 1.2,
-            )
+            val updated =
+                trial.updateMetrics(
+                    raidsAttended = 5,
+                    attendanceRate = 0.85,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 1.2,
+                )
+            val request =
+                UpdateMetricsRequest(
+                    raidsAttended = 5,
+                    attendanceRate = 0.85,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 1.2,
+                )
             every { trialService.updateMetrics(trial.id, 5, 0.85, 75.0, 1.2) } returns updated
 
             // Act
@@ -204,16 +204,16 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class PromoteTests {
-
         @Test
         fun `should promote trial`() {
             // Arrange
             val trial = createValidTrial()
             val promoted = trial.promote("officer-123", "Great job")
-            val request = PromoteTrialRequest(
-                promoterId = "officer-123",
-                reason = "Great job",
-            )
+            val request =
+                PromoteTrialRequest(
+                    promoterId = "officer-123",
+                    reason = "Great job",
+                )
             every { trialService.promoteTrial(trial.id, "officer-123", "Great job") } returns promoted
 
             // Act
@@ -256,17 +256,17 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class ExtendTests {
-
         @Test
         fun `should extend trial`() {
             // Arrange
             val trial = createValidTrial()
             val extended = trial.extend("officer-123", 4, "Needs more time")
-            val request = ExtendTrialRequest(
-                extenderId = "officer-123",
-                additionalRaids = 4,
-                reason = "Needs more time",
-            )
+            val request =
+                ExtendTrialRequest(
+                    extenderId = "officer-123",
+                    additionalRaids = 4,
+                    reason = "Needs more time",
+                )
             every { trialService.extendTrial(trial.id, "officer-123", 4, "Needs more time") } returns extended
 
             // Act
@@ -281,17 +281,17 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class EndTrialTests {
-
         @Test
         fun `should end trial`() {
             // Arrange
             val trial = createValidTrial()
             val ended = trial.endTrial("officer-123", TrialOutcome.FAILED, "Poor attendance")
-            val request = EndTrialRequest(
-                officerId = "officer-123",
-                outcome = TrialOutcome.FAILED,
-                reason = "Poor attendance",
-            )
+            val request =
+                EndTrialRequest(
+                    officerId = "officer-123",
+                    outcome = TrialOutcome.FAILED,
+                    reason = "Poor attendance",
+                )
             every { trialService.endTrial(trial.id, "officer-123", TrialOutcome.FAILED, "Poor attendance") } returns ended
 
             // Act
@@ -306,7 +306,6 @@ class TrialControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTrialTests {
-
         @Test
         fun `should delete trial and return 204`() {
             // Arrange
@@ -322,11 +321,10 @@ class TrialControllerTest : UnitTest() {
         }
     }
 
-    private fun createValidTrial(
-        applicationId: String = "app-${System.nanoTime()}",
-    ): Trial = Trial.create(
-        applicationId = ApplicationId(applicationId),
-        guildId = GuildId(guildId),
-        raidsRequired = 8,
-    )
+    private fun createValidTrial(applicationId: String = "app-${System.nanoTime()}"): Trial =
+        Trial.create(
+            applicationId = ApplicationId(applicationId),
+            guildId = GuildId(guildId),
+            raidsRequired = 8,
+        )
 }

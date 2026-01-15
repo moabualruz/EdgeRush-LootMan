@@ -12,23 +12,17 @@ import java.time.LocalDateTime
 data class CreateBehavioralActionRequest(
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Character name is required")
     val characterName: String,
-
     @field:NotBlank(message = "Action type is required")
     val actionType: String,
-
     @field:DecimalMin(value = "0.0", message = "Deduction amount must be non-negative")
     @field:DecimalMax(value = "1.0", message = "Deduction amount cannot exceed 1.0")
     val deductionAmount: Double,
-
     @field:NotBlank(message = "Reason is required")
     val reason: String,
-
     @field:NotBlank(message = "Applied by is required")
     val appliedBy: String,
-
     val expiresAt: LocalDateTime? = null,
 )
 
@@ -58,18 +52,19 @@ data class BehavioralActionResponse(
     val isActive: Boolean,
 ) {
     companion object {
-        fun from(entity: BehavioralActionEntity): BehavioralActionResponse = BehavioralActionResponse(
-            id = entity.id ?: 0L,
-            guildId = entity.guildId,
-            characterName = entity.characterName,
-            actionType = entity.actionType,
-            deductionAmount = entity.deductionAmount,
-            reason = entity.reason,
-            appliedBy = entity.appliedBy,
-            appliedAt = entity.appliedAt,
-            expiresAt = entity.expiresAt,
-            isActive = entity.isActive,
-        )
+        fun from(entity: BehavioralActionEntity): BehavioralActionResponse =
+            BehavioralActionResponse(
+                id = entity.id ?: 0L,
+                guildId = entity.guildId,
+                characterName = entity.characterName,
+                actionType = entity.actionType,
+                deductionAmount = entity.deductionAmount,
+                reason = entity.reason,
+                appliedBy = entity.appliedBy,
+                appliedAt = entity.appliedAt,
+                expiresAt = entity.expiresAt,
+                isActive = entity.isActive,
+            )
     }
 }
 

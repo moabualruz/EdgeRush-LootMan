@@ -11,10 +11,8 @@ import org.junit.jupiter.api.Test
  * Unit tests for ItemId value object.
  */
 class ItemIdTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid item ID with positive value`() {
             // Arrange & Act
@@ -57,47 +55,49 @@ class ItemIdTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when value is zero`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ItemId(0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ItemId(0L)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
 
         @Test
         fun `should throw exception when value is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ItemId(-1L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ItemId(-1L)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
 
         @Test
         fun `should throw exception when value is large negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ItemId(-999999L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ItemId(-999999L)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
 
         @Test
         fun `should throw exception when value is Long MIN_VALUE`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ItemId(Long.MIN_VALUE)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ItemId(Long.MIN_VALUE)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
     }
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when values are the same`() {
             // Arrange
@@ -141,7 +141,6 @@ class ItemIdTest : UnitTest() {
 
     @Nested
     inner class DataClassTests {
-
         @Test
         fun `should allow destructuring`() {
             // Arrange
@@ -198,16 +197,16 @@ class ItemIdTest : UnitTest() {
             val original = ItemId(12345L)
 
             // Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                original.copy(value = 0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    original.copy(value = 0L)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
     }
 
     @Nested
     inner class BoundaryTests {
-
         @Test
         fun `should handle minimum valid value of 1`() {
             // Arrange & Act
@@ -238,16 +237,16 @@ class ItemIdTest : UnitTest() {
         @Test
         fun `should reject value just below minimum`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                ItemId(0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    ItemId(0L)
+                }
             exception.message shouldBe "Item ID must be positive"
         }
     }
 
     @Nested
     inner class UsageTests {
-
         @Test
         fun `should work as map key`() {
             // Arrange

@@ -16,7 +16,6 @@ import java.time.LocalDateTime
 class BehavioralActionCrudServiceImpl(
     private val repository: BehavioralActionRepository,
 ) : BehavioralActionCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<BehavioralActionResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class BehavioralActionCrudServiceImpl(
     }
 
     override fun findById(id: Long): BehavioralActionResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Behavioral action not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Behavioral action not found with id: $id")
         return BehavioralActionResponse.from(entity)
     }
 
@@ -41,31 +41,37 @@ class BehavioralActionCrudServiceImpl(
     }
 
     override fun create(request: CreateBehavioralActionRequest): BehavioralActionResponse {
-        val entity = BehavioralActionEntity(
-            guildId = request.guildId,
-            characterName = request.characterName,
-            actionType = request.actionType,
-            deductionAmount = request.deductionAmount,
-            reason = request.reason,
-            appliedBy = request.appliedBy,
-            appliedAt = LocalDateTime.now(),
-            expiresAt = request.expiresAt,
-            isActive = true,
-        )
+        val entity =
+            BehavioralActionEntity(
+                guildId = request.guildId,
+                characterName = request.characterName,
+                actionType = request.actionType,
+                deductionAmount = request.deductionAmount,
+                reason = request.reason,
+                appliedBy = request.appliedBy,
+                appliedAt = LocalDateTime.now(),
+                expiresAt = request.expiresAt,
+                isActive = true,
+            )
         val saved = repository.save(entity)
         return BehavioralActionResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateBehavioralActionRequest): BehavioralActionResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Behavioral action not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateBehavioralActionRequest,
+    ): BehavioralActionResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Behavioral action not found with id: $id")
 
-        val updated = existing.copy(
-            reason = request.reason ?: existing.reason,
-            deductionAmount = request.deductionAmount ?: existing.deductionAmount,
-            expiresAt = request.expiresAt ?: existing.expiresAt,
-            isActive = request.isActive ?: existing.isActive,
-        )
+        val updated =
+            existing.copy(
+                reason = request.reason ?: existing.reason,
+                deductionAmount = request.deductionAmount ?: existing.deductionAmount,
+                expiresAt = request.expiresAt ?: existing.expiresAt,
+                isActive = request.isActive ?: existing.isActive,
+            )
 
         repository.save(updated)
         return BehavioralActionResponse.from(updated)
@@ -78,7 +84,10 @@ class BehavioralActionCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse> {
+    override fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByGuildId(guildId, offset, pageRequest.size)
         val total = repository.countByGuildId(guildId)
@@ -91,7 +100,10 @@ class BehavioralActionCrudServiceImpl(
         )
     }
 
-    override fun findActiveByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse> {
+    override fun findActiveByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findActiveByGuildId(guildId, offset, pageRequest.size)
         val total = repository.countActiveByGuildId(guildId)
@@ -104,7 +116,11 @@ class BehavioralActionCrudServiceImpl(
         )
     }
 
-    override fun findByCharacter(guildId: String, characterName: String, pageRequest: PageRequest): PagedResponse<BehavioralActionResponse> {
+    override fun findByCharacter(
+        guildId: String,
+        characterName: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<BehavioralActionResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByCharacter(guildId, characterName, offset, pageRequest.size)
         val total = repository.countByCharacter(guildId, characterName)
@@ -117,7 +133,10 @@ class BehavioralActionCrudServiceImpl(
         )
     }
 
-    override fun getTotalDeduction(guildId: String, characterName: String): Double {
+    override fun getTotalDeduction(
+        guildId: String,
+        characterName: String,
+    ): Double {
         return repository.getTotalActiveDeduction(guildId, characterName)
     }
 

@@ -15,7 +15,7 @@ data class UserCharacterMapping(
     val isPrimary: Boolean = false,
     val linkedAt: Instant = Instant.now(),
     val verified: Boolean = false,
-    val verifiedAt: Instant? = null
+    val verifiedAt: Instant? = null,
 ) {
     /**
      * Creates a copy with the given ID.
@@ -35,10 +35,11 @@ data class UserCharacterMapping(
     /**
      * Marks this character as verified (e.g., via Battle.net OAuth).
      */
-    fun verify(): UserCharacterMapping = copy(
-        verified = true,
-        verifiedAt = Instant.now()
-    )
+    fun verify(): UserCharacterMapping =
+        copy(
+            verified = true,
+            verifiedAt = Instant.now(),
+        )
 
     companion object {
         /**
@@ -47,11 +48,12 @@ data class UserCharacterMapping(
         fun create(
             userId: UserId,
             raiderId: RaiderId,
-            isPrimary: Boolean = false
-        ): UserCharacterMapping = UserCharacterMapping(
-            userId = userId,
-            raiderId = raiderId,
-            isPrimary = isPrimary
-        )
+            isPrimary: Boolean = false,
+        ): UserCharacterMapping =
+            UserCharacterMapping(
+                userId = userId,
+                raiderId = raiderId,
+                isPrimary = isPrimary,
+            )
     }
 }

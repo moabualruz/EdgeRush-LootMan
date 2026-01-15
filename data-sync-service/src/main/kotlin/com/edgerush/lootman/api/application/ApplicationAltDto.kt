@@ -38,9 +38,10 @@ data class ApplicationAltResponse(
     val race: String?,
 ) {
     companion object {
-        fun from(e: ApplicationAltEntity) = ApplicationAltResponse(
-            e.id!!, e.applicationId, e.name, e.realm, e.region, e.clazz, e.role, e.level, e.faction, e.race
-        )
+        fun from(e: ApplicationAltEntity) =
+            ApplicationAltResponse(
+                e.id!!, e.applicationId, e.name, e.realm, e.region, e.clazz, e.role, e.level, e.faction, e.race,
+            )
     }
 }
 

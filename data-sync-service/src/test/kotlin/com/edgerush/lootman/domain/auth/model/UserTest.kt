@@ -12,19 +12,18 @@ import org.junit.jupiter.api.Test
  * Unit tests for User entity.
  */
 class UserTest : UnitTest() {
-
     @Nested
     inner class Creation {
-
         @Test
         fun `should create user from Discord`() {
             // Act
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "testuser",
-                email = "test@example.com",
-                avatarUrl = "https://cdn.discordapp.com/avatars/123/abc.png"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "testuser",
+                    email = "test@example.com",
+                    avatarUrl = "https://cdn.discordapp.com/avatars/123/abc.png",
+                )
 
             // Assert
             user.discordId shouldBe "123456789012345678"
@@ -37,10 +36,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should create user from Battle net`() {
             // Act
-            val user = User.fromBattlenet(
-                battlenetId = "12345",
-                username = "Player#1234"
-            )
+            val user =
+                User.fromBattlenet(
+                    battlenetId = "12345",
+                    username = "Player#1234",
+                )
 
             // Assert
             user.battlenetId shouldBe "12345"
@@ -67,21 +67,22 @@ class UserTest : UnitTest() {
 
     @Nested
     inner class Modifications {
-
         @Test
         fun `should update profile`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "oldname"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "oldname",
+                )
 
             // Act
-            val updated = user.updateProfile(
-                username = "newname",
-                email = "new@example.com",
-                avatarUrl = "https://new-avatar.png"
-            )
+            val updated =
+                user.updateProfile(
+                    username = "newname",
+                    email = "new@example.com",
+                    avatarUrl = "https://new-avatar.png",
+                )
 
             // Assert
             updated.username shouldBe "newname"
@@ -92,10 +93,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should record login`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "testuser"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "testuser",
+                )
 
             // Act
             val updated = user.recordLogin()
@@ -107,10 +109,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should change role`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "testuser"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "testuser",
+                )
 
             // Act
             val updated = user.withRole(UserRole.GUILD_ADMIN)
@@ -122,10 +125,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should associate with guild`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "testuser"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "testuser",
+                )
             val guildId = GuildId("test-guild")
 
             // Act
@@ -138,10 +142,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should link Discord account`() {
             // Arrange
-            val user = User.fromBattlenet(
-                battlenetId = "12345",
-                username = "Player#1234"
-            )
+            val user =
+                User.fromBattlenet(
+                    battlenetId = "12345",
+                    username = "Player#1234",
+                )
 
             // Act
             val updated = user.linkDiscord("123456789012345678")
@@ -154,10 +159,11 @@ class UserTest : UnitTest() {
         @Test
         fun `should link Battle net account`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123456789012345678",
-                username = "testuser"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123456789012345678",
+                    username = "testuser",
+                )
 
             // Act
             val updated = user.linkBattlenet("12345")
@@ -170,14 +176,14 @@ class UserTest : UnitTest() {
 
     @Nested
     inner class RoleChecks {
-
         @Test
         fun `raider should have raider role`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123",
-                username = "test"
-            )
+            val user =
+                User.fromDiscord(
+                    discordId = "123",
+                    username = "test",
+                )
 
             // Assert
             user.hasRole(UserRole.RAIDER) shouldBe true
@@ -188,10 +194,11 @@ class UserTest : UnitTest() {
         @Test
         fun `guild admin should have raider and guild admin roles`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123",
-                username = "test"
-            ).withRole(UserRole.GUILD_ADMIN)
+            val user =
+                User.fromDiscord(
+                    discordId = "123",
+                    username = "test",
+                ).withRole(UserRole.GUILD_ADMIN)
 
             // Assert
             user.hasRole(UserRole.RAIDER) shouldBe true
@@ -202,10 +209,11 @@ class UserTest : UnitTest() {
         @Test
         fun `system admin should have all roles`() {
             // Arrange
-            val user = User.fromDiscord(
-                discordId = "123",
-                username = "test"
-            ).withRole(UserRole.SYSTEM_ADMIN)
+            val user =
+                User.fromDiscord(
+                    discordId = "123",
+                    username = "test",
+                ).withRole(UserRole.SYSTEM_ADMIN)
 
             // Assert
             user.hasRole(UserRole.RAIDER) shouldBe true

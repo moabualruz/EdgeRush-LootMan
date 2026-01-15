@@ -33,16 +33,16 @@ import java.time.LocalDate
  */
 @Repository
 class JdbcAttendanceRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
 ) : AttendanceRepository {
-
     override fun findById(id: AttendanceRecordId): AttendanceRecord? {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, team_id, instance, encounter,
                    startDate, endDate, attendedAmount, totalAmount, syncedAt
             FROM attendance_stats
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, attendanceRecordRowMapper, id.value)
         return results.firstOrNull()
@@ -52,16 +52,17 @@ class JdbcAttendanceRepository(
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, team_id, instance, encounter,
                    startDate, endDate, attendedAmount, totalAmount, syncedAt
             FROM attendance_stats
             WHERE character_id = ? AND team_id = ?
             AND NOT (endDate < ? OR startDate > ?)
             ORDER BY startDate DESC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(
             sql,
@@ -69,7 +70,7 @@ class JdbcAttendanceRepository(
             raiderId.value,
             guildId.value,
             Date.valueOf(startDate),
-            Date.valueOf(endDate)
+            Date.valueOf(endDate),
         )
     }
 
@@ -78,16 +79,17 @@ class JdbcAttendanceRepository(
         guildId: GuildId,
         instance: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, team_id, instance, encounter,
                    startDate, endDate, attendedAmount, totalAmount, syncedAt
             FROM attendance_stats
             WHERE character_id = ? AND team_id = ? AND instance = ?
             AND NOT (endDate < ? OR startDate > ?)
             ORDER BY startDate DESC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(
             sql,
@@ -96,7 +98,7 @@ class JdbcAttendanceRepository(
             guildId.value,
             instance,
             Date.valueOf(startDate),
-            Date.valueOf(endDate)
+            Date.valueOf(endDate),
         )
     }
 
@@ -106,16 +108,17 @@ class JdbcAttendanceRepository(
         instance: String,
         encounter: String,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, team_id, instance, encounter,
                    startDate, endDate, attendedAmount, totalAmount, syncedAt
             FROM attendance_stats
             WHERE character_id = ? AND team_id = ? AND instance = ? AND encounter = ?
             AND NOT (endDate < ? OR startDate > ?)
             ORDER BY startDate DESC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(
             sql,
@@ -125,30 +128,31 @@ class JdbcAttendanceRepository(
             instance,
             encounter,
             Date.valueOf(startDate),
-            Date.valueOf(endDate)
+            Date.valueOf(endDate),
         )
     }
 
     override fun findByGuildIdAndDateRange(
         guildId: GuildId,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<AttendanceRecord> {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, team_id, instance, encounter,
                    startDate, endDate, attendedAmount, totalAmount, syncedAt
             FROM attendance_stats
             WHERE team_id = ?
             AND NOT (endDate < ? OR startDate > ?)
             ORDER BY startDate DESC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(
             sql,
             attendanceRecordRowMapper,
             guildId.value,
             Date.valueOf(startDate),
-            Date.valueOf(endDate)
+            Date.valueOf(endDate),
         )
     }
 
@@ -176,12 +180,13 @@ class JdbcAttendanceRepository(
     }
 
     private fun insertAttendanceRecord(record: AttendanceRecord) {
-        val sql = """
+        val sql =
+            """
             INSERT INTO attendance_stats (
                 id, character_id, team_id, instance, encounter,
                 startDate, endDate, attendedAmount, totalAmount, syncedAt
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -194,12 +199,13 @@ class JdbcAttendanceRepository(
             Date.valueOf(record.endDate),
             record.attendedRaids,
             record.totalRaids,
-            Timestamp.from(record.recordedAt)
+            Timestamp.from(record.recordedAt),
         )
     }
 
     private fun updateAttendanceRecord(record: AttendanceRecord) {
-        val sql = """
+        val sql =
+            """
             UPDATE attendance_stats SET
                 character_id = ?,
                 team_id = ?,
@@ -211,7 +217,7 @@ class JdbcAttendanceRepository(
                 totalAmount = ?,
                 syncedAt = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -224,28 +230,29 @@ class JdbcAttendanceRepository(
             record.attendedRaids,
             record.totalRaids,
             Timestamp.from(record.recordedAt),
-            record.id.value
+            record.id.value,
         )
     }
 
-    private val attendanceRecordRowMapper = RowMapper { rs, _ ->
-        val encounter = rs.getString("encounter")
+    private val attendanceRecordRowMapper =
+        RowMapper { rs, _ ->
+            val encounter = rs.getString("encounter")
 
-        // Use reflection to create AttendanceRecord with specific values
-        // since the domain model uses a private constructor
-        createAttendanceRecordFromDb(
-            id = AttendanceRecordId(rs.getString("id")),
-            raiderId = RaiderId(rs.getLong("character_id")),
-            guildId = GuildId(rs.getString("team_id") ?: "default"),
-            instance = rs.getString("instance") ?: "",
-            encounter = encounter,
-            startDate = rs.getDate("startDate").toLocalDate(),
-            endDate = rs.getDate("endDate").toLocalDate(),
-            attendedRaids = rs.getInt("attendedAmount"),
-            totalRaids = rs.getInt("totalAmount"),
-            recordedAt = rs.getTimestamp("syncedAt")?.toInstant() ?: Instant.now()
-        )
-    }
+            // Use reflection to create AttendanceRecord with specific values
+            // since the domain model uses a private constructor
+            createAttendanceRecordFromDb(
+                id = AttendanceRecordId(rs.getString("id")),
+                raiderId = RaiderId(rs.getLong("character_id")),
+                guildId = GuildId(rs.getString("team_id") ?: "default"),
+                instance = rs.getString("instance") ?: "",
+                encounter = encounter,
+                startDate = rs.getDate("startDate").toLocalDate(),
+                endDate = rs.getDate("endDate").toLocalDate(),
+                attendedRaids = rs.getInt("attendedAmount"),
+                totalRaids = rs.getInt("totalAmount"),
+                recordedAt = rs.getTimestamp("syncedAt")?.toInstant() ?: Instant.now(),
+            )
+        }
 
     /**
      * Creates an AttendanceRecord from database values.
@@ -263,20 +270,21 @@ class JdbcAttendanceRepository(
         endDate: LocalDate,
         attendedRaids: Int,
         totalRaids: Int,
-        recordedAt: Instant
+        recordedAt: Instant,
     ): AttendanceRecord {
-        val constructor = AttendanceRecord::class.java.getDeclaredConstructor(
-            AttendanceRecordId::class.java,
-            RaiderId::class.java,
-            GuildId::class.java,
-            String::class.java,
-            String::class.java,
-            LocalDate::class.java,
-            LocalDate::class.java,
-            Int::class.java,
-            Int::class.java,
-            Instant::class.java
-        )
+        val constructor =
+            AttendanceRecord::class.java.getDeclaredConstructor(
+                AttendanceRecordId::class.java,
+                RaiderId::class.java,
+                GuildId::class.java,
+                String::class.java,
+                String::class.java,
+                LocalDate::class.java,
+                LocalDate::class.java,
+                Int::class.java,
+                Int::class.java,
+                Instant::class.java,
+            )
         constructor.isAccessible = true
         return constructor.newInstance(
             id,
@@ -288,7 +296,7 @@ class JdbcAttendanceRepository(
             endDate,
             attendedRaids,
             totalRaids,
-            recordedAt
+            recordedAt,
         )
     }
 }

@@ -14,5 +14,5 @@ enum class TrialOutcome(val isSuccessful: Boolean) {
     WITHDREW(false),
 
     /** Raider was removed by guild officers */
-    REMOVED(false)
+    REMOVED(false),
 }

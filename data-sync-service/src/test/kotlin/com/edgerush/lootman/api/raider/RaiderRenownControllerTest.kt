@@ -89,6 +89,6 @@ class RaiderRenownControllerTest : UnitTest() {
         id: Long = 1L,
         raiderId: Long = 1L,
         faction: String = "The Weaver",
-        level: Int? = 25
+        level: Int? = 25,
     ) = RaiderRenownResponse(id, raiderId, faction, level)
 }

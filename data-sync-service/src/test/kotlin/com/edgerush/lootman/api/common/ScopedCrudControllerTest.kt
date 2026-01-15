@@ -13,10 +13,11 @@ import org.junit.jupiter.api.Test
  * Unit tests for GuildScopedCrudController.
  */
 class GuildScopedCrudControllerTest : UnitTest() {
-
     // Test DTOs
     data class TestCreateRequest(val name: String)
+
     data class TestUpdateRequest(val name: String)
+
     data class TestResponse(val id: Long, val name: String, val guildId: String)
 
     private lateinit var mockService: GuildScopedCrudService<Long, TestCreateRequest, TestUpdateRequest, TestResponse>
@@ -27,9 +28,9 @@ class GuildScopedCrudControllerTest : UnitTest() {
         service: GuildScopedCrudService<Long, TestCreateRequest, TestUpdateRequest, TestResponse>,
         paginationProperties: PaginationProperties,
     ) : GuildScopedCrudController<Long, TestCreateRequest, TestUpdateRequest, TestResponse>(
-        service,
-        paginationProperties,
-    )
+            service,
+            paginationProperties,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -40,20 +41,21 @@ class GuildScopedCrudControllerTest : UnitTest() {
 
     @Nested
     inner class FindByGuildTests {
-
         @Test
         fun `should return entities for guild with pagination`() {
             // Given
             val guildId = "test-guild-123"
-            val expectedResponse = PagedResponse(
-                content = listOf(
-                    TestResponse(1, "Entity 1", guildId),
-                    TestResponse(2, "Entity 2", guildId),
-                ),
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content =
+                        listOf(
+                            TestResponse(1, "Entity 1", guildId),
+                            TestResponse(2, "Entity 2", guildId),
+                        ),
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { mockService.findByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -72,12 +74,13 @@ class GuildScopedCrudControllerTest : UnitTest() {
         fun `should use custom pagination when provided`() {
             // Given
             val guildId = "test-guild-123"
-            val expectedResponse = PagedResponse(
-                content = emptyList<TestResponse>(),
-                page = 2,
-                size = 50,
-                totalElements = 100,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TestResponse>(),
+                    page = 2,
+                    size = 50,
+                    totalElements = 100,
+                )
             every { mockService.findByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -93,12 +96,13 @@ class GuildScopedCrudControllerTest : UnitTest() {
         fun `should return empty response when guild has no entities`() {
             // Given
             val guildId = "empty-guild"
-            val expectedResponse = PagedResponse<TestResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<TestResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { mockService.findByGuild(guildId, any()) } returns expectedResponse
 
             // When
@@ -112,7 +116,6 @@ class GuildScopedCrudControllerTest : UnitTest() {
 
     @Nested
     inner class CountByGuildTests {
-
         @Test
         fun `should return count for guild`() {
             // Given
@@ -146,10 +149,11 @@ class GuildScopedCrudControllerTest : UnitTest() {
  * Unit tests for RaiderScopedCrudController.
  */
 class RaiderScopedCrudControllerTest : UnitTest() {
-
     // Test DTOs
     data class TestCreateRequest(val value: Int)
+
     data class TestUpdateRequest(val value: Int)
+
     data class TestResponse(val id: Long, val value: Int, val raiderId: Long)
 
     private lateinit var mockService: RaiderScopedCrudService<Long, TestCreateRequest, TestUpdateRequest, TestResponse>
@@ -160,9 +164,9 @@ class RaiderScopedCrudControllerTest : UnitTest() {
         service: RaiderScopedCrudService<Long, TestCreateRequest, TestUpdateRequest, TestResponse>,
         paginationProperties: PaginationProperties,
     ) : RaiderScopedCrudController<Long, TestCreateRequest, TestUpdateRequest, TestResponse>(
-        service,
-        paginationProperties,
-    )
+            service,
+            paginationProperties,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -173,20 +177,21 @@ class RaiderScopedCrudControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderTests {
-
         @Test
         fun `should return entities for raider with pagination`() {
             // Given
             val raiderId = 123L
-            val expectedResponse = PagedResponse(
-                content = listOf(
-                    TestResponse(1, 100, raiderId),
-                    TestResponse(2, 200, raiderId),
-                ),
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content =
+                        listOf(
+                            TestResponse(1, 100, raiderId),
+                            TestResponse(2, 200, raiderId),
+                        ),
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { mockService.findByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -205,12 +210,13 @@ class RaiderScopedCrudControllerTest : UnitTest() {
         fun `should use custom pagination when provided`() {
             // Given
             val raiderId = 456L
-            val expectedResponse = PagedResponse(
-                content = emptyList<TestResponse>(),
-                page = 3,
-                size = 25,
-                totalElements = 75,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<TestResponse>(),
+                    page = 3,
+                    size = 25,
+                    totalElements = 75,
+                )
             every { mockService.findByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -226,12 +232,13 @@ class RaiderScopedCrudControllerTest : UnitTest() {
         fun `should return empty response when raider has no entities`() {
             // Given
             val raiderId = 999L
-            val expectedResponse = PagedResponse<TestResponse>(
-                content = emptyList(),
-                page = 0,
-                size = 20,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse<TestResponse>(
+                    content = emptyList(),
+                    page = 0,
+                    size = 20,
+                    totalElements = 0,
+                )
             every { mockService.findByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -245,7 +252,6 @@ class RaiderScopedCrudControllerTest : UnitTest() {
 
     @Nested
     inner class CountByRaiderTests {
-
         @Test
         fun `should return count for raider`() {
             // Given

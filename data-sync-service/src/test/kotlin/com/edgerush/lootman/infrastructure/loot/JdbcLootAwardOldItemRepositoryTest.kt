@@ -23,7 +23,6 @@ import java.sql.ResultSet
  * The repository operates on the loot_award_old_items table.
  */
 class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcLootAwardOldItemRepository
 
@@ -35,7 +34,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return old item when found`() {
             // Given
@@ -45,7 +43,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardOldItemEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardOldItemEntity>>()
@@ -70,7 +68,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardOldItemEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } returns emptyList()
 
@@ -90,16 +88,17 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardOldItemEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardOldItemEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    itemId = 12345L,
-                    bonusId = "6652"
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        itemId = 12345L,
+                        bonusId = "6652",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -123,16 +122,17 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("id = ?") },
                     any<RowMapper<LootAwardOldItemEntity>>(),
-                    eq(id)
+                    eq(id),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardOldItemEntity>>()
-                val rs = mockResultSet(
-                    id = id,
-                    lootAwardId = 100L,
-                    itemId = null,
-                    bonusId = null
-                )
+                val rs =
+                    mockResultSet(
+                        id = id,
+                        lootAwardId = 100L,
+                        itemId = null,
+                        bonusId = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -148,7 +148,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated old items`() {
             // Given
@@ -160,13 +159,13 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<LootAwardOldItemEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardOldItemEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
                 )
             }
 
@@ -180,7 +179,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByLootAwardIdTests {
-
         @Test
         fun `should return old items for loot award`() {
             // Given
@@ -192,13 +190,13 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardOldItemEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<LootAwardOldItemEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, lootAwardId, itemId = 12345L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, itemId = 12346L), 1)
+                    rowMapper.mapRow(mockResultSet(2L, lootAwardId, itemId = 12346L), 1),
                 )
             }
 
@@ -221,7 +219,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                     any<RowMapper<LootAwardOldItemEntity>>(),
                     eq(lootAwardId),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -235,14 +233,13 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_old_items") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -259,7 +256,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -279,7 +276,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("loot_award_id = ?") },
                     Long::class.java,
-                    eq(lootAwardId)
+                    eq(lootAwardId),
                 )
             } returns 3L
 
@@ -293,7 +290,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when old item exists`() {
             // Given
@@ -303,7 +299,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -323,7 +319,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns 0
 
@@ -343,7 +339,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
                     Int::class.java,
-                    eq(id)
+                    eq(id),
                 )
             } returns null
 
@@ -357,7 +353,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new old item when id is null`() {
             // Given
@@ -398,7 +393,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -406,7 +401,6 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete old item by id`() {
             // Given
@@ -415,7 +409,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(id)
+                    eq(id),
                 )
             } returns 1
 
@@ -426,7 +420,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    id
+                    id,
                 )
             }
         }
@@ -438,7 +432,7 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
         id: Long,
         lootAwardId: Long,
         itemId: Long? = 12345L,
-        bonusId: String? = "6652"
+        bonusId: String? = "6652",
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
@@ -453,11 +447,12 @@ class JdbcLootAwardOldItemRepositoryTest : UnitTest() {
         id: Long? = 1L,
         lootAwardId: Long = 100L,
         itemId: Long? = 12345L,
-        bonusId: String? = "6652"
-    ): LootAwardOldItemEntity = LootAwardOldItemEntity(
-        id = id,
-        lootAwardId = lootAwardId,
-        itemId = itemId,
-        bonusId = bonusId
-    )
+        bonusId: String? = "6652",
+    ): LootAwardOldItemEntity =
+        LootAwardOldItemEntity(
+            id = id,
+            lootAwardId = lootAwardId,
+            itemId = itemId,
+            bonusId = bonusId,
+        )
 }

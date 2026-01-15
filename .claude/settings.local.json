@@ -113,7 +113,8 @@
       "Bash(node:*)",
       "Bash(cargo build:*)",
       "Bash(npm run build:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(npx playwright test:*)"
     ]
   }
 }

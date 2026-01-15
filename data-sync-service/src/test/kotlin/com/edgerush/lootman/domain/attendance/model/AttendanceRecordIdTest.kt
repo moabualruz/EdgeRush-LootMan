@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class AttendanceRecordIdTest : UnitTest() {
-
     @Nested
     inner class ConstructorTests {
-
         @Test
         fun `should create valid id with non-blank value`() {
             // Given & When
@@ -41,7 +39,6 @@ class AttendanceRecordIdTest : UnitTest() {
 
     @Nested
     inner class GenerateTests {
-
         @Test
         fun `should generate unique id`() {
             // Given & When
@@ -67,7 +64,6 @@ class AttendanceRecordIdTest : UnitTest() {
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when values are the same`() {
             // Given

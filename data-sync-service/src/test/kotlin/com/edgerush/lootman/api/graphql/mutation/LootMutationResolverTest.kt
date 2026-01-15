@@ -28,7 +28,6 @@ import java.time.Instant
  * Tests the GraphQL mutation resolver for loot operations following TDD principles.
  */
 class LootMutationResolverTest : UnitTest() {
-
     @MockK
     private lateinit var awardLootUseCase: AwardLootUseCase
 
@@ -40,25 +39,26 @@ class LootMutationResolverTest : UnitTest() {
 
     @Nested
     inner class AwardLootMutation {
-
         @Test
         fun `should award loot successfully`() {
             // Arrange
-            val input = AwardLootInput(
-                itemId = "12345",
-                raiderId = "42",
-                guildId = "guild-123",
-                flpsScore = 0.85,
-                tier = "MYTHIC",
-            )
-            val award = createTestLootAward(
-                id = "award-1",
-                itemId = 12345L,
-                raiderId = 42L,
-                guildId = "guild-123",
-                tier = LootTier.MYTHIC,
-                flpsScore = 0.85,
-            )
+            val input =
+                AwardLootInput(
+                    itemId = "12345",
+                    raiderId = "42",
+                    guildId = "guild-123",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
+            val award =
+                createTestLootAward(
+                    id = "award-1",
+                    itemId = 12345L,
+                    raiderId = 42L,
+                    guildId = "guild-123",
+                    tier = LootTier.MYTHIC,
+                    flpsScore = 0.85,
+                )
             val commandSlot = slot<AwardLootCommand>()
             every { awardLootUseCase.execute(capture(commandSlot)) } returns Result.success(award)
 
@@ -78,20 +78,22 @@ class LootMutationResolverTest : UnitTest() {
         @Test
         fun `should propagate exception when raider has active ban`() {
             // Arrange
-            val input = AwardLootInput(
-                itemId = "12345",
-                raiderId = "42",
-                guildId = "guild-123",
-                flpsScore = 0.85,
-                tier = "MYTHIC",
-            )
+            val input =
+                AwardLootInput(
+                    itemId = "12345",
+                    raiderId = "42",
+                    guildId = "guild-123",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
             every { awardLootUseCase.execute(any()) } returns
                 Result.failure(LootBanActiveException(RaiderId(42L), emptyList()))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<LootBanActiveException> {
-                resolver.awardLoot(input)
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<LootBanActiveException> {
+                    resolver.awardLoot(input)
+                }
             exception.raiderId.value shouldBe 42L
         }
 
@@ -102,13 +104,14 @@ class LootMutationResolverTest : UnitTest() {
             val expectedTiers = listOf(LootTier.MYTHIC, LootTier.HEROIC, LootTier.NORMAL, LootTier.LFR)
 
             tiers.forEachIndexed { index, tierString ->
-                val input = AwardLootInput(
-                    itemId = "12345",
-                    raiderId = "42",
-                    guildId = "guild-123",
-                    flpsScore = 0.85,
-                    tier = tierString,
-                )
+                val input =
+                    AwardLootInput(
+                        itemId = "12345",
+                        raiderId = "42",
+                        guildId = "guild-123",
+                        flpsScore = 0.85,
+                        tier = tierString,
+                    )
                 val award = createTestLootAward(tier = expectedTiers[index])
                 every { awardLootUseCase.execute(any()) } returns Result.success(award)
 
@@ -124,13 +127,14 @@ class LootMutationResolverTest : UnitTest() {
         fun `should include awarded timestamp in result`() {
             // Arrange
             val awardedAt = Instant.parse("2026-01-14T10:30:00Z")
-            val input = AwardLootInput(
-                itemId = "12345",
-                raiderId = "42",
-                guildId = "guild-123",
-                flpsScore = 0.85,
-                tier = "MYTHIC",
-            )
+            val input =
+                AwardLootInput(
+                    itemId = "12345",
+                    raiderId = "42",
+                    guildId = "guild-123",
+                    flpsScore = 0.85,
+                    tier = "MYTHIC",
+                )
             val award = createTestLootAward(awardedAt = awardedAt)
             every { awardLootUseCase.execute(any()) } returns Result.success(award)
 
@@ -144,7 +148,6 @@ class LootMutationResolverTest : UnitTest() {
 
     @Nested
     inner class RevokeLootMutation {
-
         @Test
         fun `should revoke loot award successfully`() {
             // Arrange
@@ -166,9 +169,10 @@ class LootMutationResolverTest : UnitTest() {
                 Result.failure(NoSuchElementException("Loot award not found: award-999"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<NoSuchElementException> {
-                resolver.revokeLootAward(awardId = "award-999")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<NoSuchElementException> {
+                    resolver.revokeLootAward(awardId = "award-999")
+                }
             exception.message shouldBe "Loot award not found: award-999"
         }
 
@@ -179,9 +183,10 @@ class LootMutationResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database error"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.revokeLootAward(awardId = "award-123")
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.revokeLootAward(awardId = "award-123")
+                }
             exception.message shouldBe "Database error"
         }
     }
@@ -195,13 +200,14 @@ class LootMutationResolverTest : UnitTest() {
         tier: LootTier = LootTier.MYTHIC,
         flpsScore: Double = 0.85,
         awardedAt: Instant = Instant.now(),
-    ): LootAward = LootAward(
-        id = LootAwardId(id),
-        itemId = ItemId(itemId),
-        raiderId = RaiderId(raiderId),
-        guildId = GuildId(guildId),
-        tier = tier,
-        flpsScore = FlpsScore.of(flpsScore),
-        awardedAt = awardedAt,
-    )
+    ): LootAward =
+        LootAward(
+            id = LootAwardId(id),
+            itemId = ItemId(itemId),
+            raiderId = RaiderId(raiderId),
+            guildId = GuildId(guildId),
+            tier = tier,
+            flpsScore = FlpsScore.of(flpsScore),
+            awardedAt = awardedAt,
+        )
 }

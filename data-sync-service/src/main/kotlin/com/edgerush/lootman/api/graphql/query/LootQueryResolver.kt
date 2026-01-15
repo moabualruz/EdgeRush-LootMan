@@ -21,7 +21,6 @@ import java.time.Instant
 class LootQueryResolver(
     private val getLootHistoryUseCase: GetLootHistoryUseCase,
 ) : Query {
-
     /**
      * Get loot awards for a guild.
      *
@@ -30,11 +29,15 @@ class LootQueryResolver(
      * @return List of loot awards for the guild
      * @throws RuntimeException on errors
      */
-    fun lootAwards(guildId: String, activeOnly: Boolean = false): List<LootAwardType> {
-        val query = GetLootHistoryByGuildQuery(
-            guildId = GuildId(guildId),
-            activeOnly = activeOnly,
-        )
+    fun lootAwards(
+        guildId: String,
+        activeOnly: Boolean = false,
+    ): List<LootAwardType> {
+        val query =
+            GetLootHistoryByGuildQuery(
+                guildId = GuildId(guildId),
+                activeOnly = activeOnly,
+            )
         return getLootHistoryUseCase.getByGuild(query)
             .map { awards -> awards.map { it.toGraphQLType() } }
             .getOrThrow()
@@ -48,11 +51,15 @@ class LootQueryResolver(
      * @return List of loot awards for the raider
      * @throws RuntimeException on errors
      */
-    fun lootHistory(raiderId: String, activeOnly: Boolean = false): List<LootAwardType> {
-        val query = GetLootHistoryByRaiderQuery(
-            raiderId = RaiderId(raiderId.toLong()),
-            activeOnly = activeOnly,
-        )
+    fun lootHistory(
+        raiderId: String,
+        activeOnly: Boolean = false,
+    ): List<LootAwardType> {
+        val query =
+            GetLootHistoryByRaiderQuery(
+                raiderId = RaiderId(raiderId.toLong()),
+                activeOnly = activeOnly,
+            )
         return getLootHistoryUseCase.getByRaider(query)
             .map { awards -> awards.map { it.toGraphQLType() } }
             .getOrThrow()
@@ -76,13 +83,14 @@ data class LootAwardType(
 /**
  * Extension function to convert domain LootAward to GraphQL LootAwardType.
  */
-private fun LootAward.toGraphQLType(): LootAwardType = LootAwardType(
-    id = this.id.value,
-    raiderId = this.raiderId.value.toString(),
-    itemId = this.itemId.value.toString(),
-    guildId = this.guildId.value,
-    tier = this.tier,
-    flpsScore = this.flpsScore.value,
-    awardedAt = this.awardedAt,
-    isActive = this.isActive(),
-)
+private fun LootAward.toGraphQLType(): LootAwardType =
+    LootAwardType(
+        id = this.id.value,
+        raiderId = this.raiderId.value.toString(),
+        itemId = this.itemId.value.toString(),
+        guildId = this.guildId.value,
+        tier = this.tier,
+        flpsScore = this.flpsScore.value,
+        awardedAt = this.awardedAt,
+        isActive = this.isActive(),
+    )

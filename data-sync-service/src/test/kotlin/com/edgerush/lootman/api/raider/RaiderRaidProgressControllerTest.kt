@@ -90,6 +90,6 @@ class RaiderRaidProgressControllerTest : UnitTest() {
         raiderId: Long = 1L,
         raid: String = "Nerub-ar Palace",
         difficulty: String = "Mythic",
-        bossesDefeated: Int? = 8
+        bossesDefeated: Int? = 8,
     ) = RaiderRaidProgressResponse(id, raiderId, raid, difficulty, bossesDefeated)
 }

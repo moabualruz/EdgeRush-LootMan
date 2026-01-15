@@ -1,8 +1,6 @@
 package com.edgerush.lootman.domain.application.client
 
 import com.edgerush.datasync.test.base.UnitTest
-import io.kotest.matchers.doubles.shouldBeGreaterThan
-import io.kotest.matchers.doubles.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -21,7 +19,6 @@ import org.springframework.web.reactive.function.client.WebClient
  * Uses MockWebServer to simulate Warcraft Logs GraphQL API responses.
  */
 class WarcraftLogsClientTest : UnitTest() {
-
     private lateinit var mockWebServer: MockWebServer
     private lateinit var client: WarcraftLogsClient
     private lateinit var tokenProvider: WarcraftLogsTokenProvider
@@ -35,11 +32,12 @@ class WarcraftLogsClientTest : UnitTest() {
         every { tokenProvider.getAccessToken() } returns "mock-access-token"
 
         val webClientBuilder = WebClient.builder()
-        client = WarcraftLogsClient(
-            webClientBuilder = webClientBuilder,
-            tokenProvider = tokenProvider,
-            baseUrl = mockWebServer.url("/").toString(),
-        )
+        client =
+            WarcraftLogsClient(
+                webClientBuilder = webClientBuilder,
+                tokenProvider = tokenProvider,
+                baseUrl = mockWebServer.url("/").toString(),
+            )
     }
 
     @AfterEach
@@ -49,11 +47,11 @@ class WarcraftLogsClientTest : UnitTest() {
 
     @Nested
     inner class FetchCharacterParsesTests {
-
         @Test
         fun `should fetch character parses successfully`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -75,12 +73,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -99,7 +97,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should handle character not found`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -107,12 +106,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -125,7 +124,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should handle no rankings available`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -140,12 +140,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -161,7 +161,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should include authorization header`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -173,12 +174,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -192,7 +193,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should send GraphQL query with correct variables`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -204,12 +206,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -229,13 +231,14 @@ class WarcraftLogsClientTest : UnitTest() {
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(500)
-                    .setBody("Internal Server Error")
+                    .setBody("Internal Server Error"),
             )
 
             // When / Then
-            val result = runCatching {
-                client.fetchCharacterParses("us", "Illidan", "Arthas").block()
-            }
+            val result =
+                runCatching {
+                    client.fetchCharacterParses("us", "Illidan", "Arthas").block()
+                }
 
             result.isFailure shouldBe true
         }
@@ -243,7 +246,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should normalize server name to slug format`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -255,12 +259,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -275,11 +279,11 @@ class WarcraftLogsClientTest : UnitTest() {
 
     @Nested
     inner class ParseResultMappingTests {
-
         @Test
         fun `should map all encounter parses`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -299,12 +303,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When
@@ -321,7 +325,8 @@ class WarcraftLogsClientTest : UnitTest() {
         @Test
         fun `should calculate best parse average from encounter data when not provided`() {
             // Given
-            val responseJson = """
+            val responseJson =
+                """
                 {
                     "data": {
                         "characterData": {
@@ -340,12 +345,12 @@ class WarcraftLogsClientTest : UnitTest() {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
 
             mockWebServer.enqueue(
                 MockResponse()
                     .setBody(responseJson)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "application/json"),
             )
 
             // When

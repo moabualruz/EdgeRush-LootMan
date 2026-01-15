@@ -17,7 +17,7 @@ data class DiscordNotificationConfig(
     val enabled: Boolean = true,
     val mentionRoleId: String? = null,
     val createdAt: Instant = Instant.now(),
-    val updatedAt: Instant? = null
+    val updatedAt: Instant? = null,
 ) {
     init {
         require(discordServerId.isNotBlank()) { "Discord server ID must not be blank" }
@@ -50,8 +50,7 @@ data class DiscordNotificationConfig(
     /**
      * Updates the mention role for this notification.
      */
-    fun updateMentionRole(roleId: String?): DiscordNotificationConfig =
-        copy(mentionRoleId = roleId, updatedAt = Instant.now())
+    fun updateMentionRole(roleId: String?): DiscordNotificationConfig = copy(mentionRoleId = roleId, updatedAt = Instant.now())
 
     companion object {
         /**
@@ -62,13 +61,14 @@ data class DiscordNotificationConfig(
             discordServerId: String,
             notificationType: DiscordNotificationType,
             channelId: String,
-            mentionRoleId: String? = null
-        ): DiscordNotificationConfig = DiscordNotificationConfig(
-            guildId = guildId,
-            discordServerId = discordServerId,
-            notificationType = notificationType,
-            channelId = channelId,
-            mentionRoleId = mentionRoleId
-        )
+            mentionRoleId: String? = null,
+        ): DiscordNotificationConfig =
+            DiscordNotificationConfig(
+                guildId = guildId,
+                discordServerId = discordServerId,
+                notificationType = notificationType,
+                channelId = channelId,
+                mentionRoleId = mentionRoleId,
+            )
     }
 }

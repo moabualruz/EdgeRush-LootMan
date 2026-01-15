@@ -25,7 +25,6 @@ import java.time.ZoneOffset
  * The repository operates on the applications table.
  */
 class JdbcApplicationRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcApplicationRepository
 
@@ -39,7 +38,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return application when found`() {
             // Given
@@ -49,7 +47,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
                     any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
@@ -74,7 +72,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
                     any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns emptyList()
 
@@ -95,28 +93,29 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
                     any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                val rs = mockResultSet(
-                    applicationId = applicationId,
-                    appliedAt = appliedAt,
-                    status = "approved",
-                    role = "Healer",
-                    age = 25,
-                    country = "US",
-                    battletag = "Player#1234",
-                    discordId = "discord123",
-                    mainCharacterName = "TestChar",
-                    mainCharacterRealm = "Illidan",
-                    mainCharacterClass = "Priest",
-                    mainCharacterRole = "Healer",
-                    mainCharacterRace = "Human",
-                    mainCharacterFaction = "Alliance",
-                    mainCharacterLevel = 70,
-                    mainCharacterRegion = "US"
-                )
+                val rs =
+                    mockResultSet(
+                        applicationId = applicationId,
+                        appliedAt = appliedAt,
+                        status = "approved",
+                        role = "Healer",
+                        age = 25,
+                        country = "US",
+                        battletag = "Player#1234",
+                        discordId = "discord123",
+                        mainCharacterName = "TestChar",
+                        mainCharacterRealm = "Illidan",
+                        mainCharacterClass = "Priest",
+                        mainCharacterRole = "Healer",
+                        mainCharacterRace = "Human",
+                        mainCharacterFaction = "Alliance",
+                        mainCharacterLevel = 70,
+                        mainCharacterRegion = "US",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -151,28 +150,29 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
                     any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                val rs = mockResultSet(
-                    applicationId = applicationId,
-                    appliedAt = null,
-                    status = null,
-                    role = null,
-                    age = null,
-                    country = null,
-                    battletag = null,
-                    discordId = null,
-                    mainCharacterName = null,
-                    mainCharacterRealm = null,
-                    mainCharacterClass = null,
-                    mainCharacterRole = null,
-                    mainCharacterRace = null,
-                    mainCharacterFaction = null,
-                    mainCharacterLevel = null,
-                    mainCharacterRegion = null
-                )
+                val rs =
+                    mockResultSet(
+                        applicationId = applicationId,
+                        appliedAt = null,
+                        status = null,
+                        role = null,
+                        age = null,
+                        country = null,
+                        battletag = null,
+                        discordId = null,
+                        mainCharacterName = null,
+                        mainCharacterRealm = null,
+                        mainCharacterClass = null,
+                        mainCharacterRole = null,
+                        mainCharacterRace = null,
+                        mainCharacterFaction = null,
+                        mainCharacterLevel = null,
+                        mainCharacterRegion = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -191,7 +191,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paginated applications`() {
             // Given
@@ -203,13 +202,13 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
                     any<RowMapper<ApplicationEntity>>(),
                     eq(limit),
-                    eq(offset)
+                    eq(offset),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L), 0),
-                    rowMapper.mapRow(mockResultSet(2L), 1)
+                    rowMapper.mapRow(mockResultSet(2L), 1),
                 )
             }
 
@@ -228,7 +227,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                     match<String> { it.contains("SELECT") && it.contains("LIMIT") },
                     any<RowMapper<ApplicationEntity>>(),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } returns emptyList()
 
@@ -242,7 +241,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByStatusTests {
-
         @Test
         fun `should return applications with matching status`() {
             // Given
@@ -254,13 +252,13 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                     any<RowMapper<ApplicationEntity>>(),
                     eq(status),
                     any<Int>(),
-                    any<Long>()
+                    any<Long>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet(1L, status = status), 0),
-                    rowMapper.mapRow(mockResultSet(2L, status = status), 1)
+                    rowMapper.mapRow(mockResultSet(2L, status = status), 1),
                 )
             }
 
@@ -275,14 +273,13 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
             // Given
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("applications") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns 42L
 
@@ -299,7 +296,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") },
-                    Long::class.java
+                    Long::class.java,
                 )
             } returns null
 
@@ -319,7 +316,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("status = ?") },
                     Long::class.java,
-                    eq(status)
+                    eq(status),
                 )
             } returns 15L
 
@@ -333,7 +330,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when application exists`() {
             // Given
@@ -343,7 +339,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
                     Int::class.java,
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns 1
 
@@ -363,7 +359,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
                     Int::class.java,
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns 0
 
@@ -383,7 +379,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
                     Int::class.java,
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns null
 
@@ -397,7 +393,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new application when not exists`() {
             // Given
@@ -417,7 +412,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -441,7 +436,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("UPDATE") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -465,7 +460,6 @@ class JdbcApplicationRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete application by id`() {
             // Given
@@ -474,7 +468,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(applicationId)
+                    eq(applicationId),
                 )
             } returns 1
 
@@ -485,7 +479,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("application_id = ?") },
-                    applicationId
+                    applicationId,
                 )
             }
         }
@@ -509,7 +503,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         mainCharacterRace: String? = "Human",
         mainCharacterFaction: String? = "Alliance",
         mainCharacterLevel: Int? = 70,
-        mainCharacterRegion: String? = "US"
+        mainCharacterRegion: String? = "US",
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("application_id") } returns applicationId
@@ -550,24 +544,25 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         mainCharacterFaction: String? = "Alliance",
         mainCharacterLevel: Int? = 70,
         mainCharacterRegion: String? = "US",
-        syncedAt: OffsetDateTime = now
-    ): ApplicationEntity = ApplicationEntity(
-        applicationId = applicationId,
-        appliedAt = appliedAt,
-        status = status,
-        role = role,
-        age = age,
-        country = country,
-        battletag = battletag,
-        discordId = discordId,
-        mainCharacterName = mainCharacterName,
-        mainCharacterRealm = mainCharacterRealm,
-        mainCharacterClass = mainCharacterClass,
-        mainCharacterRole = mainCharacterRole,
-        mainCharacterRace = mainCharacterRace,
-        mainCharacterFaction = mainCharacterFaction,
-        mainCharacterLevel = mainCharacterLevel,
-        mainCharacterRegion = mainCharacterRegion,
-        syncedAt = syncedAt
-    )
+        syncedAt: OffsetDateTime = now,
+    ): ApplicationEntity =
+        ApplicationEntity(
+            applicationId = applicationId,
+            appliedAt = appliedAt,
+            status = status,
+            role = role,
+            age = age,
+            country = country,
+            battletag = battletag,
+            discordId = discordId,
+            mainCharacterName = mainCharacterName,
+            mainCharacterRealm = mainCharacterRealm,
+            mainCharacterClass = mainCharacterClass,
+            mainCharacterRole = mainCharacterRole,
+            mainCharacterRace = mainCharacterRace,
+            mainCharacterFaction = mainCharacterFaction,
+            mainCharacterLevel = mainCharacterLevel,
+            mainCharacterRegion = mainCharacterRegion,
+            syncedAt = syncedAt,
+        )
 }

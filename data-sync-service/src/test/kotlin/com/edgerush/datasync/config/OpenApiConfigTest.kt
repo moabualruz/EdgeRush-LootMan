@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test
  * security schemes, API info, and admin mode behavior.
  */
 class OpenApiConfigTest : UnitTest() {
-
     @MockK
     private lateinit var adminModeConfig: AdminModeConfig
 
@@ -34,7 +33,6 @@ class OpenApiConfigTest : UnitTest() {
 
     @Nested
     inner class CustomOpenAPI {
-
         @Test
         fun `should create OpenAPI with correct title`() {
             // Arrange
@@ -148,7 +146,6 @@ class OpenApiConfigTest : UnitTest() {
 
     @Nested
     inner class DescriptionContent {
-
         @Test
         fun `should include FLPS algorithm information in description`() {
             // Arrange
@@ -205,7 +202,6 @@ class OpenApiConfigTest : UnitTest() {
 
     @Nested
     inner class AdminModeDescription {
-
         @Test
         fun `should include admin mode warning when enabled`() {
             // Arrange

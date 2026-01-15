@@ -4,7 +4,6 @@ import com.edgerush.datasync.test.base.IntegrationTest
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
@@ -24,46 +23,56 @@ import org.springframework.http.MediaType
  * - Gear set calculations
  */
 class GearControllerIntegrationTest : IntegrationTest() {
-
-    private fun createRaider(raiderId: Long, guildId: String = "test-guild"): Long {
+    private fun createRaider(
+        raiderId: Long,
+        guildId: String = "test-guild",
+    ): Long {
         // Insert a raider directly into the database for gear tests
         jdbcTemplate.update(
             """INSERT INTO raiders (id, guild_id, character_name, realm, character_class, role, status)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            raiderId, guildId, "TestChar$raiderId", "TestRealm", "WARRIOR", "DPS", "ACTIVE"
+            raiderId,
+            guildId,
+            "TestChar$raiderId",
+            "TestRealm",
+            "WARRIOR",
+            "DPS",
+            "ACTIVE",
         )
         return raiderId
     }
 
     private fun createGearRequest(
         gearSetType: String = "EQUIPPED",
-        items: List<GearItemRequest> = listOf(
-            GearItemRequest(
-                itemId = 12345L,
-                name = "Test Sword",
-                itemLevel = 489,
-                quality = "EPIC",
-                slot = "MAIN_HAND",
-                isTierPiece = false,
-                enchant = "Burning Writ",
-                sockets = 1
+        items: List<GearItemRequest> =
+            listOf(
+                GearItemRequest(
+                    itemId = 12345L,
+                    name = "Test Sword",
+                    itemLevel = 489,
+                    quality = "EPIC",
+                    slot = "MAIN_HAND",
+                    isTierPiece = false,
+                    enchant = "Burning Writ",
+                    sockets = 1,
+                ),
+                GearItemRequest(
+                    itemId = 12346L,
+                    name = "Test Shield",
+                    itemLevel = 489,
+                    quality = "EPIC",
+                    slot = "OFF_HAND",
+                    isTierPiece = false,
+                    enchant = null,
+                    sockets = 0,
+                ),
             ),
-            GearItemRequest(
-                itemId = 12346L,
-                name = "Test Shield",
-                itemLevel = 489,
-                quality = "EPIC",
-                slot = "OFF_HAND",
-                isTierPiece = false,
-                enchant = null,
-                sockets = 0
-            )
-        )
     ): HttpEntity<SaveGearRequest> {
-        val request = SaveGearRequest(
-            gearSetType = gearSetType,
-            items = items
-        )
+        val request =
+            SaveGearRequest(
+                gearSetType = gearSetType,
+                items = items,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -78,11 +87,12 @@ class GearControllerIntegrationTest : IntegrationTest() {
             val entity = createGearRequest()
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                entity,
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    entity,
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -101,15 +111,16 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 entity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // Then - verify in database
-            val gearCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM raider_gear_items WHERE raider_id = ?",
-                Long::class.java,
-                raiderId
-            )
+            val gearCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM raider_gear_items WHERE raider_id = ?",
+                    Long::class.java,
+                    raiderId,
+                )
             gearCount shouldBe 2L
         }
 
@@ -117,43 +128,47 @@ class GearControllerIntegrationTest : IntegrationTest() {
         fun `should calculate average item level correctly`() {
             // Given
             val raiderId = createRaider(102L)
-            val items = listOf(
-                GearItemRequest(1L, "Helm", 500, "EPIC", "HEAD", false, null, 0),
-                GearItemRequest(2L, "Chest", 490, "EPIC", "CHEST", false, null, 0),
-                GearItemRequest(3L, "Legs", 495, "EPIC", "LEGS", false, null, 0)
-            )
+            val items =
+                listOf(
+                    GearItemRequest(1L, "Helm", 500, "EPIC", "HEAD", false, null, 0),
+                    GearItemRequest(2L, "Chest", 490, "EPIC", "CHEST", false, null, 0),
+                    GearItemRequest(3L, "Legs", 495, "EPIC", "LEGS", false, null, 0),
+                )
             val entity = createGearRequest(items = items)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                entity,
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    entity,
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
-            response.body?.averageItemLevel shouldBe 495.0  // (500 + 490 + 495) / 3
+            response.body?.averageItemLevel shouldBe 495.0 // (500 + 490 + 495) / 3
         }
 
         @Test
         fun `should handle gear with tier pieces`() {
             // Given
             val raiderId = createRaider(103L)
-            val items = listOf(
-                GearItemRequest(1L, "Tier Helm", 500, "EPIC", "HEAD", true, null, 0),
-                GearItemRequest(2L, "Tier Chest", 500, "EPIC", "CHEST", true, null, 0),
-                GearItemRequest(3L, "Tier Shoulders", 500, "EPIC", "SHOULDERS", true, null, 0),
-                GearItemRequest(4L, "Tier Gloves", 500, "EPIC", "HANDS", true, null, 0)
-            )
+            val items =
+                listOf(
+                    GearItemRequest(1L, "Tier Helm", 500, "EPIC", "HEAD", true, null, 0),
+                    GearItemRequest(2L, "Tier Chest", 500, "EPIC", "CHEST", true, null, 0),
+                    GearItemRequest(3L, "Tier Shoulders", 500, "EPIC", "SHOULDERS", true, null, 0),
+                    GearItemRequest(4L, "Tier Gloves", 500, "EPIC", "HANDS", true, null, 0),
+                )
             val entity = createGearRequest(items = items)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                entity,
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    entity,
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -173,14 +188,15 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 entity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -195,10 +211,11 @@ class GearControllerIntegrationTest : IntegrationTest() {
             val raiderId = createRaider(201L)
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -215,14 +232,15 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 entity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/gear/raider/$raiderId/type/EQUIPPED",
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/gear/raider/$raiderId/type/EQUIPPED",
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -237,14 +255,15 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 entity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/gear/raider/$raiderId/type/BEST",
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/gear/raider/$raiderId/type/BEST",
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -259,14 +278,15 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 entity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/gear/raider/$raiderId/type/BEST",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/gear/raider/$raiderId/type/BEST",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -283,22 +303,24 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 createEntity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // Update with different items
-            val updateItems = listOf(
-                GearItemRequest(99999L, "New Sword", 500, "LEGENDARY", "MAIN_HAND", false, "Best Enchant", 2)
-            )
+            val updateItems =
+                listOf(
+                    GearItemRequest(99999L, "New Sword", 500, "LEGENDARY", "MAIN_HAND", false, "Best Enchant", 2),
+                )
             val updateEntity = createGearRequest(items = updateItems)
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/gear/raider/$raiderId",
-                HttpMethod.PUT,
-                updateEntity,
-                TestGearSetResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/gear/raider/$raiderId",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestGearSetResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -315,13 +337,14 @@ class GearControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/gear/raider/$raiderId",
                 createEntity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // Update
-            val updateItems = listOf(
-                GearItemRequest(88888L, "Updated Weapon", 510, "LEGENDARY", "MAIN_HAND", true, null, 0)
-            )
+            val updateItems =
+                listOf(
+                    GearItemRequest(88888L, "Updated Weapon", 510, "LEGENDARY", "MAIN_HAND", true, null, 0),
+                )
             val updateEntity = createGearRequest(items = updateItems)
 
             // When
@@ -329,15 +352,16 @@ class GearControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/gear/raider/$raiderId",
                 HttpMethod.PUT,
                 updateEntity,
-                TestGearSetResponse::class.java
+                TestGearSetResponse::class.java,
             )
 
             // Then - verify in database
-            val itemId = jdbcTemplate.queryForObject(
-                "SELECT item_id FROM raider_gear_items WHERE raider_id = ? LIMIT 1",
-                Long::class.java,
-                raiderId
-            )
+            val itemId =
+                jdbcTemplate.queryForObject(
+                    "SELECT item_id FROM raider_gear_items WHERE raider_id = ? LIMIT 1",
+                    Long::class.java,
+                    raiderId,
+                )
             itemId shouldBe 88888L
         }
     }
@@ -351,11 +375,12 @@ class GearControllerIntegrationTest : IntegrationTest() {
             val entity = createGearRequest()
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -376,11 +401,12 @@ class GearControllerIntegrationTest : IntegrationTest() {
             val entity = createGearRequest()
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/gear/raider/$raiderId",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/gear/raider/$raiderId",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -405,7 +431,7 @@ data class TestGearSetResponse(
     val tierPieceCount: Int,
     val has2PieceBonus: Boolean,
     val has4PieceBonus: Boolean,
-    val totalSlots: Int
+    val totalSlots: Int,
 )
 
 data class TestGearItemResponse(
@@ -416,5 +442,5 @@ data class TestGearItemResponse(
     val slot: String,
     val isTierPiece: Boolean,
     val enchant: String?,
-    val sockets: Int
+    val sockets: Int,
 )

@@ -10,7 +10,6 @@ import com.edgerush.lootman.domain.trial.model.TrialStatus
 import com.edgerush.lootman.domain.trial.repository.TrialRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for TrialService.
  */
 class TrialServiceTest : UnitTest() {
-
     private lateinit var trialRepository: TrialRepository
     private lateinit var trialService: TrialService
 
@@ -37,7 +35,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class CreateTrialTests {
-
         @Test
         fun `should create new trial for approved application`() {
             // Arrange
@@ -47,11 +44,12 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val trial = trialService.createTrial(
-                applicationId = applicationId,
-                guildId = guildId,
-                raidsRequired = 8,
-            )
+            val trial =
+                trialService.createTrial(
+                    applicationId = applicationId,
+                    guildId = guildId,
+                    raidsRequired = 8,
+                )
 
             // Assert
             trial.applicationId shouldBe applicationId
@@ -87,12 +85,13 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val trial = trialService.createTrial(
-                applicationId = applicationId,
-                guildId = guildId,
-                raidsRequired = 8,
-                raiderId = 12345L,
-            )
+            val trial =
+                trialService.createTrial(
+                    applicationId = applicationId,
+                    guildId = guildId,
+                    raidsRequired = 8,
+                    raiderId = 12345L,
+                )
 
             // Assert
             trial.raiderId shouldBe 12345L
@@ -101,7 +100,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class GetTrialTests {
-
         @Test
         fun `should get trial by ID`() {
             // Arrange
@@ -144,10 +142,11 @@ class TrialServiceTest : UnitTest() {
         @Test
         fun `should get active trials for guild`() {
             // Arrange
-            val trials = listOf(
-                createValidTrial(applicationId = "app-1"),
-                createValidTrial(applicationId = "app-2"),
-            )
+            val trials =
+                listOf(
+                    createValidTrial(applicationId = "app-1"),
+                    createValidTrial(applicationId = "app-2"),
+                )
             every { trialRepository.findActiveTrialsByGuildId(guildId) } returns trials
 
             // Act
@@ -160,7 +159,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class UpdateMetricsTests {
-
         @Test
         fun `should update trial metrics`() {
             // Arrange
@@ -170,13 +168,14 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val updated = trialService.updateMetrics(
-                trialId = trial.id,
-                raidsAttended = 5,
-                attendanceRate = 0.85,
-                averagePerformance = 75.0,
-                deathsPerRaid = 1.2,
-            )
+            val updated =
+                trialService.updateMetrics(
+                    trialId = trial.id,
+                    raidsAttended = 5,
+                    attendanceRate = 0.85,
+                    averagePerformance = 75.0,
+                    deathsPerRaid = 1.2,
+                )
 
             // Assert
             updated.raidsAttended shouldBe 5
@@ -205,26 +204,27 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class PromoteTests {
-
         @Test
         fun `should promote trial raider`() {
             // Arrange
-            val trial = createValidTrial().updateMetrics(
-                raidsAttended = 8,
-                attendanceRate = 0.9,
-                averagePerformance = 80.0,
-                deathsPerRaid = 0.5,
-            )
+            val trial =
+                createValidTrial().updateMetrics(
+                    raidsAttended = 8,
+                    attendanceRate = 0.9,
+                    averagePerformance = 80.0,
+                    deathsPerRaid = 0.5,
+                )
             val savedTrial = slot<Trial>()
             every { trialRepository.findById(trial.id) } returns trial
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val promoted = trialService.promoteTrial(
-                trialId = trial.id,
-                promoterId = "officer-123",
-                reason = "Excellent performance",
-            )
+            val promoted =
+                trialService.promoteTrial(
+                    trialId = trial.id,
+                    promoterId = "officer-123",
+                    reason = "Excellent performance",
+                )
 
             // Assert
             promoted.status shouldBe TrialStatus.PROMOTED
@@ -251,7 +251,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class ExtendTests {
-
         @Test
         fun `should extend trial`() {
             // Arrange
@@ -261,12 +260,13 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val extended = trialService.extendTrial(
-                trialId = trial.id,
-                extenderId = "officer-123",
-                additionalRaids = 4,
-                reason = "Needs more evaluation",
-            )
+            val extended =
+                trialService.extendTrial(
+                    trialId = trial.id,
+                    extenderId = "officer-123",
+                    additionalRaids = 4,
+                    reason = "Needs more evaluation",
+                )
 
             // Assert
             extended.status shouldBe TrialStatus.EXTENDED
@@ -293,7 +293,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class EndTrialTests {
-
         @Test
         fun `should end trial with failed outcome`() {
             // Arrange
@@ -303,12 +302,13 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val ended = trialService.endTrial(
-                trialId = trial.id,
-                officerId = "officer-123",
-                outcome = TrialOutcome.FAILED,
-                reason = "Poor attendance",
-            )
+            val ended =
+                trialService.endTrial(
+                    trialId = trial.id,
+                    officerId = "officer-123",
+                    outcome = TrialOutcome.FAILED,
+                    reason = "Poor attendance",
+                )
 
             // Assert
             ended.status shouldBe TrialStatus.ENDED
@@ -325,12 +325,13 @@ class TrialServiceTest : UnitTest() {
             every { trialRepository.save(capture(savedTrial)) } answers { savedTrial.captured }
 
             // Act
-            val ended = trialService.endTrial(
-                trialId = trial.id,
-                officerId = "officer-123",
-                outcome = TrialOutcome.WITHDREW,
-                reason = "Player decided to leave",
-            )
+            val ended =
+                trialService.endTrial(
+                    trialId = trial.id,
+                    officerId = "officer-123",
+                    outcome = TrialOutcome.WITHDREW,
+                    reason = "Player decided to leave",
+                )
 
             // Assert
             ended.status shouldBe TrialStatus.ENDED
@@ -356,14 +357,14 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class ListTrialsTests {
-
         @Test
         fun `should list all trials for guild`() {
             // Arrange
-            val trials = listOf(
-                createValidTrial(applicationId = "app-1"),
-                createValidTrial(applicationId = "app-2"),
-            )
+            val trials =
+                listOf(
+                    createValidTrial(applicationId = "app-1"),
+                    createValidTrial(applicationId = "app-2"),
+                )
             every { trialRepository.findByGuildId(guildId, 0, 50) } returns trials
 
             // Act
@@ -403,7 +404,6 @@ class TrialServiceTest : UnitTest() {
 
     @Nested
     inner class CountTrialsTests {
-
         @Test
         fun `should count trials for guild`() {
             // Arrange
@@ -432,9 +432,10 @@ class TrialServiceTest : UnitTest() {
     private fun createValidTrial(
         applicationId: String = "app-${System.nanoTime()}",
         guildId: String = this.guildId.value,
-    ): Trial = Trial.create(
-        applicationId = ApplicationId(applicationId),
-        guildId = GuildId(guildId),
-        raidsRequired = 8,
-    )
+    ): Trial =
+        Trial.create(
+            applicationId = ApplicationId(applicationId),
+            guildId = GuildId(guildId),
+            raidsRequired = 8,
+        )
 }

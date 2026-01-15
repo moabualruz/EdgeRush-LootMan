@@ -16,7 +16,7 @@ data class DiscordUserLink(
     val raiderId: RaiderId,
     val isPrimary: Boolean,
     val linkedAt: Instant,
-    val linkedBy: String?
+    val linkedBy: String?,
 ) {
     /**
      * Creates a copy with a new ID assigned.
@@ -46,14 +46,15 @@ data class DiscordUserLink(
             discordUserId: DiscordUserId,
             raiderId: RaiderId,
             isPrimary: Boolean = false,
-            linkedBy: String? = null
-        ): DiscordUserLink = DiscordUserLink(
-            id = null,
-            discordUserId = discordUserId,
-            raiderId = raiderId,
-            isPrimary = isPrimary,
-            linkedAt = Instant.now(),
-            linkedBy = linkedBy
-        )
+            linkedBy: String? = null,
+        ): DiscordUserLink =
+            DiscordUserLink(
+                id = null,
+                discordUserId = discordUserId,
+                raiderId = raiderId,
+                isPrimary = isPrimary,
+                linkedAt = Instant.now(),
+                linkedBy = linkedBy,
+            )
     }
 }

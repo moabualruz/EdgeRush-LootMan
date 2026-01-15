@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
  * - Terminal vs in-progress state identification
  */
 class SimulationStatusTest : UnitTest() {
-
     @Nested
     inner class StatusValuesTests {
         @Test
@@ -44,12 +43,13 @@ class SimulationStatusTest : UnitTest() {
 
         @Test
         fun `should contain all expected statuses`() {
-            SimulationStatus.entries shouldContainExactly listOf(
-                SimulationStatus.PENDING,
-                SimulationStatus.RUNNING,
-                SimulationStatus.COMPLETED,
-                SimulationStatus.FAILED
-            )
+            SimulationStatus.entries shouldContainExactly
+                listOf(
+                    SimulationStatus.PENDING,
+                    SimulationStatus.RUNNING,
+                    SimulationStatus.COMPLETED,
+                    SimulationStatus.FAILED,
+                )
         }
     }
 

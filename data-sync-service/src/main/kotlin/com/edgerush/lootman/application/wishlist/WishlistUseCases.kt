@@ -12,12 +12,13 @@ import org.springframework.stereotype.Service
  */
 @Service
 class GetWishlistUseCase(
-    private val wishlistRepository: WishlistRepository
+    private val wishlistRepository: WishlistRepository,
 ) {
-    fun execute(query: GetWishlistQuery): Result<Wishlist> = runCatching {
-        wishlistRepository.findByRaiderId(RaiderId(query.raiderId))
-            ?: throw NoSuchElementException("Wishlist not found for raider: ${query.raiderId}")
-    }
+    fun execute(query: GetWishlistQuery): Result<Wishlist> =
+        runCatching {
+            wishlistRepository.findByRaiderId(RaiderId(query.raiderId))
+                ?: throw NoSuchElementException("Wishlist not found for raider: ${query.raiderId}")
+        }
 }
 
 /**
@@ -25,23 +26,26 @@ class GetWishlistUseCase(
  */
 @Service
 class SaveWishlistUseCase(
-    private val wishlistRepository: WishlistRepository
+    private val wishlistRepository: WishlistRepository,
 ) {
-    fun execute(command: SaveWishlistCommand): Result<Wishlist> = runCatching {
-        val wishlist = Wishlist(
-            raiderId = RaiderId(command.raiderId),
-            items = command.items.map { item ->
-                WishlistItem(
-                    itemId = ItemId(item.itemId),
-                    itemName = item.itemName,
-                    priority = item.priority,
-                    upgradePercentage = item.upgradePercentage,
-                    specName = item.specName
+    fun execute(command: SaveWishlistCommand): Result<Wishlist> =
+        runCatching {
+            val wishlist =
+                Wishlist(
+                    raiderId = RaiderId(command.raiderId),
+                    items =
+                        command.items.map { item ->
+                            WishlistItem(
+                                itemId = ItemId(item.itemId),
+                                itemName = item.itemName,
+                                priority = item.priority,
+                                upgradePercentage = item.upgradePercentage,
+                                specName = item.specName,
+                            )
+                        },
                 )
-            }
-        )
-        wishlistRepository.save(wishlist)
-    }
+            wishlistRepository.save(wishlist)
+        }
 }
 
 /**
@@ -49,25 +53,26 @@ class SaveWishlistUseCase(
  */
 @Service
 class DeleteWishlistUseCase(
-    private val wishlistRepository: WishlistRepository
+    private val wishlistRepository: WishlistRepository,
 ) {
-    fun execute(command: DeleteWishlistCommand): Result<Unit> = runCatching {
-        val raiderId = RaiderId(command.raiderId)
-        wishlistRepository.findByRaiderId(raiderId)
-            ?: throw NoSuchElementException("Wishlist not found for raider: ${command.raiderId}")
-        wishlistRepository.delete(raiderId)
-    }
+    fun execute(command: DeleteWishlistCommand): Result<Unit> =
+        runCatching {
+            val raiderId = RaiderId(command.raiderId)
+            wishlistRepository.findByRaiderId(raiderId)
+                ?: throw NoSuchElementException("Wishlist not found for raider: ${command.raiderId}")
+            wishlistRepository.delete(raiderId)
+        }
 }
 
 // Query and Command classes
 
 data class GetWishlistQuery(
-    val raiderId: Long
+    val raiderId: Long,
 )
 
 data class SaveWishlistCommand(
     val raiderId: Long,
-    val items: List<WishlistItemCommand>
+    val items: List<WishlistItemCommand>,
 )
 
 data class WishlistItemCommand(
@@ -75,9 +80,9 @@ data class WishlistItemCommand(
     val itemName: String,
     val priority: Int,
     val upgradePercentage: Double,
-    val specName: String? = null
+    val specName: String? = null,
 )
 
 data class DeleteWishlistCommand(
-    val raiderId: Long
+    val raiderId: Long,
 )

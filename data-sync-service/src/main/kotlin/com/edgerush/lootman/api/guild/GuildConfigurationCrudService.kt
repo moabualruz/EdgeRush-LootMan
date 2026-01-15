@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with guild-configuration-specific methods.
  */
 interface GuildConfigurationCrudService : CrudService<Long, CreateGuildConfigurationRequest, UpdateGuildConfigurationRequest, GuildConfigurationResponse> {
-
     /**
      * Find a guild configuration by guild ID.
      *
@@ -35,7 +34,10 @@ interface GuildConfigurationCrudService : CrudService<Long, CreateGuildConfigura
      * @param request The benchmark update request
      * @return The updated guild configuration
      */
-    fun updateBenchmark(id: Long, request: UpdateBenchmarkRequest): GuildConfigurationResponse
+    fun updateBenchmark(
+        id: Long,
+        request: UpdateBenchmarkRequest,
+    ): GuildConfigurationResponse
 
     /**
      * Update the sync status for a guild.
@@ -45,5 +47,9 @@ interface GuildConfigurationCrudService : CrudService<Long, CreateGuildConfigura
      * @param error The error message if any
      * @return The updated guild configuration
      */
-    fun updateSyncStatus(guildId: String, status: String, error: String?): GuildConfigurationResponse
+    fun updateSyncStatus(
+        guildId: String,
+        status: String,
+        error: String?,
+    ): GuildConfigurationResponse
 }

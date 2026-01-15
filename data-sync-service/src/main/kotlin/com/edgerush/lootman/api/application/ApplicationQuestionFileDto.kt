@@ -28,11 +28,18 @@ data class ApplicationQuestionFileResponse(
     val url: String?,
 ) {
     companion object {
-        fun from(e: ApplicationQuestionFileEntity) = ApplicationQuestionFileResponse(
-            e.id!!, e.applicationId, e.questionPosition, e.question, e.originalFilename, e.url
-        )
+        fun from(e: ApplicationQuestionFileEntity) =
+            ApplicationQuestionFileResponse(
+                e.id!!,
+                e.applicationId,
+                e.questionPosition,
+                e.question,
+                e.originalFilename,
+                e.url,
+            )
     }
 }
 
 data class ApplicationQuestionFileExistsResponse(val exists: Boolean)
+
 data class ApplicationQuestionFileCountResponse(val count: Long)

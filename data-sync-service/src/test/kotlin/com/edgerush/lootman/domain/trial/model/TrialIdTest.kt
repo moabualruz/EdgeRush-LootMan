@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for TrialId value object.
  */
 class TrialIdTest : UnitTest() {
-
     @Test
     fun `should create TrialId with valid value`() {
         // Arrange & Act

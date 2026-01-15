@@ -41,27 +41,29 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalGearResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            characterClass = "Mage",
-            averageItemLevel = 489.0,
-            equippedItemLevel = 489.0,
-            items = listOf(
-                GearItemResponse(
-                    slot = "HEAD",
-                    itemId = 12345L,
-                    itemName = "Test Helmet",
-                    itemLevel = 489,
-                    quality = "EPIC",
-                    enchanted = true,
-                    gemmed = true,
-                    bonusIds = emptyList(),
-                )
-            ),
-            missingEnchants = emptyList(),
-            missingGems = emptyList(),
-        )
+        val expectedResponse =
+            PersonalGearResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                characterClass = "Mage",
+                averageItemLevel = 489.0,
+                equippedItemLevel = 489.0,
+                items =
+                    listOf(
+                        GearItemResponse(
+                            slot = "HEAD",
+                            itemId = 12345L,
+                            itemName = "Test Helmet",
+                            itemLevel = 489,
+                            quality = "EPIC",
+                            enchanted = true,
+                            gemmed = true,
+                            bonusIds = emptyList(),
+                        ),
+                    ),
+                missingEnchants = emptyList(),
+                missingGems = emptyList(),
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getGearForRaider(GuildId(guildId), raiderId) } returns expectedResponse
@@ -103,19 +105,23 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalVaultResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            raidSlots = listOf(
-                VaultSlotResponse(slot = 1, unlocked = true, itemLevel = 489, progress = 2, required = 2)
-            ),
-            mythicPlusSlots = listOf(
-                VaultSlotResponse(slot = 1, unlocked = true, itemLevel = 486, progress = 1, required = 1)
-            ),
-            pvpSlots = listOf(
-                VaultSlotResponse(slot = 1, unlocked = false, itemLevel = null, progress = 500, required = 1250)
-            ),
-        )
+        val expectedResponse =
+            PersonalVaultResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                raidSlots =
+                    listOf(
+                        VaultSlotResponse(slot = 1, unlocked = true, itemLevel = 489, progress = 2, required = 2),
+                    ),
+                mythicPlusSlots =
+                    listOf(
+                        VaultSlotResponse(slot = 1, unlocked = true, itemLevel = 486, progress = 1, required = 1),
+                    ),
+                pvpSlots =
+                    listOf(
+                        VaultSlotResponse(slot = 1, unlocked = false, itemLevel = null, progress = 500, required = 1250),
+                    ),
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getVaultForRaider(GuildId(guildId), raiderId) } returns expectedResponse
@@ -155,30 +161,33 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalAttendanceResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            overallRate = 0.95,
-            currentStreak = 10,
-            longestStreak = 15,
-            totalRaids = 100,
-            attendedRaids = 95,
-            acsScore = 0.95,
-            breakdown = AttendanceBreakdownResponse(
-                present = 95,
-                late = 2,
-                excused = 1,
-                absent = 2,
-            ),
-            recentAttendance = listOf(
-                AttendanceRecordResponse(
-                    raidDate = Instant.now(),
-                    raidName = "Nerub-ar Palace",
-                    status = "PRESENT",
-                    note = null,
-                )
-            ),
-        )
+        val expectedResponse =
+            PersonalAttendanceResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                overallRate = 0.95,
+                currentStreak = 10,
+                longestStreak = 15,
+                totalRaids = 100,
+                attendedRaids = 95,
+                acsScore = 0.95,
+                breakdown =
+                    AttendanceBreakdownResponse(
+                        present = 95,
+                        late = 2,
+                        excused = 1,
+                        absent = 2,
+                    ),
+                recentAttendance =
+                    listOf(
+                        AttendanceRecordResponse(
+                            raidDate = Instant.now(),
+                            raidName = "Nerub-ar Palace",
+                            status = "PRESENT",
+                            note = null,
+                        ),
+                    ),
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getAttendanceForRaider(GuildId(guildId), raiderId) } returns expectedResponse
@@ -217,30 +226,32 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalPerformanceResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            characterClass = "Mage",
-            spec = "Frost",
-            masScore = 0.85,
-            averagePerformance = 85.0,
-            averageItemLevelPerformance = 82.0,
-            killCount = 50,
-            bestPerformance = 95.0,
-            recentReports = listOf(
-                PerformanceReportResponse(
-                    reportId = "abc123",
-                    raidName = "Nerub-ar Palace",
-                    encounterName = "Ulgrax",
-                    date = Instant.now(),
-                    percentile = 88.0,
-                    ilvlPercentile = 85.0,
-                    dps = 150000.0,
-                    hps = null,
-                )
-            ),
-            trendData = emptyList(),
-        )
+        val expectedResponse =
+            PersonalPerformanceResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                characterClass = "Mage",
+                spec = "Frost",
+                masScore = 0.85,
+                averagePerformance = 85.0,
+                averageItemLevelPerformance = 82.0,
+                killCount = 50,
+                bestPerformance = 95.0,
+                recentReports =
+                    listOf(
+                        PerformanceReportResponse(
+                            reportId = "abc123",
+                            raidName = "Nerub-ar Palace",
+                            encounterName = "Ulgrax",
+                            date = Instant.now(),
+                            percentile = 88.0,
+                            ilvlPercentile = 85.0,
+                            dps = 150000.0,
+                            hps = null,
+                        ),
+                    ),
+                trendData = emptyList(),
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getPerformanceForRaider(GuildId(guildId), raiderId) } returns expectedResponse
@@ -279,30 +290,33 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalWishlistResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            items = listOf(
-                WishlistItemResponse(
-                    itemId = 207788L,
-                    itemName = "Fyr'alath the Dreamrender",
-                    slot = "MAINHAND",
-                    priority = 1,
-                    upgradeValue = 8.5,
-                    source = "Fyrakk",
-                    boss = "Fyrakk",
-                    currentItemLevel = 489,
-                    wishlistItemLevel = 502,
-                    isUpgrade = true,
-                )
-            ),
-            simulationStatus = SimulationStatusResponse(
-                status = "idle",
-                lastRun = Instant.now().minusSeconds(3600),
-                nextScheduled = Instant.now().plusSeconds(3600),
-                isStale = false,
-            ),
-        )
+        val expectedResponse =
+            PersonalWishlistResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                items =
+                    listOf(
+                        WishlistItemResponse(
+                            itemId = 207788L,
+                            itemName = "Fyr'alath the Dreamrender",
+                            slot = "MAINHAND",
+                            priority = 1,
+                            upgradeValue = 8.5,
+                            source = "Fyrakk",
+                            boss = "Fyrakk",
+                            currentItemLevel = 489,
+                            wishlistItemLevel = 502,
+                            isUpgrade = true,
+                        ),
+                    ),
+                simulationStatus =
+                    SimulationStatusResponse(
+                        status = "idle",
+                        lastRun = Instant.now().minusSeconds(3600),
+                        nextScheduled = Instant.now().plusSeconds(3600),
+                        isStale = false,
+                    ),
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getWishlistForRaider(GuildId(guildId), raiderId) } returns expectedResponse
@@ -340,12 +354,13 @@ class MeControllerTest : UnitTest() {
         // Given
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
-        val expectedResponse = PersonalWishlistResponse(
-            raiderId = 123L,
-            raiderName = "TestRaider",
-            items = emptyList(),
-            simulationStatus = null,
-        )
+        val expectedResponse =
+            PersonalWishlistResponse(
+                raiderId = 123L,
+                raiderName = "TestRaider",
+                items = emptyList(),
+                simulationStatus = null,
+            )
 
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
         every { meDataService.getWishlistForRaider(GuildId(guildId), raiderId) } returns expectedResponse

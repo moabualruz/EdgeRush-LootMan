@@ -23,11 +23,16 @@ data class RaiderRenownResponse(
     val level: Int?,
 ) {
     companion object {
-        fun from(e: RaiderRenownEntity) = RaiderRenownResponse(
-            e.id!!, e.raiderId, e.faction, e.level
-        )
+        fun from(e: RaiderRenownEntity) =
+            RaiderRenownResponse(
+                e.id!!,
+                e.raiderId,
+                e.faction,
+                e.level,
+            )
     }
 }
 
 data class RaiderRenownExistsResponse(val exists: Boolean)
+
 data class RaiderRenownCountResponse(val count: Long)

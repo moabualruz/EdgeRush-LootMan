@@ -3,7 +3,6 @@ package com.edgerush.lootman.api.me
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.api.auth.CurrentUserService
 import com.edgerush.lootman.domain.shared.GuildId
-import com.edgerush.lootman.domain.shared.RaiderId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -26,14 +25,13 @@ class MeController(
     private val currentUserService: CurrentUserService,
     private val meDataService: MeDataService,
 ) {
-
     /**
      * Get gear for the current user's primary character.
      */
     @GetMapping("/gear/guilds/{guildId}/me")
     @Operation(
         summary = "Get my gear",
-        description = "Returns equipped gear for the current user's primary linked character"
+        description = "Returns equipped gear for the current user's primary linked character",
     )
     fun getMyGear(
         @Parameter(description = "Guild ID")
@@ -50,7 +48,7 @@ class MeController(
     @GetMapping("/vault/guilds/{guildId}/me")
     @Operation(
         summary = "Get my vault options",
-        description = "Returns Great Vault options for the current user's primary linked character"
+        description = "Returns Great Vault options for the current user's primary linked character",
     )
     fun getMyVault(
         @Parameter(description = "Guild ID")
@@ -67,7 +65,7 @@ class MeController(
     @GetMapping("/attendance/guilds/{guildId}/me")
     @Operation(
         summary = "Get my attendance",
-        description = "Returns attendance records for the current user's primary linked character"
+        description = "Returns attendance records for the current user's primary linked character",
     )
     fun getMyAttendance(
         @Parameter(description = "Guild ID")
@@ -84,7 +82,7 @@ class MeController(
     @GetMapping("/performance/guilds/{guildId}/me")
     @Operation(
         summary = "Get my performance",
-        description = "Returns Warcraft Logs performance metrics for the current user's primary linked character"
+        description = "Returns Warcraft Logs performance metrics for the current user's primary linked character",
     )
     fun getMyPerformance(
         @Parameter(description = "Guild ID")
@@ -101,7 +99,7 @@ class MeController(
     @GetMapping("/wishlist/guilds/{guildId}/me")
     @Operation(
         summary = "Get my wishlist",
-        description = "Returns wishlist items for the current user's primary linked character"
+        description = "Returns wishlist items for the current user's primary linked character",
     )
     fun getMyWishlist(
         @Parameter(description = "Guild ID")

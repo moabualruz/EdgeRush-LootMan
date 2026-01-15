@@ -8,15 +8,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class RaiderRenownCrudServiceImpl(private val repository: RaiderRenownRepository) : RaiderRenownCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<RaiderRenownResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
-        return PagedResponse(repository.findAll(offset, pageRequest.size).map { RaiderRenownResponse.from(it) },
-            pageRequest.page, pageRequest.size, repository.count())
+        return PagedResponse(
+            repository.findAll(offset, pageRequest.size).map { RaiderRenownResponse.from(it) },
+            pageRequest.page,
+            pageRequest.size,
+            repository.count(),
+        )
     }
 
-    override fun findById(id: Long): RaiderRenownResponse = repository.findById(id)?.let { RaiderRenownResponse.from(it) }
-        ?: throw NoSuchElementException("RaiderRenown not found with id: $id")
+    override fun findById(id: Long): RaiderRenownResponse =
+        repository.findById(id)?.let { RaiderRenownResponse.from(it) }
+            ?: throw NoSuchElementException("RaiderRenown not found with id: $id")
 
     override fun existsById(id: Long): Boolean = repository.existsById(id)
 
@@ -25,7 +29,10 @@ class RaiderRenownCrudServiceImpl(private val repository: RaiderRenownRepository
         return RaiderRenownResponse.from(repository.save(entity))
     }
 
-    override fun update(id: Long, request: UpdateRaiderRenownRequest): RaiderRenownResponse {
+    override fun update(
+        id: Long,
+        request: UpdateRaiderRenownRequest,
+    ): RaiderRenownResponse {
         val existing = repository.findById(id) ?: throw NoSuchElementException("RaiderRenown not found with id: $id")
         val updated = existing.copy(level = request.level ?: existing.level)
         return RaiderRenownResponse.from(repository.save(updated))
@@ -36,10 +43,17 @@ class RaiderRenownCrudServiceImpl(private val repository: RaiderRenownRepository
         repository.delete(id)
     }
 
-    override fun findByRaiderId(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderRenownResponse> {
+    override fun findByRaiderId(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderRenownResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
-        return PagedResponse(repository.findByRaiderId(raiderId, offset, pageRequest.size).map { RaiderRenownResponse.from(it) },
-            pageRequest.page, pageRequest.size, repository.countByRaiderId(raiderId))
+        return PagedResponse(
+            repository.findByRaiderId(raiderId, offset, pageRequest.size).map { RaiderRenownResponse.from(it) },
+            pageRequest.page,
+            pageRequest.size,
+            repository.countByRaiderId(raiderId),
+        )
     }
 
     override fun countByRaiderId(raiderId: Long): Long = repository.countByRaiderId(raiderId)

@@ -17,7 +17,6 @@ import java.util.concurrent.Executor
  * naming conventions, and shutdown behavior.
  */
 class WarcraftLogsAsyncConfigTest : UnitTest() {
-
     private lateinit var config: WarcraftLogsAsyncConfig
 
     @BeforeEach
@@ -27,7 +26,6 @@ class WarcraftLogsAsyncConfigTest : UnitTest() {
 
     @Nested
     inner class WarcraftLogsExecutorBean {
-
         @Test
         fun `should create an Executor bean`() {
             // Act
@@ -97,7 +95,6 @@ class WarcraftLogsAsyncConfigTest : UnitTest() {
 
     @Nested
     inner class ExecutorInitialization {
-
         @Test
         fun `should initialize the executor`() {
             // Act
@@ -120,7 +117,6 @@ class WarcraftLogsAsyncConfigTest : UnitTest() {
 
     @Nested
     inner class ThreadPoolBehavior {
-
         @Test
         fun `should start with zero active threads before any tasks`() {
             // Act
@@ -151,7 +147,6 @@ class WarcraftLogsAsyncConfigTest : UnitTest() {
 
     @Nested
     inner class ShutdownConfiguration {
-
         @Test
         fun `executor should be properly configured for graceful shutdown`() {
             // Act
@@ -165,7 +160,6 @@ class WarcraftLogsAsyncConfigTest : UnitTest() {
 
     @Nested
     inner class MultipleInstances {
-
         @Test
         fun `should create independent executor instances`() {
             // Act

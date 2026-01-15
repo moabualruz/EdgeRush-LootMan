@@ -12,9 +12,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class WoWAuditHealthIndicator(
-    private val isApiAvailable: Boolean = true
+    private val isApiAvailable: Boolean = true,
 ) : HealthIndicator {
-
     override fun health(): Health {
         return if (isApiAvailable) {
             Health.up()

@@ -17,16 +17,16 @@ import java.time.OffsetDateTime
 class JdbcRaidRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : RaidRepository {
-
     override fun findById(raidId: Long): RaidEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT raid_id, date, start_time, end_time, instance, difficulty,
                    optional, status, present_size, total_size, notes,
                    selections_image, team_id, season_id, period_id,
                    created_at, updated_at, synced_at
             FROM raids
             WHERE raid_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, raidRowMapper, raidId)
         return results.firstOrNull()
@@ -38,8 +38,12 @@ class JdbcRaidRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<RaidEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidEntity> {
+        val sql =
+            """
             SELECT raid_id, date, start_time, end_time, instance, difficulty,
                    optional, status, present_size, total_size, notes,
                    selections_image, team_id, season_id, period_id,
@@ -47,7 +51,7 @@ class JdbcRaidRepository(
             FROM raids
             ORDER BY date DESC, raid_id DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raidRowMapper, limit, offset)
     }
@@ -57,8 +61,13 @@ class JdbcRaidRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<RaidEntity> {
-        val sql = """
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidEntity> {
+        val sql =
+            """
             SELECT raid_id, date, start_time, end_time, instance, difficulty,
                    optional, status, present_size, total_size, notes,
                    selections_image, team_id, season_id, period_id,
@@ -67,7 +76,7 @@ class JdbcRaidRepository(
             WHERE team_id = ?
             ORDER BY date DESC, raid_id DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raidRowMapper, teamId, limit, offset)
     }
@@ -83,7 +92,8 @@ class JdbcRaidRepository(
         offset: Long,
         limit: Int,
     ): List<RaidEntity> {
-        val sql = """
+        val sql =
+            """
             SELECT raid_id, date, start_time, end_time, instance, difficulty,
                    optional, status, present_size, total_size, notes,
                    selections_image, team_id, season_id, period_id,
@@ -92,12 +102,15 @@ class JdbcRaidRepository(
             WHERE date >= ? AND date <= ?
             ORDER BY date DESC, raid_id DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raidRowMapper, startDate, endDate, limit, offset)
     }
 
-    override fun countByDateRange(startDate: LocalDate, endDate: LocalDate): Long {
+    override fun countByDateRange(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): Long {
         val sql = "SELECT COUNT(*) FROM raids WHERE date >= ? AND date <= ?"
         return jdbcTemplate.queryForObject(sql, Long::class.java, startDate, endDate) ?: 0L
     }
@@ -119,8 +132,12 @@ class JdbcRaidRepository(
         jdbcTemplate.update(sql, raidId)
     }
 
-    override fun findUpcomingByGuildId(guildId: Long, limit: Int): List<RaidEntity> {
-        val sql = """
+    override fun findUpcomingByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity> {
+        val sql =
+            """
             SELECT r.raid_id, r.date, r.start_time, r.end_time, r.instance, r.difficulty,
                    r.optional, r.status, r.present_size, r.total_size, r.notes,
                    r.selections_image, r.team_id, r.season_id, r.period_id,
@@ -130,13 +147,17 @@ class JdbcRaidRepository(
             WHERE tm.guild_id = ? AND r.date >= CURRENT_DATE
             ORDER BY r.date ASC, r.start_time ASC
             LIMIT ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raidRowMapper, guildId, limit)
     }
 
-    override fun findPastByGuildId(guildId: Long, limit: Int): List<RaidEntity> {
-        val sql = """
+    override fun findPastByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity> {
+        val sql =
+            """
             SELECT r.raid_id, r.date, r.start_time, r.end_time, r.instance, r.difficulty,
                    r.optional, r.status, r.present_size, r.total_size, r.notes,
                    r.selections_image, r.team_id, r.season_id, r.period_id,
@@ -146,20 +167,21 @@ class JdbcRaidRepository(
             WHERE tm.guild_id = ? AND r.date < CURRENT_DATE
             ORDER BY r.date DESC, r.start_time DESC
             LIMIT ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, raidRowMapper, guildId, limit)
     }
 
     private fun insertRaid(raid: RaidEntity) {
-        val sql = """
+        val sql =
+            """
             INSERT INTO raids (
                 raid_id, date, start_time, end_time, instance, difficulty,
                 optional, status, present_size, total_size, notes,
                 selections_image, team_id, season_id, period_id,
                 created_at, updated_at, synced_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -185,7 +207,8 @@ class JdbcRaidRepository(
     }
 
     private fun updateRaid(raid: RaidEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE raids SET
                 date = ?,
                 start_time = ?,
@@ -204,7 +227,7 @@ class JdbcRaidRepository(
                 updated_at = ?,
                 synced_at = ?
             WHERE raid_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -228,48 +251,49 @@ class JdbcRaidRepository(
         )
     }
 
-    private val raidRowMapper = RowMapper { rs, _ ->
-        val teamIdValue = rs.getLong("team_id")
-        val teamId = if (rs.wasNull()) null else teamIdValue
+    private val raidRowMapper =
+        RowMapper { rs, _ ->
+            val teamIdValue = rs.getLong("team_id")
+            val teamId = if (rs.wasNull()) null else teamIdValue
 
-        val seasonIdValue = rs.getLong("season_id")
-        val seasonId = if (rs.wasNull()) null else seasonIdValue
+            val seasonIdValue = rs.getLong("season_id")
+            val seasonId = if (rs.wasNull()) null else seasonIdValue
 
-        val periodIdValue = rs.getLong("period_id")
-        val periodId = if (rs.wasNull()) null else periodIdValue
+            val periodIdValue = rs.getLong("period_id")
+            val periodId = if (rs.wasNull()) null else periodIdValue
 
-        val presentSizeValue = rs.getInt("present_size")
-        val presentSize = if (rs.wasNull()) null else presentSizeValue
+            val presentSizeValue = rs.getInt("present_size")
+            val presentSize = if (rs.wasNull()) null else presentSizeValue
 
-        val totalSizeValue = rs.getInt("total_size")
-        val totalSize = if (rs.wasNull()) null else totalSizeValue
+            val totalSizeValue = rs.getInt("total_size")
+            val totalSize = if (rs.wasNull()) null else totalSizeValue
 
-        val optionalValue = rs.getBoolean("optional")
-        val optional = if (rs.wasNull()) null else optionalValue
+            val optionalValue = rs.getBoolean("optional")
+            val optional = if (rs.wasNull()) null else optionalValue
 
-        val createdAtObj = rs.getObject("created_at", OffsetDateTime::class.java)
-        val updatedAtObj = rs.getObject("updated_at", OffsetDateTime::class.java)
-        val syncedAtObj = rs.getObject("synced_at", OffsetDateTime::class.java)
+            val createdAtObj = rs.getObject("created_at", OffsetDateTime::class.java)
+            val updatedAtObj = rs.getObject("updated_at", OffsetDateTime::class.java)
+            val syncedAtObj = rs.getObject("synced_at", OffsetDateTime::class.java)
 
-        RaidEntity(
-            raidId = rs.getLong("raid_id"),
-            date = rs.getObject("date", LocalDate::class.java),
-            startTime = rs.getTime("start_time")?.toLocalTime(),
-            endTime = rs.getTime("end_time")?.toLocalTime(),
-            instance = rs.getString("instance"),
-            difficulty = rs.getString("difficulty"),
-            optional = optional,
-            status = rs.getString("status"),
-            presentSize = presentSize,
-            totalSize = totalSize,
-            notes = rs.getString("notes"),
-            selectionsImage = rs.getString("selections_image"),
-            teamId = teamId,
-            seasonId = seasonId,
-            periodId = periodId,
-            createdAt = createdAtObj,
-            updatedAt = updatedAtObj,
-            syncedAt = syncedAtObj ?: OffsetDateTime.now(),
-        )
-    }
+            RaidEntity(
+                raidId = rs.getLong("raid_id"),
+                date = rs.getObject("date", LocalDate::class.java),
+                startTime = rs.getTime("start_time")?.toLocalTime(),
+                endTime = rs.getTime("end_time")?.toLocalTime(),
+                instance = rs.getString("instance"),
+                difficulty = rs.getString("difficulty"),
+                optional = optional,
+                status = rs.getString("status"),
+                presentSize = presentSize,
+                totalSize = totalSize,
+                notes = rs.getString("notes"),
+                selectionsImage = rs.getString("selections_image"),
+                teamId = teamId,
+                seasonId = seasonId,
+                periodId = periodId,
+                createdAt = createdAtObj,
+                updatedAt = updatedAtObj,
+                syncedAt = syncedAtObj ?: OffsetDateTime.now(),
+            )
+        }
 }

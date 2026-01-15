@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for RaidPlanService.
  */
 class RaidPlanServiceTest : UnitTest() {
-
     private lateinit var raidPlanRepository: RaidPlanRepository
     private lateinit var raidPlanService: RaidPlanService
 
@@ -29,18 +28,18 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class CreatePlanTests {
-
         @Test
         fun `should create raid plan with valid data`() {
             // Given
-            val request = CreateRaidPlanRequest(
-                guildId = "test-guild",
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Phase 1 Positions",
-                createdBy = 1L,
-                visibility = PlanVisibility.GUILD
-            )
+            val request =
+                CreateRaidPlanRequest(
+                    guildId = "test-guild",
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Phase 1 Positions",
+                    createdBy = 1L,
+                    visibility = PlanVisibility.GUILD,
+                )
 
             every { raidPlanRepository.save(any()) } answers { firstArg() }
 
@@ -62,14 +61,15 @@ class RaidPlanServiceTest : UnitTest() {
         @Test
         fun `should create private plan when specified`() {
             // Given
-            val request = CreateRaidPlanRequest(
-                guildId = "test-guild",
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "My Private Strategy",
-                createdBy = 1L,
-                visibility = PlanVisibility.PRIVATE
-            )
+            val request =
+                CreateRaidPlanRequest(
+                    guildId = "test-guild",
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "My Private Strategy",
+                    createdBy = 1L,
+                    visibility = PlanVisibility.PRIVATE,
+                )
 
             every { raidPlanRepository.save(any()) } answers { firstArg() }
 
@@ -83,7 +83,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class GetPlanTests {
-
         @Test
         fun `should return plan when found by id`() {
             // Given
@@ -103,16 +102,16 @@ class RaidPlanServiceTest : UnitTest() {
             every { raidPlanRepository.findById("non-existent") } returns null
 
             // When & Then
-            val exception = shouldThrow<RaidPlanNotFoundException> {
-                raidPlanService.getPlan("non-existent")
-            }
+            val exception =
+                shouldThrow<RaidPlanNotFoundException> {
+                    raidPlanService.getPlan("non-existent")
+                }
             exception.planId shouldBe "non-existent"
         }
     }
 
     @Nested
     inner class GetPlanByShareTokenTests {
-
         @Test
         fun `should return plan when found by share token`() {
             // Given
@@ -140,7 +139,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class GetPlansByGuildTests {
-
         @Test
         fun `should return all plans for guild`() {
             // Given
@@ -174,7 +172,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class UpdatePlanTests {
-
         @Test
         fun `should update plan name`() {
             // Given
@@ -222,7 +219,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class AddStepTests {
-
         @Test
         fun `should add step to plan`() {
             // Given
@@ -241,7 +237,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class RemoveStepTests {
-
         @Test
         fun `should remove step from plan`() {
             // Given
@@ -260,7 +255,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class GenerateShareTokenTests {
-
         @Test
         fun `should generate share token`() {
             // Given
@@ -279,7 +273,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class RevokeShareTokenTests {
-
         @Test
         fun `should revoke share token`() {
             // Given
@@ -297,7 +290,6 @@ class RaidPlanServiceTest : UnitTest() {
 
     @Nested
     inner class DeletePlanTests {
-
         @Test
         fun `should delete plan`() {
             // Given
@@ -324,11 +316,12 @@ class RaidPlanServiceTest : UnitTest() {
         }
     }
 
-    private fun createTestPlan(): RaidPlan = RaidPlan.create(
-        guildId = GuildId("test-guild"),
-        encounterId = 2902,
-        encounterName = "Queen Ansurek",
-        name = "Test Plan",
-        createdBy = 1L,
-    )
+    private fun createTestPlan(): RaidPlan =
+        RaidPlan.create(
+            guildId = GuildId("test-guild"),
+            encounterId = 2902,
+            encounterName = "Queen Ansurek",
+            name = "Test Plan",
+            createdBy = 1L,
+        )
 }

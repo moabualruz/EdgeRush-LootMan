@@ -8,7 +8,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * CRUD service interface for FlpsDefaultModifier operations.
  */
 interface FlpsDefaultModifierCrudService : CrudService<Long, CreateFlpsDefaultModifierRequest, UpdateFlpsDefaultModifierRequest, FlpsDefaultModifierResponse> {
-
     /**
      * Find default modifiers by category with pagination.
      *
@@ -16,14 +15,16 @@ interface FlpsDefaultModifierCrudService : CrudService<Long, CreateFlpsDefaultMo
      * @param pageRequest Pagination parameters
      * @return Paginated list of modifiers for the category
      */
-    fun findByCategory(category: String, pageRequest: PageRequest): PagedResponse<FlpsDefaultModifierResponse>
+    fun findByCategory(
+        category: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<FlpsDefaultModifierResponse>
 }
 
 /**
  * CRUD service interface for FlpsGuildModifier operations.
  */
 interface FlpsGuildModifierCrudService : CrudService<Long, CreateFlpsGuildModifierRequest, UpdateFlpsGuildModifierRequest, FlpsGuildModifierResponse> {
-
     /**
      * Find guild modifiers by guild with pagination.
      *
@@ -31,7 +32,10 @@ interface FlpsGuildModifierCrudService : CrudService<Long, CreateFlpsGuildModifi
      * @param pageRequest Pagination parameters
      * @return Paginated list of modifiers for the guild
      */
-    fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<FlpsGuildModifierResponse>
+    fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<FlpsGuildModifierResponse>
 
     /**
      * Find guild modifiers by guild and category with pagination.
@@ -41,7 +45,11 @@ interface FlpsGuildModifierCrudService : CrudService<Long, CreateFlpsGuildModifi
      * @param pageRequest Pagination parameters
      * @return Paginated list of modifiers for the guild and category
      */
-    fun findByGuildAndCategory(guildId: String, category: String, pageRequest: PageRequest): PagedResponse<FlpsGuildModifierResponse>
+    fun findByGuildAndCategory(
+        guildId: String,
+        category: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<FlpsGuildModifierResponse>
 
     /**
      * Count modifiers for a guild.

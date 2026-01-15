@@ -17,5 +17,5 @@ enum class ApplicationStatus {
     REJECTED,
 
     /** Application was withdrawn by the applicant */
-    WITHDRAWN
+    WITHDRAWN,
 }

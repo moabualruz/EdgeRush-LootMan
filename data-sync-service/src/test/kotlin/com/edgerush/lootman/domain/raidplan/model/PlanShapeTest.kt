@@ -11,19 +11,18 @@ import org.junit.jupiter.api.Test
  * Unit tests for PlanShape value object.
  */
 class PlanShapeTest : UnitTest() {
-
     @Nested
     inner class CircleCreationTests {
-
         @Test
         fun `should create valid circle shape`() {
             // Arrange & Act
-            val circle = PlanShape.circle(
-                x = 50.0,
-                y = 50.0,
-                radius = 15.0,
-                color = "#FF0000",
-            )
+            val circle =
+                PlanShape.circle(
+                    x = 50.0,
+                    y = 50.0,
+                    radius = 15.0,
+                    color = "#FF0000",
+                )
 
             // Assert
             circle.shapeType shouldBe ShapeType.CIRCLE
@@ -56,36 +55,38 @@ class PlanShapeTest : UnitTest() {
         @Test
         fun `should throw exception when radius is not positive`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanShape.circle(50.0, 50.0, 0.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanShape.circle(50.0, 50.0, 0.0)
+                }
             exception.message shouldBe "Radius must be positive"
         }
 
         @Test
         fun `should throw exception when radius is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanShape.circle(50.0, 50.0, -5.0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanShape.circle(50.0, 50.0, -5.0)
+                }
             exception.message shouldBe "Radius must be positive"
         }
     }
 
     @Nested
     inner class LineCreationTests {
-
         @Test
         fun `should create valid line shape`() {
             // Arrange & Act
-            val line = PlanShape.line(
-                x1 = 10.0,
-                y1 = 20.0,
-                x2 = 80.0,
-                y2 = 70.0,
-                color = "#00FF00",
-                strokeWidth = 3,
-            )
+            val line =
+                PlanShape.line(
+                    x1 = 10.0,
+                    y1 = 20.0,
+                    x2 = 80.0,
+                    y2 = 70.0,
+                    color = "#00FF00",
+                    strokeWidth = 3,
+                )
 
             // Assert
             line.shapeType shouldBe ShapeType.LINE
@@ -110,17 +111,17 @@ class PlanShapeTest : UnitTest() {
 
     @Nested
     inner class ArrowCreationTests {
-
         @Test
         fun `should create valid arrow shape`() {
             // Arrange & Act
-            val arrow = PlanShape.arrow(
-                x1 = 10.0,
-                y1 = 10.0,
-                x2 = 50.0,
-                y2 = 50.0,
-                color = "#0000FF",
-            )
+            val arrow =
+                PlanShape.arrow(
+                    x1 = 10.0,
+                    y1 = 10.0,
+                    x2 = 50.0,
+                    y2 = 50.0,
+                    color = "#0000FF",
+                )
 
             // Assert
             arrow.shapeType shouldBe ShapeType.ARROW
@@ -143,17 +144,17 @@ class PlanShapeTest : UnitTest() {
 
     @Nested
     inner class RectangleCreationTests {
-
         @Test
         fun `should create valid rectangle shape`() {
             // Arrange & Act
-            val rect = PlanShape.rectangle(
-                x1 = 20.0,
-                y1 = 20.0,
-                x2 = 80.0,
-                y2 = 60.0,
-                color = "#FFFF00",
-            )
+            val rect =
+                PlanShape.rectangle(
+                    x1 = 20.0,
+                    y1 = 20.0,
+                    x2 = 80.0,
+                    y2 = 60.0,
+                    color = "#FFFF00",
+                )
 
             // Assert
             rect.shapeType shouldBe ShapeType.RECTANGLE
@@ -166,29 +167,29 @@ class PlanShapeTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when stroke width is not positive`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanShape.line(0.0, 0.0, 100.0, 100.0, strokeWidth = 0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanShape.line(0.0, 0.0, 100.0, 100.0, strokeWidth = 0)
+                }
             exception.message shouldBe "Stroke width must be positive"
         }
 
         @Test
         fun `should throw exception when stroke width is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                PlanShape.circle(50.0, 50.0, 10.0, strokeWidth = -1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    PlanShape.circle(50.0, 50.0, 10.0, strokeWidth = -1)
+                }
             exception.message shouldBe "Stroke width must be positive"
         }
     }
 
     @Nested
     inner class ShapeTypeTests {
-
         @Test
         fun `should have all expected shape types`() {
             // Assert
@@ -201,7 +202,6 @@ class PlanShapeTest : UnitTest() {
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `circles should be equal when all fields match`() {
             // Arrange

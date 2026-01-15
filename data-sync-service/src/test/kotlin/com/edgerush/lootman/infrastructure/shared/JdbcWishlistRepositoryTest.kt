@@ -24,7 +24,6 @@ import java.sql.ResultSet
  * The repository operates on the wishlist_items table.
  */
 class JdbcWishlistRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcWishlistRepository
 
@@ -36,7 +35,6 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return wishlist when found`() {
             // Given
@@ -46,12 +44,13 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("raiderId = ?") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
-            } returns listOf(
-                createWishlistItem(12345L, "Sword of Power", 1, 15.5),
-                createWishlistItem(12346L, "Shield of Defense", 2, 12.0)
-            )
+            } returns
+                listOf(
+                    createWishlistItem(12345L, "Sword of Power", 1, 15.5),
+                    createWishlistItem(12346L, "Shield of Defense", 2, 12.0),
+                )
 
             // When
             val result = repository.findByRaiderId(raiderId)
@@ -71,7 +70,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("raiderId = ?") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns emptyList()
 
@@ -91,17 +90,18 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<WishlistItem>>()
-                val rs = mockResultSet(
-                    itemId = 54321L,
-                    itemName = "Epic Staff",
-                    priority = 1,
-                    upgradePercentage = 25.5,
-                    specName = "Frost"
-                )
+                val rs =
+                    mockResultSet(
+                        itemId = 54321L,
+                        itemName = "Epic Staff",
+                        priority = 1,
+                        upgradePercentage = 25.5,
+                        specName = "Frost",
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -127,17 +127,18 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<WishlistItem>>()
-                val rs = mockResultSet(
-                    itemId = 11111L,
-                    itemName = "Generic Item",
-                    priority = 1,
-                    upgradePercentage = 10.0,
-                    specName = null
-                )
+                val rs =
+                    mockResultSet(
+                        itemId = 11111L,
+                        itemName = "Generic Item",
+                        priority = 1,
+                        upgradePercentage = 10.0,
+                        specName = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -158,17 +159,18 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<WishlistItem>>()
-                val rs = mockResultSet(
-                    itemId = 99999L,
-                    itemName = null, // Null item name
-                    priority = 1,
-                    upgradePercentage = 10.0,
-                    specName = null
-                )
+                val rs =
+                    mockResultSet(
+                        itemId = 99999L,
+                        itemName = null, // Null item name
+                        priority = 1,
+                        upgradePercentage = 10.0,
+                        specName = null,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -189,13 +191,14 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("ORDER BY priority") },
                     any<RowMapper<WishlistItem>>(),
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
-            } returns listOf(
-                createWishlistItem(1L, "First Item", 1, 20.0),
-                createWishlistItem(2L, "Second Item", 2, 15.0),
-                createWishlistItem(3L, "Third Item", 3, 10.0)
-            )
+            } returns
+                listOf(
+                    createWishlistItem(1L, "First Item", 1, 20.0),
+                    createWishlistItem(2L, "Second Item", 2, 15.0),
+                    createWishlistItem(3L, "Third Item", 3, 10.0),
+                )
 
             // When
             val result = repository.findByRaiderId(raiderId)
@@ -208,7 +211,6 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should delete existing items and insert new ones`() {
             // Given
@@ -225,7 +227,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") },
-                    wishlist.raiderId.value
+                    wishlist.raiderId.value,
                 )
             }
         }
@@ -244,13 +246,13 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             verify(exactly = 1) {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") },
-                    wishlist.raiderId.value
+                    wishlist.raiderId.value,
                 )
             }
             verify(exactly = 3) {
                 jdbcTemplate.update(
                     match { it.contains("INSERT INTO") },
-                    *anyVararg()
+                    *anyVararg(),
                 )
             }
         }
@@ -258,17 +260,19 @@ class JdbcWishlistRepositoryTest : UnitTest() {
         @Test
         fun `should save wishlist with specName`() {
             // Given
-            val item = WishlistItem(
-                itemId = ItemId(12345L),
-                itemName = "Spec Item",
-                priority = 1,
-                upgradePercentage = 20.0,
-                specName = "Holy"
-            )
-            val wishlist = Wishlist(
-                raiderId = RaiderId(100L),
-                items = listOf(item)
-            )
+            val item =
+                WishlistItem(
+                    itemId = ItemId(12345L),
+                    itemName = "Spec Item",
+                    priority = 1,
+                    upgradePercentage = 20.0,
+                    specName = "Holy",
+                )
+            val wishlist =
+                Wishlist(
+                    raiderId = RaiderId(100L),
+                    items = listOf(item),
+                )
 
             every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
 
@@ -284,7 +288,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
                     item.itemName,
                     item.priority,
                     item.upgradePercentage,
-                    "Holy"
+                    "Holy",
                 )
             }
         }
@@ -292,7 +296,6 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete all wishlist items for raider`() {
             // Given
@@ -301,7 +304,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns 3
 
@@ -312,7 +315,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE FROM") && it.contains("raiderId = ?") },
-                    raiderId.value
+                    raiderId.value,
                 )
             }
         }
@@ -325,7 +328,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(raiderId.value)
+                    eq(raiderId.value),
                 )
             } returns 0
 
@@ -336,7 +339,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") },
-                    raiderId.value
+                    raiderId.value,
                 )
             }
         }
@@ -349,7 +352,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
         itemName: String? = "Test Item",
         priority: Int = 1,
         upgradePercentage: Double = 15.0,
-        specName: String? = null
+        specName: String? = null,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("itemId") } returns itemId
@@ -365,27 +368,29 @@ class JdbcWishlistRepositoryTest : UnitTest() {
         itemName: String,
         priority: Int,
         upgradePercentage: Double,
-        specName: String? = null
-    ): WishlistItem = WishlistItem(
-        itemId = ItemId(itemId),
-        itemName = itemName,
-        priority = priority,
-        upgradePercentage = upgradePercentage,
-        specName = specName
-    )
+        specName: String? = null,
+    ): WishlistItem =
+        WishlistItem(
+            itemId = ItemId(itemId),
+            itemName = itemName,
+            priority = priority,
+            upgradePercentage = upgradePercentage,
+            specName = specName,
+        )
 
     private fun createWishlist(
         raiderId: RaiderId = RaiderId(100L),
-        itemCount: Int = 2
+        itemCount: Int = 2,
     ): Wishlist {
-        val items = (1..itemCount).map { idx ->
-            createWishlistItem(
-                itemId = (12345 + idx).toLong(),
-                itemName = "Item $idx",
-                priority = idx,
-                upgradePercentage = (20.0 - idx)
-            )
-        }
+        val items =
+            (1..itemCount).map { idx ->
+                createWishlistItem(
+                    itemId = (12345 + idx).toLong(),
+                    itemName = "Item $idx",
+                    priority = idx,
+                    upgradePercentage = (20.0 - idx),
+                )
+            }
         return Wishlist(raiderId = raiderId, items = items)
     }
 }

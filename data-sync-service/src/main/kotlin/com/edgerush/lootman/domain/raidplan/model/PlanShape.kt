@@ -29,14 +29,15 @@ data class PlanShape(
             radius: Double,
             color: String? = null,
             strokeWidth: Int = 2,
-        ): PlanShape = PlanShape(
-            shapeType = ShapeType.CIRCLE,
-            x1 = x,
-            y1 = y,
-            radius = radius,
-            color = color,
-            strokeWidth = strokeWidth,
-        )
+        ): PlanShape =
+            PlanShape(
+                shapeType = ShapeType.CIRCLE,
+                x1 = x,
+                y1 = y,
+                radius = radius,
+                color = color,
+                strokeWidth = strokeWidth,
+            )
 
         /**
          * Creates a line shape.
@@ -48,15 +49,16 @@ data class PlanShape(
             y2: Double,
             color: String? = null,
             strokeWidth: Int = 2,
-        ): PlanShape = PlanShape(
-            shapeType = ShapeType.LINE,
-            x1 = x1,
-            y1 = y1,
-            x2 = x2,
-            y2 = y2,
-            color = color,
-            strokeWidth = strokeWidth,
-        )
+        ): PlanShape =
+            PlanShape(
+                shapeType = ShapeType.LINE,
+                x1 = x1,
+                y1 = y1,
+                x2 = x2,
+                y2 = y2,
+                color = color,
+                strokeWidth = strokeWidth,
+            )
 
         /**
          * Creates an arrow shape.
@@ -68,15 +70,16 @@ data class PlanShape(
             y2: Double,
             color: String? = null,
             strokeWidth: Int = 2,
-        ): PlanShape = PlanShape(
-            shapeType = ShapeType.ARROW,
-            x1 = x1,
-            y1 = y1,
-            x2 = x2,
-            y2 = y2,
-            color = color,
-            strokeWidth = strokeWidth,
-        )
+        ): PlanShape =
+            PlanShape(
+                shapeType = ShapeType.ARROW,
+                x1 = x1,
+                y1 = y1,
+                x2 = x2,
+                y2 = y2,
+                color = color,
+                strokeWidth = strokeWidth,
+            )
 
         /**
          * Creates a rectangle shape.
@@ -88,14 +91,15 @@ data class PlanShape(
             y2: Double,
             color: String? = null,
             strokeWidth: Int = 2,
-        ): PlanShape = PlanShape(
-            shapeType = ShapeType.RECTANGLE,
-            x1 = x1,
-            y1 = y1,
-            x2 = x2,
-            y2 = y2,
-            color = color,
-            strokeWidth = strokeWidth,
-        )
+        ): PlanShape =
+            PlanShape(
+                shapeType = ShapeType.RECTANGLE,
+                x1 = x1,
+                y1 = y1,
+                x2 = x2,
+                y2 = y2,
+                color = color,
+                strokeWidth = strokeWidth,
+            )
     }
 }

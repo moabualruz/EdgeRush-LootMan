@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class AuditLogControllerTest : UnitTest() {
-
     private lateinit var auditLogService: AuditLogService
     private lateinit var controller: AuditLogController
 
@@ -27,10 +26,11 @@ class AuditLogControllerTest : UnitTest() {
         // Given
         val entityType = "Raider"
         val entityId = "123"
-        val responses = listOf(
-            createAuditLogResponse(1, entityType, entityId, AuditOperation.CREATE),
-            createAuditLogResponse(2, entityType, entityId, AuditOperation.UPDATE),
-        )
+        val responses =
+            listOf(
+                createAuditLogResponse(1, entityType, entityId, AuditOperation.CREATE),
+                createAuditLogResponse(2, entityType, entityId, AuditOperation.UPDATE),
+            )
         every { auditLogService.findByEntity(entityType, entityId) } returns responses
 
         // When
@@ -47,9 +47,10 @@ class AuditLogControllerTest : UnitTest() {
     fun `findByUserId should return audit logs for user`() {
         // Given
         val userId = "user-123"
-        val responses = listOf(
-            createAuditLogResponse(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
-        )
+        val responses =
+            listOf(
+                createAuditLogResponse(1, "Guild", "1", AuditOperation.CREATE, userId = userId),
+            )
         every { auditLogService.findByUserId(userId) } returns responses
 
         // When
@@ -66,10 +67,11 @@ class AuditLogControllerTest : UnitTest() {
         // Given
         val from = Instant.parse("2025-01-01T00:00:00Z")
         val to = Instant.parse("2025-01-15T23:59:59Z")
-        val responses = listOf(
-            createAuditLogResponse(1, "Guild", "1", AuditOperation.CREATE),
-            createAuditLogResponse(2, "Raider", "2", AuditOperation.UPDATE),
-        )
+        val responses =
+            listOf(
+                createAuditLogResponse(1, "Guild", "1", AuditOperation.CREATE),
+                createAuditLogResponse(2, "Raider", "2", AuditOperation.UPDATE),
+            )
         every { auditLogService.findByTimeRange(from, to) } returns responses
 
         // When
@@ -84,9 +86,10 @@ class AuditLogControllerTest : UnitTest() {
     fun `findByOperation should return audit logs for operation type`() {
         // Given
         val operation = AuditOperation.DELETE
-        val responses = listOf(
-            createAuditLogResponse(1, "Guild", "1", operation),
-        )
+        val responses =
+            listOf(
+                createAuditLogResponse(1, "Guild", "1", operation),
+            )
         every { auditLogService.findByOperation(operation) } returns responses
 
         // When

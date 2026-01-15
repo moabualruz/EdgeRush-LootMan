@@ -39,7 +39,10 @@ interface GuildConfigurationRepository {
      * @param limit The maximum number of records to return
      * @return List of guild configuration entities
      */
-    fun findAll(offset: Long, limit: Int): List<GuildConfigurationEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<GuildConfigurationEntity>
 
     /**
      * Counts all guild configurations.
@@ -55,7 +58,10 @@ interface GuildConfigurationRepository {
      * @param limit The maximum number of records to return
      * @return List of active guild configuration entities
      */
-    fun findActive(offset: Long, limit: Int): List<GuildConfigurationEntity>
+    fun findActive(
+        offset: Long,
+        limit: Int,
+    ): List<GuildConfigurationEntity>
 
     /**
      * Counts all active guild configurations.

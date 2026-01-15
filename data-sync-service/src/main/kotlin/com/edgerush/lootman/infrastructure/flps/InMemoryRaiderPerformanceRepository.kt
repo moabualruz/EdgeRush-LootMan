@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @Repository
 class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
-
     // Storage keyed by composite key: guildId-raiderId-periodStart-periodEnd
     private val storage = ConcurrentHashMap<String, RaiderPerformanceData>()
 
@@ -24,7 +23,7 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
         raiderId: RaiderId,
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): RaiderPerformanceData? {
         val key = buildKey(guildId, raiderId, startDate, endDate)
         return storage[key]
@@ -35,7 +34,7 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
         characterRealm: String,
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): RaiderPerformanceData? {
         return storage.values.find { data ->
             data.characterName == characterName &&
@@ -48,7 +47,7 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
     override fun findAllByGuildAndPeriod(
         guildId: GuildId,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): List<RaiderPerformanceData> {
         return storage.entries
             .filter { (key, data) ->
@@ -65,7 +64,10 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
      * @param guildId The guild identifier
      * @param data The performance data to save
      */
-    fun save(guildId: GuildId, data: RaiderPerformanceData) {
+    fun save(
+        guildId: GuildId,
+        data: RaiderPerformanceData,
+    ) {
         val key = buildKey(guildId, data.raiderId, data.periodStart, data.periodEnd)
         storage[key] = data
     }
@@ -81,7 +83,7 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
         guildId: GuildId,
         raiderId: RaiderId,
         periodStart: Instant,
-        periodEnd: Instant
+        periodEnd: Instant,
     ): String {
         return "${guildId.value}-${raiderId.value}-${periodStart.epochSecond}-${periodEnd.epochSecond}"
     }
@@ -89,12 +91,15 @@ class InMemoryRaiderPerformanceRepository : RaiderPerformanceRepository {
     private fun matchesPeriod(
         data: RaiderPerformanceData,
         startDate: Instant,
-        endDate: Instant
+        endDate: Instant,
     ): Boolean {
         return data.periodStart == startDate && data.periodEnd == endDate
     }
 
-    private fun matchesGuild(data: RaiderPerformanceData, guildId: GuildId): Boolean {
+    private fun matchesGuild(
+        data: RaiderPerformanceData,
+        guildId: GuildId,
+    ): Boolean {
         // Find the entry in storage to check if it was saved with this guild
         return storage.entries.any { (key, value) ->
             key.startsWith("${guildId.value}-") && value == data

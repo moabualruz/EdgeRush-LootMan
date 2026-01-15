@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service
  */
 @Service
 class GetCurrentGearUseCase(
-    private val gearRepository: GearRepository
+    private val gearRepository: GearRepository,
 ) {
-    fun execute(query: GetCurrentGearQuery): Result<GearSet> = runCatching {
-        gearRepository.findCurrentGear(RaiderId(query.raiderId))
-            ?: throw NoSuchElementException("Gear not found for raider: ${query.raiderId}")
-    }
+    fun execute(query: GetCurrentGearQuery): Result<GearSet> =
+        runCatching {
+            gearRepository.findCurrentGear(RaiderId(query.raiderId))
+                ?: throw NoSuchElementException("Gear not found for raider: ${query.raiderId}")
+        }
 }
 
 /**
@@ -28,13 +29,14 @@ class GetCurrentGearUseCase(
  */
 @Service
 class GetGearByTypeUseCase(
-    private val gearRepository: GearRepository
+    private val gearRepository: GearRepository,
 ) {
-    fun execute(query: GetGearByTypeQuery): Result<GearSet> = runCatching {
-        val gearSetType = GearSetType.valueOf(query.gearSetType.uppercase())
-        gearRepository.findByRaiderIdAndType(RaiderId(query.raiderId), gearSetType)
-            ?: throw NoSuchElementException("Gear of type ${query.gearSetType} not found for raider: ${query.raiderId}")
-    }
+    fun execute(query: GetGearByTypeQuery): Result<GearSet> =
+        runCatching {
+            val gearSetType = GearSetType.valueOf(query.gearSetType.uppercase())
+            gearRepository.findByRaiderIdAndType(RaiderId(query.raiderId), gearSetType)
+                ?: throw NoSuchElementException("Gear of type ${query.gearSetType} not found for raider: ${query.raiderId}")
+        }
 }
 
 /**
@@ -42,47 +44,51 @@ class GetGearByTypeUseCase(
  */
 @Service
 class SaveGearUseCase(
-    private val gearRepository: GearRepository
+    private val gearRepository: GearRepository,
 ) {
-    fun execute(command: SaveGearCommand): Result<GearSet> = runCatching {
-        val gearSetType = GearSetType.valueOf(command.gearSetType.uppercase())
-        val items = command.items.associate { item ->
-            val slot = EquipmentSlot.valueOf(item.slot.uppercase())
-            val quality = ItemQuality.valueOf(item.quality.uppercase())
-            slot to GearItem(
-                itemId = ItemId(item.itemId),
-                name = item.name,
-                itemLevel = item.itemLevel,
-                quality = quality,
-                slot = slot,
-                isTierPiece = item.isTierPiece,
-                enchant = item.enchant,
-                sockets = item.sockets
-            )
+    fun execute(command: SaveGearCommand): Result<GearSet> =
+        runCatching {
+            val gearSetType = GearSetType.valueOf(command.gearSetType.uppercase())
+            val items =
+                command.items.associate { item ->
+                    val slot = EquipmentSlot.valueOf(item.slot.uppercase())
+                    val quality = ItemQuality.valueOf(item.quality.uppercase())
+                    slot to
+                        GearItem(
+                            itemId = ItemId(item.itemId),
+                            name = item.name,
+                            itemLevel = item.itemLevel,
+                            quality = quality,
+                            slot = slot,
+                            isTierPiece = item.isTierPiece,
+                            enchant = item.enchant,
+                            sockets = item.sockets,
+                        )
+                }
+            val gearSet =
+                GearSet(
+                    items = items,
+                    gearSetType = gearSetType,
+                )
+            gearRepository.save(RaiderId(command.raiderId), gearSet)
         }
-        val gearSet = GearSet(
-            items = items,
-            gearSetType = gearSetType
-        )
-        gearRepository.save(RaiderId(command.raiderId), gearSet)
-    }
 }
 
 // Query and Command classes
 
 data class GetCurrentGearQuery(
-    val raiderId: Long
+    val raiderId: Long,
 )
 
 data class GetGearByTypeQuery(
     val raiderId: Long,
-    val gearSetType: String
+    val gearSetType: String,
 )
 
 data class SaveGearCommand(
     val raiderId: Long,
     val gearSetType: String,
-    val items: List<GearItemCommand>
+    val items: List<GearItemCommand>,
 )
 
 data class GearItemCommand(
@@ -93,5 +99,5 @@ data class GearItemCommand(
     val slot: String,
     val isTierPiece: Boolean = false,
     val enchant: String? = null,
-    val sockets: Int = 0
+    val sockets: Int = 0,
 )

@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Test
  * Tests default values and configuration structure.
  */
 class WarcraftLogsGuildConfigTest : UnitTest() {
-
     @Test
     fun `should have correct default values`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.enabled shouldBe true
@@ -35,12 +35,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default included difficulties`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.includedDifficulties shouldHaveSize 2
@@ -51,12 +52,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default MAS calculation weights`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.dpaWeight shouldBe 0.25
@@ -67,12 +69,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default fallback values`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.fallbackMAS shouldBe 0.0
@@ -83,12 +86,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default time weighting configuration`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.recentPerformanceWeightMultiplier shouldBe 2.0
@@ -98,12 +102,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default spec average configuration`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.specAveragePercentile shouldBe 50
@@ -113,12 +118,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have correct default cache configuration`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.masCacheTTLMinutes shouldBe 60
@@ -127,12 +133,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should have empty character name mappings by default`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Assert
         config.characterNameMappings.shouldBeEmpty()
@@ -141,14 +148,15 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow custom guild credentials`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            clientId = "guild-specific-id",
-            clientSecret = "guild-specific-secret",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                clientId = "guild-specific-id",
+                clientSecret = "guild-specific-secret",
+            )
 
         // Assert
         config.clientId shouldBe "guild-specific-id"
@@ -158,15 +166,16 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow custom sync configuration`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            syncIntervalHours = 12,
-            syncTimeWindowDays = 60,
-            includedDifficulties = listOf("Mythic"),
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                syncIntervalHours = 12,
+                syncTimeWindowDays = 60,
+                includedDifficulties = listOf("Mythic"),
+            )
 
         // Assert
         config.syncIntervalHours shouldBe 12
@@ -178,15 +187,16 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow custom MAS weights`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            dpaWeight = 0.30,
-            adtWeight = 0.30,
-            criticalThreshold = 2.0,
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                dpaWeight = 0.30,
+                adtWeight = 0.30,
+                criticalThreshold = 2.0,
+            )
 
         // Assert
         config.dpaWeight shouldBe 0.30
@@ -197,15 +207,16 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow custom fallback values`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            fallbackMAS = 0.5,
-            fallbackDPA = 0.3,
-            fallbackADT = 15.0,
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                fallbackMAS = 0.5,
+                fallbackDPA = 0.3,
+                fallbackADT = 15.0,
+            )
 
         // Assert
         config.fallbackMAS shouldBe 0.5
@@ -216,16 +227,18 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow character name mappings`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            characterNameMappings = mapOf(
-                "WoWAuditName" to "WCLName",
-                "AnotherName" to "DifferentName",
-            ),
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                characterNameMappings =
+                    mapOf(
+                        "WoWAuditName" to "WCLName",
+                        "AnotherName" to "DifferentName",
+                    ),
+            )
 
         // Assert
         config.characterNameMappings["WoWAuditName"] shouldBe "WCLName"
@@ -235,13 +248,14 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should allow disabling guild config`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-            enabled = false,
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+                enabled = false,
+            )
 
         // Assert
         config.enabled shouldBe false
@@ -250,18 +264,20 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should support copy with modifications`() {
         // Arrange
-        val original = WarcraftLogsGuildConfig(
-            guildId = "test-guild",
-            guildName = "Test Guild",
-            realm = "Illidan",
-            region = "US",
-        )
+        val original =
+            WarcraftLogsGuildConfig(
+                guildId = "test-guild",
+                guildName = "Test Guild",
+                realm = "Illidan",
+                region = "US",
+            )
 
         // Act
-        val copied = original.copy(
-            syncIntervalHours = 3,
-            enabled = false,
-        )
+        val copied =
+            original.copy(
+                syncIntervalHours = 3,
+                enabled = false,
+            )
 
         // Assert
         copied.guildId shouldBe "test-guild"
@@ -273,12 +289,13 @@ class WarcraftLogsGuildConfigTest : UnitTest() {
     @Test
     fun `should store correct guild identifiers`() {
         // Arrange & Act
-        val config = WarcraftLogsGuildConfig(
-            guildId = "my-guild-123",
-            guildName = "Awesome Raiders",
-            realm = "Stormrage",
-            region = "EU",
-        )
+        val config =
+            WarcraftLogsGuildConfig(
+                guildId = "my-guild-123",
+                guildName = "Awesome Raiders",
+                realm = "Stormrage",
+                region = "EU",
+            )
 
         // Assert
         config.guildId shouldBe "my-guild-123"

@@ -1,8 +1,8 @@
 package com.edgerush.lootman.infrastructure.discord
 
+import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.model.DiscordUserLink
 import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.repository.DiscordUserLinkRepository
 import com.edgerush.lootman.domain.shared.RaiderId
 import java.util.concurrent.ConcurrentHashMap
@@ -33,16 +33,19 @@ class InMemoryDiscordUserLinkRepository : DiscordUserLinkRepository {
             .filter { it.raiderId == raiderId }
             .sortedBy { it.linkedAt }
 
-    override fun existsByDiscordUserIdAndRaiderId(discordUserId: DiscordUserId, raiderId: RaiderId): Boolean =
-        storage.values.any { it.discordUserId == discordUserId && it.raiderId == raiderId }
+    override fun existsByDiscordUserIdAndRaiderId(
+        discordUserId: DiscordUserId,
+        raiderId: RaiderId,
+    ): Boolean = storage.values.any { it.discordUserId == discordUserId && it.raiderId == raiderId }
 
     override fun save(link: DiscordUserLink): DiscordUserLink {
-        val savedLink = if (link.id == null) {
-            val newId = DiscordUserLinkId(idGenerator.getAndIncrement())
-            link.withId(newId)
-        } else {
-            link
-        }
+        val savedLink =
+            if (link.id == null) {
+                val newId = DiscordUserLinkId(idGenerator.getAndIncrement())
+                link.withId(newId)
+            } else {
+                link
+            }
         storage[savedLink.id!!] = savedLink
         return savedLink
     }
@@ -68,7 +71,10 @@ class InMemoryDiscordUserLinkRepository : DiscordUserLinkRepository {
     override fun countByDiscordUserId(discordUserId: DiscordUserId): Long =
         storage.values.count { it.discordUserId == discordUserId }.toLong()
 
-    override fun findAll(offset: Long, limit: Int): List<DiscordUserLink> =
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<DiscordUserLink> =
         storage.values
             .sortedBy { it.id?.value }
             .drop(offset.toInt())

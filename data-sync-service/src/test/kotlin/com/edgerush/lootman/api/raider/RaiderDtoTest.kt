@@ -23,20 +23,20 @@ import java.time.LocalDateTime
  * - Computed fields (fullName, isEligibleForLoot)
  */
 class RaiderDtoTest : UnitTest() {
-
     @Nested
     inner class CreateRaiderRequestTests {
         @Test
         fun `should create valid request with all required fields`() {
             // Given / When
-            val request = CreateRaiderRequest(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "Testchar",
-                realm = "TestRealm",
-                characterClass = "WARRIOR",
-                role = "DPS"
-            )
+            val request =
+                CreateRaiderRequest(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "Testchar",
+                    realm = "TestRealm",
+                    characterClass = "WARRIOR",
+                    role = "DPS",
+                )
 
             // Then
             request.id shouldBe 1L
@@ -45,8 +45,8 @@ class RaiderDtoTest : UnitTest() {
             request.realm shouldBe "TestRealm"
             request.characterClass shouldBe "WARRIOR"
             request.role shouldBe "DPS"
-            request.status shouldBe "ACTIVE"  // default
-            request.rank shouldBe null  // optional
+            request.status shouldBe "ACTIVE" // default
+            request.rank shouldBe null // optional
         }
 
         @Test
@@ -55,18 +55,19 @@ class RaiderDtoTest : UnitTest() {
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
 
             // When
-            val request = CreateRaiderRequest(
-                id = 1L,
-                guildId = "test-guild",
-                characterName = "Testchar",
-                realm = "TestRealm",
-                characterClass = "PALADIN",
-                role = "TANK",
-                rank = "Guild Master",
-                status = "BENCHED",
-                joinDate = joinDate,
-                wowauditId = 12345L
-            )
+            val request =
+                CreateRaiderRequest(
+                    id = 1L,
+                    guildId = "test-guild",
+                    characterName = "Testchar",
+                    realm = "TestRealm",
+                    characterClass = "PALADIN",
+                    role = "TANK",
+                    rank = "Guild Master",
+                    status = "BENCHED",
+                    joinDate = joinDate,
+                    wowauditId = 12345L,
+                )
 
             // Then
             request.rank shouldBe "Guild Master"
@@ -81,9 +82,10 @@ class RaiderDtoTest : UnitTest() {
         @Test
         fun `should create update request with partial fields`() {
             // Given / When
-            val request = UpdateRaiderRequest(
-                status = "BENCHED"
-            )
+            val request =
+                UpdateRaiderRequest(
+                    status = "BENCHED",
+                )
 
             // Then
             request.status shouldBe "BENCHED"
@@ -97,14 +99,15 @@ class RaiderDtoTest : UnitTest() {
         @Test
         fun `should create update request with all fields`() {
             // Given / When
-            val request = UpdateRaiderRequest(
-                characterName = "NewName",
-                realm = "NewRealm",
-                characterClass = "MAGE",
-                role = "DPS",
-                rank = "Officer",
-                status = "ACTIVE"
-            )
+            val request =
+                UpdateRaiderRequest(
+                    characterName = "NewName",
+                    realm = "NewRealm",
+                    characterClass = "MAGE",
+                    role = "DPS",
+                    rank = "Officer",
+                    status = "ACTIVE",
+                )
 
             // Then
             request.characterName shouldBe "NewName"
@@ -122,18 +125,19 @@ class RaiderDtoTest : UnitTest() {
         fun `should map Raider to RaiderResponse correctly`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val raider = Raider(
-                id = RaiderId(123L),
-                guildId = GuildId("test-guild"),
-                characterName = "Testchar",
-                realm = "TestRealm",
-                characterClass = CharacterClass.WARRIOR,
-                role = Role.DPS,
-                rank = "Raider",
-                status = RaiderStatus.ACTIVE,
-                joinDate = joinDate,
-                wowauditId = 9876L
-            )
+            val raider =
+                Raider(
+                    id = RaiderId(123L),
+                    guildId = GuildId("test-guild"),
+                    characterName = "Testchar",
+                    realm = "TestRealm",
+                    characterClass = CharacterClass.WARRIOR,
+                    role = Role.DPS,
+                    rank = "Raider",
+                    status = RaiderStatus.ACTIVE,
+                    joinDate = joinDate,
+                    wowauditId = 9876L,
+                )
 
             // When
             val response = RaiderResponse.from(raider)
@@ -219,11 +223,12 @@ class RaiderDtoTest : UnitTest() {
         @Test
         fun `should map list of raiders to response`() {
             // Given
-            val raiders = listOf(
-                createRaider(id = RaiderId(1L), characterName = "Raider1"),
-                createRaider(id = RaiderId(2L), characterName = "Raider2"),
-                createRaider(id = RaiderId(3L), characterName = "Raider3")
-            )
+            val raiders =
+                listOf(
+                    createRaider(id = RaiderId(1L), characterName = "Raider1"),
+                    createRaider(id = RaiderId(2L), characterName = "Raider2"),
+                    createRaider(id = RaiderId(3L), characterName = "Raider3"),
+                )
 
             // When
             val response = RaiderListResponse.from(raiders)
@@ -261,17 +266,18 @@ class RaiderDtoTest : UnitTest() {
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
-        wowauditId: Long? = null
-    ): Raider = Raider(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId
-    )
+        wowauditId: Long? = null,
+    ): Raider =
+        Raider(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

@@ -16,7 +16,6 @@ import java.time.Instant
  * GuildNotFoundException, ItemNotFoundException, and LootBanActiveException.
  */
 class DomainExceptionTest : UnitTest() {
-
     // region Test Fixtures
 
     private fun createLootBan(
@@ -25,21 +24,20 @@ class DomainExceptionTest : UnitTest() {
         guildId: String = "guild-123",
         reason: String = "Test ban reason",
         bannedAt: Instant = Instant.now(),
-        expiresAt: Instant? = null
+        expiresAt: Instant? = null,
     ) = LootBan(
         id = LootBanId(id),
         raiderId = RaiderId(raiderId),
         guildId = GuildId(guildId),
         reason = reason,
         bannedAt = bannedAt,
-        expiresAt = expiresAt
+        expiresAt = expiresAt,
     )
 
     // endregion
 
     @Nested
     inner class DomainExceptionBaseTests {
-
         @Test
         fun `should be sealed class preventing external inheritance`() {
             // This test documents that DomainException is sealed
@@ -68,7 +66,6 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class RaiderNotFoundExceptionTests {
-
         @Test
         fun `should create exception with raider ID`() {
             // Arrange
@@ -134,7 +131,6 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class GuildNotFoundExceptionTests {
-
         @Test
         fun `should create exception with guild ID`() {
             // Arrange
@@ -212,7 +208,6 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class ItemNotFoundExceptionTests {
-
         @Test
         fun `should create exception with item ID`() {
             // Arrange
@@ -278,7 +273,6 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class LootBanActiveExceptionTests {
-
         @Test
         fun `should create exception with raider ID and empty bans list`() {
             // Arrange
@@ -311,11 +305,12 @@ class DomainExceptionTest : UnitTest() {
         fun `should create exception with multiple bans`() {
             // Arrange
             val raiderId = RaiderId(42L)
-            val bans = listOf(
-                createLootBan(id = "ban-1", raiderId = 42L, reason = "First ban"),
-                createLootBan(id = "ban-2", raiderId = 42L, reason = "Second ban"),
-                createLootBan(id = "ban-3", raiderId = 42L, reason = "Third ban")
-            )
+            val bans =
+                listOf(
+                    createLootBan(id = "ban-1", raiderId = 42L, reason = "First ban"),
+                    createLootBan(id = "ban-2", raiderId = 42L, reason = "Second ban"),
+                    createLootBan(id = "ban-3", raiderId = 42L, reason = "Third ban"),
+                )
 
             // Act
             val exception = LootBanActiveException(raiderId, bans)
@@ -341,11 +336,12 @@ class DomainExceptionTest : UnitTest() {
         fun `should have descriptive message with ban count for multiple bans`() {
             // Arrange
             val raiderId = RaiderId(42L)
-            val bans = listOf(
-                createLootBan(id = "ban-1", raiderId = 42L),
-                createLootBan(id = "ban-2", raiderId = 42L),
-                createLootBan(id = "ban-3", raiderId = 42L)
-            )
+            val bans =
+                listOf(
+                    createLootBan(id = "ban-1", raiderId = 42L),
+                    createLootBan(id = "ban-2", raiderId = 42L),
+                    createLootBan(id = "ban-3", raiderId = 42L),
+                )
 
             // Act
             val exception = LootBanActiveException(raiderId, bans)
@@ -396,47 +392,49 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class ExceptionHandlingPatternTests {
-
         @Test
         fun `should allow when expression matching on exception type`() {
             // Arrange
-            val exceptions: List<DomainException> = listOf(
-                RaiderNotFoundException(RaiderId(1L)),
-                GuildNotFoundException(GuildId("test")),
-                ItemNotFoundException(ItemId(100L)),
-                LootBanActiveException(RaiderId(2L), emptyList())
-            )
+            val exceptions: List<DomainException> =
+                listOf(
+                    RaiderNotFoundException(RaiderId(1L)),
+                    GuildNotFoundException(GuildId("test")),
+                    ItemNotFoundException(ItemId(100L)),
+                    LootBanActiveException(RaiderId(2L), emptyList()),
+                )
 
             // Act & Assert
             exceptions.forEach { exception ->
-                val result = when (exception) {
-                    is RaiderNotFoundException -> "raider"
-                    is GuildNotFoundException -> "guild"
-                    is ItemNotFoundException -> "item"
-                    is LootBanActiveException -> "loot_ban"
-                    is DiscordUserLinkNotFoundException -> "discord_link_not_found"
-                    is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
-                    is UserNotFoundException -> "user_not_found"
-                    is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
-                    is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
-                    is AuthenticationFailedException -> "auth_failed"
-                    is InvalidRefreshTokenException -> "invalid_refresh_token"
-                    is OAuth2AuthenticationException -> "oauth2_error"
-                }
-                result shouldBe when (exception) {
-                    is RaiderNotFoundException -> "raider"
-                    is GuildNotFoundException -> "guild"
-                    is ItemNotFoundException -> "item"
-                    is LootBanActiveException -> "loot_ban"
-                    is DiscordUserLinkNotFoundException -> "discord_link_not_found"
-                    is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
-                    is UserNotFoundException -> "user_not_found"
-                    is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
-                    is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
-                    is AuthenticationFailedException -> "auth_failed"
-                    is InvalidRefreshTokenException -> "invalid_refresh_token"
-                    is OAuth2AuthenticationException -> "oauth2_error"
-                }
+                val result =
+                    when (exception) {
+                        is RaiderNotFoundException -> "raider"
+                        is GuildNotFoundException -> "guild"
+                        is ItemNotFoundException -> "item"
+                        is LootBanActiveException -> "loot_ban"
+                        is DiscordUserLinkNotFoundException -> "discord_link_not_found"
+                        is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
+                        is UserNotFoundException -> "user_not_found"
+                        is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
+                        is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
+                        is AuthenticationFailedException -> "auth_failed"
+                        is InvalidRefreshTokenException -> "invalid_refresh_token"
+                        is OAuth2AuthenticationException -> "oauth2_error"
+                    }
+                result shouldBe
+                    when (exception) {
+                        is RaiderNotFoundException -> "raider"
+                        is GuildNotFoundException -> "guild"
+                        is ItemNotFoundException -> "item"
+                        is LootBanActiveException -> "loot_ban"
+                        is DiscordUserLinkNotFoundException -> "discord_link_not_found"
+                        is DiscordUserLinkAlreadyExistsException -> "discord_link_exists"
+                        is UserNotFoundException -> "user_not_found"
+                        is UserNotFoundByDiscordIdException -> "user_not_found_by_discord"
+                        is UserNotFoundByBattlenetIdException -> "user_not_found_by_battlenet"
+                        is AuthenticationFailedException -> "auth_failed"
+                        is InvalidRefreshTokenException -> "invalid_refresh_token"
+                        is OAuth2AuthenticationException -> "oauth2_error"
+                    }
             }
         }
 
@@ -477,7 +475,6 @@ class DomainExceptionTest : UnitTest() {
 
     @Nested
     inner class ExceptionCauseTests {
-
         @Test
         fun `RaiderNotFoundException should have null cause by default`() {
             // Arrange & Act

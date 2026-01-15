@@ -89,6 +89,6 @@ class RaiderCrestCountControllerTest : UnitTest() {
         id: Long = 1L,
         raiderId: Long = 1L,
         crestType: String = "Weathered",
-        crestCount: Int? = 10
+        crestCount: Int? = 10,
     ) = RaiderCrestCountResponse(id, raiderId, crestType, crestCount)
 }

@@ -28,27 +28,27 @@ import java.util.*
  * - Edge cases
  */
 class JwtServiceTest : UnitTest() {
-
-    private val defaultProperties = JwtProperties(
-        secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-        expirationMs = 3600000, // 1 hour
-        issuer = "test-issuer",
-    )
+    private val defaultProperties =
+        JwtProperties(
+            secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+            expirationMs = 3600000, // 1 hour
+            issuer = "test-issuer",
+        )
 
     private val jwtService = JwtService(defaultProperties)
 
     @Nested
     inner class `generateToken` {
-
         @Test
         fun `should create valid JWT token`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -61,11 +61,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with three parts separated by dots`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -78,11 +79,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with correct subject`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -95,11 +97,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with username claim`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -112,11 +115,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with roles claim`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -131,12 +135,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with guildIds claim`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -151,11 +156,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with issuer`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -168,11 +174,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with issued at date`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val beforeGeneration = Date()
@@ -189,11 +196,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create token with expiration date`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -207,16 +215,18 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should create different tokens for different users`() {
             // Arrange
-            val user1 = AuthenticatedUser(
-                id = "user-1",
-                username = "user1",
-                roles = listOf("GUILD_ADMIN"),
-            )
-            val user2 = AuthenticatedUser(
-                id = "user-2",
-                username = "user2",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user1 =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user1",
+                    roles = listOf("GUILD_ADMIN"),
+                )
+            val user2 =
+                AuthenticatedUser(
+                    id = "user-2",
+                    username = "user2",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token1 = jwtService.generateToken(user1)
@@ -229,11 +239,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle user with empty roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = emptyList(),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -248,12 +259,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle user with empty guildIds`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = emptyList(),
+                )
 
             // Act
             val token = jwtService.generateToken(user)
@@ -268,15 +280,15 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `validateToken` {
-
         @Test
         fun `should return true for valid token`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
             val token = jwtService.generateToken(user)
 
             // Act
@@ -316,17 +328,19 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for token with wrong signature`() {
             // Arrange - create a token with a different secret
-            val differentProperties = JwtProperties(
-                secret = "different-secret-key-must-be-at-least-256-bits-long-for-security",
-                expirationMs = 3600000,
-                issuer = "test-issuer",
-            )
+            val differentProperties =
+                JwtProperties(
+                    secret = "different-secret-key-must-be-at-least-256-bits-long-for-security",
+                    expirationMs = 3600000,
+                    issuer = "test-issuer",
+                )
             val differentService = JwtService(differentProperties)
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
             val tokenWithDifferentSignature = differentService.generateToken(user)
 
             // Act
@@ -339,17 +353,19 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for expired token`() {
             // Arrange - create service with very short expiration
-            val shortExpirationProperties = JwtProperties(
-                secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = 1, // 1 millisecond
-                issuer = "test-issuer",
-            )
+            val shortExpirationProperties =
+                JwtProperties(
+                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = 1, // 1 millisecond
+                    issuer = "test-issuer",
+                )
             val shortExpirationService = JwtService(shortExpirationProperties)
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
             val token = shortExpirationService.generateToken(user)
 
             // Wait for token to expire
@@ -374,11 +390,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for token with tampered payload`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
             val token = jwtService.generateToken(user)
             val parts = token.split(".")
             // Modify the payload (base64 encoded)
@@ -395,16 +412,16 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `extractClaims` {
-
         @Test
         fun `should extract all claims from valid token`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2"),
+                )
             val token = jwtService.generateToken(user)
 
             // Act
@@ -429,17 +446,19 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should throw exception for expired token`() {
             // Arrange - create service with very short expiration
-            val shortExpirationProperties = JwtProperties(
-                secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = 1, // 1 millisecond
-                issuer = "test-issuer",
-            )
+            val shortExpirationProperties =
+                JwtProperties(
+                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = 1, // 1 millisecond
+                    issuer = "test-issuer",
+                )
             val shortExpirationService = JwtService(shortExpirationProperties)
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
             val token = shortExpirationService.generateToken(user)
 
             // Wait for token to expire
@@ -454,16 +473,16 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `extractUser` {
-
         @Test
         fun `should extract user with all fields from valid token`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2"),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2"),
+                )
             val token = jwtService.generateToken(originalUser)
 
             // Act
@@ -479,12 +498,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should set isAdminMode to false for extracted user`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                isAdminMode = true, // This is not stored in token
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    isAdminMode = true, // This is not stored in token
+                )
             val token = jwtService.generateToken(originalUser)
 
             // Act
@@ -497,11 +517,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle user with empty roles`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = emptyList(),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = emptyList(),
+                )
             val token = jwtService.generateToken(originalUser)
 
             // Act
@@ -514,12 +535,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle user with empty guildIds`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = emptyList(),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = emptyList(),
+                )
             val token = jwtService.generateToken(originalUser)
 
             // Act
@@ -533,15 +555,16 @@ class JwtServiceTest : UnitTest() {
         fun `should use subject as username when username claim is missing`() {
             // Arrange - manually create a token without username claim
             val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
-            val token = Jwts.builder()
-                .subject("user-123")
-                .claim("roles", listOf("GUILD_ADMIN"))
-                .claim("guildIds", listOf("guild-1"))
-                .issuer(defaultProperties.issuer)
-                .issuedAt(Date())
-                .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                .signWith(secretKey)
-                .compact()
+            val token =
+                Jwts.builder()
+                    .subject("user-123")
+                    .claim("roles", listOf("GUILD_ADMIN"))
+                    .claim("guildIds", listOf("guild-1"))
+                    .issuer(defaultProperties.issuer)
+                    .issuedAt(Date())
+                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
+                    .signWith(secretKey)
+                    .compact()
 
             // Act
             val extractedUser = jwtService.extractUser(token)
@@ -554,15 +577,16 @@ class JwtServiceTest : UnitTest() {
         fun `should handle missing roles claim as empty list`() {
             // Arrange - manually create a token without roles claim
             val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
-            val token = Jwts.builder()
-                .subject("user-123")
-                .claim("username", "testuser")
-                .claim("guildIds", listOf("guild-1"))
-                .issuer(defaultProperties.issuer)
-                .issuedAt(Date())
-                .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                .signWith(secretKey)
-                .compact()
+            val token =
+                Jwts.builder()
+                    .subject("user-123")
+                    .claim("username", "testuser")
+                    .claim("guildIds", listOf("guild-1"))
+                    .issuer(defaultProperties.issuer)
+                    .issuedAt(Date())
+                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
+                    .signWith(secretKey)
+                    .compact()
 
             // Act
             val extractedUser = jwtService.extractUser(token)
@@ -575,15 +599,16 @@ class JwtServiceTest : UnitTest() {
         fun `should handle missing guildIds claim as empty list`() {
             // Arrange - manually create a token without guildIds claim
             val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
-            val token = Jwts.builder()
-                .subject("user-123")
-                .claim("username", "testuser")
-                .claim("roles", listOf("GUILD_ADMIN"))
-                .issuer(defaultProperties.issuer)
-                .issuedAt(Date())
-                .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                .signWith(secretKey)
-                .compact()
+            val token =
+                Jwts.builder()
+                    .subject("user-123")
+                    .claim("username", "testuser")
+                    .claim("roles", listOf("GUILD_ADMIN"))
+                    .issuer(defaultProperties.issuer)
+                    .issuedAt(Date())
+                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
+                    .signWith(secretKey)
+                    .compact()
 
             // Act
             val extractedUser = jwtService.extractUser(token)
@@ -603,7 +628,6 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `JwtProperties configuration` {
-
         @Test
         fun `should have sensible defaults`() {
             // Arrange & Act
@@ -618,11 +642,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should allow configuration of all properties via constructor`() {
             // Arrange & Act
-            val properties = JwtProperties(
-                secret = "custom-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = 7200000,
-                issuer = "custom-issuer",
-            )
+            val properties =
+                JwtProperties(
+                    secret = "custom-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = 7200000,
+                    issuer = "custom-issuer",
+                )
 
             // Assert
             properties.component1() shouldBe "custom-secret-key-must-be-at-least-256-bits-long-for-security-purposes"
@@ -636,11 +661,12 @@ class JwtServiceTest : UnitTest() {
             val original = JwtProperties()
 
             // Act
-            val copied = original.copy(
-                secret = "new-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = 1800000,
-                issuer = "new-issuer",
-            )
+            val copied =
+                original.copy(
+                    secret = "new-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = 1800000,
+                    issuer = "new-issuer",
+                )
 
             // Assert
             copied.component1() shouldBe "new-secret-key-must-be-at-least-256-bits-long-for-security-purposes"
@@ -706,16 +732,16 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `token round-trip` {
-
         @Test
         fun `should preserve all user data through token round-trip`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2", "guild-3"),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2", "guild-3"),
+                )
 
             // Act
             val token = jwtService.generateToken(originalUser)
@@ -731,11 +757,12 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should preserve special characters in username`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "test.user@example.com",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "test.user@example.com",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = jwtService.generateToken(originalUser)
@@ -748,12 +775,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should preserve unicode characters in data`() {
             // Arrange
-            val originalUser = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("guild-1"),
-            )
+            val originalUser =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("guild-1"),
+                )
 
             // Act
             val token = jwtService.generateToken(originalUser)
@@ -766,21 +794,22 @@ class JwtServiceTest : UnitTest() {
 
     @Nested
     inner class `different configurations` {
-
         @Test
         fun `should work with custom issuer`() {
             // Arrange
-            val customProperties = JwtProperties(
-                secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = 3600000,
-                issuer = "custom-application-issuer",
-            )
+            val customProperties =
+                JwtProperties(
+                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = 3600000,
+                    issuer = "custom-application-issuer",
+                )
             val customService = JwtService(customProperties)
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = customService.generateToken(user)
@@ -794,17 +823,19 @@ class JwtServiceTest : UnitTest() {
         fun `should work with different expiration times`() {
             // Arrange
             val sevenDaysInMs = 86400000L * 7 // 7 days (use Long to avoid overflow)
-            val longExpirationProperties = JwtProperties(
-                secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                expirationMs = sevenDaysInMs,
-                issuer = "test-issuer",
-            )
+            val longExpirationProperties =
+                JwtProperties(
+                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
+                    expirationMs = sevenDaysInMs,
+                    issuer = "test-issuer",
+                )
             val longExpirationService = JwtService(longExpirationProperties)
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val token = longExpirationService.generateToken(user)

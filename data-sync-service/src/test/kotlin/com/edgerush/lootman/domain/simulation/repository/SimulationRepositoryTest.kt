@@ -22,7 +22,6 @@ import java.time.Instant
  * Integration tests should verify the actual database implementation.
  */
 class SimulationRepositoryTest : UnitTest() {
-
     private lateinit var repository: InMemorySimulationRepository
 
     @BeforeEach
@@ -33,14 +32,14 @@ class SimulationRepositoryTest : UnitTest() {
     private fun createProfile(
         guildId: String = "guild-123",
         characterName: String = "Testchar",
-        characterRealm: String = "TestRealm"
+        characterRealm: String = "TestRealm",
     ): SimulationProfile {
         return SimulationProfile.create(
             guildId = guildId,
             characterName = characterName,
             characterRealm = characterRealm,
             profileContent = """warrior="$characterName"""",
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
     }
 
@@ -64,13 +63,14 @@ class SimulationRepositoryTest : UnitTest() {
         fun `should update existing profile for same character`() {
             // Arrange
             val profile1 = createProfile(characterName = "Testchar")
-            val profile2 = SimulationProfile.create(
-                guildId = "guild-123",
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                profileContent = """warrior="Testchar" # Updated""",
-                createdAt = Instant.now()
-            )
+            val profile2 =
+                SimulationProfile.create(
+                    guildId = "guild-123",
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    profileContent = """warrior="Testchar" # Updated""",
+                    createdAt = Instant.now(),
+                )
 
             // Act
             repository.saveProfile(profile1)
@@ -177,14 +177,15 @@ class SimulationRepositoryTest : UnitTest() {
             // Arrange
             val profile = createProfile()
             val (profileId, _) = repository.saveProfile(profile)
-            val result = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Test Item",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
+            val result =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Test Item",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
 
             // Act
             repository.saveResult(profileId, result)
@@ -201,22 +202,24 @@ class SimulationRepositoryTest : UnitTest() {
             // Arrange
             val profile = createProfile()
             val (profileId, _) = repository.saveProfile(profile)
-            val oldResult = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Test Item",
-                slot = "head",
-                dpsGain = 500.0,
-                percentGain = 0.5,
-                simulatedAt = Instant.now().minusSeconds(3600)
-            )
-            val newResult = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Test Item",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
+            val oldResult =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Test Item",
+                    slot = "head",
+                    dpsGain = 500.0,
+                    percentGain = 0.5,
+                    simulatedAt = Instant.now().minusSeconds(3600),
+                )
+            val newResult =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Test Item",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
 
             // Act
             repository.saveResult(profileId, oldResult)
@@ -236,22 +239,24 @@ class SimulationRepositoryTest : UnitTest() {
             // Arrange
             val profile = createProfile()
             val (profileId, _) = repository.saveProfile(profile)
-            val result1 = SimulationResult.create(
-                itemId = 12345L,
-                itemName = "Item 1",
-                slot = "head",
-                dpsGain = 1000.0,
-                percentGain = 1.0,
-                simulatedAt = Instant.now()
-            )
-            val result2 = SimulationResult.create(
-                itemId = 12346L,
-                itemName = "Item 2",
-                slot = "neck",
-                dpsGain = 500.0,
-                percentGain = 0.5,
-                simulatedAt = Instant.now()
-            )
+            val result1 =
+                SimulationResult.create(
+                    itemId = 12345L,
+                    itemName = "Item 1",
+                    slot = "head",
+                    dpsGain = 1000.0,
+                    percentGain = 1.0,
+                    simulatedAt = Instant.now(),
+                )
+            val result2 =
+                SimulationResult.create(
+                    itemId = 12346L,
+                    itemName = "Item 2",
+                    slot = "neck",
+                    dpsGain = 500.0,
+                    percentGain = 0.5,
+                    simulatedAt = Instant.now(),
+                )
             repository.saveResult(profileId, result1)
             repository.saveResult(profileId, result2)
 
@@ -277,12 +282,13 @@ class InMemorySimulationRepository : SimulationRepository {
     private var requestIdCounter = 1L
 
     override fun saveProfile(profile: SimulationProfile): Pair<Long, SimulationProfile> {
-        val existingId = profiles.entries
-            .find {
-                it.value.guildId == profile.guildId &&
-                    it.value.characterName == profile.characterName &&
-                    it.value.characterRealm == profile.characterRealm
-            }?.key
+        val existingId =
+            profiles.entries
+                .find {
+                    it.value.guildId == profile.guildId &&
+                        it.value.characterName == profile.characterName &&
+                        it.value.characterRealm == profile.characterRealm
+                }?.key
 
         val id = existingId ?: profileIdCounter++
         profiles[id] = profile
@@ -294,7 +300,7 @@ class InMemorySimulationRepository : SimulationRepository {
     override fun findProfileByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): SimulationProfile? {
         return profiles.values.find {
             it.guildId == guildId &&
@@ -306,7 +312,7 @@ class InMemorySimulationRepository : SimulationRepository {
     override fun findProfileIdByCharacter(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long? {
         return profiles.entries.find {
             it.value.guildId == guildId &&
@@ -317,11 +323,12 @@ class InMemorySimulationRepository : SimulationRepository {
 
     override fun saveRequest(request: SimulationRequest): SimulationRequest {
         val id = request.id ?: requestIdCounter++
-        val savedRequest = if (request.id == null) {
-            request.withId(id)
-        } else {
-            request
-        }
+        val savedRequest =
+            if (request.id == null) {
+                request.withId(id)
+            } else {
+                request
+            }
         requests[id] = savedRequest
         return savedRequest
     }
@@ -332,11 +339,17 @@ class InMemorySimulationRepository : SimulationRepository {
         return requests.values.filter { it.status == SimulationStatus.PENDING }
     }
 
-    override fun saveResult(profileId: Long, result: SimulationResult) {
+    override fun saveResult(
+        profileId: Long,
+        result: SimulationResult,
+    ) {
         results.getOrPut(profileId) { mutableListOf() }.add(result)
     }
 
-    override fun findLatestResultForItem(profileId: Long, itemId: Long): SimulationResult? {
+    override fun findLatestResultForItem(
+        profileId: Long,
+        itemId: Long,
+    ): SimulationResult? {
         return results[profileId]
             ?.filter { it.itemId == itemId }
             ?.maxByOrNull { it.simulatedAt }

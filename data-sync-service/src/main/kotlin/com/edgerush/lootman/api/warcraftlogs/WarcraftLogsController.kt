@@ -46,28 +46,30 @@ class WarcraftLogsController(
         @Parameter(description = "Maximum number of reports")
         @RequestParam(defaultValue = "20") limit: Int,
     ): WarcraftLogsReportResponse {
-        val raider = raiderRepository.findById(raiderId)
-            ?: throw NoSuchElementException("Raider not found: $raiderId")
+        val raider =
+            raiderRepository.findById(raiderId)
+                ?: throw NoSuchElementException("Raider not found: $raiderId")
 
         // Get the Warcraft Logs scores for the raider
         val logs = warcraftLogService.findByRaiderIdUnpaged(raiderId, limit)
 
         // Transform to the expected format
-        val entries = logs.map { log ->
-            WarcraftLogsEntryResponse(
-                reportId = "wcl_${log.id}",
-                encounterId = 0,
-                encounterName = log.difficulty,
-                difficulty = log.difficulty,
-                date = "",
-                dps = null,
-                hps = null,
-                ilvl = 0,
-                spec = "",
-                percentile = log.score?.toDouble() ?: 0.0,
-                deaths = 0,
-            )
-        }
+        val entries =
+            logs.map { log ->
+                WarcraftLogsEntryResponse(
+                    reportId = "wcl_${log.id}",
+                    encounterId = 0,
+                    encounterName = log.difficulty,
+                    difficulty = log.difficulty,
+                    date = "",
+                    dps = null,
+                    hps = null,
+                    ilvl = 0,
+                    spec = "",
+                    percentile = log.score?.toDouble() ?: 0.0,
+                    deaths = 0,
+                )
+            }
 
         return WarcraftLogsReportResponse(
             raiderId = raiderId,

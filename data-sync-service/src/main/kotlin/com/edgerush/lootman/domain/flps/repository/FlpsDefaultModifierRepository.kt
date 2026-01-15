@@ -31,7 +31,10 @@ interface FlpsDefaultModifierRepository {
      * @param limit The maximum number of records to return
      * @return List of modifier entities
      */
-    fun findAll(offset: Long, limit: Int): List<FlpsDefaultModifierEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity>
 
     /**
      * Counts all modifiers.
@@ -48,7 +51,11 @@ interface FlpsDefaultModifierRepository {
      * @param limit The maximum number of records to return
      * @return List of modifier entities for the category
      */
-    fun findByCategory(category: String, offset: Long, limit: Int): List<FlpsDefaultModifierEntity>
+    fun findByCategory(
+        category: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity>
 
     /**
      * Counts modifiers for a category.

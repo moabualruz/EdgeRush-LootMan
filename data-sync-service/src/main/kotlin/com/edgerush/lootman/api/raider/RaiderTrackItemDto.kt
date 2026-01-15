@@ -23,11 +23,16 @@ data class RaiderTrackItemResponse(
     val itemCount: Int?,
 ) {
     companion object {
-        fun from(e: RaiderTrackItemEntity) = RaiderTrackItemResponse(
-            e.id!!, e.raiderId, e.tier, e.itemCount
-        )
+        fun from(e: RaiderTrackItemEntity) =
+            RaiderTrackItemResponse(
+                e.id!!,
+                e.raiderId,
+                e.tier,
+                e.itemCount,
+            )
     }
 }
 
 data class RaiderTrackItemExistsResponse(val exists: Boolean)
+
 data class RaiderTrackItemCountResponse(val count: Long)

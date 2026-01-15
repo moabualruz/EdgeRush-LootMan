@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -58,15 +57,16 @@ class AdminController(
         @PathVariable guildId: String,
         @Valid @RequestBody request: AdminBehavioralActionRequest,
     ): AdminBehavioralActionResponse {
-        val createRequest = CreateBehavioralActionRequest(
-            guildId = guildId,
-            characterName = request.characterName,
-            actionType = request.actionType,
-            deductionAmount = kotlin.math.abs(request.flpsModifier),
-            reason = request.reason,
-            appliedBy = "admin", // Will be replaced with actual user from security context
-            expiresAt = request.endDate?.let { parseIsoDateTime(it) },
-        )
+        val createRequest =
+            CreateBehavioralActionRequest(
+                guildId = guildId,
+                characterName = request.characterName,
+                actionType = request.actionType,
+                deductionAmount = kotlin.math.abs(request.flpsModifier),
+                reason = request.reason,
+                appliedBy = "admin", // Will be replaced with actual user from security context
+                expiresAt = request.endDate?.let { parseIsoDateTime(it) },
+            )
         val response = behavioralActionService.create(createRequest)
         return AdminBehavioralActionResponse.from(response)
     }
@@ -80,12 +80,13 @@ class AdminController(
         @PathVariable actionId: Long,
         @Valid @RequestBody request: AdminBehavioralActionUpdateRequest,
     ): AdminBehavioralActionResponse {
-        val updateRequest = UpdateBehavioralActionRequest(
-            reason = request.reason,
-            deductionAmount = request.flpsModifier?.let { kotlin.math.abs(it) },
-            expiresAt = request.endDate?.let { parseIsoDateTime(it) },
-            isActive = request.active,
-        )
+        val updateRequest =
+            UpdateBehavioralActionRequest(
+                reason = request.reason,
+                deductionAmount = request.flpsModifier?.let { kotlin.math.abs(it) },
+                expiresAt = request.endDate?.let { parseIsoDateTime(it) },
+                isActive = request.active,
+            )
         val response = behavioralActionService.update(actionId, updateRequest)
         return AdminBehavioralActionResponse.from(response)
     }
@@ -122,13 +123,14 @@ class AdminController(
         @PathVariable guildId: String,
         @Valid @RequestBody request: AdminLootBanRequest,
     ): AdminLootBanResponse {
-        val createRequest = CreateLootBanEntityRequest(
-            guildId = guildId,
-            characterName = request.characterName,
-            reason = request.reason,
-            bannedBy = "admin", // Will be replaced with actual user from security context
-            expiresAt = request.endDate?.let { parseIsoDateTime(it) },
-        )
+        val createRequest =
+            CreateLootBanEntityRequest(
+                guildId = guildId,
+                characterName = request.characterName,
+                reason = request.reason,
+                bannedBy = "admin", // Will be replaced with actual user from security context
+                expiresAt = request.endDate?.let { parseIsoDateTime(it) },
+            )
         val response = lootBanService.create(createRequest)
         return AdminLootBanResponse.from(response)
     }
@@ -142,11 +144,12 @@ class AdminController(
         @PathVariable banId: Long,
         @Valid @RequestBody request: AdminLootBanUpdateRequest,
     ): AdminLootBanResponse {
-        val updateRequest = UpdateLootBanEntityRequest(
-            reason = request.reason,
-            expiresAt = request.endDate?.let { parseIsoDateTime(it) },
-            isActive = request.active,
-        )
+        val updateRequest =
+            UpdateLootBanEntityRequest(
+                reason = request.reason,
+                expiresAt = request.endDate?.let { parseIsoDateTime(it) },
+                isActive = request.active,
+            )
         val response = lootBanService.update(banId, updateRequest)
         return AdminLootBanResponse.from(response)
     }

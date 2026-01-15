@@ -15,24 +15,17 @@ import java.time.LocalDate
 data class TrackAttendanceRequest(
     @field:Min(value = 1, message = "Raider ID must be positive")
     val raiderId: Long,
-
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Instance is required")
     val instance: String,
-
     val encounter: String? = null,
-
     @field:NotNull(message = "Start date is required")
     val startDate: LocalDate,
-
     @field:NotNull(message = "End date is required")
     val endDate: LocalDate,
-
     @field:Min(value = 0, message = "Attended raids must be non-negative")
     val attendedRaids: Int,
-
     @field:Min(value = 1, message = "Total raids must be at least 1")
     val totalRaids: Int,
 )
@@ -129,7 +122,7 @@ data class UpdateAttendanceRequest(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val attendedRaids: Int? = null,
-    val totalRaids: Int? = null
+    val totalRaids: Int? = null,
 )
 
 /**
@@ -141,7 +134,7 @@ data class RaiderAttendanceHistoryResponse(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val records: List<TrackAttendanceResponse>,
-    val totalRecords: Int
+    val totalRecords: Int,
 )
 
 /**
@@ -154,7 +147,7 @@ data class GuildAttendanceSummaryResponse(
     val totalRecords: Int,
     val uniqueRaiders: Int,
     val overallAttendancePercentage: Double,
-    val raiderSummaries: List<RaiderAttendanceSummaryResponse>
+    val raiderSummaries: List<RaiderAttendanceSummaryResponse>,
 ) {
     companion object {
         fun from(summary: com.edgerush.lootman.application.attendance.GuildAttendanceSummary): GuildAttendanceSummaryResponse {
@@ -165,7 +158,7 @@ data class GuildAttendanceSummaryResponse(
                 totalRecords = summary.totalRecords,
                 uniqueRaiders = summary.uniqueRaiders,
                 overallAttendancePercentage = summary.overallAttendancePercentage,
-                raiderSummaries = summary.raiderSummaries.map { RaiderAttendanceSummaryResponse.from(it) }
+                raiderSummaries = summary.raiderSummaries.map { RaiderAttendanceSummaryResponse.from(it) },
             )
         }
     }
@@ -179,7 +172,7 @@ data class RaiderAttendanceSummaryResponse(
     val totalRecords: Int,
     val totalAttendedRaids: Int,
     val totalRaids: Int,
-    val averageAttendancePercentage: Double
+    val averageAttendancePercentage: Double,
 ) {
     companion object {
         fun from(summary: com.edgerush.lootman.application.attendance.RaiderAttendanceSummary): RaiderAttendanceSummaryResponse {
@@ -188,7 +181,7 @@ data class RaiderAttendanceSummaryResponse(
                 totalRecords = summary.totalRecords,
                 totalAttendedRaids = summary.totalAttendedRaids,
                 totalRaids = summary.totalRaids,
-                averageAttendancePercentage = summary.averageAttendancePercentage
+                averageAttendancePercentage = summary.averageAttendancePercentage,
             )
         }
     }

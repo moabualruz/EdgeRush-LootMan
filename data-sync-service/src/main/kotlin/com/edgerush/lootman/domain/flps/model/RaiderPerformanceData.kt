@@ -46,11 +46,12 @@ data class RaiderPerformanceData(
             periodStart: Instant,
             periodEnd: Instant,
         ): RaiderPerformanceData {
-            val deathsPerAttempt = if (totalFights > 0) {
-                totalDeaths.toDouble() / totalFights
-            } else {
-                0.0
-            }
+            val deathsPerAttempt =
+                if (totalFights > 0) {
+                    totalDeaths.toDouble() / totalFights
+                } else {
+                    0.0
+                }
 
             return RaiderPerformanceData(
                 raiderId = raiderId,
@@ -72,16 +73,17 @@ data class RaiderPerformanceData(
             raiderId: RaiderId,
             characterName: String,
             characterRealm: String,
-        ): RaiderPerformanceData = RaiderPerformanceData(
-            raiderId = raiderId,
-            characterName = characterName,
-            characterRealm = characterRealm,
-            totalDeaths = 0,
-            totalFights = 0,
-            deathsPerAttempt = 0.0,
-            avoidableDamagePercentage = 0.0,
-            periodStart = Instant.now(),
-            periodEnd = Instant.now(),
-        )
+        ): RaiderPerformanceData =
+            RaiderPerformanceData(
+                raiderId = raiderId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+                totalDeaths = 0,
+                totalFights = 0,
+                deathsPerAttempt = 0.0,
+                avoidableDamagePercentage = 0.0,
+                periodStart = Instant.now(),
+                periodEnd = Instant.now(),
+            )
     }
 }

@@ -24,7 +24,6 @@ class GlobalExceptionHandlerTest : UnitTest() {
 
     @Nested
     inner class DomainExceptionHandlerTests {
-
         @Test
         fun `handleRaiderNotFoundException should return 404 Not Found`() {
             // Arrange
@@ -73,18 +72,20 @@ class GlobalExceptionHandlerTest : UnitTest() {
         @Test
         fun `handleLootBanActiveException should return 409 Conflict`() {
             // Arrange
-            val ban1 = LootBan.create(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                reason = "Test ban 1",
-                expiresAt = null
-            )
-            val ban2 = LootBan.create(
-                raiderId = RaiderId(123L),
-                guildId = GuildId("guild-456"),
-                reason = "Test ban 2",
-                expiresAt = null
-            )
+            val ban1 =
+                LootBan.create(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Test ban 1",
+                    expiresAt = null,
+                )
+            val ban2 =
+                LootBan.create(
+                    raiderId = RaiderId(123L),
+                    guildId = GuildId("guild-456"),
+                    reason = "Test ban 2",
+                    expiresAt = null,
+                )
             val exception = LootBanActiveException(RaiderId(123L), listOf(ban1, ban2))
 
             // Act
@@ -100,12 +101,13 @@ class GlobalExceptionHandlerTest : UnitTest() {
         @Test
         fun `handleLootBanActiveException should handle single ban`() {
             // Arrange
-            val ban = LootBan.create(
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                reason = "Single ban",
-                expiresAt = null
-            )
+            val ban =
+                LootBan.create(
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    reason = "Single ban",
+                    expiresAt = null,
+                )
             val exception = LootBanActiveException(RaiderId(456L), listOf(ban))
 
             // Act
@@ -299,7 +301,6 @@ class GlobalExceptionHandlerTest : UnitTest() {
 
     @Nested
     inner class NullMessageBranchTests {
-
         @Test
         fun `handleException should return 500 for exception with null message`() {
             // Arrange - RuntimeException with explicit null message

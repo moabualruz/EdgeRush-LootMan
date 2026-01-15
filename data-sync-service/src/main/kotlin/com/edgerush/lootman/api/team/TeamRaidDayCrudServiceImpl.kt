@@ -16,7 +16,6 @@ import java.time.OffsetDateTime
 class TeamRaidDayCrudServiceImpl(
     private val repository: TeamRaidDayRepository,
 ) : TeamRaidDayCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<TeamRaidDayResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class TeamRaidDayCrudServiceImpl(
     }
 
     override fun findById(id: Long): TeamRaidDayResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Team raid day not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Team raid day not found with id: $id")
         return TeamRaidDayResponse.from(entity)
     }
 
@@ -41,32 +41,38 @@ class TeamRaidDayCrudServiceImpl(
     }
 
     override fun create(request: CreateTeamRaidDayRequest): TeamRaidDayResponse {
-        val entity = TeamRaidDayEntity(
-            teamId = request.teamId,
-            weekDay = request.weekDay,
-            startTime = request.startTime,
-            endTime = request.endTime,
-            currentInstance = request.currentInstance,
-            difficulty = request.difficulty,
-            activeFrom = request.activeFrom,
-            syncedAt = OffsetDateTime.now(),
-        )
+        val entity =
+            TeamRaidDayEntity(
+                teamId = request.teamId,
+                weekDay = request.weekDay,
+                startTime = request.startTime,
+                endTime = request.endTime,
+                currentInstance = request.currentInstance,
+                difficulty = request.difficulty,
+                activeFrom = request.activeFrom,
+                syncedAt = OffsetDateTime.now(),
+            )
         val saved = repository.save(entity)
         return TeamRaidDayResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateTeamRaidDayRequest): TeamRaidDayResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Team raid day not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateTeamRaidDayRequest,
+    ): TeamRaidDayResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Team raid day not found with id: $id")
 
-        val updated = existing.copy(
-            weekDay = request.weekDay ?: existing.weekDay,
-            startTime = request.startTime ?: existing.startTime,
-            endTime = request.endTime ?: existing.endTime,
-            currentInstance = request.currentInstance ?: existing.currentInstance,
-            difficulty = request.difficulty ?: existing.difficulty,
-            activeFrom = request.activeFrom ?: existing.activeFrom,
-        )
+        val updated =
+            existing.copy(
+                weekDay = request.weekDay ?: existing.weekDay,
+                startTime = request.startTime ?: existing.startTime,
+                endTime = request.endTime ?: existing.endTime,
+                currentInstance = request.currentInstance ?: existing.currentInstance,
+                difficulty = request.difficulty ?: existing.difficulty,
+                activeFrom = request.activeFrom ?: existing.activeFrom,
+            )
 
         repository.save(updated)
         return TeamRaidDayResponse.from(updated)
@@ -79,7 +85,10 @@ class TeamRaidDayCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByTeamId(teamId: Long, pageRequest: PageRequest): PagedResponse<TeamRaidDayResponse> {
+    override fun findByTeamId(
+        teamId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamRaidDayResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByTeamId(teamId, offset, pageRequest.size)
         val total = repository.countByTeamId(teamId)

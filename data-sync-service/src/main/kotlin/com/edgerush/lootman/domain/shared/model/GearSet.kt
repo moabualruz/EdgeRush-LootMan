@@ -9,7 +9,7 @@ import com.edgerush.lootman.domain.shared.ItemId
  */
 data class GearSet(
     val items: Map<EquipmentSlot, GearItem>,
-    val gearSetType: GearSetType
+    val gearSetType: GearSetType,
 ) {
     /**
      * Calculates the average item level across all equipped items.
@@ -54,7 +54,7 @@ data class GearItem(
     val slot: EquipmentSlot,
     val isTierPiece: Boolean = false,
     val enchant: String? = null,
-    val sockets: Int = 0
+    val sockets: Int = 0,
 ) {
     init {
         require(itemLevel > 0) { "Item level must be positive" }
@@ -81,7 +81,8 @@ enum class EquipmentSlot {
     TRINKET_1,
     TRINKET_2,
     MAIN_HAND,
-    OFF_HAND;
+    OFF_HAND,
+    ;
 
     companion object {
         fun fromString(value: String): EquipmentSlot? =
@@ -99,7 +100,8 @@ enum class ItemQuality {
     RARE,
     EPIC,
     LEGENDARY,
-    ARTIFACT;
+    ARTIFACT,
+    ;
 
     companion object {
         fun fromInt(value: Int): ItemQuality? = entries.getOrNull(value)
@@ -110,6 +112,6 @@ enum class ItemQuality {
  * Type of gear set (best possible vs currently equipped).
  */
 enum class GearSetType {
-    EQUIPPED,  // Currently equipped gear
-    BEST       // Best in bags
+    EQUIPPED, // Currently equipped gear
+    BEST, // Best in bags
 }

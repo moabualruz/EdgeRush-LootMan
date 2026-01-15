@@ -22,7 +22,6 @@ import java.time.Instant
  */
 @EnabledIfDockerAvailable
 class DockerSimulationExecutorIntegrationTest : UnitTest() {
-
     private lateinit var executor: DockerSimulationExecutor
 
     @TempDir
@@ -30,12 +29,13 @@ class DockerSimulationExecutorIntegrationTest : UnitTest() {
 
     @BeforeEach
     fun setUp() {
-        executor = DockerSimulationExecutor(
-            dockerImage = "simulationcraftorg/simc",
-            profileDirectory = tempDir.toString(),
-            dockerCommand = "docker",
-            timeoutMinutes = 5
-        )
+        executor =
+            DockerSimulationExecutor(
+                dockerImage = "simulationcraftorg/simc",
+                profileDirectory = tempDir.toString(),
+                dockerCommand = "docker",
+                timeoutMinutes = 5,
+            )
     }
 
     private fun createProfile(): SimulationProfile {
@@ -43,92 +43,100 @@ class DockerSimulationExecutorIntegrationTest : UnitTest() {
             guildId = "guild-123",
             characterName = "Testchar",
             characterRealm = "TestRealm",
-            profileContent = """
+            profileContent =
+                """
                 warrior="Testchar"
                 level=80
                 race=human
                 spec=fury
-            """.trimIndent(),
-            createdAt = Instant.now()
+                """.trimIndent(),
+            createdAt = Instant.now(),
         )
     }
 
     @Nested
     inner class ExecuteWithDocker {
         @Test
-        fun `should handle docker execution timeout gracefully`() = runBlocking {
-            // Arrange - Use a very short timeout to trigger timeout behavior
-            val shortTimeoutExecutor = DockerSimulationExecutor(
-                dockerImage = "simulationcraftorg/simc",
-                profileDirectory = tempDir.toString(),
-                dockerCommand = "docker",
-                timeoutMinutes = 0 // Will timeout immediately
-            )
-            val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
+        fun `should handle docker execution timeout gracefully`() =
+            runBlocking {
+                // Arrange - Use a very short timeout to trigger timeout behavior
+                val shortTimeoutExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "simulationcraftorg/simc",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = "docker",
+                        timeoutMinutes = 0, // Will timeout immediately
+                    )
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
 
-            // Act
-            val result = shortTimeoutExecutor.execute(request)
+                // Act
+                val result = shortTimeoutExecutor.execute(request)
 
-            // Assert
-            result.isFailure shouldBe true
-            result.exceptionOrNull()?.message shouldNotBe null
-        }
-
-        @Test
-        fun `should handle non-existent docker image`() = runBlocking {
-            // Arrange - Use a non-existent image
-            val badImageExecutor = DockerSimulationExecutor(
-                dockerImage = "nonexistent/fake-image:99999",
-                profileDirectory = tempDir.toString(),
-                dockerCommand = "docker",
-                timeoutMinutes = 1
-            )
-            val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
-
-            // Act
-            val result = badImageExecutor.execute(request)
-
-            // Assert
-            result.isFailure shouldBe true
-        }
+                // Assert
+                result.isFailure shouldBe true
+                result.exceptionOrNull()?.message shouldNotBe null
+            }
 
         @Test
-        fun `should handle invalid docker command`() = runBlocking {
-            // Arrange - Use a non-existent docker command
-            val badCommandExecutor = DockerSimulationExecutor(
-                dockerImage = "simulationcraftorg/simc",
-                profileDirectory = tempDir.toString(),
-                dockerCommand = "nonexistent-docker-command",
-                timeoutMinutes = 1
-            )
-            val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
+        fun `should handle non-existent docker image`() =
+            runBlocking {
+                // Arrange - Use a non-existent image
+                val badImageExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "nonexistent/fake-image:99999",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = "docker",
+                        timeoutMinutes = 1,
+                    )
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
 
-            // Act
-            val result = badCommandExecutor.execute(request)
+                // Act
+                val result = badImageExecutor.execute(request)
 
-            // Assert
-            result.isFailure shouldBe true
-        }
+                // Assert
+                result.isFailure shouldBe true
+            }
 
         @Test
-        fun `should create profile file before execution`() = runBlocking {
-            // Arrange
-            val profile = createProfile()
-            val request = SimulationRequest.create(profile = profile)
+        fun `should handle invalid docker command`() =
+            runBlocking {
+                // Arrange - Use a non-existent docker command
+                val badCommandExecutor =
+                    DockerSimulationExecutor(
+                        dockerImage = "simulationcraftorg/simc",
+                        profileDirectory = tempDir.toString(),
+                        dockerCommand = "nonexistent-docker-command",
+                        timeoutMinutes = 1,
+                    )
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
 
-            // Act - Just write the profile, don't run Docker (faster test)
-            val profileFile = executor.writeProfileToFile(request)
+                // Act
+                val result = badCommandExecutor.execute(request)
 
-            // Assert
-            profileFile.exists() shouldBe true
-            profileFile.readText().contains("warrior=\"Testchar\"") shouldBe true
+                // Assert
+                result.isFailure shouldBe true
+            }
 
-            // Cleanup
-            profileFile.delete()
-        }
+        @Test
+        fun `should create profile file before execution`() =
+            runBlocking {
+                // Arrange
+                val profile = createProfile()
+                val request = SimulationRequest.create(profile = profile)
+
+                // Act - Just write the profile, don't run Docker (faster test)
+                val profileFile = executor.writeProfileToFile(request)
+
+                // Assert
+                profileFile.exists() shouldBe true
+                profileFile.readText().contains("warrior=\"Testchar\"") shouldBe true
+
+                // Cleanup
+                profileFile.delete()
+            }
     }
 
     @Nested
@@ -136,8 +144,9 @@ class DockerSimulationExecutorIntegrationTest : UnitTest() {
         @Test
         fun `docker info command should succeed when Docker is available`() {
             // Arrange
-            val processBuilder = ProcessBuilder("docker", "info")
-                .redirectErrorStream(true)
+            val processBuilder =
+                ProcessBuilder("docker", "info")
+                    .redirectErrorStream(true)
 
             // Act
             val process = processBuilder.start()
@@ -150,8 +159,9 @@ class DockerSimulationExecutorIntegrationTest : UnitTest() {
         @Test
         fun `docker version command should succeed when Docker is available`() {
             // Arrange
-            val processBuilder = ProcessBuilder("docker", "version")
-                .redirectErrorStream(true)
+            val processBuilder =
+                ProcessBuilder("docker", "version")
+                    .redirectErrorStream(true)
 
             // Act
             val process = processBuilder.start()

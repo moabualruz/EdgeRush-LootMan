@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with team-metadata-specific query methods.
  */
 interface TeamMetadataCrudService : CrudService<Long, CreateTeamMetadataRequest, UpdateTeamMetadataRequest, TeamMetadataResponse> {
-
     /**
      * Find team metadata by guild with pagination.
      *
@@ -18,7 +17,10 @@ interface TeamMetadataCrudService : CrudService<Long, CreateTeamMetadataRequest,
      * @param pageRequest Pagination parameters
      * @return Paginated list of team metadata for the guild
      */
-    fun findByGuildId(guildId: Long, pageRequest: PageRequest): PagedResponse<TeamMetadataResponse>
+    fun findByGuildId(
+        guildId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamMetadataResponse>
 
     /**
      * Find team metadata by region with pagination.
@@ -27,7 +29,10 @@ interface TeamMetadataCrudService : CrudService<Long, CreateTeamMetadataRequest,
      * @param pageRequest Pagination parameters
      * @return Paginated list of team metadata for the region
      */
-    fun findByRegion(region: String, pageRequest: PageRequest): PagedResponse<TeamMetadataResponse>
+    fun findByRegion(
+        region: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<TeamMetadataResponse>
 
     /**
      * Count team metadata for a guild.

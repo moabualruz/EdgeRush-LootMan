@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Tests configuration behavior without requiring Spring context.
  */
 class AdminModeConfigTest : UnitTest() {
-
     @Test
     fun `should be disabled by default`() {
         // Arrange & Act
@@ -24,7 +23,6 @@ class AdminModeConfigTest : UnitTest() {
 
     @Nested
     inner class `logWarning PostConstruct` {
-
         @Test
         fun `should execute logWarning without error when admin mode is enabled`() {
             // Arrange

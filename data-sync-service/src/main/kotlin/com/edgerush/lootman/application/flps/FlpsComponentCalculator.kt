@@ -30,9 +30,8 @@ import java.time.temporal.ChronoUnit
  */
 @Service
 class FlpsComponentCalculator(
-    private val upgradeValueCalculator: UpgradeValueCalculator? = null
+    private val upgradeValueCalculator: UpgradeValueCalculator? = null,
 ) {
-
     /**
      * Calculate Attendance Commitment Score (ACS) from attendance records.
      */
@@ -44,11 +43,12 @@ class FlpsComponentCalculator(
         val totalAttended = attendance.sumOf { it.attendedRaids }
         val totalPossible = attendance.sumOf { it.totalRaids }
 
-        val percentage = if (totalPossible > 0) {
-            totalAttended.toDouble() / totalPossible
-        } else {
-            0.0
-        }
+        val percentage =
+            if (totalPossible > 0) {
+                totalAttended.toDouble() / totalPossible
+            } else {
+                0.0
+            }
 
         return AttendanceCommitmentScore.of(percentage.coerceIn(0.0, 1.0))
     }
@@ -75,24 +75,26 @@ class FlpsComponentCalculator(
         // Calculate deaths per attempt score
         // 0 deaths = 1.0, 1 death/attempt = 0.5, 2+ deaths/attempt = approaching 0
         val dpa = performanceData.deathsPerAttempt
-        val deathsScore = when {
-            dpa <= 0.0 -> 1.0
-            dpa <= 0.5 -> 1.0 - (dpa * 0.4)  // 0.5 dpa = 0.8 score
-            dpa <= 1.0 -> 0.8 - ((dpa - 0.5) * 0.6) // 1.0 dpa = 0.5 score
-            dpa <= 2.0 -> 0.5 - ((dpa - 1.0) * 0.3) // 2.0 dpa = 0.2 score
-            else -> (0.2 - ((dpa - 2.0) * 0.1)).coerceAtLeast(0.0)
-        }
+        val deathsScore =
+            when {
+                dpa <= 0.0 -> 1.0
+                dpa <= 0.5 -> 1.0 - (dpa * 0.4) // 0.5 dpa = 0.8 score
+                dpa <= 1.0 -> 0.8 - ((dpa - 0.5) * 0.6) // 1.0 dpa = 0.5 score
+                dpa <= 2.0 -> 0.5 - ((dpa - 1.0) * 0.3) // 2.0 dpa = 0.2 score
+                else -> (0.2 - ((dpa - 2.0) * 0.1)).coerceAtLeast(0.0)
+            }
 
         // Calculate avoidable damage score
         // 0% = 1.0, 50% = 0.5, 100%+ = approaching 0
         val adtPct = performanceData.avoidableDamagePercentage
-        val avoidableDamageScore = when {
-            adtPct <= 10.0 -> 1.0 - (adtPct * 0.01) // 10% = 0.9 score
-            adtPct <= 30.0 -> 0.9 - ((adtPct - 10.0) * 0.015) // 30% = 0.6 score
-            adtPct <= 60.0 -> 0.6 - ((adtPct - 30.0) * 0.01) // 60% = 0.3 score
-            adtPct <= 100.0 -> 0.3 - ((adtPct - 60.0) * 0.005) // 100% = 0.1 score
-            else -> (0.1 - ((adtPct - 100.0) * 0.001)).coerceAtLeast(0.0)
-        }
+        val avoidableDamageScore =
+            when {
+                adtPct <= 10.0 -> 1.0 - (adtPct * 0.01) // 10% = 0.9 score
+                adtPct <= 30.0 -> 0.9 - ((adtPct - 10.0) * 0.015) // 30% = 0.6 score
+                adtPct <= 60.0 -> 0.6 - ((adtPct - 30.0) * 0.01) // 60% = 0.3 score
+                adtPct <= 100.0 -> 0.3 - ((adtPct - 60.0) * 0.005) // 100% = 0.1 score
+                else -> (0.1 - ((adtPct - 100.0) * 0.001)).coerceAtLeast(0.0)
+            }
 
         // Combine weighted scores
         val masValue = (deathsScore * deathsWeight) + (avoidableDamageScore * avoidableDamageWeight)
@@ -132,7 +134,10 @@ class FlpsComponentCalculator(
      * @param preparation The raider's vault/activity data, or null if unavailable
      * @return EPS score between 0.0 and 1.0
      */
-    fun calculateEPS(gear: GearSet?, preparation: RaiderPreparationData?): ExternalPreparationScore {
+    fun calculateEPS(
+        gear: GearSet?,
+        preparation: RaiderPreparationData?,
+    ): ExternalPreparationScore {
         // If both are null, return zero
         if (gear == null && preparation == null) {
             return ExternalPreparationScore.of(0.0)
@@ -164,12 +169,13 @@ class FlpsComponentCalculator(
         val normalClearScore = if (preparation.hasNormalClear) 0.05 else 0.0
 
         // Total score
-        val totalScore = raidVaultScore +
-            mythicPlusVaultScore +
-            pvpVaultScore +
-            ratingScore +
-            heroicClearScore +
-            normalClearScore
+        val totalScore =
+            raidVaultScore +
+                mythicPlusVaultScore +
+                pvpVaultScore +
+                ratingScore +
+                heroicClearScore +
+                normalClearScore
 
         return ExternalPreparationScore.of(totalScore.coerceIn(0.0, 1.0))
     }
@@ -191,7 +197,10 @@ class FlpsComponentCalculator(
      * Calculate Upgrade Value (UV) from wishlist data.
      * This is the legacy method - prefer calculateUVWithSimulation when character context is available.
      */
-    fun calculateUV(wishlist: Wishlist?, itemId: ItemId): UpgradeValue {
+    fun calculateUV(
+        wishlist: Wishlist?,
+        itemId: ItemId,
+    ): UpgradeValue {
         val upgradePercentage = wishlist?.getUpgradePercentage(itemId) ?: 0.0
 
         // Convert percentage to 0-1 range
@@ -220,7 +229,7 @@ class FlpsComponentCalculator(
         characterName: String,
         characterRealm: String,
         itemId: ItemId,
-        wishlist: Wishlist?
+        wishlist: Wishlist?,
     ): UpgradeValue {
         // Use simulation-based calculator if available
         if (upgradeValueCalculator != null) {
@@ -229,7 +238,7 @@ class FlpsComponentCalculator(
                 characterName = characterName,
                 characterRealm = characterRealm,
                 itemId = itemId,
-                wishlistFallback = wishlist
+                wishlistFallback = wishlist,
             )
         }
 
@@ -243,12 +252,12 @@ class FlpsComponentCalculator(
     fun hasSimulationData(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Boolean {
         return upgradeValueCalculator?.hasSimulationData(
             guildId = guildId,
             characterName = characterName,
-            characterRealm = characterRealm
+            characterRealm = characterRealm,
         ) ?: false
     }
 
@@ -263,13 +272,14 @@ class FlpsComponentCalculator(
         val tierCount = gear.getTierPieceCount()
 
         // Value increases significantly when approaching tier bonuses
-        val value = when {
-            tierCount >= 4 -> 1.0      // Has 4-piece
-            tierCount == 3 -> 0.8      // Close to 4-piece
-            tierCount >= 2 -> 0.6      // Has 2-piece
-            tierCount == 1 -> 0.3      // Close to 2-piece
-            else -> 0.0                 // No tier
-        }
+        val value =
+            when {
+                tierCount >= 4 -> 1.0 // Has 4-piece
+                tierCount == 3 -> 0.8 // Close to 4-piece
+                tierCount >= 2 -> 0.6 // Has 2-piece
+                tierCount == 1 -> 0.3 // Close to 2-piece
+                else -> 0.0 // No tier
+            }
 
         return TierBonus.of(value)
     }
@@ -279,11 +289,12 @@ class FlpsComponentCalculator(
      */
     fun calculateRoleMultiplier(role: Role): RoleMultiplier {
         // Default multipliers (can be made guild-configurable)
-        val value = when (role) {
-            Role.TANK -> 1.0
-            Role.HEALER -> 1.0
-            Role.DPS -> 1.0
-        }
+        val value =
+            when (role) {
+                Role.TANK -> 1.0
+                Role.HEALER -> 1.0
+                Role.DPS -> 1.0
+            }
 
         return RoleMultiplier.of(value)
     }
@@ -293,7 +304,7 @@ class FlpsComponentCalculator(
      */
     fun calculateRDF(
         lootHistory: List<LootAward>,
-        activeBans: List<LootBan>
+        activeBans: List<LootBan>,
     ): RecencyDecayFactor {
         // If banned, RDF is 0
         if (activeBans.isNotEmpty()) {
@@ -305,20 +316,23 @@ class FlpsComponentCalculator(
         val oneWeekAgo = now.minus(7, ChronoUnit.DAYS)
 
         // Count recent Mythic and Heroic tier loot
-        val recentMythic = lootHistory.count {
-            it.tier == LootTier.MYTHIC && it.awardedAt.isAfter(twoWeeksAgo)
-        }
+        val recentMythic =
+            lootHistory.count {
+                it.tier == LootTier.MYTHIC && it.awardedAt.isAfter(twoWeeksAgo)
+            }
 
-        val recentHeroic = lootHistory.count {
-            it.tier == LootTier.HEROIC && it.awardedAt.isAfter(oneWeekAgo)
-        }
+        val recentHeroic =
+            lootHistory.count {
+                it.tier == LootTier.HEROIC && it.awardedAt.isAfter(oneWeekAgo)
+            }
 
         // Apply decay based on recent loot
-        val decayValue = when {
-            recentMythic > 0 -> 0.8  // 20% penalty for Mythic loot
-            recentHeroic > 0 -> 0.9  // 10% penalty for Heroic loot
-            else -> 1.0              // No penalty
-        }
+        val decayValue =
+            when {
+                recentMythic > 0 -> 0.8 // 20% penalty for Mythic loot
+                recentHeroic > 0 -> 0.9 // 10% penalty for Heroic loot
+                else -> 1.0 // No penalty
+            }
 
         return RecencyDecayFactor.of(decayValue)
     }

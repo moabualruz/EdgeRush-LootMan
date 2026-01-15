@@ -25,11 +25,17 @@ data class LootAwardWishDataResponse(
     val value: Int?,
 ) {
     companion object {
-        fun from(e: LootAwardWishDataEntity) = LootAwardWishDataResponse(
-            e.id!!, e.lootAwardId, e.specName, e.specIcon, e.value
-        )
+        fun from(e: LootAwardWishDataEntity) =
+            LootAwardWishDataResponse(
+                e.id!!,
+                e.lootAwardId,
+                e.specName,
+                e.specIcon,
+                e.value,
+            )
     }
 }
 
 data class LootAwardWishDataExistsResponse(val exists: Boolean)
+
 data class LootAwardWishDataCountResponse(val count: Long)

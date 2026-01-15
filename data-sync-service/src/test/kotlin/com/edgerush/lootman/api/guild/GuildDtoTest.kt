@@ -23,39 +23,40 @@ import java.time.Instant
  * - Computed fields (canSync)
  */
 class GuildDtoTest : UnitTest() {
-
     @Nested
     inner class CreateGuildRequestTests {
         @Test
         fun `should create valid request with required fields`() {
             // Given / When
-            val request = CreateGuildRequest(
-                id = "test-guild",
-                name = "Test Guild"
-            )
+            val request =
+                CreateGuildRequest(
+                    id = "test-guild",
+                    name = "Test Guild",
+                )
 
             // Then
             request.id shouldBe "test-guild"
             request.name shouldBe "Test Guild"
-            request.region shouldBe "US"  // default
-            request.syncEnabled shouldBe true  // default
-            request.benchmarkMode shouldBe "THEORETICAL"  // default
+            request.region shouldBe "US" // default
+            request.syncEnabled shouldBe true // default
+            request.benchmarkMode shouldBe "THEORETICAL" // default
         }
 
         @Test
         fun `should create request with all fields`() {
             // Given / When
-            val request = CreateGuildRequest(
-                id = "full-guild",
-                name = "Full Guild",
-                description = "A complete guild",
-                realm = "Area 52",
-                region = "EU",
-                syncEnabled = false,
-                syncCronExpression = "0 0 6 * * *",
-                timezone = "America/New_York",
-                benchmarkMode = "CUSTOM"
-            )
+            val request =
+                CreateGuildRequest(
+                    id = "full-guild",
+                    name = "Full Guild",
+                    description = "A complete guild",
+                    realm = "Area 52",
+                    region = "EU",
+                    syncEnabled = false,
+                    syncCronExpression = "0 0 6 * * *",
+                    timezone = "America/New_York",
+                    benchmarkMode = "CUSTOM",
+                )
 
             // Then
             request.id shouldBe "full-guild"
@@ -75,9 +76,10 @@ class GuildDtoTest : UnitTest() {
         @Test
         fun `should create update request with partial fields`() {
             // Given / When
-            val request = UpdateGuildRequest(
-                name = "Updated Name"
-            )
+            val request =
+                UpdateGuildRequest(
+                    name = "Updated Name",
+                )
 
             // Then
             request.name shouldBe "Updated Name"
@@ -90,19 +92,20 @@ class GuildDtoTest : UnitTest() {
         @Test
         fun `should create update request with all fields`() {
             // Given / When
-            val request = UpdateGuildRequest(
-                name = "Updated Name",
-                description = "Updated description",
-                realm = "New Realm",
-                region = "EU",
-                syncEnabled = false,
-                syncCronExpression = "0 0 8 * * *",
-                timezone = "Europe/London",
-                benchmarkMode = "TOP_PERFORMER",
-                customBenchmarkRms = 0.95,
-                customBenchmarkIpi = 0.90,
-                isActive = false
-            )
+            val request =
+                UpdateGuildRequest(
+                    name = "Updated Name",
+                    description = "Updated description",
+                    realm = "New Realm",
+                    region = "EU",
+                    syncEnabled = false,
+                    syncCronExpression = "0 0 8 * * *",
+                    timezone = "Europe/London",
+                    benchmarkMode = "TOP_PERFORMER",
+                    customBenchmarkRms = 0.95,
+                    customBenchmarkIpi = 0.90,
+                    isActive = false,
+                )
 
             // Then
             request.name shouldBe "Updated Name"
@@ -126,15 +129,16 @@ class GuildDtoTest : UnitTest() {
             // Given
             val createdAt = Instant.parse("2024-01-01T00:00:00Z")
             val updatedAt = Instant.parse("2024-06-15T12:00:00Z")
-            val guild = createGuild(
-                id = GuildId("test-guild"),
-                name = "Test Guild",
-                description = "Test description",
-                realm = "Area 52",
-                region = Region.EU,
-                createdAt = createdAt,
-                updatedAt = updatedAt
-            )
+            val guild =
+                createGuild(
+                    id = GuildId("test-guild"),
+                    name = "Test Guild",
+                    description = "Test description",
+                    realm = "Area 52",
+                    region = Region.EU,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt,
+                )
 
             // When
             val response = GuildResponse.from(guild)
@@ -152,14 +156,15 @@ class GuildDtoTest : UnitTest() {
         @Test
         fun `should map settings correctly`() {
             // Given
-            val settings = GuildSettings(
-                syncEnabled = true,
-                syncCronExpression = "0 0 5 * * *",
-                timezone = "America/New_York",
-                benchmarkMode = BenchmarkMode.CUSTOM,
-                customBenchmarkRms = 0.95,
-                customBenchmarkIpi = 0.90
-            )
+            val settings =
+                GuildSettings(
+                    syncEnabled = true,
+                    syncCronExpression = "0 0 5 * * *",
+                    timezone = "America/New_York",
+                    benchmarkMode = BenchmarkMode.CUSTOM,
+                    customBenchmarkRms = 0.95,
+                    customBenchmarkIpi = 0.90,
+                )
             val guild = createGuild(settings = settings)
 
             // When
@@ -228,14 +233,16 @@ class GuildDtoTest : UnitTest() {
         @Test
         fun `should handle null optional fields`() {
             // Given
-            val guild = createGuild(
-                description = null,
-                realm = null,
-                settings = GuildSettings(
-                    customBenchmarkRms = null,
-                    customBenchmarkIpi = null
+            val guild =
+                createGuild(
+                    description = null,
+                    realm = null,
+                    settings =
+                        GuildSettings(
+                            customBenchmarkRms = null,
+                            customBenchmarkIpi = null,
+                        ),
                 )
-            )
 
             // When
             val response = GuildResponse.from(guild)
@@ -253,11 +260,12 @@ class GuildDtoTest : UnitTest() {
         @Test
         fun `should map list of guilds to response`() {
             // Given
-            val guilds = listOf(
-                createGuild(id = GuildId("guild-1"), name = "Guild One"),
-                createGuild(id = GuildId("guild-2"), name = "Guild Two"),
-                createGuild(id = GuildId("guild-3"), name = "Guild Three")
-            )
+            val guilds =
+                listOf(
+                    createGuild(id = GuildId("guild-1"), name = "Guild One"),
+                    createGuild(id = GuildId("guild-2"), name = "Guild Two"),
+                    createGuild(id = GuildId("guild-3"), name = "Guild Three"),
+                )
 
             // When
             val response = GuildListResponse.from(guilds)
@@ -295,17 +303,18 @@ class GuildDtoTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

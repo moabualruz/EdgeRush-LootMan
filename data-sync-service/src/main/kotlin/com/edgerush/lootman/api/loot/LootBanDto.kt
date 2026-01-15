@@ -10,16 +10,12 @@ import java.time.LocalDateTime
 data class CreateLootBanEntityRequest(
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
-
     @field:NotBlank(message = "Character name is required")
     val characterName: String,
-
     @field:NotBlank(message = "Reason is required")
     val reason: String,
-
     @field:NotBlank(message = "Banned by is required")
     val bannedBy: String,
-
     val expiresAt: LocalDateTime? = null,
 )
 
@@ -46,16 +42,17 @@ data class LootBanResponse(
     val isActive: Boolean,
 ) {
     companion object {
-        fun from(entity: LootBanEntity): LootBanResponse = LootBanResponse(
-            id = entity.id ?: 0L,
-            guildId = entity.guildId,
-            characterName = entity.characterName,
-            reason = entity.reason,
-            bannedBy = entity.bannedBy,
-            bannedAt = entity.bannedAt,
-            expiresAt = entity.expiresAt,
-            isActive = entity.isActive,
-        )
+        fun from(entity: LootBanEntity): LootBanResponse =
+            LootBanResponse(
+                id = entity.id ?: 0L,
+                guildId = entity.guildId,
+                characterName = entity.characterName,
+                reason = entity.reason,
+                bannedBy = entity.bannedBy,
+                bannedAt = entity.bannedAt,
+                expiresAt = entity.expiresAt,
+                isActive = entity.isActive,
+            )
     }
 }
 

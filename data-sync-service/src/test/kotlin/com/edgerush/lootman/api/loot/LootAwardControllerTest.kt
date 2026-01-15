@@ -19,7 +19,6 @@ import java.time.OffsetDateTime
  * Unit tests for LootAwardController.
  */
 class LootAwardControllerTest : UnitTest() {
-
     private lateinit var lootAwardService: LootAwardCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: LootAwardController
@@ -33,16 +32,16 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createLootAwardResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createLootAwardResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { lootAwardService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class LootAwardControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<LootAwardEntityResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<LootAwardEntityResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { lootAwardService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return loot award when found`() {
             // Given
@@ -110,25 +109,26 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created loot award with 201 status`() {
             // Given
-            val request = CreateLootAwardEntityRequest(
-                raiderId = 1L,
-                itemId = 12345L,
-                itemName = "Legendary Sword",
-                tier = "MYTHIC",
-                flps = 0.85,
-                rdf = 0.95,
-            )
+            val request =
+                CreateLootAwardEntityRequest(
+                    raiderId = 1L,
+                    itemId = 12345L,
+                    itemName = "Legendary Sword",
+                    tier = "MYTHIC",
+                    flps = 0.85,
+                    rdf = 0.95,
+                )
 
-            val created = createLootAwardResponse(
-                id = 1L,
-                raiderId = 1L,
-                itemName = "Legendary Sword",
-                tier = "MYTHIC",
-            )
+            val created =
+                createLootAwardResponse(
+                    id = 1L,
+                    raiderId = 1L,
+                    itemName = "Legendary Sword",
+                    tier = "MYTHIC",
+                )
             every { lootAwardService.create(request) } returns created
 
             // When
@@ -145,20 +145,21 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated loot award`() {
             // Given
-            val request = UpdateLootAwardEntityRequest(
-                note = "Updated note",
-                discarded = true,
-            )
+            val request =
+                UpdateLootAwardEntityRequest(
+                    note = "Updated note",
+                    discarded = true,
+                )
 
-            val updated = createLootAwardResponse(
-                id = 1L,
-                note = "Updated note",
-                discarded = true,
-            )
+            val updated =
+                createLootAwardResponse(
+                    id = 1L,
+                    note = "Updated note",
+                    discarded = true,
+                )
             every { lootAwardService.update(1L, request) } returns updated
 
             // When
@@ -190,7 +191,6 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -208,7 +208,6 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when loot award exists`() {
             // Given
@@ -237,21 +236,22 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderTests {
-
         @Test
         fun `should return loot awards for a raider`() {
             // Given
             val raiderId = 1L
-            val awards = listOf(
-                createLootAwardResponse(id = 1L, raiderId = raiderId),
-                createLootAwardResponse(id = 2L, raiderId = raiderId),
-            )
-            val expectedResponse = PagedResponse(
-                content = awards,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val awards =
+                listOf(
+                    createLootAwardResponse(id = 1L, raiderId = raiderId),
+                    createLootAwardResponse(id = 2L, raiderId = raiderId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = awards,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { lootAwardService.findByRaider(raiderId, any()) } returns expectedResponse
 
             // When
@@ -265,21 +265,22 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class FindByItemTests {
-
         @Test
         fun `should return loot awards for an item`() {
             // Given
             val itemId = 12345L
-            val awards = listOf(
-                createLootAwardResponse(id = 1L, itemId = itemId),
-                createLootAwardResponse(id = 2L, itemId = itemId),
-            )
-            val expectedResponse = PagedResponse(
-                content = awards,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val awards =
+                listOf(
+                    createLootAwardResponse(id = 1L, itemId = itemId),
+                    createLootAwardResponse(id = 2L, itemId = itemId),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = awards,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { lootAwardService.findByItem(itemId, any()) } returns expectedResponse
 
             // When
@@ -293,21 +294,22 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class FindByTierTests {
-
         @Test
         fun `should return loot awards for a tier`() {
             // Given
             val tier = "MYTHIC"
-            val awards = listOf(
-                createLootAwardResponse(id = 1L, tier = tier),
-                createLootAwardResponse(id = 2L, tier = tier),
-            )
-            val expectedResponse = PagedResponse(
-                content = awards,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val awards =
+                listOf(
+                    createLootAwardResponse(id = 1L, tier = tier),
+                    createLootAwardResponse(id = 2L, tier = tier),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = awards,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { lootAwardService.findByTier(tier, any()) } returns expectedResponse
 
             // When
@@ -321,7 +323,6 @@ class LootAwardControllerTest : UnitTest() {
 
     @Nested
     inner class CountByRaiderTests {
-
         @Test
         fun `should return count for raider`() {
             // Given
@@ -359,27 +360,28 @@ class LootAwardControllerTest : UnitTest() {
         characterId: Long? = null,
         awardedByCharacterId: Long? = null,
         awardedByName: String? = null,
-    ): LootAwardEntityResponse = LootAwardEntityResponse(
-        id = id,
-        raiderId = raiderId,
-        itemId = itemId,
-        itemName = itemName,
-        tier = tier,
-        flps = flps,
-        rdf = rdf,
-        awardedAt = awardedAt,
-        rclootcouncilId = rclootcouncilId,
-        icon = icon,
-        slot = slot,
-        quality = quality,
-        responseTypeId = responseTypeId,
-        responseTypeName = responseTypeName,
-        note = note,
-        wishValue = wishValue,
-        difficulty = difficulty,
-        discarded = discarded,
-        characterId = characterId,
-        awardedByCharacterId = awardedByCharacterId,
-        awardedByName = awardedByName,
-    )
+    ): LootAwardEntityResponse =
+        LootAwardEntityResponse(
+            id = id,
+            raiderId = raiderId,
+            itemId = itemId,
+            itemName = itemName,
+            tier = tier,
+            flps = flps,
+            rdf = rdf,
+            awardedAt = awardedAt,
+            rclootcouncilId = rclootcouncilId,
+            icon = icon,
+            slot = slot,
+            quality = quality,
+            responseTypeId = responseTypeId,
+            responseTypeName = responseTypeName,
+            note = note,
+            wishValue = wishValue,
+            difficulty = difficulty,
+            discarded = discarded,
+            characterId = characterId,
+            awardedByCharacterId = awardedByCharacterId,
+            awardedByName = awardedByName,
+        )
 }

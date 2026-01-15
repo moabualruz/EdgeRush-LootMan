@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 class QueryComplexityConfig {
-
     @Value("\${graphql.complexity.max-complexity:100}")
     private var maxComplexity: Int = 100
 

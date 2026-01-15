@@ -14,7 +14,7 @@ data class SimulationProfile private constructor(
     val characterName: String,
     val characterRealm: String,
     val profileContent: String,
-    val createdAt: Instant
+    val createdAt: Instant,
 ) {
     /**
      * Returns the character identifier in "Name-Realm" format.
@@ -39,7 +39,7 @@ data class SimulationProfile private constructor(
             characterName: String,
             characterRealm: String,
             profileContent: String,
-            createdAt: Instant
+            createdAt: Instant,
         ): SimulationProfile {
             require(guildId.isNotBlank()) { "guildId must not be blank" }
             require(characterName.isNotBlank()) { "characterName must not be blank" }
@@ -51,7 +51,7 @@ data class SimulationProfile private constructor(
                 characterName = characterName.trim(),
                 characterRealm = characterRealm.trim(),
                 profileContent = profileContent,
-                createdAt = createdAt
+                createdAt = createdAt,
             )
         }
     }

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Tests default values and property structure.
  */
 class FlpsConfigPropertiesTest : UnitTest() {
-
     @Test
     fun `should have correct default RMS weights`() {
         // Arrange & Act
@@ -85,11 +84,12 @@ class FlpsConfigPropertiesTest : UnitTest() {
         val properties = FlpsConfigProperties()
 
         // Act
-        properties.rms = FlpsConfigProperties.RmsWeights(
-            attendance = 0.50,
-            mechanical = 0.30,
-            preparation = 0.20,
-        )
+        properties.rms =
+            FlpsConfigProperties.RmsWeights(
+                attendance = 0.50,
+                mechanical = 0.30,
+                preparation = 0.20,
+            )
 
         // Assert
         properties.rms.attendance shouldBe 0.50
@@ -103,11 +103,12 @@ class FlpsConfigPropertiesTest : UnitTest() {
         val properties = FlpsConfigProperties()
 
         // Act
-        properties.ipi = FlpsConfigProperties.IpiWeights(
-            upgradeValue = 0.50,
-            tierBonus = 0.30,
-            roleMultiplier = 0.20,
-        )
+        properties.ipi =
+            FlpsConfigProperties.IpiWeights(
+                upgradeValue = 0.50,
+                tierBonus = 0.30,
+                roleMultiplier = 0.20,
+            )
 
         // Assert
         properties.ipi.upgradeValue shouldBe 0.50
@@ -121,11 +122,12 @@ class FlpsConfigPropertiesTest : UnitTest() {
         val properties = FlpsConfigProperties()
 
         // Act
-        properties.roleMultipliers = FlpsConfigProperties.RoleMultipliers(
-            tank = 1.5,
-            healer = 1.3,
-            dps = 1.0,
-        )
+        properties.roleMultipliers =
+            FlpsConfigProperties.RoleMultipliers(
+                tank = 1.5,
+                healer = 1.3,
+                dps = 1.0,
+            )
 
         // Assert
         properties.roleMultipliers.tank shouldBe 1.5
@@ -139,14 +141,15 @@ class FlpsConfigPropertiesTest : UnitTest() {
         val properties = FlpsConfigProperties()
 
         // Act
-        properties.thresholds = FlpsConfigProperties.Thresholds(
-            eligibilityAttendance = 0.9,
-            eligibilityActivity = 0.5,
-            recencyDecayDays = 14,
-            maxAttendanceBonus = 0.8,
-            minMechanicalScore = 0.2,
-            maxPreparationScore = 0.9,
-        )
+        properties.thresholds =
+            FlpsConfigProperties.Thresholds(
+                eligibilityAttendance = 0.9,
+                eligibilityActivity = 0.5,
+                recencyDecayDays = 14,
+                maxAttendanceBonus = 0.8,
+                minMechanicalScore = 0.2,
+                maxPreparationScore = 0.9,
+            )
 
         // Assert
         properties.thresholds.eligibilityAttendance shouldBe 0.9

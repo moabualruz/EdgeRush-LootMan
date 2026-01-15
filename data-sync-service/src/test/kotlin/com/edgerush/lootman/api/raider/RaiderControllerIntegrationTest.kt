@@ -25,7 +25,6 @@ import java.time.LocalDateTime
  * - Pagination functionality
  */
 class RaiderControllerIntegrationTest : IntegrationTest() {
-
     private fun createRequest(
         id: Long = 1L,
         guildId: String = "test-guild",
@@ -34,19 +33,20 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
         characterClass: String = "WARRIOR",
         role: String = "DPS",
         rank: String? = "Raider",
-        status: String = "ACTIVE"
+        status: String = "ACTIVE",
     ): HttpEntity<CreateRaiderRequest> {
-        val request = CreateRaiderRequest(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = LocalDateTime.now()
-        )
+        val request =
+            CreateRaiderRequest(
+                id = id,
+                guildId = guildId,
+                characterName = characterName,
+                realm = realm,
+                characterClass = characterClass,
+                role = role,
+                rank = rank,
+                status = status,
+                joinDate = LocalDateTime.now(),
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -56,14 +56,15 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
         characterName: String? = null,
         realm: String? = null,
         status: String? = null,
-        rank: String? = null
+        rank: String? = null,
     ): HttpEntity<UpdateRaiderRequest> {
-        val request = UpdateRaiderRequest(
-            characterName = characterName,
-            realm = realm,
-            status = status,
-            rank = rank
-        )
+        val request =
+            UpdateRaiderRequest(
+                characterName = characterName,
+                realm = realm,
+                status = status,
+                rank = rank,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -77,11 +78,12 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = 100L, characterName = "NewRaider")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/raiders",
-                entity,
-                TestRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/raiders",
+                    entity,
+                    TestRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -102,16 +104,17 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 entity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // Then - verify in database
-            val raiderCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM raiders WHERE guild_id = ? AND character_name = ?",
-                Long::class.java,
-                "persist-guild",
-                "PersistChar"
-            )
+            val raiderCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM raiders WHERE guild_id = ? AND character_name = ?",
+                    Long::class.java,
+                    "persist-guild",
+                    "PersistChar",
+                )
             raiderCount shouldBe 1L
         }
 
@@ -121,11 +124,12 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = 102L, characterName = "ComputedChar", realm = "ComputedRealm")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/raiders",
-                entity,
-                TestRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/raiders",
+                    entity,
+                    TestRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -139,11 +143,12 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = 103L, characterName = "BenchedChar", status = "BENCHED")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/raiders",
-                entity,
-                TestRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/raiders",
+                    entity,
+                    TestRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -160,14 +165,15 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 createEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/200",
-                TestRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/200",
+                    TestRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -178,10 +184,11 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return 404 when raider not found`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/999999",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/999999",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -197,18 +204,19 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 createEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(rank = "Officer", status = "BENCHED")
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/raiders/300",
-                HttpMethod.PUT,
-                updateEntity,
-                TestRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/raiders/300",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -223,7 +231,7 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 createEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             val updateEntity = createUpdateRequest(rank = "Guild Master")
@@ -233,15 +241,16 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/raiders/301",
                 HttpMethod.PUT,
                 updateEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // Then - verify in database
-            val rank = jdbcTemplate.queryForObject(
-                "SELECT rank FROM raiders WHERE id = ?",
-                String::class.java,
-                301L
-            )
+            val rank =
+                jdbcTemplate.queryForObject(
+                    "SELECT rank FROM raiders WHERE id = ?",
+                    String::class.java,
+                    301L,
+                )
             rank shouldBe "Guild Master"
         }
 
@@ -251,12 +260,13 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             val updateEntity = createUpdateRequest(status = "BENCHED")
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/raiders/999999",
-                HttpMethod.PUT,
-                updateEntity,
-                String::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/raiders/999999",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -272,16 +282,17 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 createEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/raiders/400",
-                HttpMethod.DELETE,
-                null,
-                Void::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/raiders/400",
+                    HttpMethod.DELETE,
+                    null,
+                    Void::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NO_CONTENT
@@ -294,7 +305,7 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 createEntity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // When
@@ -302,27 +313,29 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/raiders/401",
                 HttpMethod.DELETE,
                 null,
-                Void::class.java
+                Void::class.java,
             )
 
             // Then - verify removed from database
-            val raiderCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM raiders WHERE id = ?",
-                Long::class.java,
-                401L
-            )
+            val raiderCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM raiders WHERE id = ?",
+                    Long::class.java,
+                    401L,
+                )
             raiderCount shouldBe 0L
         }
 
         @Test
         fun `should return 404 when deleting non-existent raider`() {
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/raiders/999999",
-                HttpMethod.DELETE,
-                null,
-                String::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/raiders/999999",
+                    HttpMethod.DELETE,
+                    null,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -340,15 +353,16 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 restTemplate.postForEntity(
                     "/api/v1/raiders",
                     entity,
-                    TestRaiderResponse::class.java
+                    TestRaiderResponse::class.java,
                 )
             }
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId?page=0&size=3",
-                TestPagedRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId?page=0&size=3",
+                    TestPagedRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -369,29 +383,31 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 restTemplate.postForEntity(
                     "/api/v1/raiders",
                     entity,
-                    TestRaiderResponse::class.java
+                    TestRaiderResponse::class.java,
                 )
             }
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId?page=1&size=3",
-                TestPagedRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId?page=1&size=3",
+                    TestPagedRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
-            response.body?.content?.shouldHaveSize(2)  // Remaining 2 on page 1
+            response.body?.content?.shouldHaveSize(2) // Remaining 2 on page 1
             response.body?.page shouldBe 1
         }
 
         @Test
         fun `should return empty page when guild has no raiders`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/empty-guild?page=0&size=20",
-                TestPagedRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/empty-guild?page=0&size=20",
+                    TestPagedRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -409,19 +425,20 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 restTemplate.postForEntity(
                     "/api/v1/raiders",
                     entity,
-                    TestRaiderResponse::class.java
+                    TestRaiderResponse::class.java,
                 )
             }
 
             // When - no size parameter
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId?page=0",
-                TestPagedRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId?page=0",
+                    TestPagedRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
-            response.body?.size shouldBe 20  // default page size
+            response.body?.size shouldBe 20 // default page size
         }
 
         @Test
@@ -432,18 +449,19 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/raiders",
                 entity,
-                TestRaiderResponse::class.java
+                TestRaiderResponse::class.java,
             )
 
             // When - request size > max (100)
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId?page=0&size=500",
-                TestPagedRaiderResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId?page=0&size=500",
+                    TestPagedRaiderResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
-            response.body?.size shouldBe 100  // max page size
+            response.body?.size shouldBe 100 // max page size
         }
     }
 
@@ -458,15 +476,16 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
                 restTemplate.postForEntity(
                     "/api/v1/raiders",
                     entity,
-                    TestRaiderResponse::class.java
+                    TestRaiderResponse::class.java,
                 )
             }
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId/all",
-                TestRaiderListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId/all",
+                    TestRaiderListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -478,10 +497,11 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
         @Test
         fun `should return empty list when guild has no raiders`() {
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/no-raiders-guild/all",
-                TestRaiderListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/no-raiders-guild/all",
+                    TestRaiderListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -498,10 +518,11 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity("/api/v1/raiders", entity2, TestRaiderResponse::class.java)
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/guild-A/all",
-                TestRaiderListResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/guild-A/all",
+                    TestRaiderListResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -518,11 +539,12 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             val entity = createRequest(id = 1100L, characterName = "JsonChar", realm = "JsonRealm")
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/raiders",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/raiders",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -546,10 +568,11 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity("/api/v1/raiders", entity, TestRaiderResponse::class.java)
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/raiders/guild/$guildId?page=0&size=10",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/raiders/guild/$guildId?page=0&size=10",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -576,12 +599,12 @@ data class TestRaiderResponse(
     val joinDate: String?,
     val wowauditId: Long?,
     val fullName: String,
-    val isEligibleForLoot: Boolean
+    val isEligibleForLoot: Boolean,
 )
 
 data class TestRaiderListResponse(
     val raiders: List<TestRaiderResponse>,
-    val count: Int
+    val count: Int,
 )
 
 data class TestPagedRaiderResponse(
@@ -593,5 +616,5 @@ data class TestPagedRaiderResponse(
     val isFirst: Boolean,
     val isLast: Boolean,
     val hasNext: Boolean,
-    val hasPrevious: Boolean
+    val hasPrevious: Boolean,
 )

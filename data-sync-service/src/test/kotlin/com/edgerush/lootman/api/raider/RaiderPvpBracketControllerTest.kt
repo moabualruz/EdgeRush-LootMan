@@ -92,6 +92,6 @@ class RaiderPvpBracketControllerTest : UnitTest() {
         rating: Int? = 1800,
         seasonPlayed: Int? = 50,
         weekPlayed: Int? = 10,
-        maxRating: Int? = 2000
+        maxRating: Int? = 2000,
     ) = RaiderPvpBracketResponse(id, raiderId, bracket, rating, seasonPlayed, weekPlayed, maxRating)
 }

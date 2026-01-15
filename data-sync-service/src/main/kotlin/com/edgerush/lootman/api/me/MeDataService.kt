@@ -31,58 +31,64 @@ class MeDataService(
     private val wishlistRepository: WishlistRepository,
     private val simulationRepository: SimulationRepository,
 ) {
-
     /**
      * Get gear data for a raider.
      */
-    fun getGearForRaider(guildId: GuildId, raiderId: RaiderId): PersonalGearResponse {
-        val raider = raiderRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+    fun getGearForRaider(
+        guildId: GuildId,
+        raiderId: RaiderId,
+    ): PersonalGearResponse {
+        val raider =
+            raiderRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         val gearItems = gearItemRepository.findByRaiderId(raiderId.value, 0, 100)
 
         val missingEnchants = mutableListOf<String>()
         val missingGems = mutableListOf<String>()
 
-        val items = gearItems.mapNotNull { item ->
-            val itemId = item.itemId ?: return@mapNotNull null
-            val itemLevel = item.itemLevel ?: return@mapNotNull null
+        val items =
+            gearItems.mapNotNull { item ->
+                val itemId = item.itemId ?: return@mapNotNull null
+                val itemLevel = item.itemLevel ?: return@mapNotNull null
 
-            val isEnchanted = item.enchant != null
-            val hasSockets = (item.sockets ?: 0) > 0
+                val isEnchanted = item.enchant != null
+                val hasSockets = (item.sockets ?: 0) > 0
 
-            // Check for missing enchants on enchantable slots
-            val enchantableSlots = setOf("HEAD", "SHOULDER", "BACK", "CHEST", "WRIST", "HANDS", "LEGS", "FEET", "FINGER1", "FINGER2", "MAINHAND")
-            if (enchantableSlots.contains(item.slot.uppercase()) && !isEnchanted) {
-                missingEnchants.add(item.slot)
+                // Check for missing enchants on enchantable slots
+                val enchantableSlots =
+                    setOf("HEAD", "SHOULDER", "BACK", "CHEST", "WRIST", "HANDS", "LEGS", "FEET", "FINGER1", "FINGER2", "MAINHAND")
+                if (enchantableSlots.contains(item.slot.uppercase()) && !isEnchanted) {
+                    missingEnchants.add(item.slot)
+                }
+
+                // Check for missing gems
+                if (hasSockets) {
+                    missingGems.add(item.slot)
+                }
+
+                // Map quality integer to string
+                val qualityName =
+                    when (item.quality) {
+                        1 -> "COMMON"
+                        2 -> "UNCOMMON"
+                        3 -> "RARE"
+                        4 -> "EPIC"
+                        5 -> "LEGENDARY"
+                        else -> "EPIC"
+                    }
+
+                GearItemResponse(
+                    slot = item.slot,
+                    itemId = itemId,
+                    itemName = item.name ?: "Unknown Item",
+                    itemLevel = itemLevel,
+                    quality = qualityName,
+                    enchanted = isEnchanted,
+                    gemmed = !hasSockets,
+                    bonusIds = emptyList(),
+                )
             }
-
-            // Check for missing gems
-            if (hasSockets) {
-                missingGems.add(item.slot)
-            }
-
-            // Map quality integer to string
-            val qualityName = when (item.quality) {
-                1 -> "COMMON"
-                2 -> "UNCOMMON"
-                3 -> "RARE"
-                4 -> "EPIC"
-                5 -> "LEGENDARY"
-                else -> "EPIC"
-            }
-
-            GearItemResponse(
-                slot = item.slot,
-                itemId = itemId,
-                itemName = item.name ?: "Unknown Item",
-                itemLevel = itemLevel,
-                quality = qualityName,
-                enchanted = isEnchanted,
-                gemmed = !hasSockets,
-                bonusIds = emptyList(),
-            )
-        }
 
         val avgIlvl = if (items.isNotEmpty()) items.map { it.itemLevel }.average() else 0.0
 
@@ -101,45 +107,67 @@ class MeDataService(
     /**
      * Get vault data for a raider.
      */
-    fun getVaultForRaider(guildId: GuildId, raiderId: RaiderId): PersonalVaultResponse {
-        val raider = raiderRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+    fun getVaultForRaider(
+        guildId: GuildId,
+        raiderId: RaiderId,
+    ): PersonalVaultResponse {
+        val raider =
+            raiderRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         val vaultSlots = vaultSlotRepository.findByRaiderId(raiderId.value, 0, 20)
 
         // Group by type based on slot naming convention or default to raid
-        val raidSlots = vaultSlots.filter { it.slot.startsWith("RAID") || it.slot.contains("raid", ignoreCase = true) }
-            .mapIndexed { index, slot ->
-                VaultSlotResponse(
-                    slot = index + 1,
-                    unlocked = slot.unlocked ?: false,
-                    itemLevel = null,
-                    progress = 0,
-                    required = when (index) { 0 -> 2; 1 -> 4; else -> 6 },
-                )
-            }
+        val raidSlots =
+            vaultSlots.filter { it.slot.startsWith("RAID") || it.slot.contains("raid", ignoreCase = true) }
+                .mapIndexed { index, slot ->
+                    VaultSlotResponse(
+                        slot = index + 1,
+                        unlocked = slot.unlocked ?: false,
+                        itemLevel = null,
+                        progress = 0,
+                        required =
+                            when (index) {
+                                0 -> 2
+                                1 -> 4
+                                else -> 6
+                            },
+                    )
+                }
 
-        val mythicPlusSlots = vaultSlots.filter { it.slot.startsWith("M+") || it.slot.contains("mythic", ignoreCase = true) }
-            .mapIndexed { index, slot ->
-                VaultSlotResponse(
-                    slot = index + 1,
-                    unlocked = slot.unlocked ?: false,
-                    itemLevel = null,
-                    progress = 0,
-                    required = when (index) { 0 -> 1; 1 -> 4; else -> 8 },
-                )
-            }
+        val mythicPlusSlots =
+            vaultSlots.filter { it.slot.startsWith("M+") || it.slot.contains("mythic", ignoreCase = true) }
+                .mapIndexed { index, slot ->
+                    VaultSlotResponse(
+                        slot = index + 1,
+                        unlocked = slot.unlocked ?: false,
+                        itemLevel = null,
+                        progress = 0,
+                        required =
+                            when (index) {
+                                0 -> 1
+                                1 -> 4
+                                else -> 8
+                            },
+                    )
+                }
 
-        val pvpSlots = vaultSlots.filter { it.slot.startsWith("PVP") || it.slot.contains("pvp", ignoreCase = true) }
-            .mapIndexed { index, slot ->
-                VaultSlotResponse(
-                    slot = index + 1,
-                    unlocked = slot.unlocked ?: false,
-                    itemLevel = null,
-                    progress = 0,
-                    required = when (index) { 0 -> 1250; 1 -> 2500; else -> 5000 },
-                )
-            }
+        val pvpSlots =
+            vaultSlots.filter { it.slot.startsWith("PVP") || it.slot.contains("pvp", ignoreCase = true) }
+                .mapIndexed { index, slot ->
+                    VaultSlotResponse(
+                        slot = index + 1,
+                        unlocked = slot.unlocked ?: false,
+                        itemLevel = null,
+                        progress = 0,
+                        required =
+                            when (index) {
+                                0 -> 1250
+                                1 -> 2500
+                                else -> 5000
+                            },
+                    )
+                }
 
         return PersonalVaultResponse(
             raiderId = raiderId.value,
@@ -150,7 +178,10 @@ class MeDataService(
         )
     }
 
-    private fun createDefaultVaultSlots(count: Int, requirements: List<Int>): List<VaultSlotResponse> {
+    private fun createDefaultVaultSlots(
+        count: Int,
+        requirements: List<Int>,
+    ): List<VaultSlotResponse> {
         return (1..count).map { slot ->
             VaultSlotResponse(
                 slot = slot,
@@ -165,18 +196,26 @@ class MeDataService(
     /**
      * Get attendance data for a raider.
      */
-    fun getAttendanceForRaider(guildId: GuildId, raiderId: RaiderId): PersonalAttendanceResponse {
-        val raider = raiderRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+    fun getAttendanceForRaider(
+        guildId: GuildId,
+        raiderId: RaiderId,
+    ): PersonalAttendanceResponse {
+        val raider =
+            raiderRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         val stats = attendanceStatRepository.findByCharacterId(raiderId.value, 0, 1).firstOrNull()
 
         // Get attendance records for the past 90 days
         val startDate = LocalDate.now().minusDays(90)
         val endDate = LocalDate.now()
-        val records = attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
-            raiderId, guildId, startDate, endDate
-        ).sortedByDescending { it.endDate }
+        val records =
+            attendanceRepository.findByRaiderIdAndGuildIdAndDateRange(
+                raiderId,
+                guildId,
+                startDate,
+                endDate,
+            ).sortedByDescending { it.endDate }
 
         // Calculate totals from aggregated attendance records
         val totalAttended = records.sumOf { it.attendedRaids }
@@ -198,20 +237,22 @@ class MeDataService(
             totalRaids = totalRaids,
             attendedRaids = attendedRaids,
             acsScore = attendanceRate,
-            breakdown = AttendanceBreakdownResponse(
-                present = attendedRaids,
-                late = 0, // Not tracked in current model
-                excused = 0, // Not tracked in current model
-                absent = totalRaids - attendedRaids,
-            ),
-            recentAttendance = records.take(20).map { record ->
-                AttendanceRecordResponse(
-                    raidDate = record.endDate.atStartOfDay().toInstant(java.time.ZoneOffset.UTC),
-                    raidName = record.instance,
-                    status = if (record.attendedRaids > 0) "PRESENT" else "ABSENT",
-                    note = null,
-                )
-            },
+            breakdown =
+                AttendanceBreakdownResponse(
+                    present = attendedRaids,
+                    late = 0, // Not tracked in current model
+                    excused = 0, // Not tracked in current model
+                    absent = totalRaids - attendedRaids,
+                ),
+            recentAttendance =
+                records.take(20).map { record ->
+                    AttendanceRecordResponse(
+                        raidDate = record.endDate.atStartOfDay().toInstant(java.time.ZoneOffset.UTC),
+                        raidName = record.instance,
+                        status = if (record.attendedRaids > 0) "PRESENT" else "ABSENT",
+                        note = null,
+                    )
+                },
         )
     }
 
@@ -219,16 +260,23 @@ class MeDataService(
      * Get performance data for a raider.
      * Note: Limited data available from current entity structure.
      */
-    fun getPerformanceForRaider(guildId: GuildId, raiderId: RaiderId): PersonalPerformanceResponse {
-        val raider = raiderRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+    fun getPerformanceForRaider(
+        guildId: GuildId,
+        raiderId: RaiderId,
+    ): PersonalPerformanceResponse {
+        val raider =
+            raiderRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         val logs = warcraftLogRepository.findByRaiderId(raiderId.value, 0, 100)
 
         // Current entity only has difficulty and score, not detailed fight data
-        val avgScore = if (logs.isNotEmpty()) {
-            logs.mapNotNull { it.score }.average()
-        } else 0.0
+        val avgScore =
+            if (logs.isNotEmpty()) {
+                logs.mapNotNull { it.score }.average()
+            } else {
+                0.0
+            }
 
         val bestScore = logs.mapNotNull { it.score }.maxOrNull()?.toDouble() ?: 0.0
 
@@ -253,42 +301,49 @@ class MeDataService(
     /**
      * Get wishlist data for a raider.
      */
-    fun getWishlistForRaider(guildId: GuildId, raiderId: RaiderId): PersonalWishlistResponse {
-        val raider = raiderRepository.findById(raiderId.value)
-            ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
+    fun getWishlistForRaider(
+        guildId: GuildId,
+        raiderId: RaiderId,
+    ): PersonalWishlistResponse {
+        val raider =
+            raiderRepository.findById(raiderId.value)
+                ?: throw IllegalArgumentException("Raider not found: ${raiderId.value}")
 
         val wishlist = wishlistRepository.findByRaiderId(raiderId)
-        val items = wishlist?.getItemsByPriority()?.map { item ->
-            WishlistItemResponse(
-                itemId = item.itemId.value,
-                itemName = item.itemName,
-                slot = "UNKNOWN",
-                priority = item.priority,
-                upgradeValue = item.upgradePercentage,
-                source = "Unknown",
-                boss = null,
-                currentItemLevel = null,
-                wishlistItemLevel = 0,
-                isUpgrade = item.upgradePercentage > 0,
-            )
-        } ?: emptyList()
+        val items =
+            wishlist?.getItemsByPriority()?.map { item ->
+                WishlistItemResponse(
+                    itemId = item.itemId.value,
+                    itemName = item.itemName,
+                    slot = "UNKNOWN",
+                    priority = item.priority,
+                    upgradeValue = item.upgradePercentage,
+                    source = "Unknown",
+                    boss = null,
+                    currentItemLevel = null,
+                    wishlistItemLevel = 0,
+                    isUpgrade = item.upgradePercentage > 0,
+                )
+            } ?: emptyList()
 
         // Check if a simulation profile exists for this character
-        val simProfile = simulationRepository.findProfileByCharacter(
-            guildId.value,
-            raider.characterName,
-            raider.realm
-        )
-        val simulationStatus = if (simProfile != null) {
-            SimulationStatusResponse(
-                status = "idle",
-                lastRun = simProfile.createdAt,
-                nextScheduled = null,
-                isStale = ChronoUnit.HOURS.between(simProfile.createdAt, Instant.now()) > 24,
+        val simProfile =
+            simulationRepository.findProfileByCharacter(
+                guildId.value,
+                raider.characterName,
+                raider.realm,
             )
-        } else {
-            null
-        }
+        val simulationStatus =
+            if (simProfile != null) {
+                SimulationStatusResponse(
+                    status = "idle",
+                    lastRun = simProfile.createdAt,
+                    nextScheduled = null,
+                    isStale = ChronoUnit.HOURS.between(simProfile.createdAt, Instant.now()) > 24,
+                )
+            } else {
+                null
+            }
 
         return PersonalWishlistResponse(
             raiderId = raiderId.value,

@@ -20,18 +20,17 @@ import org.junit.jupiter.api.Test
  * - Edge cases
  */
 class AuthenticatedUserTest : UnitTest() {
-
     @Nested
     inner class `isSystemAdmin` {
-
         @Test
         fun `should return true when user has SYSTEM_ADMIN role`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "admin",
-                roles = listOf("SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "admin",
+                    roles = listOf("SYSTEM_ADMIN"),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeTrue()
@@ -40,12 +39,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when admin mode is enabled`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-                isAdminMode = true,
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                    isAdminMode = true,
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeTrue()
@@ -54,11 +54,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has no admin roles and admin mode is disabled`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "regularuser",
-                roles = listOf("PUBLIC_USER", "GUILD_MEMBER"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "regularuser",
+                    roles = listOf("PUBLIC_USER", "GUILD_MEMBER"),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeFalse()
@@ -67,11 +68,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has GUILD_ADMIN role only`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "guildadmin",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "guildadmin",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeFalse()
@@ -80,11 +82,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has empty roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "norolesuser",
-                roles = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "norolesuser",
+                    roles = emptyList(),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeFalse()
@@ -93,11 +96,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when user has multiple roles including SYSTEM_ADMIN`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "superadmin",
-                roles = listOf("PUBLIC_USER", "GUILD_ADMIN", "SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "superadmin",
+                    roles = listOf("PUBLIC_USER", "GUILD_ADMIN", "SYSTEM_ADMIN"),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeTrue()
@@ -106,15 +110,15 @@ class AuthenticatedUserTest : UnitTest() {
 
     @Nested
     inner class `isGuildAdmin` {
-
         @Test
         fun `should return true when user has GUILD_ADMIN role`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "guildadmin",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "guildadmin",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeTrue()
@@ -123,11 +127,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when user has SYSTEM_ADMIN role`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "admin",
-                roles = listOf("SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "admin",
+                    roles = listOf("SYSTEM_ADMIN"),
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeTrue()
@@ -136,12 +141,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when admin mode is enabled`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-                isAdminMode = true,
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                    isAdminMode = true,
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeTrue()
@@ -150,11 +156,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has no admin roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "regularuser",
-                roles = listOf("PUBLIC_USER", "GUILD_MEMBER"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "regularuser",
+                    roles = listOf("PUBLIC_USER", "GUILD_MEMBER"),
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeFalse()
@@ -163,11 +170,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has empty roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "norolesuser",
-                roles = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "norolesuser",
+                    roles = emptyList(),
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeFalse()
@@ -176,11 +184,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when user has both GUILD_ADMIN and SYSTEM_ADMIN roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "superadmin",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "superadmin",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                )
 
             // Act & Assert
             user.isGuildAdmin().shouldBeTrue()
@@ -189,15 +198,15 @@ class AuthenticatedUserTest : UnitTest() {
 
     @Nested
     inner class `hasGuildAccess` {
-
         @Test
         fun `should return true when user is system admin`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "admin",
-                roles = listOf("SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "admin",
+                    roles = listOf("SYSTEM_ADMIN"),
+                )
 
             // Act & Assert
             user.hasGuildAccess("any-guild").shouldBeTrue()
@@ -208,12 +217,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when user has the guild in their guildIds`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2", "guild-3"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2", "guild-3"),
+                )
 
             // Act & Assert
             user.hasGuildAccess("guild-1").shouldBeTrue()
@@ -224,12 +234,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user does not have the guild in their guildIds`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("guild-1", "guild-2"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("guild-1", "guild-2"),
+                )
 
             // Act & Assert
             user.hasGuildAccess("guild-3").shouldBeFalse()
@@ -239,12 +250,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return false when user has empty guildIds and is not admin`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-                guildIds = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                    guildIds = emptyList(),
+                )
 
             // Act & Assert
             user.hasGuildAccess("any-guild").shouldBeFalse()
@@ -253,13 +265,14 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should return true when admin mode is enabled regardless of guildIds`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-                guildIds = emptyList(),
-                isAdminMode = true,
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                    guildIds = emptyList(),
+                    isAdminMode = true,
+                )
 
             // Act & Assert
             user.hasGuildAccess("any-guild").shouldBeTrue()
@@ -269,12 +282,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should be case-sensitive for guild IDs`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf("Guild-1", "GUILD-2"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf("Guild-1", "GUILD-2"),
+                )
 
             // Act & Assert
             user.hasGuildAccess("Guild-1").shouldBeTrue()
@@ -286,7 +300,6 @@ class AuthenticatedUserTest : UnitTest() {
 
     @Nested
     inner class `adminModeUser factory method` {
-
         @Test
         fun `should create user with admin mode enabled`() {
             // Act
@@ -355,22 +368,23 @@ class AuthenticatedUserTest : UnitTest() {
 
     @Nested
     inner class `data class functionality` {
-
         @Test
         fun `should support copy with modifications`() {
             // Arrange
-            val original = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-                guildIds = listOf("guild-1"),
-            )
+            val original =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                    guildIds = listOf("guild-1"),
+                )
 
             // Act
-            val copied = original.copy(
-                username = "newuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val copied =
+                original.copy(
+                    username = "newuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Assert
             copied.id shouldBe original.id
@@ -382,16 +396,18 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should support equality comparison`() {
             // Arrange
-            val user1 = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-            )
-            val user2 = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-            )
+            val user1 =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                )
+            val user2 =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                )
 
             // Assert
             user1 shouldBe user2
@@ -400,11 +416,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should have meaningful toString`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Act
             val result = user.toString()
@@ -416,11 +433,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should use default values for optional parameters`() {
             // Arrange & Act
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("PUBLIC_USER"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("PUBLIC_USER"),
+                )
 
             // Assert
             user.guildIds shouldBe emptyList()
@@ -430,15 +448,15 @@ class AuthenticatedUserTest : UnitTest() {
 
     @Nested
     inner class `edge cases` {
-
         @Test
         fun `should handle role name with spaces`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("SYSTEM ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("SYSTEM ADMIN"),
+                )
 
             // Act & Assert - SYSTEM_ADMIN requires underscore
             user.isSystemAdmin().shouldBeFalse()
@@ -447,11 +465,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should handle case-sensitive role names`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("system_admin", "System_Admin"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("system_admin", "System_Admin"),
+                )
 
             // Act & Assert - roles are case-sensitive
             user.isSystemAdmin().shouldBeFalse()
@@ -460,11 +479,12 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should handle duplicate roles`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("SYSTEM_ADMIN", "SYSTEM_ADMIN", "GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("SYSTEM_ADMIN", "SYSTEM_ADMIN", "GUILD_ADMIN"),
+                )
 
             // Act & Assert
             user.isSystemAdmin().shouldBeTrue()
@@ -474,12 +494,13 @@ class AuthenticatedUserTest : UnitTest() {
         @Test
         fun `should handle empty guild ID string`() {
             // Arrange
-            val user = AuthenticatedUser(
-                id = "user-1",
-                username = "user",
-                roles = listOf("GUILD_ADMIN"),
-                guildIds = listOf(""),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-1",
+                    username = "user",
+                    roles = listOf("GUILD_ADMIN"),
+                    guildIds = listOf(""),
+                )
 
             // Act & Assert
             user.hasGuildAccess("").shouldBeTrue()

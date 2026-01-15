@@ -25,22 +25,37 @@ interface EnhancedApplicationRepository {
     /**
      * Finds all applications for a guild.
      */
-    fun findByGuildId(guildId: GuildId, offset: Long = 0, limit: Int = 50): List<Application>
+    fun findByGuildId(
+        guildId: GuildId,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Application>
 
     /**
      * Finds applications for a guild filtered by status.
      */
-    fun findByGuildIdAndStatus(guildId: GuildId, status: ApplicationStatus, offset: Long = 0, limit: Int = 50): List<Application>
+    fun findByGuildIdAndStatus(
+        guildId: GuildId,
+        status: ApplicationStatus,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Application>
 
     /**
      * Finds an application by Discord ID within a guild.
      */
-    fun findByGuildIdAndDiscordId(guildId: GuildId, discordId: String): Application?
+    fun findByGuildIdAndDiscordId(
+        guildId: GuildId,
+        discordId: String,
+    ): Application?
 
     /**
      * Finds an application by Battle.net ID within a guild.
      */
-    fun findByGuildIdAndBattleNetId(guildId: GuildId, battleNetId: String): Application?
+    fun findByGuildIdAndBattleNetId(
+        guildId: GuildId,
+        battleNetId: String,
+    ): Application?
 
     /**
      * Counts applications for a guild.
@@ -50,7 +65,10 @@ interface EnhancedApplicationRepository {
     /**
      * Counts applications for a guild filtered by status.
      */
-    fun countByGuildIdAndStatus(guildId: GuildId, status: ApplicationStatus): Long
+    fun countByGuildIdAndStatus(
+        guildId: GuildId,
+        status: ApplicationStatus,
+    ): Long
 
     /**
      * Deletes an application by its ID.

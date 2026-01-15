@@ -5,6 +5,10 @@ import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.api.common.PagedResponse
 
 interface RaiderPvpBracketCrudService : CrudService<Long, CreateRaiderPvpBracketRequest, UpdateRaiderPvpBracketRequest, RaiderPvpBracketResponse> {
-    fun findByRaiderId(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderPvpBracketResponse>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderPvpBracketResponse>
+
     fun countByRaiderId(raiderId: Long): Long
 }

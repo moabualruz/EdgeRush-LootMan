@@ -20,13 +20,13 @@ import java.time.ZoneOffset
 class JdbcSyncRunRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : SyncRunRepository {
-
     override fun findById(id: Long): SyncRunEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, source, status, started_at, completed_at, message
             FROM sync_runs
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, syncRunRowMapper, id)
         return results.firstOrNull()
@@ -38,13 +38,17 @@ class JdbcSyncRunRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<SyncRunEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity> {
+        val sql =
+            """
             SELECT id, source, status, started_at, completed_at, message
             FROM sync_runs
             ORDER BY started_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, syncRunRowMapper, limit, offset)
     }
@@ -54,14 +58,19 @@ class JdbcSyncRunRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findBySource(source: String, offset: Long, limit: Int): List<SyncRunEntity> {
-        val sql = """
+    override fun findBySource(
+        source: String,
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity> {
+        val sql =
+            """
             SELECT id, source, status, started_at, completed_at, message
             FROM sync_runs
             WHERE source = ?
             ORDER BY started_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, syncRunRowMapper, source, limit, offset)
     }
@@ -71,14 +80,19 @@ class JdbcSyncRunRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, source) ?: 0L
     }
 
-    override fun findByStatus(status: String, offset: Long, limit: Int): List<SyncRunEntity> {
-        val sql = """
+    override fun findByStatus(
+        status: String,
+        offset: Long,
+        limit: Int,
+    ): List<SyncRunEntity> {
+        val sql =
+            """
             SELECT id, source, status, started_at, completed_at, message
             FROM sync_runs
             WHERE status = ?
             ORDER BY started_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, syncRunRowMapper, status, limit, offset)
     }
@@ -103,10 +117,11 @@ class JdbcSyncRunRepository(
     }
 
     private fun insertSyncRun(entity: SyncRunEntity): SyncRunEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO sync_runs (source, status, started_at, completed_at, message)
             VALUES (?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -125,11 +140,12 @@ class JdbcSyncRunRepository(
     }
 
     private fun updateSyncRun(entity: SyncRunEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE sync_runs SET
                 source = ?, status = ?, started_at = ?, completed_at = ?, message = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -142,14 +158,15 @@ class JdbcSyncRunRepository(
         )
     }
 
-    private val syncRunRowMapper = RowMapper { rs, _ ->
-        SyncRunEntity(
-            id = rs.getLong("id"),
-            source = rs.getString("source"),
-            status = rs.getString("status"),
-            startedAt = rs.getTimestamp("started_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-            completedAt = rs.getTimestamp("completed_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            message = rs.getString("message"),
-        )
-    }
+    private val syncRunRowMapper =
+        RowMapper { rs, _ ->
+            SyncRunEntity(
+                id = rs.getLong("id"),
+                source = rs.getString("source"),
+                status = rs.getString("status"),
+                startedAt = rs.getTimestamp("started_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+                completedAt = rs.getTimestamp("completed_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                message = rs.getString("message"),
+            )
+        }
 }

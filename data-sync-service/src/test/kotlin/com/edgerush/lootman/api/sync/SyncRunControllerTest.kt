@@ -19,7 +19,6 @@ import java.time.OffsetDateTime
  * Unit tests for SyncRunController.
  */
 class SyncRunControllerTest : UnitTest() {
-
     private lateinit var syncRunService: SyncRunCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: SyncRunController
@@ -33,16 +32,16 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response with default pagination`() {
             // Given
-            val expectedResponse = PagedResponse(
-                content = listOf(createSyncRunResponse(id = 1L)),
-                page = 0,
-                size = 20,
-                totalElements = 1,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = listOf(createSyncRunResponse(id = 1L)),
+                    page = 0,
+                    size = 20,
+                    totalElements = 1,
+                )
             every { syncRunService.findAll(any()) } returns expectedResponse
 
             // When
@@ -59,12 +58,13 @@ class SyncRunControllerTest : UnitTest() {
         fun `should cap page size at max`() {
             // Given
             val slot = slot<PageRequest>()
-            val expectedResponse = PagedResponse(
-                content = emptyList<SyncRunResponse>(),
-                page = 0,
-                size = 100,
-                totalElements = 0,
-            )
+            val expectedResponse =
+                PagedResponse(
+                    content = emptyList<SyncRunResponse>(),
+                    page = 0,
+                    size = 100,
+                    totalElements = 0,
+                )
             every { syncRunService.findAll(capture(slot)) } returns expectedResponse
 
             // When
@@ -77,7 +77,6 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return sync run when found`() {
             // Given
@@ -110,21 +109,22 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should return created sync run with 201 status`() {
             // Given
-            val request = CreateSyncRunRequest(
-                source = "WoWAudit",
-                status = "RUNNING",
-                message = "Sync started",
-            )
+            val request =
+                CreateSyncRunRequest(
+                    source = "WoWAudit",
+                    status = "RUNNING",
+                    message = "Sync started",
+                )
 
-            val created = createSyncRunResponse(
-                id = 1L,
-                source = "WoWAudit",
-                status = "RUNNING",
-            )
+            val created =
+                createSyncRunResponse(
+                    id = 1L,
+                    source = "WoWAudit",
+                    status = "RUNNING",
+                )
             every { syncRunService.create(request) } returns created
 
             // When
@@ -141,20 +141,21 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should return updated sync run`() {
             // Given
-            val request = UpdateSyncRunRequest(
-                status = "COMPLETED",
-                message = "Sync completed successfully",
-            )
+            val request =
+                UpdateSyncRunRequest(
+                    status = "COMPLETED",
+                    message = "Sync completed successfully",
+                )
 
-            val updated = createSyncRunResponse(
-                id = 1L,
-                status = "COMPLETED",
-                message = "Sync completed successfully",
-            )
+            val updated =
+                createSyncRunResponse(
+                    id = 1L,
+                    status = "COMPLETED",
+                    message = "Sync completed successfully",
+                )
             every { syncRunService.update(1L, request) } returns updated
 
             // When
@@ -186,7 +187,6 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should return 204 No Content on success`() {
             // Given
@@ -218,7 +218,6 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class ExistsTests {
-
         @Test
         fun `should return exists true when sync run exists`() {
             // Given
@@ -247,21 +246,22 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class FindBySourceTests {
-
         @Test
         fun `should return sync runs for a source`() {
             // Given
             val source = "WoWAudit"
-            val runs = listOf(
-                createSyncRunResponse(id = 1L, source = source),
-                createSyncRunResponse(id = 2L, source = source),
-            )
-            val expectedResponse = PagedResponse(
-                content = runs,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val runs =
+                listOf(
+                    createSyncRunResponse(id = 1L, source = source),
+                    createSyncRunResponse(id = 2L, source = source),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = runs,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { syncRunService.findBySource(source, any()) } returns expectedResponse
 
             // When
@@ -275,21 +275,22 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class FindByStatusTests {
-
         @Test
         fun `should return sync runs for a status`() {
             // Given
             val status = "COMPLETED"
-            val runs = listOf(
-                createSyncRunResponse(id = 1L, status = status),
-                createSyncRunResponse(id = 2L, status = status),
-            )
-            val expectedResponse = PagedResponse(
-                content = runs,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-            )
+            val runs =
+                listOf(
+                    createSyncRunResponse(id = 1L, status = status),
+                    createSyncRunResponse(id = 2L, status = status),
+                )
+            val expectedResponse =
+                PagedResponse(
+                    content = runs,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                )
             every { syncRunService.findByStatus(status, any()) } returns expectedResponse
 
             // When
@@ -303,7 +304,6 @@ class SyncRunControllerTest : UnitTest() {
 
     @Nested
     inner class CountBySourceTests {
-
         @Test
         fun `should return count for source`() {
             // Given
@@ -326,12 +326,13 @@ class SyncRunControllerTest : UnitTest() {
         startedAt: OffsetDateTime = OffsetDateTime.now().minusMinutes(5),
         completedAt: OffsetDateTime? = OffsetDateTime.now(),
         message: String? = "Sync completed",
-    ): SyncRunResponse = SyncRunResponse(
-        id = id,
-        source = source,
-        status = status,
-        startedAt = startedAt,
-        completedAt = completedAt,
-        message = message,
-    )
+    ): SyncRunResponse =
+        SyncRunResponse(
+            id = id,
+            source = source,
+            status = status,
+            startedAt = startedAt,
+            completedAt = completedAt,
+            message = message,
+        )
 }

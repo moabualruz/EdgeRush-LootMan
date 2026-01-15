@@ -22,7 +22,6 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 class CacheConfig {
-
     companion object {
         const val FLPS_LEADERBOARD = "flps-leaderboard"
         const val FLPS_CHARACTER = "flps-character"

@@ -19,8 +19,7 @@ class InMemoryRefreshTokenRepository : RefreshTokenRepository {
 
     override fun findById(id: RefreshTokenId): UserRefreshToken? = storage[id]
 
-    override fun findByTokenHash(tokenHash: String): UserRefreshToken? =
-        storage.values.find { it.tokenHash == tokenHash }
+    override fun findByTokenHash(tokenHash: String): UserRefreshToken? = storage.values.find { it.tokenHash == tokenHash }
 
     override fun findByUserId(userId: UserId): List<UserRefreshToken> =
         storage.values
@@ -35,12 +34,13 @@ class InMemoryRefreshTokenRepository : RefreshTokenRepository {
     }
 
     override fun save(token: UserRefreshToken): UserRefreshToken {
-        val savedToken = if (token.id == null) {
-            val newId = RefreshTokenId(idGenerator.getAndIncrement())
-            token.withId(newId)
-        } else {
-            token
-        }
+        val savedToken =
+            if (token.id == null) {
+                val newId = RefreshTokenId(idGenerator.getAndIncrement())
+                token.withId(newId)
+            } else {
+                token
+            }
         storage[savedToken.id!!] = savedToken
         return savedToken
     }

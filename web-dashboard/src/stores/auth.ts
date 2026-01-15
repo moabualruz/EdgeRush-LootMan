@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'ADMIN' || user.value?.role === 'OFFICER')
+  const guildId = computed(() => user.value?.guildId)
 
   async function fetchUser() {
     if (!token.value) return
@@ -54,6 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     isAuthenticated,
     isAdmin,
+    guildId,
     fetchUser,
     setToken,
     logout,

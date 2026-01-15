@@ -19,7 +19,6 @@ import java.sql.ResultSet
  * The repository reads from flps_default_modifiers and flps_guild_modifiers tables.
  */
 class JdbcFlpsModifierRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcFlpsModifierRepository
 
@@ -31,7 +30,6 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByGuildIdTests {
-
         @Test
         fun `should return default modifiers when guild has no overrides`() {
             // Arrange
@@ -62,9 +60,12 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
             mockDefaultModifiers(defaultModifierRows())
 
             // Mock guild overrides - override attendance weight
-            mockGuildOverrides(guildId, listOf(
-                Triple("rms", "attendance_weight", 0.50)
-            ))
+            mockGuildOverrides(
+                guildId,
+                listOf(
+                    Triple("rms", "attendance_weight", 0.50),
+                ),
+            )
 
             // Act
             val modifiers = repository.findByGuildId(guildId)
@@ -133,12 +134,15 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
             mockDefaultModifiers(defaultModifierRows())
 
             // Override all RMS weights and threshold
-            mockGuildOverrides(guildId, listOf(
-                Triple("rms", "attendance_weight", 0.30),
-                Triple("rms", "mechanical_weight", 0.50),
-                Triple("rms", "preparation_weight", 0.20),
-                Triple("threshold", "eligibility_attendance", 0.9)
-            ))
+            mockGuildOverrides(
+                guildId,
+                listOf(
+                    Triple("rms", "attendance_weight", 0.30),
+                    Triple("rms", "mechanical_weight", 0.50),
+                    Triple("rms", "preparation_weight", 0.20),
+                    Triple("threshold", "eligibility_attendance", 0.9),
+                ),
+            )
 
             // Act
             val modifiers = repository.findByGuildId(guildId)
@@ -177,7 +181,7 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
         every {
             jdbcTemplate.query(
                 match<String> { it.contains("flps_default_modifiers") },
-                any<RowMapper<Any>>()
+                any<RowMapper<Any>>(),
             )
         } answers {
             // The RowMapper is the second argument
@@ -195,12 +199,15 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
     /**
      * Mock the guild overrides query to return the given rows.
      */
-    private fun mockGuildOverrides(guildId: GuildId, rows: List<Triple<String, String, Double>>) {
+    private fun mockGuildOverrides(
+        guildId: GuildId,
+        rows: List<Triple<String, String, Double>>,
+    ) {
         every {
             jdbcTemplate.query(
                 match<String> { it.contains("flps_guild_modifiers") },
                 any<RowMapper<Any>>(),
-                eq(guildId.value)
+                eq(guildId.value),
             )
         } answers {
             // The RowMapper is the second argument
@@ -218,26 +225,27 @@ class JdbcFlpsModifierRepositoryTest : UnitTest() {
     /**
      * Returns default modifier rows matching the V0012 migration data.
      */
-    private fun defaultModifierRows(): List<Triple<String, String, Double>> = listOf(
-        // RMS weights
-        Triple("rms", "attendance_weight", 0.45),
-        Triple("rms", "mechanical_weight", 0.35),
-        Triple("rms", "preparation_weight", 0.20),
-        // IPI weights
-        Triple("ipi", "upgrade_value_weight", 0.45),
-        Triple("ipi", "tier_bonus_weight", 0.35),
-        Triple("ipi", "role_multiplier_weight", 0.20),
-        // Role multipliers
-        Triple("role", "tank_multiplier", 1.2),
-        Triple("role", "healer_multiplier", 1.1),
-        Triple("role", "dps_multiplier", 1.0),
-        // Thresholds
-        Triple("threshold", "eligibility_attendance", 0.8),
-        Triple("threshold", "eligibility_activity", 0.0),
-        Triple("threshold", "recency_decay_days", 30.0),
-        // Limits
-        Triple("limit", "max_attendance_bonus", 1.0),
-        Triple("limit", "min_mechanical_score", 0.0),
-        Triple("limit", "max_preparation_score", 1.0),
-    )
+    private fun defaultModifierRows(): List<Triple<String, String, Double>> =
+        listOf(
+            // RMS weights
+            Triple("rms", "attendance_weight", 0.45),
+            Triple("rms", "mechanical_weight", 0.35),
+            Triple("rms", "preparation_weight", 0.20),
+            // IPI weights
+            Triple("ipi", "upgrade_value_weight", 0.45),
+            Triple("ipi", "tier_bonus_weight", 0.35),
+            Triple("ipi", "role_multiplier_weight", 0.20),
+            // Role multipliers
+            Triple("role", "tank_multiplier", 1.2),
+            Triple("role", "healer_multiplier", 1.1),
+            Triple("role", "dps_multiplier", 1.0),
+            // Thresholds
+            Triple("threshold", "eligibility_attendance", 0.8),
+            Triple("threshold", "eligibility_activity", 0.0),
+            Triple("threshold", "recency_decay_days", 30.0),
+            // Limits
+            Triple("limit", "max_attendance_bonus", 1.0),
+            Triple("limit", "min_mechanical_score", 0.0),
+            Triple("limit", "max_preparation_score", 1.0),
+        )
 }

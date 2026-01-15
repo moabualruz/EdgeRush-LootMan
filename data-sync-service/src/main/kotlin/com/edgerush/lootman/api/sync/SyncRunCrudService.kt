@@ -10,7 +10,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Extends the generic CrudService with sync-run-specific query methods.
  */
 interface SyncRunCrudService : CrudService<Long, CreateSyncRunRequest, UpdateSyncRunRequest, SyncRunResponse> {
-
     /**
      * Find sync runs by source with pagination.
      *
@@ -18,7 +17,10 @@ interface SyncRunCrudService : CrudService<Long, CreateSyncRunRequest, UpdateSyn
      * @param pageRequest Pagination parameters
      * @return Paginated list of sync runs for the source
      */
-    fun findBySource(source: String, pageRequest: PageRequest): PagedResponse<SyncRunResponse>
+    fun findBySource(
+        source: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<SyncRunResponse>
 
     /**
      * Find sync runs by status with pagination.
@@ -27,7 +29,10 @@ interface SyncRunCrudService : CrudService<Long, CreateSyncRunRequest, UpdateSyn
      * @param pageRequest Pagination parameters
      * @return Paginated list of sync runs with the status
      */
-    fun findByStatus(status: String, pageRequest: PageRequest): PagedResponse<SyncRunResponse>
+    fun findByStatus(
+        status: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<SyncRunResponse>
 
     /**
      * Count sync runs for a source.

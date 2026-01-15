@@ -64,10 +64,11 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
             val originalRaider = createRaider(status = RaiderStatus.ACTIVE)
             repository.save(originalRaider)
 
-            val modifiedRaider = originalRaider.copy(
-                status = RaiderStatus.BENCHED,
-                rank = "Officer"
-            )
+            val modifiedRaider =
+                originalRaider.copy(
+                    status = RaiderStatus.BENCHED,
+                    rank = "Officer",
+                )
 
             // Act
             repository.save(modifiedRaider)
@@ -224,9 +225,10 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         fun `should return paginated results with offset and limit`() {
             // Arrange
             val guildId = GuildId("test-guild")
-            val raiders = (1..10).map { index ->
-                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
-            }
+            val raiders =
+                (1..10).map { index ->
+                    createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+                }
             raiders.forEach { repository.save(it) }
 
             // Act
@@ -254,9 +256,10 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         fun `should return remaining items when limit exceeds available`() {
             // Arrange
             val guildId = GuildId("test-guild")
-            val raiders = (1..5).map { index ->
-                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
-            }
+            val raiders =
+                (1..5).map { index ->
+                    createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+                }
             raiders.forEach { repository.save(it) }
 
             // Act
@@ -285,9 +288,10 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         fun `should return correct count for guild with raiders`() {
             // Arrange
             val guildId = GuildId("test-guild")
-            val raiders = (1..5).map { index ->
-                createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
-            }
+            val raiders =
+                (1..5).map { index ->
+                    createRaider(id = RaiderId(index.toLong()), guildId = guildId, characterName = "Raider$index")
+                }
             raiders.forEach { repository.save(it) }
 
             // Act
@@ -314,12 +318,14 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
             // Arrange
             val guild1 = GuildId("guild-1")
             val guild2 = GuildId("guild-2")
-            val raiders1 = (1..3).map { index ->
-                createRaider(id = RaiderId(index.toLong()), guildId = guild1, characterName = "G1Raider$index")
-            }
-            val raiders2 = (4..6).map { index ->
-                createRaider(id = RaiderId(index.toLong()), guildId = guild2, characterName = "G2Raider$index")
-            }
+            val raiders1 =
+                (1..3).map { index ->
+                    createRaider(id = RaiderId(index.toLong()), guildId = guild1, characterName = "G1Raider$index")
+                }
+            val raiders2 =
+                (4..6).map { index ->
+                    createRaider(id = RaiderId(index.toLong()), guildId = guild2, characterName = "G2Raider$index")
+                }
             raiders1.forEach { repository.save(it) }
             raiders2.forEach { repository.save(it) }
 
@@ -501,12 +507,13 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         @Test
         fun `should handle concurrent saves without data loss`() {
             // Arrange
-            val raiders = (1..100).map { index ->
-                createRaider(
-                    id = RaiderId(index.toLong()),
-                    characterName = "Raider$index"
-                )
-            }
+            val raiders =
+                (1..100).map { index ->
+                    createRaider(
+                        id = RaiderId(index.toLong()),
+                        characterName = "Raider$index",
+                    )
+                }
 
             // Act - simulate concurrent saves
             raiders.parallelStream().forEach { raider ->
@@ -523,23 +530,25 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         fun `should handle concurrent reads and writes`() {
             // Arrange
             val guildId = GuildId("test-guild")
-            val initialRaiders = (1..50).map { index ->
-                createRaider(
-                    id = RaiderId(index.toLong()),
-                    guildId = guildId,
-                    characterName = "Raider$index"
-                )
-            }
+            val initialRaiders =
+                (1..50).map { index ->
+                    createRaider(
+                        id = RaiderId(index.toLong()),
+                        guildId = guildId,
+                        characterName = "Raider$index",
+                    )
+                }
             initialRaiders.forEach { repository.save(it) }
 
             // Act - concurrent reads while writing
-            val newRaiders = (51..100).map { index ->
-                createRaider(
-                    id = RaiderId(index.toLong()),
-                    guildId = guildId,
-                    characterName = "Raider$index"
-                )
-            }
+            val newRaiders =
+                (51..100).map { index ->
+                    createRaider(
+                        id = RaiderId(index.toLong()),
+                        guildId = guildId,
+                        characterName = "Raider$index",
+                    )
+                }
 
             newRaiders.parallelStream().forEach { raider ->
                 repository.save(raider)
@@ -584,24 +593,27 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         @Test
         fun `should correctly store and retrieve raiders with different classes and roles`() {
             // Arrange
-            val tank = createRaider(
-                id = RaiderId(1L),
-                characterClass = CharacterClass.WARRIOR,
-                role = Role.TANK,
-                characterName = "Tank"
-            )
-            val healer = createRaider(
-                id = RaiderId(2L),
-                characterClass = CharacterClass.PRIEST,
-                role = Role.HEALER,
-                characterName = "Healer"
-            )
-            val dps = createRaider(
-                id = RaiderId(3L),
-                characterClass = CharacterClass.MAGE,
-                role = Role.DPS,
-                characterName = "DPS"
-            )
+            val tank =
+                createRaider(
+                    id = RaiderId(1L),
+                    characterClass = CharacterClass.WARRIOR,
+                    role = Role.TANK,
+                    characterName = "Tank",
+                )
+            val healer =
+                createRaider(
+                    id = RaiderId(2L),
+                    characterClass = CharacterClass.PRIEST,
+                    role = Role.HEALER,
+                    characterName = "Healer",
+                )
+            val dps =
+                createRaider(
+                    id = RaiderId(3L),
+                    characterClass = CharacterClass.MAGE,
+                    role = Role.DPS,
+                    characterName = "DPS",
+                )
 
             // Act
             repository.save(tank)
@@ -633,17 +645,18 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
-        wowauditId: Long? = null
-    ): Raider = Raider(
-        id = id,
-        guildId = guildId,
-        characterName = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId
-    )
+        wowauditId: Long? = null,
+    ): Raider =
+        Raider(
+            id = id,
+            guildId = guildId,
+            characterName = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

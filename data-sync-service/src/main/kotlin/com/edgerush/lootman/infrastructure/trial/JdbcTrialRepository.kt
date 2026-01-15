@@ -21,35 +21,41 @@ import java.sql.Timestamp
 class JdbcTrialRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : TrialRepository {
-
     override fun findById(id: TrialId): Trial? {
-        val sql = """
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
                    promoted_by, promoted_at, created_at, last_updated
             FROM trials
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, id.value).firstOrNull()
     }
 
     override fun findByApplicationId(applicationId: ApplicationId): Trial? {
-        val sql = """
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
                    promoted_by, promoted_at, created_at, last_updated
             FROM trials
             WHERE application_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, applicationId.value).firstOrNull()
     }
 
-    override fun findByGuildId(guildId: GuildId, offset: Long, limit: Int): List<Trial> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: GuildId,
+        offset: Long,
+        limit: Int,
+    ): List<Trial> {
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
@@ -58,7 +64,7 @@ class JdbcTrialRepository(
             WHERE guild_id = ?
             ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, guildId.value, limit, offset)
     }
@@ -69,7 +75,8 @@ class JdbcTrialRepository(
         offset: Long,
         limit: Int,
     ): List<Trial> {
-        val sql = """
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
@@ -78,13 +85,14 @@ class JdbcTrialRepository(
             WHERE guild_id = ? AND status = ?
             ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, guildId.value, status.name, limit, offset)
     }
 
     override fun findActiveTrialsByGuildId(guildId: GuildId): List<Trial> {
-        val sql = """
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
@@ -92,20 +100,21 @@ class JdbcTrialRepository(
             FROM trials
             WHERE guild_id = ? AND status IN ('ACTIVE', 'EXTENDED')
             ORDER BY created_at DESC
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, guildId.value)
     }
 
     override fun findByRaiderId(raiderId: Long): Trial? {
-        val sql = """
+        val sql =
+            """
             SELECT id, application_id, raider_id, guild_id, status, start_date, end_date,
                    expected_end_date, raids_attended, raids_required, attendance_rate,
                    average_performance, deaths_per_raid, outcome, outcome_reason,
                    promoted_by, promoted_at, created_at, last_updated
             FROM trials
             WHERE raider_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, trialRowMapper, raiderId).firstOrNull()
     }
@@ -115,7 +124,10 @@ class JdbcTrialRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
     }
 
-    override fun countByGuildIdAndStatus(guildId: GuildId, status: TrialStatus): Long {
+    override fun countByGuildIdAndStatus(
+        guildId: GuildId,
+        status: TrialStatus,
+    ): Long {
         val sql = "SELECT COUNT(*) FROM trials WHERE guild_id = ? AND status = ?"
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value, status.name) ?: 0L
     }
@@ -140,14 +152,15 @@ class JdbcTrialRepository(
     }
 
     private fun insert(trial: Trial): Trial {
-        val sql = """
+        val sql =
+            """
             INSERT INTO trials (
                 id, application_id, raider_id, guild_id, status, start_date, end_date,
                 expected_end_date, raids_attended, raids_required, attendance_rate,
                 average_performance, deaths_per_raid, outcome, outcome_reason,
                 promoted_by, promoted_at, created_at, last_updated
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -176,7 +189,8 @@ class JdbcTrialRepository(
     }
 
     private fun update(trial: Trial): Trial {
-        val sql = """
+        val sql =
+            """
             UPDATE trials SET
                 application_id = ?, raider_id = ?, guild_id = ?, status = ?,
                 start_date = ?, end_date = ?, expected_end_date = ?,
@@ -184,7 +198,7 @@ class JdbcTrialRepository(
                 average_performance = ?, deaths_per_raid = ?, outcome = ?,
                 outcome_reason = ?, promoted_by = ?, promoted_at = ?, last_updated = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -211,37 +225,38 @@ class JdbcTrialRepository(
         return trial
     }
 
-    private val trialRowMapper = RowMapper { rs, _ ->
-        fun getDoubleOrNull(col: String): Double? {
-            val value = rs.getDouble(col)
-            return if (rs.wasNull()) null else value
-        }
+    private val trialRowMapper =
+        RowMapper { rs, _ ->
+            fun getDoubleOrNull(col: String): Double? {
+                val value = rs.getDouble(col)
+                return if (rs.wasNull()) null else value
+            }
 
-        fun getLongOrNull(col: String): Long? {
-            val value = rs.getLong(col)
-            return if (rs.wasNull()) null else value
-        }
+            fun getLongOrNull(col: String): Long? {
+                val value = rs.getLong(col)
+                return if (rs.wasNull()) null else value
+            }
 
-        Trial.reconstruct(
-            id = TrialId(rs.getString("id")),
-            applicationId = ApplicationId(rs.getString("application_id")),
-            raiderId = getLongOrNull("raider_id"),
-            guildId = GuildId(rs.getString("guild_id")),
-            status = TrialStatus.valueOf(rs.getString("status")),
-            startDate = rs.getTimestamp("start_date").toInstant(),
-            endDate = rs.getTimestamp("end_date")?.toInstant(),
-            expectedEndDate = rs.getTimestamp("expected_end_date").toInstant(),
-            raidsAttended = rs.getInt("raids_attended"),
-            raidsRequired = rs.getInt("raids_required"),
-            attendanceRate = getDoubleOrNull("attendance_rate"),
-            averagePerformance = getDoubleOrNull("average_performance"),
-            deathsPerRaid = getDoubleOrNull("deaths_per_raid"),
-            outcome = rs.getString("outcome")?.let { TrialOutcome.valueOf(it) },
-            outcomeReason = rs.getString("outcome_reason"),
-            promotedBy = rs.getString("promoted_by"),
-            promotedAt = rs.getTimestamp("promoted_at")?.toInstant(),
-            createdAt = rs.getTimestamp("created_at").toInstant(),
-            lastUpdated = rs.getTimestamp("last_updated").toInstant(),
-        )
-    }
+            Trial.reconstruct(
+                id = TrialId(rs.getString("id")),
+                applicationId = ApplicationId(rs.getString("application_id")),
+                raiderId = getLongOrNull("raider_id"),
+                guildId = GuildId(rs.getString("guild_id")),
+                status = TrialStatus.valueOf(rs.getString("status")),
+                startDate = rs.getTimestamp("start_date").toInstant(),
+                endDate = rs.getTimestamp("end_date")?.toInstant(),
+                expectedEndDate = rs.getTimestamp("expected_end_date").toInstant(),
+                raidsAttended = rs.getInt("raids_attended"),
+                raidsRequired = rs.getInt("raids_required"),
+                attendanceRate = getDoubleOrNull("attendance_rate"),
+                averagePerformance = getDoubleOrNull("average_performance"),
+                deathsPerRaid = getDoubleOrNull("deaths_per_raid"),
+                outcome = rs.getString("outcome")?.let { TrialOutcome.valueOf(it) },
+                outcomeReason = rs.getString("outcome_reason"),
+                promotedBy = rs.getString("promoted_by"),
+                promotedAt = rs.getTimestamp("promoted_at")?.toInstant(),
+                createdAt = rs.getTimestamp("created_at").toInstant(),
+                lastUpdated = rs.getTimestamp("last_updated").toInstant(),
+            )
+        }
 }

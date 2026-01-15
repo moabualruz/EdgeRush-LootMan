@@ -17,13 +17,17 @@ import java.util.concurrent.ConcurrentHashMap
 class InMemoryGearRepository : GearRepository {
     private val storage = ConcurrentHashMap<GearKey, GearSet>()
 
-    override fun findCurrentGear(raiderId: RaiderId): GearSet? =
-        findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
+    override fun findCurrentGear(raiderId: RaiderId): GearSet? = findByRaiderIdAndType(raiderId, GearSetType.EQUIPPED)
 
-    override fun findByRaiderIdAndType(raiderId: RaiderId, gearSetType: GearSetType): GearSet? =
-        storage[GearKey(raiderId, gearSetType)]
+    override fun findByRaiderIdAndType(
+        raiderId: RaiderId,
+        gearSetType: GearSetType,
+    ): GearSet? = storage[GearKey(raiderId, gearSetType)]
 
-    override fun save(raiderId: RaiderId, gearSet: GearSet): GearSet {
+    override fun save(
+        raiderId: RaiderId,
+        gearSet: GearSet,
+    ): GearSet {
         storage[GearKey(raiderId, gearSet.gearSetType)] = gearSet
         return gearSet
     }

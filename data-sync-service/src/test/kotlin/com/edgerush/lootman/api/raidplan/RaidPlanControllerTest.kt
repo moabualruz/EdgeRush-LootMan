@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
  * Unit tests for RaidPlanController.
  */
 class RaidPlanControllerTest : UnitTest() {
-
     private lateinit var raidPlanService: RaidPlanService
     private lateinit var mockMvc: MockMvc
     private val objectMapper = ObjectMapper()
@@ -37,27 +36,27 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class CreatePlanTests {
-
         @Test
         fun `should create plan and return 201`() {
             // Given
             val plan = createTestPlan()
             every { raidPlanService.createPlan(any()) } returns plan
 
-            val request = CreateRaidPlanApiRequest(
-                guildId = "test-guild",
-                encounterId = 2902,
-                encounterName = "Queen Ansurek",
-                name = "Phase 1 Positions",
-                createdBy = 1L,
-                visibility = PlanVisibility.GUILD
-            )
+            val request =
+                CreateRaidPlanApiRequest(
+                    guildId = "test-guild",
+                    encounterId = 2902,
+                    encounterName = "Queen Ansurek",
+                    name = "Phase 1 Positions",
+                    createdBy = 1L,
+                    visibility = PlanVisibility.GUILD,
+                )
 
             // When & Then
             mockMvc.perform(
                 post("/api/v1/raid-plans")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").value(plan.id))
@@ -70,7 +69,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class GetPlanTests {
-
         @Test
         fun `should return plan when found`() {
             // Given
@@ -103,7 +101,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class GetPlanByShareTokenTests {
-
         @Test
         fun `should return plan when share token valid`() {
             // Given
@@ -120,18 +117,18 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class GetPlansByGuildTests {
-
         @Test
         fun `should return paginated plans for guild`() {
             // Given
             val plans = listOf(createTestPlan(), createTestPlan())
-            val pagedResult = PagedRaidPlans(
-                content = plans,
-                page = 0,
-                size = 20,
-                totalElements = 2,
-                totalPages = 1
-            )
+            val pagedResult =
+                PagedRaidPlans(
+                    content = plans,
+                    page = 0,
+                    size = 20,
+                    totalElements = 2,
+                    totalPages = 1,
+                )
             every { raidPlanService.getPlansByGuildPaginated("test-guild", 0, 20) } returns pagedResult
 
             // When & Then
@@ -145,7 +142,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class GetPlansByEncounterTests {
-
         @Test
         fun `should return plans for encounter`() {
             // Given
@@ -162,24 +158,24 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class UpdatePlanTests {
-
         @Test
         fun `should update plan name`() {
             // Given
             val plan = createTestPlan()
-            val updatedPlan = RaidPlan.reconstitute(
-                id = plan.id,
-                guildId = plan.guildId,
-                encounterId = plan.encounterId,
-                encounterName = plan.encounterName,
-                name = "Updated Name",
-                steps = plan.steps,
-                visibility = plan.visibility,
-                shareToken = plan.shareToken,
-                createdBy = plan.createdBy,
-                createdAt = plan.createdAt,
-                updatedAt = plan.updatedAt
-            )
+            val updatedPlan =
+                RaidPlan.reconstitute(
+                    id = plan.id,
+                    guildId = plan.guildId,
+                    encounterId = plan.encounterId,
+                    encounterName = plan.encounterName,
+                    name = "Updated Name",
+                    steps = plan.steps,
+                    visibility = plan.visibility,
+                    shareToken = plan.shareToken,
+                    createdBy = plan.createdBy,
+                    createdAt = plan.createdAt,
+                    updatedAt = plan.updatedAt,
+                )
             every { raidPlanService.updatePlan(plan.id, any()) } returns updatedPlan
 
             val request = UpdateRaidPlanApiRequest(name = "Updated Name")
@@ -188,7 +184,7 @@ class RaidPlanControllerTest : UnitTest() {
             mockMvc.perform(
                 put("/api/v1/raid-plans/${plan.id}")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.name").value("Updated Name"))
@@ -197,7 +193,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class DeletePlanTests {
-
         @Test
         fun `should delete plan and return 204`() {
             // Given
@@ -214,7 +209,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class AddStepTests {
-
         @Test
         fun `should add step to plan`() {
             // Given
@@ -227,7 +221,7 @@ class RaidPlanControllerTest : UnitTest() {
             mockMvc.perform(
                 post("/api/v1/raid-plans/${plan.id}/steps")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
+                    .content(objectMapper.writeValueAsString(request)),
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.steps.length()").value(1))
@@ -237,7 +231,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class RemoveStepTests {
-
         @Test
         fun `should remove step from plan`() {
             // Given
@@ -254,7 +247,6 @@ class RaidPlanControllerTest : UnitTest() {
 
     @Nested
     inner class ShareTokenTests {
-
         @Test
         fun `should generate share token`() {
             // Given
@@ -282,11 +274,12 @@ class RaidPlanControllerTest : UnitTest() {
         }
     }
 
-    private fun createTestPlan(): RaidPlan = RaidPlan.create(
-        guildId = GuildId("test-guild"),
-        encounterId = 2902,
-        encounterName = "Queen Ansurek",
-        name = "Test Plan",
-        createdBy = 1L,
-    )
+    private fun createTestPlan(): RaidPlan =
+        RaidPlan.create(
+            guildId = GuildId("test-guild"),
+            encounterId = 2902,
+            encounterName = "Queen Ansurek",
+            name = "Test Plan",
+            createdBy = 1L,
+        )
 }

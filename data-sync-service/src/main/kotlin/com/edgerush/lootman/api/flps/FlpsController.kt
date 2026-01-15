@@ -10,13 +10,12 @@ import com.edgerush.lootman.application.flps.FlpsComponentCalculator
 import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.GetFlpsReportQuery
 import com.edgerush.lootman.application.flps.GetFlpsReportUseCase
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -76,7 +75,7 @@ class FlpsController(
     @GetMapping("/api/v1/flps/guilds/{guildId}/me")
     @Operation(
         summary = "Get my FLPS score",
-        description = "Returns the FLPS score for the current user's primary linked character"
+        description = "Returns the FLPS score for the current user's primary linked character",
     )
     fun getMyFlpsScore(
         @Parameter(description = "Guild ID")
@@ -154,7 +153,7 @@ class FlpsController(
     @GetMapping("/api/v1/flps/guilds/{guildId}/leaderboard")
     @Operation(
         summary = "Get FLPS leaderboard",
-        description = "Returns a filtered and paginated leaderboard of raiders sorted by FLPS score"
+        description = "Returns a filtered and paginated leaderboard of raiders sorted by FLPS score",
     )
     @Cacheable(
         value = [CacheConfig.FLPS_LEADERBOARD],
@@ -172,7 +171,7 @@ class FlpsController(
         @Parameter(description = "Maximum number of results (default 10, max 100)")
         @RequestParam(required = false, defaultValue = "10") limit: Int,
         @Parameter(description = "Number of results to skip")
-        @RequestParam(required = false, defaultValue = "0") offset: Int
+        @RequestParam(required = false, defaultValue = "0") offset: Int,
     ): LeaderboardResponse {
         val effectiveLimit = limit.coerceIn(1, 100)
 
@@ -181,34 +180,36 @@ class FlpsController(
         val exampleItemId = com.edgerush.lootman.domain.shared.ItemId(12345L)
 
         // Calculate FLPS for each raider and create leaderboard entries
-        val allEntries = raiderDataList.map { raiderData ->
-            val acs = componentCalculator.calculateACS(raiderData.attendance)
-            val mas = componentCalculator.calculateMAS()
-            val eps = componentCalculator.calculateEPS(raiderData.gear)
-            val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
-            val tb = componentCalculator.calculateTierBonus(raiderData.gear)
-            val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
-            val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
+        val allEntries =
+            raiderDataList.map { raiderData ->
+                val acs = componentCalculator.calculateACS(raiderData.attendance)
+                val mas = componentCalculator.calculateMAS()
+                val eps = componentCalculator.calculateEPS(raiderData.gear)
+                val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
+                val tb = componentCalculator.calculateTierBonus(raiderData.gear)
+                val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
+                val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
 
-            val command = CalculateFlpsScoreCommand(
-                guildId = GuildId(guildId),
-                raiderId = raiderData.raider.id,
-                itemId = exampleItemId,
-                acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf
-            )
+                val command =
+                    CalculateFlpsScoreCommand(
+                        guildId = GuildId(guildId),
+                        raiderId = raiderData.raider.id,
+                        itemId = exampleItemId,
+                        acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf,
+                    )
 
-            val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
+                val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
 
-            LeaderboardEntry(
-                rank = 0, // Will be set after filtering/sorting
-                raiderId = raiderData.raider.id.value,
-                raiderName = raiderData.raider.characterName,
-                characterClass = raiderData.raider.characterClass.name,
-                role = raiderData.raider.role.name,
-                flpsScore = result.flps.value,
-                eligible = result.eligible
-            )
-        }
+                LeaderboardEntry(
+                    rank = 0, // Will be set after filtering/sorting
+                    raiderId = raiderData.raider.id.value,
+                    raiderName = raiderData.raider.characterName,
+                    characterClass = raiderData.raider.characterClass.name,
+                    role = raiderData.raider.role.name,
+                    flpsScore = result.flps.value,
+                    eligible = result.eligible,
+                )
+            }
 
         // Apply filters
         var filtered = allEntries
@@ -226,9 +227,10 @@ class FlpsController(
         }
 
         // Sort by score descending and assign ranks
-        val sorted = filtered
-            .sortedByDescending { it.flpsScore }
-            .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+        val sorted =
+            filtered
+                .sortedByDescending { it.flpsScore }
+                .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
 
         // Apply pagination
         val total = sorted.size
@@ -240,11 +242,12 @@ class FlpsController(
             total = total,
             limit = effectiveLimit,
             offset = offset,
-            filters = LeaderboardFilters(
-                role = role,
-                characterClass = characterClass,
-                eligible = eligible
-            )
+            filters =
+                LeaderboardFilters(
+                    role = role,
+                    characterClass = characterClass,
+                    eligible = eligible,
+                ),
         )
     }
 
@@ -283,7 +286,7 @@ class FlpsController(
     @GetMapping("/api/v1/flps/guilds/{guildId}/config")
     @Operation(
         summary = "Get current FLPS configuration",
-        description = "Returns the current FLPS configuration settings for a guild"
+        description = "Returns the current FLPS configuration settings for a guild",
     )
     fun getCurrentConfig(
         @Parameter(description = "Guild ID")
@@ -310,7 +313,7 @@ class FlpsController(
     @PostMapping("/api/v1/flps/guilds/{guildId}/config/preview")
     @Operation(
         summary = "Preview configuration changes",
-        description = "Shows how proposed configuration changes would affect FLPS scores without applying them"
+        description = "Shows how proposed configuration changes would affect FLPS scores without applying them",
     )
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Preview generated successfully"),
@@ -340,18 +343,19 @@ class FlpsController(
 
         // Calculate FLPS for each raider
         return raiderDataList.map { raiderData ->
-            val command = CalculateFlpsScoreCommand(
-                guildId = GuildId(guildId),
-                raiderId = raiderData.raider.id,
-                itemId = exampleItemId,
-                acs = componentCalculator.calculateACS(raiderData.attendance),
-                mas = componentCalculator.calculateMAS(),
-                eps = componentCalculator.calculateEPS(raiderData.gear),
-                uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId),
-                tb = componentCalculator.calculateTierBonus(raiderData.gear),
-                rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role),
-                rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
-            )
+            val command =
+                CalculateFlpsScoreCommand(
+                    guildId = GuildId(guildId),
+                    raiderId = raiderData.raider.id,
+                    itemId = exampleItemId,
+                    acs = componentCalculator.calculateACS(raiderData.attendance),
+                    mas = componentCalculator.calculateMAS(),
+                    eps = componentCalculator.calculateEPS(raiderData.gear),
+                    uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId),
+                    tb = componentCalculator.calculateTierBonus(raiderData.gear),
+                    rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role),
+                    rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans),
+                )
 
             calculateFlpsScoreUseCase.execute(command).getOrThrow()
         }
@@ -375,18 +379,19 @@ class FlpsController(
             val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
             val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
 
-            val command = CalculateFlpsScoreCommand(
-                guildId = GuildId(guildId),
-                raiderId = raiderData.raider.id,
-                itemId = exampleItemId,
-                acs = acs,
-                mas = mas,
-                eps = eps,
-                uv = uv,
-                tb = tb,
-                rm = rm,
-                rdf = rdf
-            )
+            val command =
+                CalculateFlpsScoreCommand(
+                    guildId = GuildId(guildId),
+                    raiderId = raiderData.raider.id,
+                    itemId = exampleItemId,
+                    acs = acs,
+                    mas = mas,
+                    eps = eps,
+                    uv = uv,
+                    tb = tb,
+                    rm = rm,
+                    rdf = rdf,
+                )
 
             val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
 
@@ -425,14 +430,18 @@ class FlpsController(
     /**
      * Calculate FLPS for a specific raider and return personal response.
      */
-    private fun calculateFlpsForRaider(guildId: String, raiderId: RaiderId): PersonalFlpsResponse {
+    private fun calculateFlpsForRaider(
+        guildId: String,
+        raiderId: RaiderId,
+    ): PersonalFlpsResponse {
         // Fetch all raider data from database
         val raiderDataList = flpsDataAssembler.assembleFlpsData(GuildId(guildId))
         val exampleItemId = com.edgerush.lootman.domain.shared.ItemId(12345L)
 
         // Find the specific raider
-        val raiderData = raiderDataList.find { it.raider.id == raiderId }
-            ?: throw IllegalArgumentException("Raider not found in guild: ${raiderId.value}")
+        val raiderData =
+            raiderDataList.find { it.raider.id == raiderId }
+                ?: throw IllegalArgumentException("Raider not found in guild: ${raiderId.value}")
 
         // Calculate components
         val acs = componentCalculator.calculateACS(raiderData.attendance)
@@ -443,34 +452,37 @@ class FlpsController(
         val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
         val rdf = componentCalculator.calculateRDF(raiderData.lootHistory, raiderData.activeBans)
 
-        val command = CalculateFlpsScoreCommand(
-            guildId = GuildId(guildId),
-            raiderId = raiderId,
-            itemId = exampleItemId,
-            acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf
-        )
+        val command =
+            CalculateFlpsScoreCommand(
+                guildId = GuildId(guildId),
+                raiderId = raiderId,
+                itemId = exampleItemId,
+                acs = acs, mas = mas, eps = eps, uv = uv, tb = tb, rm = rm, rdf = rdf,
+            )
 
         val result = calculateFlpsScoreUseCase.execute(command).getOrThrow()
 
         // Calculate all scores to determine rank
-        val allScores = raiderDataList.map { rd ->
-            val rdAcs = componentCalculator.calculateACS(rd.attendance)
-            val rdMas = componentCalculator.calculateMAS()
-            val rdEps = componentCalculator.calculateEPS(rd.gear)
-            val rdUv = componentCalculator.calculateUV(rd.wishlist, exampleItemId)
-            val rdTb = componentCalculator.calculateTierBonus(rd.gear)
-            val rdRm = componentCalculator.calculateRoleMultiplier(rd.raider.role)
-            val rdRdf = componentCalculator.calculateRDF(rd.lootHistory, rd.activeBans)
+        val allScores =
+            raiderDataList.map { rd ->
+                val rdAcs = componentCalculator.calculateACS(rd.attendance)
+                val rdMas = componentCalculator.calculateMAS()
+                val rdEps = componentCalculator.calculateEPS(rd.gear)
+                val rdUv = componentCalculator.calculateUV(rd.wishlist, exampleItemId)
+                val rdTb = componentCalculator.calculateTierBonus(rd.gear)
+                val rdRm = componentCalculator.calculateRoleMultiplier(rd.raider.role)
+                val rdRdf = componentCalculator.calculateRDF(rd.lootHistory, rd.activeBans)
 
-            val rdCommand = CalculateFlpsScoreCommand(
-                guildId = GuildId(guildId),
-                raiderId = rd.raider.id,
-                itemId = exampleItemId,
-                acs = rdAcs, mas = rdMas, eps = rdEps, uv = rdUv, tb = rdTb, rm = rdRm, rdf = rdRdf
-            )
+                val rdCommand =
+                    CalculateFlpsScoreCommand(
+                        guildId = GuildId(guildId),
+                        raiderId = rd.raider.id,
+                        itemId = exampleItemId,
+                        acs = rdAcs, mas = rdMas, eps = rdEps, uv = rdUv, tb = rdTb, rm = rdRm, rdf = rdRdf,
+                    )
 
-            rd.raider.id to calculateFlpsScoreUseCase.execute(rdCommand).getOrThrow().flps.value
-        }.sortedByDescending { it.second }
+                rd.raider.id to calculateFlpsScoreUseCase.execute(rdCommand).getOrThrow().flps.value
+            }.sortedByDescending { it.second }
 
         val rank = allScores.indexOfFirst { it.first == raiderId } + 1
 
@@ -483,21 +495,24 @@ class FlpsController(
             rank = rank,
             totalRaiders = allScores.size,
             eligible = result.eligible,
-            breakdown = FlpsBreakdownResponse(
-                rms = RmsBreakdownResponse(
-                    value = result.rms.value,
-                    acs = acs.value,
-                    mas = mas.value,
-                    eps = eps.value,
+            breakdown =
+                FlpsBreakdownResponse(
+                    rms =
+                        RmsBreakdownResponse(
+                            value = result.rms.value,
+                            acs = acs.value,
+                            mas = mas.value,
+                            eps = eps.value,
+                        ),
+                    ipi =
+                        IpiBreakdownResponse(
+                            value = result.ipi.value,
+                            uv = uv.value,
+                            tierBonus = tb.value,
+                            roleMultiplier = rm.value,
+                        ),
+                    rdf = rdf.value,
                 ),
-                ipi = IpiBreakdownResponse(
-                    value = result.ipi.value,
-                    uv = uv.value,
-                    tierBonus = tb.value,
-                    roleMultiplier = rm.value,
-                ),
-                rdf = rdf.value,
-            ),
         )
     }
 }

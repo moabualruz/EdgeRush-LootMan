@@ -31,7 +31,10 @@ interface LootAwardEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot award entities
      */
-    fun findAll(offset: Long, limit: Int): List<LootAwardEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity>
 
     /**
      * Counts all loot awards.
@@ -48,7 +51,11 @@ interface LootAwardEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot award entities for the raider
      */
-    fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<LootAwardEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity>
 
     /**
      * Counts loot awards for a raider.
@@ -66,7 +73,11 @@ interface LootAwardEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot award entities for the item
      */
-    fun findByItemId(itemId: Long, offset: Long, limit: Int): List<LootAwardEntity>
+    fun findByItemId(
+        itemId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity>
 
     /**
      * Counts loot awards for an item.
@@ -84,7 +95,11 @@ interface LootAwardEntityRepository {
      * @param limit The maximum number of records to return
      * @return List of loot award entities for the tier
      */
-    fun findByTier(tier: String, offset: Long, limit: Int): List<LootAwardEntity>
+    fun findByTier(
+        tier: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardEntity>
 
     /**
      * Counts loot awards for a tier.

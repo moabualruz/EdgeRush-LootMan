@@ -20,7 +20,6 @@ import java.sql.ResultSet
  * Unit tests for JdbcRaiderGearItemRepository.
  */
 class JdbcRaiderGearItemRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcRaiderGearItemRepository
 
@@ -32,11 +31,17 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return gear item when found`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<RaiderGearItemEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id, 100L), 0))
             }
@@ -48,14 +53,28 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         @Test
         fun `should return null when gear item not found`() {
             val id = 999L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(id)) } returns emptyList()
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(id),
+                )
+            } returns emptyList()
             repository.findById(id) shouldBe null
         }
 
         @Test
         fun `should map all database fields to entity`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<RaiderGearItemEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id, 100L, gearSet = "equipped", slot = "head", itemId = 12345L, itemLevel = 450, quality = 4, enchant = "Enchant", enchantQuality = 3, upgradeLevel = 2, sockets = 1, name = "Helm of Power"), 0))
             }
@@ -76,7 +95,14 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         @Test
         fun `should handle null optional fields`() {
             val id = 1L
-            every { jdbcTemplate.query(match<String> { it.contains("SELECT") && it.contains("id = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(id)) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("SELECT") && it.contains("id = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(id),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<RaiderGearItemEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(id, 100L, itemId = null, itemLevel = null, quality = null, enchant = null, enchantQuality = null, upgradeLevel = null, sockets = null, name = null), 0))
             }
@@ -91,11 +117,17 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdTests {
-
         @Test
         fun `should return gear items for raider`() {
             val raiderId = 100L
-            every { jdbcTemplate.query(match<String> { it.contains("raider_id = ?") && !it.contains("gear_set = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(raiderId), any<Int>(), any<Long>()) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("raider_id = ?") && !it.contains("gear_set = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(raiderId), any<Int>(), any<Long>(),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<RaiderGearItemEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L, raiderId, slot = "head"), 0), rowMapper.mapRow(mockResultSet(2L, raiderId, slot = "chest"), 1))
             }
@@ -106,12 +138,18 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByRaiderIdAndGearSetTests {
-
         @Test
         fun `should return gear items for raider and gear set`() {
             val raiderId = 100L
             val gearSet = "equipped"
-            every { jdbcTemplate.query(match<String> { it.contains("raider_id = ?") && it.contains("gear_set = ?") }, any<RowMapper<RaiderGearItemEntity>>(), eq(raiderId), eq(gearSet), any<Int>(), any<Long>()) } answers {
+            every {
+                jdbcTemplate.query(
+                    match<String> {
+                        it.contains("raider_id = ?") && it.contains("gear_set = ?")
+                    },
+                    any<RowMapper<RaiderGearItemEntity>>(), eq(raiderId), eq(gearSet), any<Int>(), any<Long>(),
+                )
+            } answers {
                 val rowMapper = secondArg<RowMapper<RaiderGearItemEntity>>()
                 listOf(rowMapper.mapRow(mockResultSet(1L, raiderId, gearSet = gearSet), 0))
             }
@@ -122,17 +160,25 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
 
     @Nested
     inner class CountTests {
-
         @Test
         fun `should return total count`() {
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("raider_gear_items") }, Long::class.java) } returns 42L
+            every {
+                jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("raider_gear_items") }, Long::class.java)
+            } returns 42L
             repository.count() shouldBe 42L
         }
 
         @Test
         fun `should return count by raider id`() {
             val raiderId = 100L
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") && !it.contains("gear_set = ?") }, Long::class.java, eq(raiderId)) } returns 16L
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> {
+                        it.contains("COUNT(*)") && it.contains("raider_id = ?") && !it.contains("gear_set = ?")
+                    },
+                    Long::class.java, eq(raiderId),
+                )
+            } returns 16L
             repository.countByRaiderId(raiderId) shouldBe 16L
         }
 
@@ -140,20 +186,27 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         fun `should return count by raider id and gear set`() {
             val raiderId = 100L
             val gearSet = "equipped"
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") && it.contains("gear_set = ?") }, Long::class.java, eq(raiderId), eq(gearSet)) } returns 16L
+            every {
+                jdbcTemplate.queryForObject(
+                    match<String> {
+                        it.contains("COUNT(*)") && it.contains("raider_id = ?") && it.contains("gear_set = ?")
+                    },
+                    Long::class.java, eq(raiderId), eq(gearSet),
+                )
+            } returns 16L
             repository.countByRaiderIdAndGearSet(raiderId, gearSet) shouldBe 16L
         }
     }
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new gear item when id is null`() {
             val entity = createEntity(id = null)
             val generatedId = 1L
             every { jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>()) } answers {
-                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId)); 1
+                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId))
+                1
             }
             val result = repository.save(entity)
             result.id shouldBe generatedId
@@ -180,7 +233,20 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         }
     }
 
-    private fun mockResultSet(id: Long, raiderId: Long, gearSet: String = "equipped", slot: String = "head", itemId: Long? = 12345L, itemLevel: Int? = 450, quality: Int? = 4, enchant: String? = "Enchant", enchantQuality: Int? = 3, upgradeLevel: Int? = 2, sockets: Int? = 1, name: String? = "Helm"): ResultSet {
+    private fun mockResultSet(
+        id: Long,
+        raiderId: Long,
+        gearSet: String = "equipped",
+        slot: String = "head",
+        itemId: Long? = 12345L,
+        itemLevel: Int? = 450,
+        quality: Int? = 4,
+        enchant: String? = "Enchant",
+        enchantQuality: Int? = 3,
+        upgradeLevel: Int? = 2,
+        sockets: Int? = 1,
+        name: String? = "Helm",
+    ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getLong("id") } returns id
         every { rs.getLong("raider_id") } returns raiderId
@@ -195,10 +261,35 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         every { rs.getInt("sockets") } returns (sockets ?: 0)
         every { rs.getString("name") } returns name
         var wasNullCount = 0
-        every { rs.wasNull() } answers { val isNull = when(wasNullCount) { 0 -> itemId == null; 1 -> itemLevel == null; 2 -> quality == null; 3 -> enchantQuality == null; 4 -> upgradeLevel == null; 5 -> sockets == null; else -> false }; wasNullCount++; isNull }
+        every { rs.wasNull() } answers {
+            val isNull =
+                when (wasNullCount) {
+                    0 -> itemId == null
+                    1 -> itemLevel == null
+                    2 -> quality == null
+                    3 -> enchantQuality == null
+                    4 -> upgradeLevel == null
+                    5 -> sockets == null
+                    else -> false
+                }
+            wasNullCount++
+            isNull
+        }
         return rs
     }
 
-    private fun createEntity(id: Long? = 1L, raiderId: Long = 100L, gearSet: String = "equipped", slot: String = "head", itemId: Long? = 12345L, itemLevel: Int? = 450, quality: Int? = 4, enchant: String? = "Enchant", enchantQuality: Int? = 3, upgradeLevel: Int? = 2, sockets: Int? = 1, name: String? = "Helm") =
-        RaiderGearItemEntity(id, raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, enchantQuality, upgradeLevel, sockets, name)
+    private fun createEntity(
+        id: Long? = 1L,
+        raiderId: Long = 100L,
+        gearSet: String = "equipped",
+        slot: String = "head",
+        itemId: Long? = 12345L,
+        itemLevel: Int? = 450,
+        quality: Int? = 4,
+        enchant: String? = "Enchant",
+        enchantQuality: Int? = 3,
+        upgradeLevel: Int? = 2,
+        sockets: Int? = 1,
+        name: String? = "Helm",
+    ) = RaiderGearItemEntity(id, raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, enchantQuality, upgradeLevel, sockets, name)
 }

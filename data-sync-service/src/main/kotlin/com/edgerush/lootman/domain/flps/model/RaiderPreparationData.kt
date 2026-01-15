@@ -54,16 +54,17 @@ data class RaiderPreparationData(
         /**
          * Creates empty preparation data when no activity data is available.
          */
-        fun empty(raiderId: RaiderId): RaiderPreparationData = RaiderPreparationData(
-            raiderId = raiderId,
-            raidVaultSlots = 0,
-            mythicPlusVaultSlots = 0,
-            pvpVaultSlots = 0,
-            mythicPlusRating = 0,
-            crestsUsed = 0,
-            hasHeroicClear = false,
-            hasNormalClear = false,
-        )
+        fun empty(raiderId: RaiderId): RaiderPreparationData =
+            RaiderPreparationData(
+                raiderId = raiderId,
+                raidVaultSlots = 0,
+                mythicPlusVaultSlots = 0,
+                pvpVaultSlots = 0,
+                mythicPlusRating = 0,
+                crestsUsed = 0,
+                hasHeroicClear = false,
+                hasNormalClear = false,
+            )
 
         /**
          * Creates preparation data with common defaults for active raiders.
@@ -77,15 +78,16 @@ data class RaiderPreparationData(
             crestsUsed: Int = 0,
             hasHeroicClear: Boolean = false,
             hasNormalClear: Boolean = false,
-        ): RaiderPreparationData = RaiderPreparationData(
-            raiderId = raiderId,
-            raidVaultSlots = raidVaultSlots,
-            mythicPlusVaultSlots = mythicPlusVaultSlots,
-            pvpVaultSlots = pvpVaultSlots,
-            mythicPlusRating = mythicPlusRating,
-            crestsUsed = crestsUsed,
-            hasHeroicClear = hasHeroicClear,
-            hasNormalClear = hasNormalClear,
-        )
+        ): RaiderPreparationData =
+            RaiderPreparationData(
+                raiderId = raiderId,
+                raidVaultSlots = raidVaultSlots,
+                mythicPlusVaultSlots = mythicPlusVaultSlots,
+                pvpVaultSlots = pvpVaultSlots,
+                mythicPlusRating = mythicPlusRating,
+                crestsUsed = crestsUsed,
+                hasHeroicClear = hasHeroicClear,
+                hasNormalClear = hasNormalClear,
+            )
     }
 }

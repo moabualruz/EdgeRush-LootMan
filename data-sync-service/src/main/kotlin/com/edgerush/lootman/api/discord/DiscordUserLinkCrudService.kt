@@ -1,8 +1,6 @@
 package com.edgerush.lootman.api.discord
 
 import com.edgerush.lootman.api.common.CrudService
-import com.edgerush.lootman.api.common.PageRequest
-import com.edgerush.lootman.api.common.PagedResponse
 
 /**
  * CRUD service interface for Discord user link operations.
@@ -10,7 +8,6 @@ import com.edgerush.lootman.api.common.PagedResponse
  * Provides CRUD operations plus Discord-specific query methods.
  */
 interface DiscordUserLinkCrudService : CrudService<Long, CreateDiscordUserLinkRequest, UpdateDiscordUserLinkRequest, DiscordUserLinkResponse> {
-
     /**
      * Find all links for a Discord user.
      *

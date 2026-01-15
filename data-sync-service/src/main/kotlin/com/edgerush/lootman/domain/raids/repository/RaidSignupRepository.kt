@@ -31,7 +31,10 @@ interface RaidSignupRepository {
      * @param limit The maximum number of records to return
      * @return List of signup entities
      */
-    fun findAll(offset: Long, limit: Int): List<RaidSignupEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity>
 
     /**
      * Counts all signups.
@@ -48,7 +51,11 @@ interface RaidSignupRepository {
      * @param limit The maximum number of records to return
      * @return List of signup entities for the raid
      */
-    fun findByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidSignupEntity>
+    fun findByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity>
 
     /**
      * Counts signups for a raid.
@@ -66,7 +73,11 @@ interface RaidSignupRepository {
      * @param limit The maximum number of records to return
      * @return List of selected signup entities for the raid
      */
-    fun findSelectedByRaidId(raidId: Long, offset: Long, limit: Int): List<RaidSignupEntity>
+    fun findSelectedByRaidId(
+        raidId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity>
 
     /**
      * Counts selected signups for a raid.
@@ -84,7 +95,11 @@ interface RaidSignupRepository {
      * @param limit The maximum number of records to return
      * @return List of signup entities for the character
      */
-    fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<RaidSignupEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaidSignupEntity>
 
     /**
      * Counts signups for a character.

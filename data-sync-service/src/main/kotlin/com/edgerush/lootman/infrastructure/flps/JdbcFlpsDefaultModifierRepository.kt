@@ -17,13 +17,13 @@ import java.time.OffsetDateTime
 class JdbcFlpsDefaultModifierRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : FlpsDefaultModifierRepository {
-
     override fun findById(id: Long): FlpsDefaultModifierEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_default_modifiers
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, modifierRowMapper, id)
         return results.firstOrNull()
@@ -35,13 +35,17 @@ class JdbcFlpsDefaultModifierRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<FlpsDefaultModifierEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity> {
+        val sql =
+            """
             SELECT id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_default_modifiers
             ORDER BY category, modifier_key
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, modifierRowMapper, limit, offset)
     }
@@ -51,14 +55,19 @@ class JdbcFlpsDefaultModifierRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByCategory(category: String, offset: Long, limit: Int): List<FlpsDefaultModifierEntity> {
-        val sql = """
+    override fun findByCategory(
+        category: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity> {
+        val sql =
+            """
             SELECT id, category, modifier_key, modifier_value, description, created_at, updated_at
             FROM flps_default_modifiers
             WHERE category = ?
             ORDER BY modifier_key
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, modifierRowMapper, category, limit, offset)
     }
@@ -83,10 +92,11 @@ class JdbcFlpsDefaultModifierRepository(
     }
 
     private fun insertModifier(modifier: FlpsDefaultModifierEntity): FlpsDefaultModifierEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO flps_default_modifiers (category, modifier_key, modifier_value, description, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val now = OffsetDateTime.now()
         val keyHolder = GeneratedKeyHolder()
@@ -106,7 +116,8 @@ class JdbcFlpsDefaultModifierRepository(
     }
 
     private fun updateModifier(modifier: FlpsDefaultModifierEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE flps_default_modifiers SET
                 category = ?,
                 modifier_key = ?,
@@ -114,7 +125,7 @@ class JdbcFlpsDefaultModifierRepository(
                 description = ?,
                 updated_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -127,15 +138,16 @@ class JdbcFlpsDefaultModifierRepository(
         )
     }
 
-    private val modifierRowMapper = RowMapper { rs, _ ->
-        FlpsDefaultModifierEntity(
-            id = rs.getLong("id"),
-            category = rs.getString("category"),
-            modifierKey = rs.getString("modifier_key"),
-            modifierValue = rs.getBigDecimal("modifier_value") ?: BigDecimal.ZERO,
-            description = rs.getString("description"),
-            createdAt = rs.getObject("created_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
-            updatedAt = rs.getObject("updated_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
-        )
-    }
+    private val modifierRowMapper =
+        RowMapper { rs, _ ->
+            FlpsDefaultModifierEntity(
+                id = rs.getLong("id"),
+                category = rs.getString("category"),
+                modifierKey = rs.getString("modifier_key"),
+                modifierValue = rs.getBigDecimal("modifier_value") ?: BigDecimal.ZERO,
+                description = rs.getString("description"),
+                createdAt = rs.getObject("created_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
+                updatedAt = rs.getObject("updated_at", OffsetDateTime::class.java) ?: OffsetDateTime.now(),
+            )
+        }
 }

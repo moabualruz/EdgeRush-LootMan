@@ -88,6 +88,6 @@ class LootAwardBonusIdControllerTest : UnitTest() {
     private fun createResponse(
         id: Long = 1L,
         lootAwardId: Long = 1L,
-        bonusId: String? = "1234"
+        bonusId: String? = "1234",
     ) = LootAwardBonusIdResponse(id, lootAwardId, bonusId)
 }

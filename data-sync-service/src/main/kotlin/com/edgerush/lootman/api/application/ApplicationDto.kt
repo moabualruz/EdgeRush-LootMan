@@ -53,13 +53,15 @@ data class ApplicationResponse(
     val syncedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(e: ApplicationEntity) = ApplicationResponse(
-            e.applicationId, e.appliedAt, e.status, e.role, e.age, e.country, e.battletag, e.discordId,
-            e.mainCharacterName, e.mainCharacterRealm, e.mainCharacterClass, e.mainCharacterRole,
-            e.mainCharacterRace, e.mainCharacterFaction, e.mainCharacterLevel, e.mainCharacterRegion, e.syncedAt
-        )
+        fun from(e: ApplicationEntity) =
+            ApplicationResponse(
+                e.applicationId, e.appliedAt, e.status, e.role, e.age, e.country, e.battletag, e.discordId,
+                e.mainCharacterName, e.mainCharacterRealm, e.mainCharacterClass, e.mainCharacterRole,
+                e.mainCharacterRace, e.mainCharacterFaction, e.mainCharacterLevel, e.mainCharacterRegion, e.syncedAt,
+            )
     }
 }
 
 data class ApplicationExistsResponse(val exists: Boolean)
+
 data class ApplicationCountResponse(val count: Long)

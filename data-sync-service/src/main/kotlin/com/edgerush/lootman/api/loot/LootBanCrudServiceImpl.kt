@@ -16,7 +16,6 @@ import java.time.LocalDateTime
 class LootBanCrudServiceImpl(
     private val repository: LootBanEntityRepository,
 ) : LootBanCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<LootBanResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -31,8 +30,9 @@ class LootBanCrudServiceImpl(
     }
 
     override fun findById(id: Long): LootBanResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Loot ban not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Loot ban not found with id: $id")
         return LootBanResponse.from(entity)
     }
 
@@ -41,28 +41,34 @@ class LootBanCrudServiceImpl(
     }
 
     override fun create(request: CreateLootBanEntityRequest): LootBanResponse {
-        val entity = LootBanEntity(
-            guildId = request.guildId,
-            characterName = request.characterName,
-            reason = request.reason,
-            bannedBy = request.bannedBy,
-            bannedAt = LocalDateTime.now(),
-            expiresAt = request.expiresAt,
-            isActive = true,
-        )
+        val entity =
+            LootBanEntity(
+                guildId = request.guildId,
+                characterName = request.characterName,
+                reason = request.reason,
+                bannedBy = request.bannedBy,
+                bannedAt = LocalDateTime.now(),
+                expiresAt = request.expiresAt,
+                isActive = true,
+            )
         val saved = repository.save(entity)
         return LootBanResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateLootBanEntityRequest): LootBanResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Loot ban not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateLootBanEntityRequest,
+    ): LootBanResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Loot ban not found with id: $id")
 
-        val updated = existing.copy(
-            reason = request.reason ?: existing.reason,
-            expiresAt = request.expiresAt ?: existing.expiresAt,
-            isActive = request.isActive ?: existing.isActive,
-        )
+        val updated =
+            existing.copy(
+                reason = request.reason ?: existing.reason,
+                expiresAt = request.expiresAt ?: existing.expiresAt,
+                isActive = request.isActive ?: existing.isActive,
+            )
 
         repository.save(updated)
         return LootBanResponse.from(updated)
@@ -75,7 +81,10 @@ class LootBanCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<LootBanResponse> {
+    override fun findByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootBanResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByGuildId(guildId, offset, pageRequest.size)
         val total = repository.countByGuildId(guildId)
@@ -88,7 +97,10 @@ class LootBanCrudServiceImpl(
         )
     }
 
-    override fun findActiveByGuild(guildId: String, pageRequest: PageRequest): PagedResponse<LootBanResponse> {
+    override fun findActiveByGuild(
+        guildId: String,
+        pageRequest: PageRequest,
+    ): PagedResponse<LootBanResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findActiveByGuildId(guildId, offset, pageRequest.size)
         val total = repository.countActiveByGuildId(guildId)
@@ -101,7 +113,10 @@ class LootBanCrudServiceImpl(
         )
     }
 
-    override fun isCharacterBanned(guildId: String, characterName: String): Boolean {
+    override fun isCharacterBanned(
+        guildId: String,
+        characterName: String,
+    ): Boolean {
         return repository.isCharacterBanned(guildId, characterName)
     }
 

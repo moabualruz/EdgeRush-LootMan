@@ -27,7 +27,6 @@ import java.time.LocalDate
  * Tests the GraphQL query resolver for attendance operations following TDD principles.
  */
 class AttendanceQueryResolverTest : UnitTest() {
-
     @MockK
     private lateinit var listRaiderAttendanceUseCase: ListRaiderAttendanceUseCase
 
@@ -39,24 +38,25 @@ class AttendanceQueryResolverTest : UnitTest() {
 
     @Nested
     inner class RaiderAttendanceQuery {
-
         @Test
         fun `should return attendance records for raider`() {
             // Arrange
-            val records = listOf(
-                createTestAttendanceRecord(raiderId = 42L, instance = "Nerub-ar Palace", attendedRaids = 8, totalRaids = 10),
-                createTestAttendanceRecord(raiderId = 42L, instance = "Vault of the Incarnates", attendedRaids = 12, totalRaids = 12),
-            )
+            val records =
+                listOf(
+                    createTestAttendanceRecord(raiderId = 42L, instance = "Nerub-ar Palace", attendedRaids = 8, totalRaids = 10),
+                    createTestAttendanceRecord(raiderId = 42L, instance = "Vault of the Incarnates", attendedRaids = 12, totalRaids = 12),
+                )
             val querySlot = slot<ListRaiderAttendanceQuery>()
             every { listRaiderAttendanceUseCase.execute(capture(querySlot)) } returns Result.success(records)
 
             // Act
-            val result = resolver.raiderAttendance(
-                raiderId = "42",
-                guildId = "guild-123",
-                startDate = "2025-01-01",
-                endDate = "2025-12-31",
-            )
+            val result =
+                resolver.raiderAttendance(
+                    raiderId = "42",
+                    guildId = "guild-123",
+                    startDate = "2025-01-01",
+                    endDate = "2025-12-31",
+                )
 
             // Assert
             result shouldHaveSize 2
@@ -74,12 +74,13 @@ class AttendanceQueryResolverTest : UnitTest() {
             every { listRaiderAttendanceUseCase.execute(any()) } returns Result.success(emptyList())
 
             // Act
-            val result = resolver.raiderAttendance(
-                raiderId = "999",
-                guildId = "guild-123",
-                startDate = "2025-01-01",
-                endDate = "2025-12-31",
-            )
+            val result =
+                resolver.raiderAttendance(
+                    raiderId = "999",
+                    guildId = "guild-123",
+                    startDate = "2025-01-01",
+                    endDate = "2025-12-31",
+                )
 
             // Assert
             result shouldHaveSize 0
@@ -92,14 +93,15 @@ class AttendanceQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database connection failed"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.raiderAttendance(
-                    raiderId = "42",
-                    guildId = "guild-123",
-                    startDate = "2025-01-01",
-                    endDate = "2025-12-31",
-                )
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.raiderAttendance(
+                        raiderId = "42",
+                        guildId = "guild-123",
+                        startDate = "2025-01-01",
+                        endDate = "2025-12-31",
+                    )
+                }
             exception.message shouldBe "Database connection failed"
         }
 
@@ -108,25 +110,27 @@ class AttendanceQueryResolverTest : UnitTest() {
             // Arrange
             val startDate = LocalDate.of(2025, 1, 1)
             val endDate = LocalDate.of(2025, 3, 31)
-            val record = createTestAttendanceRecord(
-                raiderId = 42L,
-                guildId = "guild-123",
-                instance = "Nerub-ar Palace",
-                encounter = "Queen Ansurek",
-                startDate = startDate,
-                endDate = endDate,
-                attendedRaids = 15,
-                totalRaids = 20,
-            )
+            val record =
+                createTestAttendanceRecord(
+                    raiderId = 42L,
+                    guildId = "guild-123",
+                    instance = "Nerub-ar Palace",
+                    encounter = "Queen Ansurek",
+                    startDate = startDate,
+                    endDate = endDate,
+                    attendedRaids = 15,
+                    totalRaids = 20,
+                )
             every { listRaiderAttendanceUseCase.execute(any()) } returns Result.success(listOf(record))
 
             // Act
-            val result = resolver.raiderAttendance(
-                raiderId = "42",
-                guildId = "guild-123",
-                startDate = "2025-01-01",
-                endDate = "2025-03-31",
-            )
+            val result =
+                resolver.raiderAttendance(
+                    raiderId = "42",
+                    guildId = "guild-123",
+                    startDate = "2025-01-01",
+                    endDate = "2025-03-31",
+                )
 
             // Assert
             result shouldHaveSize 1
@@ -144,24 +148,25 @@ class AttendanceQueryResolverTest : UnitTest() {
 
     @Nested
     inner class GuildAttendanceSummaryQuery {
-
         @Test
         fun `should return guild attendance summary`() {
             // Arrange
-            val summary = createTestGuildSummary(
-                guildId = "guild-123",
-                uniqueRaiders = 25,
-                overallAttendancePercentage = 0.85,
-            )
+            val summary =
+                createTestGuildSummary(
+                    guildId = "guild-123",
+                    uniqueRaiders = 25,
+                    overallAttendancePercentage = 0.85,
+                )
             val querySlot = slot<GetGuildAttendanceSummaryQuery>()
             every { getGuildAttendanceSummaryUseCase.execute(capture(querySlot)) } returns Result.success(summary)
 
             // Act
-            val result = resolver.guildAttendanceSummary(
-                guildId = "guild-123",
-                startDate = "2025-01-01",
-                endDate = "2025-12-31",
-            )
+            val result =
+                resolver.guildAttendanceSummary(
+                    guildId = "guild-123",
+                    startDate = "2025-01-01",
+                    endDate = "2025-12-31",
+                )
 
             // Assert
             result.guildId shouldBe "guild-123"
@@ -173,39 +178,42 @@ class AttendanceQueryResolverTest : UnitTest() {
         @Test
         fun `should include raider summaries in guild summary`() {
             // Arrange
-            val raiderSummaries = listOf(
-                RaiderAttendanceSummary(
-                    raiderId = 1L,
-                    totalRecords = 5,
-                    totalAttendedRaids = 45,
-                    totalRaids = 50,
-                    averageAttendancePercentage = 0.90,
-                ),
-                RaiderAttendanceSummary(
-                    raiderId = 2L,
-                    totalRecords = 5,
-                    totalAttendedRaids = 40,
-                    totalRaids = 50,
-                    averageAttendancePercentage = 0.80,
-                ),
-            )
-            val summary = GuildAttendanceSummary(
-                guildId = "guild-123",
-                startDate = LocalDate.of(2025, 1, 1),
-                endDate = LocalDate.of(2025, 12, 31),
-                totalRecords = 10,
-                uniqueRaiders = 2,
-                overallAttendancePercentage = 0.85,
-                raiderSummaries = raiderSummaries,
-            )
+            val raiderSummaries =
+                listOf(
+                    RaiderAttendanceSummary(
+                        raiderId = 1L,
+                        totalRecords = 5,
+                        totalAttendedRaids = 45,
+                        totalRaids = 50,
+                        averageAttendancePercentage = 0.90,
+                    ),
+                    RaiderAttendanceSummary(
+                        raiderId = 2L,
+                        totalRecords = 5,
+                        totalAttendedRaids = 40,
+                        totalRaids = 50,
+                        averageAttendancePercentage = 0.80,
+                    ),
+                )
+            val summary =
+                GuildAttendanceSummary(
+                    guildId = "guild-123",
+                    startDate = LocalDate.of(2025, 1, 1),
+                    endDate = LocalDate.of(2025, 12, 31),
+                    totalRecords = 10,
+                    uniqueRaiders = 2,
+                    overallAttendancePercentage = 0.85,
+                    raiderSummaries = raiderSummaries,
+                )
             every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
 
             // Act
-            val result = resolver.guildAttendanceSummary(
-                guildId = "guild-123",
-                startDate = "2025-01-01",
-                endDate = "2025-12-31",
-            )
+            val result =
+                resolver.guildAttendanceSummary(
+                    guildId = "guild-123",
+                    startDate = "2025-01-01",
+                    endDate = "2025-12-31",
+                )
 
             // Assert
             result.raiderSummaries shouldHaveSize 2
@@ -222,36 +230,39 @@ class AttendanceQueryResolverTest : UnitTest() {
                 Result.failure(RuntimeException("Database error"))
 
             // Act & Assert
-            val exception = org.junit.jupiter.api.assertThrows<RuntimeException> {
-                resolver.guildAttendanceSummary(
-                    guildId = "guild-123",
-                    startDate = "2025-01-01",
-                    endDate = "2025-12-31",
-                )
-            }
+            val exception =
+                org.junit.jupiter.api.assertThrows<RuntimeException> {
+                    resolver.guildAttendanceSummary(
+                        guildId = "guild-123",
+                        startDate = "2025-01-01",
+                        endDate = "2025-12-31",
+                    )
+                }
             exception.message shouldBe "Database error"
         }
 
         @Test
         fun `should handle empty guild with no raiders`() {
             // Arrange
-            val summary = GuildAttendanceSummary(
-                guildId = "empty-guild",
-                startDate = LocalDate.of(2025, 1, 1),
-                endDate = LocalDate.of(2025, 12, 31),
-                totalRecords = 0,
-                uniqueRaiders = 0,
-                overallAttendancePercentage = 0.0,
-                raiderSummaries = emptyList(),
-            )
+            val summary =
+                GuildAttendanceSummary(
+                    guildId = "empty-guild",
+                    startDate = LocalDate.of(2025, 1, 1),
+                    endDate = LocalDate.of(2025, 12, 31),
+                    totalRecords = 0,
+                    uniqueRaiders = 0,
+                    overallAttendancePercentage = 0.0,
+                    raiderSummaries = emptyList(),
+                )
             every { getGuildAttendanceSummaryUseCase.execute(any()) } returns Result.success(summary)
 
             // Act
-            val result = resolver.guildAttendanceSummary(
-                guildId = "empty-guild",
-                startDate = "2025-01-01",
-                endDate = "2025-12-31",
-            )
+            val result =
+                resolver.guildAttendanceSummary(
+                    guildId = "empty-guild",
+                    startDate = "2025-01-01",
+                    endDate = "2025-12-31",
+                )
 
             // Assert
             result.uniqueRaiders shouldBe 0
@@ -271,28 +282,30 @@ class AttendanceQueryResolverTest : UnitTest() {
         endDate: LocalDate = LocalDate.of(2025, 3, 31),
         attendedRaids: Int = 10,
         totalRaids: Int = 12,
-    ): AttendanceRecord = AttendanceRecord.create(
-        raiderId = RaiderId(raiderId),
-        guildId = GuildId(guildId),
-        instance = instance,
-        encounter = encounter,
-        startDate = startDate,
-        endDate = endDate,
-        attendedRaids = attendedRaids,
-        totalRaids = totalRaids,
-    )
+    ): AttendanceRecord =
+        AttendanceRecord.create(
+            raiderId = RaiderId(raiderId),
+            guildId = GuildId(guildId),
+            instance = instance,
+            encounter = encounter,
+            startDate = startDate,
+            endDate = endDate,
+            attendedRaids = attendedRaids,
+            totalRaids = totalRaids,
+        )
 
     private fun createTestGuildSummary(
         guildId: String = "test-guild",
         uniqueRaiders: Int = 20,
         overallAttendancePercentage: Double = 0.80,
-    ): GuildAttendanceSummary = GuildAttendanceSummary(
-        guildId = guildId,
-        startDate = LocalDate.of(2025, 1, 1),
-        endDate = LocalDate.of(2025, 12, 31),
-        totalRecords = 100,
-        uniqueRaiders = uniqueRaiders,
-        overallAttendancePercentage = overallAttendancePercentage,
-        raiderSummaries = emptyList(),
-    )
+    ): GuildAttendanceSummary =
+        GuildAttendanceSummary(
+            guildId = guildId,
+            startDate = LocalDate.of(2025, 1, 1),
+            endDate = LocalDate.of(2025, 12, 31),
+            totalRecords = 100,
+            uniqueRaiders = uniqueRaiders,
+            overallAttendancePercentage = overallAttendancePercentage,
+            raiderSummaries = emptyList(),
+        )
 }

@@ -15,12 +15,10 @@ import org.junit.jupiter.api.Test
  * to prevent denial of service attacks via expensive queries.
  */
 class QueryComplexityConfigTest : UnitTest() {
-
     private val config = QueryComplexityConfig()
 
     @Nested
     inner class MaxQueryComplexity {
-
         @Test
         fun `should create max query complexity instrumentation`() {
             // Act
@@ -34,7 +32,6 @@ class QueryComplexityConfigTest : UnitTest() {
 
     @Nested
     inner class MaxQueryDepth {
-
         @Test
         fun `should create max query depth instrumentation`() {
             // Act

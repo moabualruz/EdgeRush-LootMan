@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
 /**
@@ -59,18 +58,19 @@ class PerformanceTest : IntegrationTest() {
     fun `should calculate FLPS for 30 raiders in less than 1 second`() {
         // Arrange: Create test data for 30 raiders
         val raiderCount = 30
-        val raiders = (1..raiderCount).map { index ->
-            RaiderData(
-                raiderId = RaiderId(index.toLong()),
-                acs = AttendanceCommitmentScore.of(0.85 + (index % 10) * 0.01),
-                mas = MechanicalAdherenceScore.of(0.80 + (index % 15) * 0.01),
-                eps = ExternalPreparationScore.of(0.90 + (index % 5) * 0.01),
-                uv = UpgradeValue.of(0.75 + (index % 20) * 0.01),
-                tb = TierBonus.of(if (index % 3 == 0) 1.15 else 1.0),
-                rm = RoleMultiplier.of(if (index % 4 == 0) 1.1 else 1.0),
-                rdf = RecencyDecayFactor.of(0.95 - (index % 10) * 0.05),
-            )
-        }
+        val raiders =
+            (1..raiderCount).map { index ->
+                RaiderData(
+                    raiderId = RaiderId(index.toLong()),
+                    acs = AttendanceCommitmentScore.of(0.85 + (index % 10) * 0.01),
+                    mas = MechanicalAdherenceScore.of(0.80 + (index % 15) * 0.01),
+                    eps = ExternalPreparationScore.of(0.90 + (index % 5) * 0.01),
+                    uv = UpgradeValue.of(0.75 + (index % 20) * 0.01),
+                    tb = TierBonus.of(if (index % 3 == 0) 1.15 else 1.0),
+                    rm = RoleMultiplier.of(if (index % 4 == 0) 1.1 else 1.0),
+                    rdf = RecencyDecayFactor.of(0.95 - (index % 10) * 0.05),
+                )
+            }
 
         // Act: Measure time to calculate FLPS for all raiders
         val executionTime =

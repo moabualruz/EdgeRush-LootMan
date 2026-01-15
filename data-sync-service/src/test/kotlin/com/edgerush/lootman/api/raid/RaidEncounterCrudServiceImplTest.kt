@@ -5,7 +5,6 @@ import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.domain.raids.repository.RaidEncounterRepository
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.Test
  * Tests the service layer using mocked repository.
  */
 class RaidEncounterCrudServiceImplTest : UnitTest() {
-
     private lateinit var encounterRepository: RaidEncounterRepository
     private lateinit var service: RaidEncounterCrudServiceImpl
 
@@ -32,14 +30,14 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return paged response`() {
             // Given
-            val encounters = listOf(
-                createEncounterEntity(id = 1L),
-                createEncounterEntity(id = 2L),
-            )
+            val encounters =
+                listOf(
+                    createEncounterEntity(id = 1L),
+                    createEncounterEntity(id = 2L),
+                )
             every { encounterRepository.findAll(0L, 20) } returns encounters
             every { encounterRepository.count() } returns 2L
 
@@ -74,7 +72,6 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return encounter when found`() {
             // Given
@@ -106,17 +103,17 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class CreateTests {
-
         @Test
         fun `should create encounter and return response`() {
             // Given
-            val request = CreateRaidEncounterRequest(
-                raidId = 1L,
-                encounterId = 2902L,
-                name = "Queen Ansurek",
-                enabled = true,
-                extra = false,
-            )
+            val request =
+                CreateRaidEncounterRequest(
+                    raidId = 1L,
+                    encounterId = 2902L,
+                    name = "Queen Ansurek",
+                    enabled = true,
+                    extra = false,
+                )
 
             val entitySlot = slot<RaidEncounterEntity>()
             every { encounterRepository.save(capture(entitySlot)) } answers {
@@ -139,7 +136,6 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class UpdateTests {
-
         @Test
         fun `should update encounter and return response`() {
             // Given
@@ -164,12 +160,13 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
         @Test
         fun `should preserve existing values for null fields`() {
             // Given
-            val existing = createEncounterEntity(
-                id = 1L,
-                name = "Queen Ansurek",
-                encounterId = 2902L,
-                notes = "Original notes",
-            )
+            val existing =
+                createEncounterEntity(
+                    id = 1L,
+                    name = "Queen Ansurek",
+                    encounterId = 2902L,
+                    notes = "Original notes",
+                )
             every { encounterRepository.findById(1L) } returns existing
 
             val request = UpdateRaidEncounterRequest(enabled = false)
@@ -205,7 +202,6 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class DeleteTests {
-
         @Test
         fun `should delete encounter when exists`() {
             // Given
@@ -236,7 +232,6 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when encounter exists`() {
             // Given
@@ -264,15 +259,15 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindByRaidTests {
-
         @Test
         fun `should return paged encounters for raid`() {
             // Given
             val raidId = 1L
-            val encounters = listOf(
-                createEncounterEntity(id = 1L, raidId = raidId),
-                createEncounterEntity(id = 2L, raidId = raidId),
-            )
+            val encounters =
+                listOf(
+                    createEncounterEntity(id = 1L, raidId = raidId),
+                    createEncounterEntity(id = 2L, raidId = raidId),
+                )
             every { encounterRepository.findByRaidId(raidId, 0L, 20) } returns encounters
             every { encounterRepository.countByRaidId(raidId) } returns 2L
 
@@ -290,15 +285,15 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class FindEnabledByRaidTests {
-
         @Test
         fun `should return only enabled encounters`() {
             // Given
             val raidId = 1L
-            val encounters = listOf(
-                createEncounterEntity(id = 1L, raidId = raidId, enabled = true),
-                createEncounterEntity(id = 2L, raidId = raidId, enabled = true),
-            )
+            val encounters =
+                listOf(
+                    createEncounterEntity(id = 1L, raidId = raidId, enabled = true),
+                    createEncounterEntity(id = 2L, raidId = raidId, enabled = true),
+                )
             every { encounterRepository.findEnabledByRaidId(raidId, 0L, 20) } returns encounters
             every { encounterRepository.countEnabledByRaidId(raidId) } returns 2L
 
@@ -315,7 +310,6 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
 
     @Nested
     inner class CountByRaidTests {
-
         @Test
         fun `should return count for raid`() {
             // Given
@@ -338,13 +332,14 @@ class RaidEncounterCrudServiceImplTest : UnitTest() {
         enabled: Boolean? = true,
         extra: Boolean? = false,
         notes: String? = null,
-    ): RaidEncounterEntity = RaidEncounterEntity(
-        id = id,
-        raidId = raidId,
-        encounterId = encounterId,
-        name = name,
-        enabled = enabled,
-        extra = extra,
-        notes = notes,
-    )
+    ): RaidEncounterEntity =
+        RaidEncounterEntity(
+            id = id,
+            raidId = raidId,
+            encounterId = encounterId,
+            name = name,
+            enabled = enabled,
+            extra = extra,
+            notes = notes,
+        )
 }

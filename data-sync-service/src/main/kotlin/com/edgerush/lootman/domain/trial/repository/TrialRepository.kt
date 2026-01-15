@@ -31,12 +31,21 @@ interface TrialRepository {
     /**
      * Finds all trials for a guild.
      */
-    fun findByGuildId(guildId: GuildId, offset: Long = 0, limit: Int = 50): List<Trial>
+    fun findByGuildId(
+        guildId: GuildId,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Trial>
 
     /**
      * Finds trials for a guild filtered by status.
      */
-    fun findByGuildIdAndStatus(guildId: GuildId, status: TrialStatus, offset: Long = 0, limit: Int = 50): List<Trial>
+    fun findByGuildIdAndStatus(
+        guildId: GuildId,
+        status: TrialStatus,
+        offset: Long = 0,
+        limit: Int = 50,
+    ): List<Trial>
 
     /**
      * Finds all active and extended trials for a guild.
@@ -56,7 +65,10 @@ interface TrialRepository {
     /**
      * Counts trials for a guild filtered by status.
      */
-    fun countByGuildIdAndStatus(guildId: GuildId, status: TrialStatus): Long
+    fun countByGuildIdAndStatus(
+        guildId: GuildId,
+        status: TrialStatus,
+    ): Long
 
     /**
      * Deletes a trial by its ID.

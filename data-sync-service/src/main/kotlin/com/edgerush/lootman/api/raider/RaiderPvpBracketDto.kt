@@ -32,11 +32,19 @@ data class RaiderPvpBracketResponse(
     val maxRating: Int?,
 ) {
     companion object {
-        fun from(e: RaiderPvpBracketEntity) = RaiderPvpBracketResponse(
-            e.id!!, e.raiderId, e.bracket, e.rating, e.seasonPlayed, e.weekPlayed, e.maxRating
-        )
+        fun from(e: RaiderPvpBracketEntity) =
+            RaiderPvpBracketResponse(
+                e.id!!,
+                e.raiderId,
+                e.bracket,
+                e.rating,
+                e.seasonPlayed,
+                e.weekPlayed,
+                e.maxRating,
+            )
     }
 }
 
 data class RaiderPvpBracketExistsResponse(val exists: Boolean)
+
 data class RaiderPvpBracketCountResponse(val count: Long)

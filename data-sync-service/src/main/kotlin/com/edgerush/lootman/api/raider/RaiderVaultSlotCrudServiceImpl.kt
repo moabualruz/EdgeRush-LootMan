@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service
 class RaiderVaultSlotCrudServiceImpl(
     private val repository: RaiderVaultSlotRepository,
 ) : RaiderVaultSlotCrudService {
-
     override fun findAll(pageRequest: PageRequest): PagedResponse<RaiderVaultSlotResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findAll(offset, pageRequest.size)
@@ -30,8 +29,9 @@ class RaiderVaultSlotCrudServiceImpl(
     }
 
     override fun findById(id: Long): RaiderVaultSlotResponse {
-        val entity = repository.findById(id)
-            ?: throw NoSuchElementException("Vault slot not found with id: $id")
+        val entity =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Vault slot not found with id: $id")
         return RaiderVaultSlotResponse.from(entity)
     }
 
@@ -40,23 +40,29 @@ class RaiderVaultSlotCrudServiceImpl(
     }
 
     override fun create(request: CreateRaiderVaultSlotRequest): RaiderVaultSlotResponse {
-        val entity = RaiderVaultSlotEntity(
-            raiderId = request.raiderId,
-            slot = request.slot,
-            unlocked = request.unlocked,
-        )
+        val entity =
+            RaiderVaultSlotEntity(
+                raiderId = request.raiderId,
+                slot = request.slot,
+                unlocked = request.unlocked,
+            )
         val saved = repository.save(entity)
         return RaiderVaultSlotResponse.from(saved)
     }
 
-    override fun update(id: Long, request: UpdateRaiderVaultSlotRequest): RaiderVaultSlotResponse {
-        val existing = repository.findById(id)
-            ?: throw NoSuchElementException("Vault slot not found with id: $id")
+    override fun update(
+        id: Long,
+        request: UpdateRaiderVaultSlotRequest,
+    ): RaiderVaultSlotResponse {
+        val existing =
+            repository.findById(id)
+                ?: throw NoSuchElementException("Vault slot not found with id: $id")
 
-        val updated = existing.copy(
-            slot = request.slot ?: existing.slot,
-            unlocked = request.unlocked ?: existing.unlocked,
-        )
+        val updated =
+            existing.copy(
+                slot = request.slot ?: existing.slot,
+                unlocked = request.unlocked ?: existing.unlocked,
+            )
 
         repository.save(updated)
         return RaiderVaultSlotResponse.from(updated)
@@ -69,7 +75,10 @@ class RaiderVaultSlotCrudServiceImpl(
         repository.delete(id)
     }
 
-    override fun findByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderVaultSlotResponse> {
+    override fun findByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderVaultSlotResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findByRaiderId(raiderId, offset, pageRequest.size)
         val total = repository.countByRaiderId(raiderId)
@@ -82,7 +91,10 @@ class RaiderVaultSlotCrudServiceImpl(
         )
     }
 
-    override fun findUnlockedByRaider(raiderId: Long, pageRequest: PageRequest): PagedResponse<RaiderVaultSlotResponse> {
+    override fun findUnlockedByRaider(
+        raiderId: Long,
+        pageRequest: PageRequest,
+    ): PagedResponse<RaiderVaultSlotResponse> {
         val offset = pageRequest.page.toLong() * pageRequest.size
         val entities = repository.findUnlockedByRaiderId(raiderId, offset, pageRequest.size)
         val total = repository.countUnlockedByRaiderId(raiderId)

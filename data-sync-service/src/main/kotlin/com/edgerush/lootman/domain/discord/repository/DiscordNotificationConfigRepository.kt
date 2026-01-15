@@ -9,7 +9,6 @@ import com.edgerush.lootman.domain.shared.GuildId
  * Repository interface for Discord notification configuration operations.
  */
 interface DiscordNotificationConfigRepository {
-
     /**
      * Finds a configuration by its unique identifier.
      */
@@ -23,7 +22,10 @@ interface DiscordNotificationConfigRepository {
     /**
      * Finds a configuration by guild and notification type.
      */
-    fun findByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): DiscordNotificationConfig?
+    fun findByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): DiscordNotificationConfig?
 
     /**
      * Finds all enabled configurations for a guild.
@@ -33,7 +35,10 @@ interface DiscordNotificationConfigRepository {
     /**
      * Finds a specific enabled configuration for a guild and type.
      */
-    fun findEnabledByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): DiscordNotificationConfig?
+    fun findEnabledByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): DiscordNotificationConfig?
 
     /**
      * Saves a configuration (creates or updates).
@@ -53,5 +58,8 @@ interface DiscordNotificationConfigRepository {
     /**
      * Checks if a configuration exists for guild and type.
      */
-    fun existsByGuildIdAndType(guildId: GuildId, type: DiscordNotificationType): Boolean
+    fun existsByGuildIdAndType(
+        guildId: GuildId,
+        type: DiscordNotificationType,
+    ): Boolean
 }

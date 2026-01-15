@@ -2,9 +2,9 @@ package com.edgerush.lootman.api.discord
 
 import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.model.DiscordUserLink
 import com.edgerush.lootman.domain.discord.model.DiscordUserLinkId
-import com.edgerush.lootman.domain.discord.model.DiscordUserId
 import com.edgerush.lootman.domain.discord.repository.DiscordUserLinkRepository
 import com.edgerush.lootman.domain.shared.DiscordUserLinkAlreadyExistsException
 import com.edgerush.lootman.domain.shared.DiscordUserLinkNotFoundException
@@ -21,9 +21,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class DiscordUserLinkCrudServiceImpl(
-    private val repository: DiscordUserLinkRepository
+    private val repository: DiscordUserLinkRepository,
 ) : DiscordUserLinkCrudService {
-
     @Transactional(readOnly = true)
     override fun findAll(pageRequest: PageRequest): PagedResponse<DiscordUserLinkResponse> {
         val links = repository.findAll(pageRequest.offset, pageRequest.size)
@@ -33,14 +32,15 @@ class DiscordUserLinkCrudServiceImpl(
             content = links.map { DiscordUserLinkResponse.from(it) },
             page = pageRequest.page,
             size = pageRequest.size,
-            totalElements = total
+            totalElements = total,
         )
     }
 
     @Transactional(readOnly = true)
     override fun findById(id: Long): DiscordUserLinkResponse {
-        val link = repository.findById(DiscordUserLinkId(id))
-            ?: throw DiscordUserLinkNotFoundException(id)
+        val link =
+            repository.findById(DiscordUserLinkId(id))
+                ?: throw DiscordUserLinkNotFoundException(id)
         return DiscordUserLinkResponse.from(link)
     }
 
@@ -61,20 +61,25 @@ class DiscordUserLinkCrudServiceImpl(
         // If no links exist for this user, make it primary automatically
         val isPrimary = request.isPrimary || repository.countByDiscordUserId(discordUserId) == 0L
 
-        val link = DiscordUserLink.create(
-            discordUserId = discordUserId,
-            raiderId = raiderId,
-            isPrimary = isPrimary,
-            linkedBy = request.linkedBy
-        )
+        val link =
+            DiscordUserLink.create(
+                discordUserId = discordUserId,
+                raiderId = raiderId,
+                isPrimary = isPrimary,
+                linkedBy = request.linkedBy,
+            )
 
         val savedLink = repository.save(link)
         return DiscordUserLinkResponse.from(savedLink)
     }
 
-    override fun update(id: Long, request: UpdateDiscordUserLinkRequest): DiscordUserLinkResponse {
-        val existingLink = repository.findById(DiscordUserLinkId(id))
-            ?: throw DiscordUserLinkNotFoundException(id)
+    override fun update(
+        id: Long,
+        request: UpdateDiscordUserLinkRequest,
+    ): DiscordUserLinkResponse {
+        val existingLink =
+            repository.findById(DiscordUserLinkId(id))
+                ?: throw DiscordUserLinkNotFoundException(id)
 
         var updatedLink = existingLink
 
@@ -99,8 +104,9 @@ class DiscordUserLinkCrudServiceImpl(
     }
 
     override fun delete(id: Long) {
-        val link = repository.findById(DiscordUserLinkId(id))
-            ?: throw DiscordUserLinkNotFoundException(id)
+        val link =
+            repository.findById(DiscordUserLinkId(id))
+                ?: throw DiscordUserLinkNotFoundException(id)
 
         repository.deleteById(link.id!!)
 
@@ -127,8 +133,9 @@ class DiscordUserLinkCrudServiceImpl(
 
     @Transactional(readOnly = true)
     override fun findPrimaryByDiscordUserId(discordUserId: String): DiscordUserLinkResponse {
-        val link = repository.findPrimaryByDiscordUserId(DiscordUserId(discordUserId))
-            ?: throw NoSuchElementException("No primary link found for Discord user: $discordUserId")
+        val link =
+            repository.findPrimaryByDiscordUserId(DiscordUserId(discordUserId))
+                ?: throw NoSuchElementException("No primary link found for Discord user: $discordUserId")
         return DiscordUserLinkResponse.from(link)
     }
 
@@ -144,8 +151,9 @@ class DiscordUserLinkCrudServiceImpl(
     }
 
     override fun setPrimary(linkId: Long): DiscordUserLinkResponse {
-        val link = repository.findById(DiscordUserLinkId(linkId))
-            ?: throw DiscordUserLinkNotFoundException(linkId)
+        val link =
+            repository.findById(DiscordUserLinkId(linkId))
+                ?: throw DiscordUserLinkNotFoundException(linkId)
 
         // Clear other primary links for this user
         repository.clearPrimaryForDiscordUser(link.discordUserId)

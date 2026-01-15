@@ -11,10 +11,8 @@ import org.junit.jupiter.api.Test
  * Unit tests for GuildId value object.
  */
 class GuildIdTest : UnitTest() {
-
     @Nested
     inner class CreationTests {
-
         @Test
         fun `should create valid guild ID with non-blank string`() {
             // Arrange & Act
@@ -81,56 +79,59 @@ class GuildIdTest : UnitTest() {
 
     @Nested
     inner class ValidationTests {
-
         @Test
         fun `should throw exception when value is empty`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                GuildId("")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    GuildId("")
+                }
             exception.message shouldBe "Guild ID cannot be blank"
         }
 
         @Test
         fun `should throw exception when value is only whitespace`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                GuildId("   ")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    GuildId("   ")
+                }
             exception.message shouldBe "Guild ID cannot be blank"
         }
 
         @Test
         fun `should throw exception when value contains only tabs`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                GuildId("\t\t\t")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    GuildId("\t\t\t")
+                }
             exception.message shouldBe "Guild ID cannot be blank"
         }
 
         @Test
         fun `should throw exception when value contains only newlines`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                GuildId("\n\n")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    GuildId("\n\n")
+                }
             exception.message shouldBe "Guild ID cannot be blank"
         }
 
         @Test
         fun `should throw exception when value contains mixed whitespace`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                GuildId(" \t\n ")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    GuildId(" \t\n ")
+                }
             exception.message shouldBe "Guild ID cannot be blank"
         }
     }
 
     @Nested
     inner class EqualityTests {
-
         @Test
         fun `should be equal when values are the same`() {
             // Arrange
@@ -174,7 +175,6 @@ class GuildIdTest : UnitTest() {
 
     @Nested
     inner class DataClassTests {
-
         @Test
         fun `should allow destructuring`() {
             // Arrange
@@ -228,7 +228,6 @@ class GuildIdTest : UnitTest() {
 
     @Nested
     inner class EdgeCaseTests {
-
         @Test
         fun `should handle very long guild ID`() {
             // Arrange

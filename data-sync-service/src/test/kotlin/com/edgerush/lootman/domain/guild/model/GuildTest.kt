@@ -4,7 +4,6 @@ import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.shared.GuildId
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -19,7 +18,6 @@ import java.time.Instant
  * - GuildSettings configuration
  */
 class GuildTest : UnitTest() {
-
     @Nested
     inner class GuildCreation {
         @Test
@@ -151,15 +149,16 @@ class GuildTest : UnitTest() {
         @Test
         fun `should create custom settings`() {
             // Given / When
-            val settings = GuildSettings(
-                syncEnabled = false,
-                syncCronExpression = "0 0 6 * * *",
-                syncRunOnStartup = true,
-                timezone = "America/New_York",
-                benchmarkMode = BenchmarkMode.CUSTOM,
-                customBenchmarkRms = 0.95,
-                customBenchmarkIpi = 0.90
-            )
+            val settings =
+                GuildSettings(
+                    syncEnabled = false,
+                    syncCronExpression = "0 0 6 * * *",
+                    syncRunOnStartup = true,
+                    timezone = "America/New_York",
+                    benchmarkMode = BenchmarkMode.CUSTOM,
+                    customBenchmarkRms = 0.95,
+                    customBenchmarkIpi = 0.90,
+                )
 
             // Then
             settings.syncEnabled shouldBe false
@@ -288,17 +287,18 @@ class GuildTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

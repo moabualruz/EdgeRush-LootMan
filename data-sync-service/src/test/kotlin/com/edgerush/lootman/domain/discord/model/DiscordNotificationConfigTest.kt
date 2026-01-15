@@ -7,28 +7,26 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 /**
  * Unit tests for DiscordNotificationConfig domain entity.
  */
 class DiscordNotificationConfigTest : UnitTest() {
-
     private val guildId = GuildId("guild-123")
     private val discordServerId = "discord-server-456"
     private val channelId = "channel-789"
 
     @Nested
     inner class Creation {
-
         @Test
         fun `should create notification config with valid data`() {
-            val config = DiscordNotificationConfig.create(
-                guildId = guildId,
-                discordServerId = discordServerId,
-                notificationType = DiscordNotificationType.LOOT_AWARD,
-                channelId = channelId,
-            )
+            val config =
+                DiscordNotificationConfig.create(
+                    guildId = guildId,
+                    discordServerId = discordServerId,
+                    notificationType = DiscordNotificationType.LOOT_AWARD,
+                    channelId = channelId,
+                )
 
             config.guildId shouldBe guildId
             config.discordServerId shouldBe discordServerId
@@ -42,13 +40,14 @@ class DiscordNotificationConfigTest : UnitTest() {
         @Test
         fun `should create notification config with mention role`() {
             val roleId = "role-123"
-            val config = DiscordNotificationConfig.create(
-                guildId = guildId,
-                discordServerId = discordServerId,
-                notificationType = DiscordNotificationType.PENALTY,
-                channelId = channelId,
-                mentionRoleId = roleId,
-            )
+            val config =
+                DiscordNotificationConfig.create(
+                    guildId = guildId,
+                    discordServerId = discordServerId,
+                    notificationType = DiscordNotificationType.PENALTY,
+                    channelId = channelId,
+                    mentionRoleId = roleId,
+                )
 
             config.mentionRoleId shouldBe roleId
         }
@@ -80,7 +79,6 @@ class DiscordNotificationConfigTest : UnitTest() {
 
     @Nested
     inner class StateChanges {
-
         @Test
         fun `should enable config`() {
             val config = createConfig().disable()
@@ -156,19 +154,19 @@ class DiscordNotificationConfigTest : UnitTest() {
 
     @Nested
     inner class NotificationTypes {
-
         @Test
         fun `should support all notification types`() {
             val types = DiscordNotificationType.entries
 
             types.size shouldBe 5
-            types shouldBe listOf(
-                DiscordNotificationType.LOOT_AWARD,
-                DiscordNotificationType.RDF_EXPIRY,
-                DiscordNotificationType.PENALTY,
-                DiscordNotificationType.LOOT_BAN,
-                DiscordNotificationType.SYNC_COMPLETE,
-            )
+            types shouldBe
+                listOf(
+                    DiscordNotificationType.LOOT_AWARD,
+                    DiscordNotificationType.RDF_EXPIRY,
+                    DiscordNotificationType.PENALTY,
+                    DiscordNotificationType.LOOT_BAN,
+                    DiscordNotificationType.SYNC_COMPLETE,
+                )
         }
 
         @Test
@@ -185,10 +183,11 @@ class DiscordNotificationConfigTest : UnitTest() {
         }
     }
 
-    private fun createConfig(): DiscordNotificationConfig = DiscordNotificationConfig.create(
-        guildId = guildId,
-        discordServerId = discordServerId,
-        notificationType = DiscordNotificationType.LOOT_AWARD,
-        channelId = channelId,
-    )
+    private fun createConfig(): DiscordNotificationConfig =
+        DiscordNotificationConfig.create(
+            guildId = guildId,
+            discordServerId = discordServerId,
+            notificationType = DiscordNotificationType.LOOT_AWARD,
+            channelId = channelId,
+        )
 }

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class ProfileGeneratorServiceTest : UnitTest() {
-
     private lateinit var generator: ProfileGeneratorService
 
     @BeforeEach
@@ -29,7 +28,7 @@ class ProfileGeneratorServiceTest : UnitTest() {
         itemId: Long = 12345L,
         name: String = "Test Item",
         itemLevel: Int = 639,
-        isTierPiece: Boolean = false
+        isTierPiece: Boolean = false,
     ): GearItem {
         return GearItem(
             itemId = ItemId(itemId),
@@ -37,14 +36,14 @@ class ProfileGeneratorServiceTest : UnitTest() {
             itemLevel = itemLevel,
             quality = ItemQuality.EPIC,
             slot = slot,
-            isTierPiece = isTierPiece
+            isTierPiece = isTierPiece,
         )
     }
 
     private fun createGearSet(items: Map<EquipmentSlot, GearItem>): GearSet {
         return GearSet(
             items = items,
-            gearSetType = GearSetType.EQUIPPED
+            gearSetType = GearSetType.EQUIPPED,
         )
     }
 
@@ -61,15 +60,16 @@ class ProfileGeneratorServiceTest : UnitTest() {
             val characterRace = "human"
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = characterName,
-                characterRealm = characterRealm,
-                characterClass = characterClass,
-                characterSpec = characterSpec,
-                characterLevel = characterLevel,
-                characterRace = characterRace,
-                gear = null
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = characterName,
+                    characterRealm = characterRealm,
+                    characterClass = characterClass,
+                    characterSpec = characterSpec,
+                    characterLevel = characterLevel,
+                    characterRace = characterRace,
+                    gear = null,
+                )
 
             // Assert
             profile shouldContain """$characterClass="$characterName""""
@@ -84,15 +84,16 @@ class ProfileGeneratorServiceTest : UnitTest() {
             val characterClass = "death_knight"
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = characterClass,
-                characterSpec = "frost",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = null
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = characterClass,
+                    characterSpec = "frost",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = null,
+                )
 
             // Assert
             profile shouldContain """death_knight="Testchar""""
@@ -101,23 +102,25 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `should include gear when provided`() {
             // Arrange
-            val gear = createGearSet(
-                mapOf(
-                    EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD, itemId = 12345L),
-                    EquipmentSlot.NECK to createGearItem(EquipmentSlot.NECK, itemId = 12346L)
+            val gear =
+                createGearSet(
+                    mapOf(
+                        EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD, itemId = 12345L),
+                        EquipmentSlot.NECK to createGearItem(EquipmentSlot.NECK, itemId = 12346L),
+                    ),
                 )
-            )
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = gear
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = gear,
+                )
 
             // Assert
             profile shouldContain "head=,id=12345"
@@ -127,15 +130,16 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `should exclude gear section when no gear provided`() {
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = null
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = null,
+                )
 
             // Assert
             profile shouldNotContain "head="
@@ -148,36 +152,38 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `should map all equipment slots to simc slot names`() {
             // Arrange
-            val allSlots = mapOf(
-                EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD, itemId = 1L),
-                EquipmentSlot.NECK to createGearItem(EquipmentSlot.NECK, itemId = 2L),
-                EquipmentSlot.SHOULDER to createGearItem(EquipmentSlot.SHOULDER, itemId = 3L),
-                EquipmentSlot.BACK to createGearItem(EquipmentSlot.BACK, itemId = 4L),
-                EquipmentSlot.CHEST to createGearItem(EquipmentSlot.CHEST, itemId = 5L),
-                EquipmentSlot.WRIST to createGearItem(EquipmentSlot.WRIST, itemId = 6L),
-                EquipmentSlot.HANDS to createGearItem(EquipmentSlot.HANDS, itemId = 7L),
-                EquipmentSlot.WAIST to createGearItem(EquipmentSlot.WAIST, itemId = 8L),
-                EquipmentSlot.LEGS to createGearItem(EquipmentSlot.LEGS, itemId = 9L),
-                EquipmentSlot.FEET to createGearItem(EquipmentSlot.FEET, itemId = 10L),
-                EquipmentSlot.FINGER_1 to createGearItem(EquipmentSlot.FINGER_1, itemId = 11L),
-                EquipmentSlot.FINGER_2 to createGearItem(EquipmentSlot.FINGER_2, itemId = 12L),
-                EquipmentSlot.TRINKET_1 to createGearItem(EquipmentSlot.TRINKET_1, itemId = 13L),
-                EquipmentSlot.TRINKET_2 to createGearItem(EquipmentSlot.TRINKET_2, itemId = 14L),
-                EquipmentSlot.MAIN_HAND to createGearItem(EquipmentSlot.MAIN_HAND, itemId = 15L),
-                EquipmentSlot.OFF_HAND to createGearItem(EquipmentSlot.OFF_HAND, itemId = 16L)
-            )
+            val allSlots =
+                mapOf(
+                    EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD, itemId = 1L),
+                    EquipmentSlot.NECK to createGearItem(EquipmentSlot.NECK, itemId = 2L),
+                    EquipmentSlot.SHOULDER to createGearItem(EquipmentSlot.SHOULDER, itemId = 3L),
+                    EquipmentSlot.BACK to createGearItem(EquipmentSlot.BACK, itemId = 4L),
+                    EquipmentSlot.CHEST to createGearItem(EquipmentSlot.CHEST, itemId = 5L),
+                    EquipmentSlot.WRIST to createGearItem(EquipmentSlot.WRIST, itemId = 6L),
+                    EquipmentSlot.HANDS to createGearItem(EquipmentSlot.HANDS, itemId = 7L),
+                    EquipmentSlot.WAIST to createGearItem(EquipmentSlot.WAIST, itemId = 8L),
+                    EquipmentSlot.LEGS to createGearItem(EquipmentSlot.LEGS, itemId = 9L),
+                    EquipmentSlot.FEET to createGearItem(EquipmentSlot.FEET, itemId = 10L),
+                    EquipmentSlot.FINGER_1 to createGearItem(EquipmentSlot.FINGER_1, itemId = 11L),
+                    EquipmentSlot.FINGER_2 to createGearItem(EquipmentSlot.FINGER_2, itemId = 12L),
+                    EquipmentSlot.TRINKET_1 to createGearItem(EquipmentSlot.TRINKET_1, itemId = 13L),
+                    EquipmentSlot.TRINKET_2 to createGearItem(EquipmentSlot.TRINKET_2, itemId = 14L),
+                    EquipmentSlot.MAIN_HAND to createGearItem(EquipmentSlot.MAIN_HAND, itemId = 15L),
+                    EquipmentSlot.OFF_HAND to createGearItem(EquipmentSlot.OFF_HAND, itemId = 16L),
+                )
             val gear = createGearSet(allSlots)
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = gear
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = gear,
+                )
 
             // Assert - verify simc slot names
             profile shouldContain "head=,id=1"
@@ -204,26 +210,29 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `should include item level in gear lines`() {
             // Arrange
-            val gear = createGearSet(
-                mapOf(
-                    EquipmentSlot.HEAD to createGearItem(
-                        EquipmentSlot.HEAD,
-                        itemId = 12345L,
-                        itemLevel = 639
-                    )
+            val gear =
+                createGearSet(
+                    mapOf(
+                        EquipmentSlot.HEAD to
+                            createGearItem(
+                                EquipmentSlot.HEAD,
+                                itemId = 12345L,
+                                itemLevel = 639,
+                            ),
+                    ),
                 )
-            )
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = gear
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = gear,
+                )
 
             // Assert
             profile shouldContain "head=,id=12345,ilevel=639"
@@ -240,11 +249,12 @@ class ProfileGeneratorServiceTest : UnitTest() {
             val characterSpec = "fire"
 
             // Act
-            val profile = generator.generateMinimalProfile(
-                characterName = characterName,
-                characterClass = characterClass,
-                characterSpec = characterSpec
-            )
+            val profile =
+                generator.generateMinimalProfile(
+                    characterName = characterName,
+                    characterClass = characterClass,
+                    characterSpec = characterSpec,
+                )
 
             // Assert
             profile shouldContain """$characterClass="$characterName""""
@@ -256,11 +266,12 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `should lowercase spec in minimal profile`() {
             // Act
-            val profile = generator.generateMinimalProfile(
-                characterName = "Test",
-                characterClass = "warrior",
-                characterSpec = "FURY"
-            )
+            val profile =
+                generator.generateMinimalProfile(
+                    characterName = "Test",
+                    characterClass = "warrior",
+                    characterSpec = "FURY",
+                )
 
             // Assert
             profile shouldContain "spec=fury"
@@ -275,15 +286,16 @@ class ProfileGeneratorServiceTest : UnitTest() {
             val emptyGear = createGearSet(emptyMap())
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = emptyGear
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = emptyGear,
+                )
 
             // Assert
             profile shouldNotContain "# Gear"
@@ -296,22 +308,24 @@ class ProfileGeneratorServiceTest : UnitTest() {
         @Test
         fun `generated profile should be valid simc syntax`() {
             // Arrange
-            val gear = createGearSet(
-                mapOf(
-                    EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD)
+            val gear =
+                createGearSet(
+                    mapOf(
+                        EquipmentSlot.HEAD to createGearItem(EquipmentSlot.HEAD),
+                    ),
                 )
-            )
 
             // Act
-            val profile = generator.generateProfile(
-                characterName = "Testchar",
-                characterRealm = "TestRealm",
-                characterClass = "warrior",
-                characterSpec = "fury",
-                characterLevel = 80,
-                characterRace = "human",
-                gear = gear
-            )
+            val profile =
+                generator.generateProfile(
+                    characterName = "Testchar",
+                    characterRealm = "TestRealm",
+                    characterClass = "warrior",
+                    characterSpec = "fury",
+                    characterLevel = 80,
+                    characterRace = "human",
+                    gear = gear,
+                )
 
             // Assert - basic syntax validation
             profile shouldNotBe null

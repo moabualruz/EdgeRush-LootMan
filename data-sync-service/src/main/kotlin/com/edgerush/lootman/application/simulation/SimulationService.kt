@@ -31,7 +31,7 @@ interface SimulationExecutor {
 class SimulationService(
     private val simulationRepository: SimulationRepository,
     private val profileGenerator: ProfileGeneratorService,
-    private val simulationExecutor: SimulationExecutor
+    private val simulationExecutor: SimulationExecutor,
 ) {
     private val logger = LoggerFactory.getLogger(SimulationService::class.java)
 
@@ -60,38 +60,41 @@ class SimulationService(
         characterRace: String = "human",
         gear: GearSet? = null,
         iterations: Int = SimulationRequest.DEFAULT_ITERATIONS,
-        fightLengthSeconds: Int = SimulationRequest.DEFAULT_FIGHT_LENGTH_SECONDS
+        fightLengthSeconds: Int = SimulationRequest.DEFAULT_FIGHT_LENGTH_SECONDS,
     ): SimulationRequest {
         logger.info("Submitting simulation for $characterName-$characterRealm")
 
         // Generate SimC profile
-        val profileContent = profileGenerator.generateProfile(
-            characterName = characterName,
-            characterRealm = characterRealm,
-            characterClass = characterClass,
-            characterSpec = characterSpec,
-            characterLevel = characterLevel,
-            characterRace = characterRace,
-            gear = gear
-        )
+        val profileContent =
+            profileGenerator.generateProfile(
+                characterName = characterName,
+                characterRealm = characterRealm,
+                characterClass = characterClass,
+                characterSpec = characterSpec,
+                characterLevel = characterLevel,
+                characterRace = characterRace,
+                gear = gear,
+            )
 
         // Create and save profile
-        val profile = SimulationProfile.create(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm,
-            profileContent = profileContent,
-            createdAt = Instant.now()
-        )
+        val profile =
+            SimulationProfile.create(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+                profileContent = profileContent,
+                createdAt = Instant.now(),
+            )
         val (profileId, _) = simulationRepository.saveProfile(profile)
         logger.debug("Saved profile with id=$profileId for $characterName-$characterRealm")
 
         // Create and save request
-        val request = SimulationRequest.create(
-            profile = profile,
-            iterations = iterations,
-            fightLengthSeconds = fightLengthSeconds
-        )
+        val request =
+            SimulationRequest.create(
+                profile = profile,
+                iterations = iterations,
+                fightLengthSeconds = fightLengthSeconds,
+            )
         val savedRequest = simulationRepository.saveRequest(request)
 
         logger.info("Simulation request created with id=${savedRequest.id}")
@@ -103,23 +106,24 @@ class SimulationService(
      *
      * @return Number of simulations executed
      */
-    fun executePendingSimulations(): Int = runBlocking {
-        val pendingRequests = simulationRepository.findPendingRequests()
-        logger.info("Found ${pendingRequests.size} pending simulations")
+    fun executePendingSimulations(): Int =
+        runBlocking {
+            val pendingRequests = simulationRepository.findPendingRequests()
+            logger.info("Found ${pendingRequests.size} pending simulations")
 
-        var executedCount = 0
-        for (request in pendingRequests) {
-            try {
-                executeSimulation(request)
-                executedCount++
-            } catch (e: Exception) {
-                logger.error("Failed to execute simulation ${request.id}: ${e.message}", e)
+            var executedCount = 0
+            for (request in pendingRequests) {
+                try {
+                    executeSimulation(request)
+                    executedCount++
+                } catch (e: Exception) {
+                    logger.error("Failed to execute simulation ${request.id}: ${e.message}", e)
+                }
             }
-        }
 
-        logger.info("Executed $executedCount simulations")
-        return@runBlocking executedCount
-    }
+            logger.info("Executed $executedCount simulations")
+            return@runBlocking executedCount
+        }
 
     /**
      * Gets simulation results for a character.
@@ -132,13 +136,14 @@ class SimulationService(
     fun getSimulationResults(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): List<SimulationResult> {
-        val profile = simulationRepository.findProfileByCharacter(
-            guildId = guildId,
-            characterName = characterName,
-            characterRealm = characterRealm
-        ) ?: return emptyList()
+        val profile =
+            simulationRepository.findProfileByCharacter(
+                guildId = guildId,
+                characterName = characterName,
+                characterRealm = characterRealm,
+            ) ?: return emptyList()
 
         // Get profile ID (in production, this would be returned with the profile)
         val profileId = getProfileId(guildId, characterName, characterRealm) ?: return emptyList()
@@ -164,11 +169,12 @@ class SimulationService(
                 simulationRepository.saveRequest(completedRequest)
 
                 // Save individual results
-                val profileId = getProfileId(
-                    request.profile.guildId,
-                    request.profile.characterName,
-                    request.profile.characterRealm
-                )
+                val profileId =
+                    getProfileId(
+                        request.profile.guildId,
+                        request.profile.characterName,
+                        request.profile.characterRealm,
+                    )
                 if (profileId != null) {
                     results.forEach { result ->
                         simulationRepository.saveResult(profileId, result)
@@ -179,19 +185,19 @@ class SimulationService(
                 logger.error("Simulation ${request.id} failed: ${error.message}")
                 val failedRequest = runningRequest.markFailed(error.message ?: "Unknown error")
                 simulationRepository.saveRequest(failedRequest)
-            }
+            },
         )
     }
 
     private fun getProfileId(
         guildId: String,
         characterName: String,
-        characterRealm: String
+        characterRealm: String,
     ): Long? {
         return simulationRepository.findProfileIdByCharacter(
             guildId = guildId,
             characterName = characterName,
-            characterRealm = characterRealm
+            characterRealm = characterRealm,
         )
     }
 }

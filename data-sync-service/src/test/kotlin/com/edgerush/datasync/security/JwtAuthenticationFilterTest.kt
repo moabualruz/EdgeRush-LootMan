@@ -1,10 +1,6 @@
 package com.edgerush.datasync.security
 
 import com.edgerush.datasync.test.base.UnitTest
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -32,7 +28,6 @@ import reactor.test.StepVerifier
  * - Edge cases
  */
 class JwtAuthenticationFilterTest : UnitTest() {
-
     private lateinit var jwtService: JwtService
     private lateinit var adminModeConfig: AdminModeConfig
     private lateinit var filter: JwtAuthenticationFilter
@@ -48,7 +43,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `admin mode enabled` {
-
         @Test
         fun `should bypass authentication and use admin user when admin mode is enabled`() {
             // Arrange
@@ -84,9 +78,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
             // Arrange
             every { adminModeConfig.isEnabled() } returns true
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer some-token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer some-token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { filterChain.filter(exchange) } returns Mono.empty()
@@ -105,7 +100,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `token extraction` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -115,15 +109,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should extract token from Authorization header with Bearer prefix`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -162,9 +158,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
         @Test
         fun `should not extract token when Authorization header does not start with Bearer`() {
             // Arrange
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Basic some-credentials")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Basic some-credentials")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { filterChain.filter(exchange) } returns Mono.empty()
@@ -182,9 +179,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
         @Test
         fun `should not extract token when Authorization header is just Bearer without token`() {
             // Arrange
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer ")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken("") } returns false
@@ -203,9 +201,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
         @Test
         fun `should handle case-sensitive Bearer prefix`() {
             // Arrange - "bearer" in lowercase should not match
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "bearer some-token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "bearer some-token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { filterChain.filter(exchange) } returns Mono.empty()
@@ -223,7 +222,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `token validation` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -233,16 +231,18 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should authenticate user when token is valid`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-                guildIds = listOf("guild-1"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                    guildIds = listOf("guild-1"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -266,9 +266,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
             // Arrange
             val token = "invalid-jwt-token"
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns false
@@ -291,9 +292,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
             // Arrange
             val token = "expired-token"
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns false
@@ -312,7 +314,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `error handling` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -323,9 +324,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
             // Arrange
             val token = "malformed-token"
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -365,7 +367,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `authentication creation` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -375,15 +376,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should create authentication with correct authorities from user roles`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN", "SYSTEM_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -412,15 +415,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should create authentication with user as principal`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -441,15 +446,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should handle user with empty roles`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = emptyList(),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = emptyList(),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -469,7 +476,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `request types` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -479,15 +485,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should process GET request with valid token`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -506,15 +514,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should process POST request with valid token`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.post("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.post("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -533,15 +543,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should process DELETE request with valid token`() {
             // Arrange
             val token = "valid-jwt-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("SYSTEM_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("SYSTEM_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.delete("/api/v1/test/123")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.delete("/api/v1/test/123")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -577,7 +589,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `edge cases` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false
@@ -587,15 +598,17 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should handle token with special characters`() {
             // Arrange
             val token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLTEyMyJ9.signature_with_special-chars+and/more="
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -616,17 +629,19 @@ class JwtAuthenticationFilterTest : UnitTest() {
         fun `should handle multiple Authorization headers - uses first one`() {
             // Arrange
             val token = "first-token"
-            val user = AuthenticatedUser(
-                id = "user-123",
-                username = "testuser",
-                roles = listOf("GUILD_ADMIN"),
-            )
+            val user =
+                AuthenticatedUser(
+                    id = "user-123",
+                    username = "testuser",
+                    roles = listOf("GUILD_ADMIN"),
+                )
 
             // Note: MockServerHttpRequest doesn't easily support multiple headers with same name
             // This test verifies single header behavior
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns true
@@ -648,9 +663,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
             // Arrange
             val token = "a".repeat(10000)
 
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken(token) } returns false
@@ -669,9 +685,10 @@ class JwtAuthenticationFilterTest : UnitTest() {
         @Test
         fun `should handle whitespace-only token`() {
             // Arrange
-            val request = MockServerHttpRequest.get("/api/v1/test")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer    ")
-                .build()
+            val request =
+                MockServerHttpRequest.get("/api/v1/test")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer    ")
+                    .build()
             val exchange = MockServerWebExchange.from(request)
 
             every { jwtService.validateToken("   ") } returns false
@@ -690,7 +707,6 @@ class JwtAuthenticationFilterTest : UnitTest() {
 
     @Nested
     inner class `filter chain continuation` {
-
         @BeforeEach
         fun setupAdminMode() {
             every { adminModeConfig.isEnabled() } returns false

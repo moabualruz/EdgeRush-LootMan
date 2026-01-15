@@ -1,11 +1,10 @@
 package com.edgerush.lootman.api.flps
 
 import com.edgerush.lootman.domain.flps.repository.FlpsModifiers
+import com.edgerush.lootman.domain.flps.repository.FlpsThresholds
 import com.edgerush.lootman.domain.flps.repository.IpiWeights
 import com.edgerush.lootman.domain.flps.repository.RmsWeights
 import com.edgerush.lootman.domain.flps.repository.RoleMultipliers
-import com.edgerush.lootman.domain.flps.repository.FlpsThresholds
-import com.edgerush.lootman.domain.shared.GuildId
 
 /**
  * Request to preview configuration changes.
@@ -76,27 +75,32 @@ data class FlpsConfigSummary(
     val thresholds: ThresholdsResponse,
 ) {
     companion object {
-        fun from(modifiers: FlpsModifiers): FlpsConfigSummary = FlpsConfigSummary(
-            rmsWeights = RmsWeightsResponse(
-                attendance = modifiers.rmsWeights.attendance,
-                mechanical = modifiers.rmsWeights.mechanical,
-                preparation = modifiers.rmsWeights.preparation,
-            ),
-            ipiWeights = IpiWeightsResponse(
-                upgradeValue = modifiers.ipiWeights.upgradeValue,
-                tierBonus = modifiers.ipiWeights.tierBonus,
-                roleMultiplier = modifiers.ipiWeights.roleMultiplier,
-            ),
-            roleMultipliers = RoleMultipliersResponse(
-                dps = modifiers.roleMultipliers.dps,
-                tank = modifiers.roleMultipliers.tank,
-                healer = modifiers.roleMultipliers.healer,
-            ),
-            thresholds = ThresholdsResponse(
-                eligibilityAttendance = modifiers.thresholds.eligibilityAttendance,
-                eligibilityActivity = modifiers.thresholds.eligibilityActivity,
-            ),
-        )
+        fun from(modifiers: FlpsModifiers): FlpsConfigSummary =
+            FlpsConfigSummary(
+                rmsWeights =
+                    RmsWeightsResponse(
+                        attendance = modifiers.rmsWeights.attendance,
+                        mechanical = modifiers.rmsWeights.mechanical,
+                        preparation = modifiers.rmsWeights.preparation,
+                    ),
+                ipiWeights =
+                    IpiWeightsResponse(
+                        upgradeValue = modifiers.ipiWeights.upgradeValue,
+                        tierBonus = modifiers.ipiWeights.tierBonus,
+                        roleMultiplier = modifiers.ipiWeights.roleMultiplier,
+                    ),
+                roleMultipliers =
+                    RoleMultipliersResponse(
+                        dps = modifiers.roleMultipliers.dps,
+                        tank = modifiers.roleMultipliers.tank,
+                        healer = modifiers.roleMultipliers.healer,
+                    ),
+                thresholds =
+                    ThresholdsResponse(
+                        eligibilityAttendance = modifiers.thresholds.eligibilityAttendance,
+                        eligibilityActivity = modifiers.thresholds.eligibilityActivity,
+                    ),
+            )
     }
 }
 
@@ -179,26 +183,32 @@ data class RaiderImpact(
 fun FlpsModifiers.mergeWith(request: ConfigPreviewRequest): FlpsModifiers {
     return FlpsModifiers(
         guildId = this.guildId,
-        rmsWeights = RmsWeights(
-            attendance = request.rmsWeights?.attendance ?: this.rmsWeights.attendance,
-            mechanical = request.rmsWeights?.mechanical ?: this.rmsWeights.mechanical,
-            preparation = request.rmsWeights?.preparation ?: this.rmsWeights.preparation,
-        ),
-        ipiWeights = IpiWeights(
-            upgradeValue = request.ipiWeights?.upgradeValue ?: this.ipiWeights.upgradeValue,
-            tierBonus = request.ipiWeights?.tierBonus ?: this.ipiWeights.tierBonus,
-            roleMultiplier = request.ipiWeights?.roleMultiplier ?: this.ipiWeights.roleMultiplier,
-        ),
-        roleMultipliers = RoleMultipliers(
-            dps = request.roleMultipliers?.dps ?: this.roleMultipliers.dps,
-            tank = request.roleMultipliers?.tank ?: this.roleMultipliers.tank,
-            healer = request.roleMultipliers?.healer ?: this.roleMultipliers.healer,
-        ),
-        thresholds = FlpsThresholds(
-            eligibilityAttendance = request.thresholds?.eligibilityAttendance
-                ?: this.thresholds.eligibilityAttendance,
-            eligibilityActivity = request.thresholds?.eligibilityActivity
-                ?: this.thresholds.eligibilityActivity,
-        ),
+        rmsWeights =
+            RmsWeights(
+                attendance = request.rmsWeights?.attendance ?: this.rmsWeights.attendance,
+                mechanical = request.rmsWeights?.mechanical ?: this.rmsWeights.mechanical,
+                preparation = request.rmsWeights?.preparation ?: this.rmsWeights.preparation,
+            ),
+        ipiWeights =
+            IpiWeights(
+                upgradeValue = request.ipiWeights?.upgradeValue ?: this.ipiWeights.upgradeValue,
+                tierBonus = request.ipiWeights?.tierBonus ?: this.ipiWeights.tierBonus,
+                roleMultiplier = request.ipiWeights?.roleMultiplier ?: this.ipiWeights.roleMultiplier,
+            ),
+        roleMultipliers =
+            RoleMultipliers(
+                dps = request.roleMultipliers?.dps ?: this.roleMultipliers.dps,
+                tank = request.roleMultipliers?.tank ?: this.roleMultipliers.tank,
+                healer = request.roleMultipliers?.healer ?: this.roleMultipliers.healer,
+            ),
+        thresholds =
+            FlpsThresholds(
+                eligibilityAttendance =
+                    request.thresholds?.eligibilityAttendance
+                        ?: this.thresholds.eligibilityAttendance,
+                eligibilityActivity =
+                    request.thresholds?.eligibilityActivity
+                        ?: this.thresholds.eligibilityActivity,
+            ),
     )
 }

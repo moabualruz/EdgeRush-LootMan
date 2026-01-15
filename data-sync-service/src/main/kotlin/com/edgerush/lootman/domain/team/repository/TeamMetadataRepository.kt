@@ -31,7 +31,10 @@ interface TeamMetadataRepository {
      * @param limit The maximum number of records to return
      * @return List of team metadata entities
      */
-    fun findAll(offset: Long, limit: Int): List<TeamMetadataEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity>
 
     /**
      * Counts all team metadata.
@@ -48,7 +51,11 @@ interface TeamMetadataRepository {
      * @param limit The maximum number of records to return
      * @return List of team metadata entities for the guild
      */
-    fun findByGuildId(guildId: Long, offset: Long, limit: Int): List<TeamMetadataEntity>
+    fun findByGuildId(
+        guildId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity>
 
     /**
      * Counts team metadata for a guild.
@@ -66,7 +73,11 @@ interface TeamMetadataRepository {
      * @param limit The maximum number of records to return
      * @return List of team metadata entities for the region
      */
-    fun findByRegion(region: String, offset: Long, limit: Int): List<TeamMetadataEntity>
+    fun findByRegion(
+        region: String,
+        offset: Long,
+        limit: Int,
+    ): List<TeamMetadataEntity>
 
     /**
      * Counts team metadata for a region.

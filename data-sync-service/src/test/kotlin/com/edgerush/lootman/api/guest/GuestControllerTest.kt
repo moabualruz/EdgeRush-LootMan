@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus
 import java.time.OffsetDateTime
 
 class GuestControllerTest : UnitTest() {
-
     private lateinit var guestService: GuestCrudService
     private lateinit var paginationProperties: PaginationProperties
     private lateinit var controller: GuestController
@@ -58,7 +56,11 @@ class GuestControllerTest : UnitTest() {
         @Test
         fun `should propagate exception when not found`() {
             every { guestService.findById(999L) } throws NoSuchElementException("Guest not found")
-            try { controller.findById(999L); throw AssertionError() } catch (e: NoSuchElementException) { }
+            try {
+                controller.findById(999L)
+                throw AssertionError()
+            } catch (e: NoSuchElementException) {
+            }
         }
     }
 
@@ -93,8 +95,13 @@ class GuestControllerTest : UnitTest() {
     }
 
     private fun createGuestResponse(
-        guestId: Long = 1L, name: String = "Guestchar", realm: String? = "Silvermoon",
-        clazz: String? = "Mage", role: String? = "DPS", blizzardId: Long? = 12345L,
-        trackingSince: OffsetDateTime? = OffsetDateTime.now(), syncedAt: OffsetDateTime = OffsetDateTime.now()
+        guestId: Long = 1L,
+        name: String = "Guestchar",
+        realm: String? = "Silvermoon",
+        clazz: String? = "Mage",
+        role: String? = "DPS",
+        blizzardId: Long? = 12345L,
+        trackingSince: OffsetDateTime? = OffsetDateTime.now(),
+        syncedAt: OffsetDateTime = OffsetDateTime.now(),
     ) = GuestResponse(guestId, name, realm, clazz, role, blizzardId, trackingSince, syncedAt)
 }

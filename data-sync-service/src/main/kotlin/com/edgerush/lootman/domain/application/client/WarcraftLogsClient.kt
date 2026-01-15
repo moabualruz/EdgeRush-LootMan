@@ -1,8 +1,6 @@
 package com.edgerush.lootman.domain.application.client
 
-import com.edgerush.datasync.config.warcraftlogs.WarcraftLogsProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -26,9 +24,10 @@ class WarcraftLogsClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val webClient: WebClient = webClientBuilder
-        .baseUrl(baseUrl)
-        .build()
+    private val webClient: WebClient =
+        webClientBuilder
+            .baseUrl(baseUrl)
+            .build()
 
     /**
      * Fetches character parse data from Warcraft Logs.
@@ -38,7 +37,11 @@ class WarcraftLogsClient(
      * @param characterName The character's name
      * @return Character parse data or null if not found
      */
-    fun fetchCharacterParses(region: String, serverName: String, characterName: String): Mono<WarcraftLogsParseResult?> {
+    fun fetchCharacterParses(
+        region: String,
+        serverName: String,
+        characterName: String,
+    ): Mono<WarcraftLogsParseResult?> {
         val normalizedServer = normalizeServerSlug(serverName)
         val normalizedRegion = region.lowercase()
 
@@ -73,13 +76,14 @@ class WarcraftLogsClient(
                             region = char.server?.region?.slug ?: normalizedRegion,
                             bestPerformanceAverage = char.zoneRankings?.bestPerformanceAverage,
                             medianPerformanceAverage = char.zoneRankings?.medianPerformanceAverage,
-                            encounterParses = char.zoneRankings?.rankings?.map { ranking ->
-                                EncounterParse(
-                                    encounterName = ranking.encounter?.name ?: "Unknown",
-                                    rankPercent = ranking.rankPercent ?: 0.0,
-                                )
-                            } ?: emptyList(),
-                        )
+                            encounterParses =
+                                char.zoneRankings?.rankings?.map { ranking ->
+                                    EncounterParse(
+                                        encounterName = ranking.encounter?.name ?: "Unknown",
+                                        rankPercent = ranking.rankPercent ?: 0.0,
+                                    )
+                                } ?: emptyList(),
+                        ),
                     )
                 } else {
                     Mono.empty()
@@ -90,18 +94,33 @@ class WarcraftLogsClient(
             }
             .doOnSuccess { result ->
                 if (result != null) {
-                    log.debug("Successfully fetched Warcraft Logs parses for {}: best avg = {}", result.characterName, result.bestPerformanceAverage)
+                    log.debug(
+                        "Successfully fetched Warcraft Logs parses for {}: best avg = {}",
+                        result.characterName,
+                        result.bestPerformanceAverage,
+                    )
                 } else {
                     log.debug("No Warcraft Logs data found for {}-{}-{}", characterName, normalizedServer, normalizedRegion)
                 }
             }
             .doOnError { error ->
-                log.warn("Failed to fetch Warcraft Logs parses for {}-{}-{}: {}", characterName, normalizedServer, normalizedRegion, error.message)
+                log.warn(
+                    "Failed to fetch Warcraft Logs parses for {}-{}-{}: {}",
+                    characterName,
+                    normalizedServer,
+                    normalizedRegion,
+                    error.message,
+                )
             }
     }
 
-    private fun buildGraphQLQuery(characterName: String, serverSlug: String, serverRegion: String): Map<String, Any> {
-        val query = """
+    private fun buildGraphQLQuery(
+        characterName: String,
+        serverSlug: String,
+        serverRegion: String,
+    ): Map<String, Any> {
+        val query =
+            """
             query CharacterParses(${'$'}name: String!, ${'$'}serverSlug: String!, ${'$'}serverRegion: String!) {
                 characterData {
                     character(name: ${'$'}name, serverSlug: ${'$'}serverSlug, serverRegion: ${'$'}serverRegion) {
@@ -121,15 +140,16 @@ class WarcraftLogsClient(
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         return mapOf(
             "query" to query,
-            "variables" to mapOf(
-                "name" to characterName,
-                "serverSlug" to serverSlug,
-                "serverRegion" to serverRegion,
-            ),
+            "variables" to
+                mapOf(
+                    "name" to characterName,
+                    "serverSlug" to serverSlug,
+                    "serverRegion" to serverRegion,
+                ),
         )
     }
 
@@ -222,4 +242,5 @@ internal data class WarcraftLogsEncounter(
 )
 
 class WarcraftLogsNotFoundException(message: String) : RuntimeException(message)
+
 class WarcraftLogsServerException(message: String) : RuntimeException(message)

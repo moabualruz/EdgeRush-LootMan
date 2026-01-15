@@ -45,18 +45,21 @@ class VaultControllerTest : UnitTest() {
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
 
-        val raidSlots = listOf(
-            RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
-            RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "RAID_2", unlocked = true),
-            RaiderVaultSlotResponse(id = 3L, raiderId = 123L, slot = "RAID_3", unlocked = false),
-        )
-        val mythicPlusSlots = listOf(
-            RaiderVaultSlotResponse(id = 4L, raiderId = 123L, slot = "MYTHIC_PLUS_1", unlocked = true),
-            RaiderVaultSlotResponse(id = 5L, raiderId = 123L, slot = "MYTHIC_PLUS_2", unlocked = false),
-        )
-        val pvpSlots = listOf(
-            RaiderVaultSlotResponse(id = 6L, raiderId = 123L, slot = "PVP_1", unlocked = false),
-        )
+        val raidSlots =
+            listOf(
+                RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
+                RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "RAID_2", unlocked = true),
+                RaiderVaultSlotResponse(id = 3L, raiderId = 123L, slot = "RAID_3", unlocked = false),
+            )
+        val mythicPlusSlots =
+            listOf(
+                RaiderVaultSlotResponse(id = 4L, raiderId = 123L, slot = "MYTHIC_PLUS_1", unlocked = true),
+                RaiderVaultSlotResponse(id = 5L, raiderId = 123L, slot = "MYTHIC_PLUS_2", unlocked = false),
+            )
+        val pvpSlots =
+            listOf(
+                RaiderVaultSlotResponse(id = 6L, raiderId = 123L, slot = "PVP_1", unlocked = false),
+            )
         val allSlots = raidSlots + mythicPlusSlots + pvpSlots
 
         justRun { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) }
@@ -84,12 +87,13 @@ class VaultControllerTest : UnitTest() {
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
 
-        val mixedSlots = listOf(
-            RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
-            RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "MYTHIC_PLUS_1", unlocked = true),
-            RaiderVaultSlotResponse(id = 3L, raiderId = 123L, slot = "PVP_1", unlocked = false),
-            RaiderVaultSlotResponse(id = 4L, raiderId = 123L, slot = "RAID_2", unlocked = false),
-        )
+        val mixedSlots =
+            listOf(
+                RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
+                RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "MYTHIC_PLUS_1", unlocked = true),
+                RaiderVaultSlotResponse(id = 3L, raiderId = 123L, slot = "PVP_1", unlocked = false),
+                RaiderVaultSlotResponse(id = 4L, raiderId = 123L, slot = "RAID_2", unlocked = false),
+            )
 
         justRun { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) }
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId
@@ -190,10 +194,11 @@ class VaultControllerTest : UnitTest() {
         val guildId = "test-guild"
         val raiderId = RaiderId(123L)
 
-        val raidOnlySlots = listOf(
-            RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
-            RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "RAID_2", unlocked = true),
-        )
+        val raidOnlySlots =
+            listOf(
+                RaiderVaultSlotResponse(id = 1L, raiderId = 123L, slot = "RAID_1", unlocked = true),
+                RaiderVaultSlotResponse(id = 2L, raiderId = 123L, slot = "RAID_2", unlocked = true),
+            )
 
         justRun { currentUserService.validateGuildAccess(authenticatedUser, GuildId(guildId)) }
         every { currentUserService.getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser) } returns raiderId

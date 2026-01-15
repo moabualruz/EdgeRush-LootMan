@@ -24,24 +24,26 @@ class InMemoryUserCharacterMappingRepository : UserCharacterMappingRepository {
             .filter { it.userId == userId }
             .sortedWith(compareByDescending<UserCharacterMapping> { it.isPrimary }.thenBy { it.linkedAt })
 
-    override fun findPrimaryByUserId(userId: UserId): UserCharacterMapping? =
-        storage.values.find { it.userId == userId && it.isPrimary }
+    override fun findPrimaryByUserId(userId: UserId): UserCharacterMapping? = storage.values.find { it.userId == userId && it.isPrimary }
 
     override fun findByRaiderId(raiderId: RaiderId): List<UserCharacterMapping> =
         storage.values
             .filter { it.raiderId == raiderId }
             .sortedBy { it.linkedAt }
 
-    override fun existsByUserIdAndRaiderId(userId: UserId, raiderId: RaiderId): Boolean =
-        storage.values.any { it.userId == userId && it.raiderId == raiderId }
+    override fun existsByUserIdAndRaiderId(
+        userId: UserId,
+        raiderId: RaiderId,
+    ): Boolean = storage.values.any { it.userId == userId && it.raiderId == raiderId }
 
     override fun save(mapping: UserCharacterMapping): UserCharacterMapping {
-        val savedMapping = if (mapping.id == null) {
-            val newId = UserCharacterMappingId(idGenerator.getAndIncrement())
-            mapping.withId(newId)
-        } else {
-            mapping
-        }
+        val savedMapping =
+            if (mapping.id == null) {
+                val newId = UserCharacterMappingId(idGenerator.getAndIncrement())
+                mapping.withId(newId)
+            } else {
+                mapping
+            }
         storage[savedMapping.id!!] = savedMapping
         return savedMapping
     }
@@ -64,8 +66,7 @@ class InMemoryUserCharacterMappingRepository : UserCharacterMappingRepository {
             }
     }
 
-    override fun countByUserId(userId: UserId): Long =
-        storage.values.count { it.userId == userId }.toLong()
+    override fun countByUserId(userId: UserId): Long = storage.values.count { it.userId == userId }.toLong()
 
     /**
      * Clears all data. Useful for test setup/teardown.

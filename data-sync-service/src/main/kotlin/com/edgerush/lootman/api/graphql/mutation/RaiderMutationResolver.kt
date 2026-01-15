@@ -7,10 +7,7 @@ import com.edgerush.lootman.application.raider.DeleteRaiderCommand
 import com.edgerush.lootman.application.raider.DeleteRaiderUseCase
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
-import com.edgerush.lootman.domain.shared.model.CharacterClass
 import com.edgerush.lootman.domain.shared.model.Raider
-import com.edgerush.lootman.domain.shared.model.RaiderStatus
-import com.edgerush.lootman.domain.shared.model.Role
 import com.expediagroup.graphql.server.operations.Mutation
 import org.springframework.stereotype.Component
 
@@ -26,7 +23,6 @@ class RaiderMutationResolver(
     private val updateRaiderUseCase: UpdateRaiderUseCase,
     private val deleteRaiderUseCase: DeleteRaiderUseCase,
 ) : Mutation {
-
     /**
      * Create a new raider.
      *
@@ -35,18 +31,19 @@ class RaiderMutationResolver(
      * @throws RuntimeException on errors
      */
     fun createRaider(input: CreateRaiderInput): RaiderType {
-        val command = CreateRaiderCommand(
-            id = input.id.toLong(),
-            guildId = input.guildId,
-            characterName = input.characterName,
-            realm = input.realm,
-            characterClass = input.characterClass,
-            role = input.role,
-            rank = input.rank,
-            status = input.status ?: "ACTIVE",
-            joinDate = null,
-            wowauditId = input.wowauditId?.toLong(),
-        )
+        val command =
+            CreateRaiderCommand(
+                id = input.id.toLong(),
+                guildId = input.guildId,
+                characterName = input.characterName,
+                realm = input.realm,
+                characterClass = input.characterClass,
+                role = input.role,
+                rank = input.rank,
+                status = input.status ?: "ACTIVE",
+                joinDate = null,
+                wowauditId = input.wowauditId?.toLong(),
+            )
         return createRaiderUseCase.execute(command)
             .map { it.toGraphQLType() }
             .getOrThrow()
@@ -60,15 +57,16 @@ class RaiderMutationResolver(
      * @throws RuntimeException on errors
      */
     fun updateRaider(input: UpdateRaiderInput): RaiderType {
-        val command = UpdateRaiderCommand(
-            id = input.id.toLong(),
-            characterName = input.characterName,
-            realm = input.realm,
-            characterClass = input.characterClass,
-            role = input.role,
-            rank = input.rank,
-            status = input.status,
-        )
+        val command =
+            UpdateRaiderCommand(
+                id = input.id.toLong(),
+                characterName = input.characterName,
+                realm = input.realm,
+                characterClass = input.characterClass,
+                role = input.role,
+                rank = input.rank,
+                status = input.status,
+            )
         return updateRaiderUseCase.execute(command)
             .map { it.toGraphQLType() }
             .getOrThrow()
@@ -120,15 +118,16 @@ data class UpdateRaiderInput(
 /**
  * Extension function to convert domain Raider to GraphQL RaiderType.
  */
-private fun Raider.toGraphQLType(): RaiderType = RaiderType(
-    id = this.id.value.toString(),
-    guildId = this.guildId.value,
-    characterName = this.characterName,
-    realm = this.realm,
-    characterClass = this.characterClass,
-    role = this.role,
-    rank = this.rank,
-    status = this.status,
-    fullName = this.getFullName(),
-    isEligibleForLoot = this.isEligibleForLoot(),
-)
+private fun Raider.toGraphQLType(): RaiderType =
+    RaiderType(
+        id = this.id.value.toString(),
+        guildId = this.guildId.value,
+        characterName = this.characterName,
+        realm = this.realm,
+        characterClass = this.characterClass,
+        role = this.role,
+        rank = this.rank,
+        status = this.status,
+        fullName = this.getFullName(),
+        isEligibleForLoot = this.isEligibleForLoot(),
+    )

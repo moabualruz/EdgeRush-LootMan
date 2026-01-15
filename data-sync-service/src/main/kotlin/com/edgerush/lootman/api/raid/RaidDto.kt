@@ -14,17 +14,13 @@ data class CreateRaidRequest(
     val date: LocalDate? = null,
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
-
     @field:NotBlank(message = "Instance is required")
     val instance: String? = null,
-
     val difficulty: String? = null,
     val optional: Boolean? = false,
     val status: String? = "SCHEDULED",
-
     @field:Positive(message = "Total size must be positive")
     val totalSize: Int? = null,
-
     val notes: String? = null,
     val selectionsImage: String? = null,
     val teamId: Long? = null,
@@ -76,25 +72,26 @@ data class RaidResponse(
     val syncedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(entity: RaidEntity): RaidResponse = RaidResponse(
-            raidId = entity.raidId,
-            date = entity.date,
-            startTime = entity.startTime,
-            endTime = entity.endTime,
-            instance = entity.instance,
-            difficulty = entity.difficulty,
-            optional = entity.optional,
-            status = entity.status,
-            presentSize = entity.presentSize,
-            totalSize = entity.totalSize,
-            notes = entity.notes,
-            selectionsImage = entity.selectionsImage,
-            teamId = entity.teamId,
-            seasonId = entity.seasonId,
-            periodId = entity.periodId,
-            createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt,
-            syncedAt = entity.syncedAt,
-        )
+        fun from(entity: RaidEntity): RaidResponse =
+            RaidResponse(
+                raidId = entity.raidId,
+                date = entity.date,
+                startTime = entity.startTime,
+                endTime = entity.endTime,
+                instance = entity.instance,
+                difficulty = entity.difficulty,
+                optional = entity.optional,
+                status = entity.status,
+                presentSize = entity.presentSize,
+                totalSize = entity.totalSize,
+                notes = entity.notes,
+                selectionsImage = entity.selectionsImage,
+                teamId = entity.teamId,
+                seasonId = entity.seasonId,
+                periodId = entity.periodId,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt,
+                syncedAt = entity.syncedAt,
+            )
     }
 }

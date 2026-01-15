@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.wishlist
 
 import com.edgerush.datasync.test.base.IntegrationTest
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -24,40 +23,50 @@ import org.springframework.http.MediaType
  * - Wishlist item priority handling
  */
 class WishlistControllerIntegrationTest : IntegrationTest() {
-
-    private fun createRaider(raiderId: Long, guildId: String = "test-guild"): Long {
+    private fun createRaider(
+        raiderId: Long,
+        guildId: String = "test-guild",
+    ): Long {
         // Insert a raider directly into the database for wishlist tests
         jdbcTemplate.update(
             """INSERT INTO raiders (id, guild_id, character_name, realm, character_class, role, status)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            raiderId, guildId, "TestChar$raiderId", "TestRealm", "WARRIOR", "DPS", "ACTIVE"
+            raiderId,
+            guildId,
+            "TestChar$raiderId",
+            "TestRealm",
+            "WARRIOR",
+            "DPS",
+            "ACTIVE",
         )
         return raiderId
     }
 
     private fun createWishlistRequest(
         raiderId: Long,
-        items: List<WishlistItemRequest> = listOf(
-            WishlistItemRequest(
-                itemId = 12345L,
-                itemName = "Awesome Sword",
-                priority = 1,
-                upgradePercentage = 15.5,
-                specName = "Fury"
+        items: List<WishlistItemRequest> =
+            listOf(
+                WishlistItemRequest(
+                    itemId = 12345L,
+                    itemName = "Awesome Sword",
+                    priority = 1,
+                    upgradePercentage = 15.5,
+                    specName = "Fury",
+                ),
+                WishlistItemRequest(
+                    itemId = 12346L,
+                    itemName = "Great Shield",
+                    priority = 2,
+                    upgradePercentage = 10.0,
+                    specName = "Protection",
+                ),
             ),
-            WishlistItemRequest(
-                itemId = 12346L,
-                itemName = "Great Shield",
-                priority = 2,
-                upgradePercentage = 10.0,
-                specName = "Protection"
-            )
-        )
     ): HttpEntity<SaveWishlistRequest> {
-        val request = SaveWishlistRequest(
-            raiderId = raiderId,
-            items = items
-        )
+        val request =
+            SaveWishlistRequest(
+                raiderId = raiderId,
+                items = items,
+            )
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         return HttpEntity(request, headers)
@@ -72,11 +81,12 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             val entity = createWishlistRequest(raiderId)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/wishlists",
-                entity,
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/wishlists",
+                    entity,
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -96,15 +106,16 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 entity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // Then - verify in database
-            val wishlistCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
-                Long::class.java,
-                raiderId
-            )
+            val wishlistCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
+                    Long::class.java,
+                    raiderId,
+                )
             wishlistCount shouldBe 2L
         }
 
@@ -112,19 +123,21 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
         fun `should return top priority item`() {
             // Given
             val raiderId = createRaider(102L)
-            val items = listOf(
-                WishlistItemRequest(1L, "Second Priority", 2, 10.0, null),
-                WishlistItemRequest(2L, "First Priority", 1, 20.0, null),
-                WishlistItemRequest(3L, "Third Priority", 3, 5.0, null)
-            )
+            val items =
+                listOf(
+                    WishlistItemRequest(1L, "Second Priority", 2, 10.0, null),
+                    WishlistItemRequest(2L, "First Priority", 1, 20.0, null),
+                    WishlistItemRequest(3L, "Third Priority", 3, 5.0, null),
+                )
             val entity = createWishlistRequest(raiderId, items)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/wishlists",
-                entity,
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/wishlists",
+                    entity,
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -137,17 +150,19 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
         fun `should handle wishlist with single item`() {
             // Given
             val raiderId = createRaider(103L)
-            val items = listOf(
-                WishlistItemRequest(1L, "Only Item", 1, 25.0, "Arms")
-            )
+            val items =
+                listOf(
+                    WishlistItemRequest(1L, "Only Item", 1, 25.0, "Arms"),
+                )
             val entity = createWishlistRequest(raiderId, items)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/wishlists",
-                entity,
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/wishlists",
+                    entity,
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -166,14 +181,15 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 entity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/wishlists/raider/$raiderId",
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -188,10 +204,11 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             val raiderId = createRaider(201L)
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/wishlists/raider/$raiderId",
-                String::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -201,23 +218,25 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
         fun `should preserve item priority order`() {
             // Given
             val raiderId = createRaider(202L)
-            val items = listOf(
-                WishlistItemRequest(1L, "Priority 3", 3, 5.0, null),
-                WishlistItemRequest(2L, "Priority 1", 1, 25.0, null),
-                WishlistItemRequest(3L, "Priority 2", 2, 15.0, null)
-            )
+            val items =
+                listOf(
+                    WishlistItemRequest(1L, "Priority 3", 3, 5.0, null),
+                    WishlistItemRequest(2L, "Priority 1", 1, 25.0, null),
+                    WishlistItemRequest(3L, "Priority 2", 2, 15.0, null),
+                )
             val entity = createWishlistRequest(raiderId, items)
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 entity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // When
-            val response = restTemplate.getForEntity(
-                "/api/v1/wishlists/raider/$raiderId",
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.getForEntity(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -236,22 +255,24 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 createEntity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // Update with different items
-            val updateItems = listOf(
-                WishlistItemRequest(99999L, "New Top Item", 1, 50.0, "Fury")
-            )
+            val updateItems =
+                listOf(
+                    WishlistItemRequest(99999L, "New Top Item", 1, 50.0, "Fury"),
+                )
             val updateEntity = createWishlistRequest(raiderId, updateItems)
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/wishlists/raider/$raiderId",
-                HttpMethod.PUT,
-                updateEntity,
-                TestWishlistResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    HttpMethod.PUT,
+                    updateEntity,
+                    TestWishlistResponse::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.OK
@@ -268,15 +289,16 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 createEntity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // Update with 3 items
-            val updateItems = listOf(
-                WishlistItemRequest(1L, "Item 1", 1, 30.0, null),
-                WishlistItemRequest(2L, "Item 2", 2, 20.0, null),
-                WishlistItemRequest(3L, "Item 3", 3, 10.0, null)
-            )
+            val updateItems =
+                listOf(
+                    WishlistItemRequest(1L, "Item 1", 1, 30.0, null),
+                    WishlistItemRequest(2L, "Item 2", 2, 20.0, null),
+                    WishlistItemRequest(3L, "Item 3", 3, 10.0, null),
+                )
             val updateEntity = createWishlistRequest(raiderId, updateItems)
 
             // When
@@ -284,15 +306,16 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/wishlists/raider/$raiderId",
                 HttpMethod.PUT,
                 updateEntity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // Then - verify in database only 3 items exist
-            val wishlistCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
-                Long::class.java,
-                raiderId
-            )
+            val wishlistCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
+                    Long::class.java,
+                    raiderId,
+                )
             wishlistCount shouldBe 3L
         }
     }
@@ -307,16 +330,17 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 entity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/wishlists/raider/$raiderId",
-                HttpMethod.DELETE,
-                null,
-                Void::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    HttpMethod.DELETE,
+                    null,
+                    Void::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NO_CONTENT
@@ -330,7 +354,7 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             restTemplate.postForEntity(
                 "/api/v1/wishlists",
                 entity,
-                TestWishlistResponse::class.java
+                TestWishlistResponse::class.java,
             )
 
             // When
@@ -338,15 +362,16 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
                 "/api/v1/wishlists/raider/$raiderId",
                 HttpMethod.DELETE,
                 null,
-                Void::class.java
+                Void::class.java,
             )
 
             // Then - verify removed from database
-            val wishlistCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
-                Long::class.java,
-                raiderId
-            )
+            val wishlistCount =
+                jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM wishlist_items WHERE raider_id = ?",
+                    Long::class.java,
+                    raiderId,
+                )
             wishlistCount shouldBe 0L
         }
 
@@ -356,12 +381,13 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             val raiderId = createRaider(402L)
 
             // When
-            val response = restTemplate.exchange(
-                "/api/v1/wishlists/raider/$raiderId",
-                HttpMethod.DELETE,
-                null,
-                String::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    "/api/v1/wishlists/raider/$raiderId",
+                    HttpMethod.DELETE,
+                    null,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.NOT_FOUND
@@ -377,11 +403,12 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             val entity = createWishlistRequest(raiderId)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/wishlists",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/wishlists",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -399,11 +426,12 @@ class WishlistControllerIntegrationTest : IntegrationTest() {
             val entity = createWishlistRequest(raiderId)
 
             // When
-            val response = restTemplate.postForEntity(
-                "/api/v1/wishlists",
-                entity,
-                String::class.java
-            )
+            val response =
+                restTemplate.postForEntity(
+                    "/api/v1/wishlists",
+                    entity,
+                    String::class.java,
+                )
 
             // Then
             response.statusCode shouldBe HttpStatus.CREATED
@@ -422,7 +450,7 @@ data class TestWishlistResponse(
     val raiderId: Long,
     val items: List<TestWishlistItemResponse>,
     val itemCount: Int,
-    val topPriorityItem: TestWishlistItemResponse?
+    val topPriorityItem: TestWishlistItemResponse?,
 )
 
 data class TestWishlistItemResponse(
@@ -431,5 +459,5 @@ data class TestWishlistItemResponse(
     val priority: Int,
     val upgradePercentage: Double,
     val normalizedUpgradeValue: Double,
-    val specName: String?
+    val specName: String?,
 )

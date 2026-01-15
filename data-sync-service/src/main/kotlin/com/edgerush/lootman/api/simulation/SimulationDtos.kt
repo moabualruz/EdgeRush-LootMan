@@ -14,26 +14,20 @@ import java.time.Instant
 data class SubmitSimulationRequest(
     @field:NotBlank(message = "Character realm is required")
     val characterRealm: String,
-
     @field:NotBlank(message = "Character class is required")
     val characterClass: String,
-
     @field:NotBlank(message = "Character spec is required")
     val characterSpec: String,
-
     @field:Min(value = 1, message = "Character level must be at least 1")
     @field:Max(value = 80, message = "Character level cannot exceed 80")
     val characterLevel: Int? = null,
-
     val characterRace: String? = null,
-
     @field:Min(value = 100, message = "Iterations must be at least 100")
     @field:Max(value = 100000, message = "Iterations cannot exceed 100000")
     val iterations: Int? = null,
-
     @field:Min(value = 60, message = "Fight length must be at least 60 seconds")
     @field:Max(value = 1800, message = "Fight length cannot exceed 1800 seconds")
-    val fightLengthSeconds: Int? = null
+    val fightLengthSeconds: Int? = null,
 )
 
 /**
@@ -48,7 +42,7 @@ data class SimulationRequestDto(
     val submittedAt: Instant,
     val completedAt: Instant?,
     val errorMessage: String?,
-    val resultCount: Int
+    val resultCount: Int,
 ) {
     companion object {
         fun from(request: SimulationRequest): SimulationRequestDto {
@@ -61,7 +55,7 @@ data class SimulationRequestDto(
                 submittedAt = request.submittedAt,
                 completedAt = request.completedAt,
                 errorMessage = request.errorMessage,
-                resultCount = request.results.size
+                resultCount = request.results.size,
             )
         }
     }
@@ -78,7 +72,7 @@ data class SimulationResultDto(
     val percentGain: Double,
     val isUpgrade: Boolean,
     val normalizedValue: Double,
-    val simulatedAt: Instant
+    val simulatedAt: Instant,
 ) {
     companion object {
         fun from(result: SimulationResult): SimulationResultDto {
@@ -90,7 +84,7 @@ data class SimulationResultDto(
                 percentGain = result.percentGain,
                 isUpgrade = result.isUpgrade,
                 normalizedValue = result.normalizedUpgradeValue(),
-                simulatedAt = result.simulatedAt
+                simulatedAt = result.simulatedAt,
             )
         }
     }
@@ -104,7 +98,7 @@ data class SimulationResultsResponse(
     val characterName: String,
     val characterRealm: String,
     val results: List<SimulationResultDto>,
-    val retrievedAt: Instant
+    val retrievedAt: Instant,
 )
 
 /**
@@ -112,7 +106,7 @@ data class SimulationResultsResponse(
  */
 data class ExecutionSummaryResponse(
     val executedCount: Int,
-    val executedAt: Instant
+    val executedAt: Instant,
 )
 
 /**
@@ -121,5 +115,5 @@ data class ExecutionSummaryResponse(
 data class SimulationStatusResponse(
     val status: String,
     val pendingSimulations: Int,
-    val endpoints: Map<String, String>
+    val endpoints: Map<String, String>,
 )

@@ -46,13 +46,15 @@ data class RaiderStatisticsResponse(
     val honorLevel: Int?,
 ) {
     companion object {
-        fun from(e: RaiderStatisticsEntity) = RaiderStatisticsResponse(
-            e.id!!, e.raiderId, e.mythicPlusScore, e.weeklyHighestMplus, e.seasonHighestMplus,
-            e.worldQuestsTotal, e.worldQuestsThisWeek, e.collectiblesMounts, e.collectiblesToys,
-            e.collectiblesUniquePets, e.collectiblesLevel25Pets, e.honorLevel
-        )
+        fun from(e: RaiderStatisticsEntity) =
+            RaiderStatisticsResponse(
+                e.id!!, e.raiderId, e.mythicPlusScore, e.weeklyHighestMplus, e.seasonHighestMplus,
+                e.worldQuestsTotal, e.worldQuestsThisWeek, e.collectiblesMounts, e.collectiblesToys,
+                e.collectiblesUniquePets, e.collectiblesLevel25Pets, e.honorLevel,
+            )
     }
 }
 
 data class RaiderStatisticsExistsResponse(val exists: Boolean)
+
 data class RaiderStatisticsCountResponse(val count: Long)

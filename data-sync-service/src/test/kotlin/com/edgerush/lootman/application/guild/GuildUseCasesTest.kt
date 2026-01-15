@@ -26,7 +26,6 @@ import java.time.Instant
  * Tests use case business logic by mocking the repository layer.
  */
 class GuildUseCasesTest : UnitTest() {
-
     private lateinit var guildRepository: GuildRepository
 
     @BeforeEach
@@ -46,17 +45,18 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should create guild with valid data`() {
             // Given
-            val command = CreateGuildCommand(
-                id = "test-guild",
-                name = "Test Guild",
-                description = "A test guild",
-                realm = "Area 52",
-                region = "US",
-                syncEnabled = true,
-                syncCronExpression = "0 0 4 * * *",
-                timezone = "UTC",
-                benchmarkMode = "THEORETICAL"
-            )
+            val command =
+                CreateGuildCommand(
+                    id = "test-guild",
+                    name = "Test Guild",
+                    description = "A test guild",
+                    realm = "Area 52",
+                    region = "US",
+                    syncEnabled = true,
+                    syncCronExpression = "0 0 4 * * *",
+                    timezone = "UTC",
+                    benchmarkMode = "THEORETICAL",
+                )
 
             every { guildRepository.existsById(any()) } returns false
             val savedGuildSlot = slot<Guild>()
@@ -85,17 +85,18 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should fail when guild already exists`() {
             // Given
-            val command = CreateGuildCommand(
-                id = "existing-guild",
-                name = "Existing Guild",
-                description = null,
-                realm = null,
-                region = "US",
-                syncEnabled = true,
-                syncCronExpression = "0 0 4 * * *",
-                timezone = "UTC",
-                benchmarkMode = "THEORETICAL"
-            )
+            val command =
+                CreateGuildCommand(
+                    id = "existing-guild",
+                    name = "Existing Guild",
+                    description = null,
+                    realm = null,
+                    region = "US",
+                    syncEnabled = true,
+                    syncCronExpression = "0 0 4 * * *",
+                    timezone = "UTC",
+                    benchmarkMode = "THEORETICAL",
+                )
 
             every { guildRepository.existsById(GuildId("existing-guild")) } returns true
 
@@ -113,17 +114,18 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should fail with invalid region`() {
             // Given
-            val command = CreateGuildCommand(
-                id = "test-guild",
-                name = "Test Guild",
-                description = null,
-                realm = null,
-                region = "INVALID",
-                syncEnabled = true,
-                syncCronExpression = "0 0 4 * * *",
-                timezone = "UTC",
-                benchmarkMode = "THEORETICAL"
-            )
+            val command =
+                CreateGuildCommand(
+                    id = "test-guild",
+                    name = "Test Guild",
+                    description = null,
+                    realm = null,
+                    region = "INVALID",
+                    syncEnabled = true,
+                    syncCronExpression = "0 0 4 * * *",
+                    timezone = "UTC",
+                    benchmarkMode = "THEORETICAL",
+                )
 
             every { guildRepository.existsById(any()) } returns false
 
@@ -139,17 +141,18 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should fail with invalid benchmark mode`() {
             // Given
-            val command = CreateGuildCommand(
-                id = "test-guild",
-                name = "Test Guild",
-                description = null,
-                realm = null,
-                region = "US",
-                syncEnabled = true,
-                syncCronExpression = "0 0 4 * * *",
-                timezone = "UTC",
-                benchmarkMode = "INVALID_MODE"
-            )
+            val command =
+                CreateGuildCommand(
+                    id = "test-guild",
+                    name = "Test Guild",
+                    description = null,
+                    realm = null,
+                    region = "US",
+                    syncEnabled = true,
+                    syncCronExpression = "0 0 4 * * *",
+                    timezone = "UTC",
+                    benchmarkMode = "INVALID_MODE",
+                )
 
             every { guildRepository.existsById(any()) } returns false
 
@@ -176,20 +179,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update existing guild`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"), name = "Old Name")
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = "New Name",
-                description = "New description",
-                realm = null,
-                region = null,
-                syncEnabled = false,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = "New Name",
+                    description = "New description",
+                    realm = null,
+                    region = null,
+                    syncEnabled = false,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -212,20 +216,21 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should fail when guild not found`() {
             // Given
-            val command = UpdateGuildCommand(
-                id = "non-existent",
-                name = "New Name",
-                description = null,
-                realm = null,
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "non-existent",
+                    name = "New Name",
+                    description = null,
+                    realm = null,
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("non-existent")) } returns null
 
@@ -244,20 +249,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update custom benchmark values`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"))
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = "CUSTOM",
-                customBenchmarkRms = 0.95,
-                customBenchmarkIpi = 0.90,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = "CUSTOM",
+                    customBenchmarkRms = 0.95,
+                    customBenchmarkIpi = 0.90,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -278,20 +284,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should fail with invalid region on update`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"))
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = "INVALID_REGION",
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = "INVALID_REGION",
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
 
@@ -310,20 +317,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should fail with invalid benchmark mode on update`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"))
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = "INVALID_MODE",
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = "INVALID_MODE",
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
 
@@ -342,20 +350,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update region`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"), region = Region.US)
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = "EU",
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = "EU",
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -374,20 +383,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update realm`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"), realm = "Old Realm")
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = "New Realm",
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = "New Realm",
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -406,20 +416,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update isActive flag`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"), isActive = true)
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = null,
-                timezone = null,
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = false
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = null,
+                    timezone = null,
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = false,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -438,20 +449,21 @@ class GuildUseCasesTest : UnitTest() {
         fun `should update sync cron expression and timezone`() {
             // Given
             val existingGuild = createGuild(id = GuildId("test-guild"))
-            val command = UpdateGuildCommand(
-                id = "test-guild",
-                name = null,
-                description = null,
-                realm = null,
-                region = null,
-                syncEnabled = null,
-                syncCronExpression = "0 0 6 * * *",
-                timezone = "America/New_York",
-                benchmarkMode = null,
-                customBenchmarkRms = null,
-                customBenchmarkIpi = null,
-                isActive = null
-            )
+            val command =
+                UpdateGuildCommand(
+                    id = "test-guild",
+                    name = null,
+                    description = null,
+                    realm = null,
+                    region = null,
+                    syncEnabled = null,
+                    syncCronExpression = "0 0 6 * * *",
+                    timezone = "America/New_York",
+                    benchmarkMode = null,
+                    customBenchmarkRms = null,
+                    customBenchmarkIpi = null,
+                    isActive = null,
+                )
 
             every { guildRepository.findById(GuildId("test-guild")) } returns existingGuild
             val savedGuildSlot = slot<Guild>()
@@ -566,11 +578,12 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should return all guilds`() {
             // Given
-            val guilds = listOf(
-                createGuild(id = GuildId("guild-1"), name = "Guild One"),
-                createGuild(id = GuildId("guild-2"), name = "Guild Two"),
-                createGuild(id = GuildId("guild-3"), name = "Guild Three", isActive = false)
-            )
+            val guilds =
+                listOf(
+                    createGuild(id = GuildId("guild-1"), name = "Guild One"),
+                    createGuild(id = GuildId("guild-2"), name = "Guild Two"),
+                    createGuild(id = GuildId("guild-3"), name = "Guild Three", isActive = false),
+                )
 
             every { guildRepository.findAll() } returns guilds
 
@@ -589,10 +602,11 @@ class GuildUseCasesTest : UnitTest() {
         @Test
         fun `should return only active guilds`() {
             // Given
-            val activeGuilds = listOf(
-                createGuild(id = GuildId("active-1"), name = "Active Guild 1"),
-                createGuild(id = GuildId("active-2"), name = "Active Guild 2")
-            )
+            val activeGuilds =
+                listOf(
+                    createGuild(id = GuildId("active-1"), name = "Active Guild 1"),
+                    createGuild(id = GuildId("active-2"), name = "Active Guild 2"),
+                )
 
             every { guildRepository.findAllActive() } returns activeGuilds
 
@@ -643,17 +657,18 @@ class GuildUseCasesTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

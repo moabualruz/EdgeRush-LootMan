@@ -14,7 +14,6 @@ import java.time.LocalDateTime
  * Unit tests for Raider, CharacterClass, Role, and RaiderStatus.
  */
 class RaiderTest : UnitTest() {
-
     // region Test Fixtures
 
     private fun createRaider(
@@ -27,7 +26,7 @@ class RaiderTest : UnitTest() {
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.of(2024, 1, 15, 10, 30),
-        wowauditId: Long? = 12345L
+        wowauditId: Long? = 12345L,
     ) = Raider(
         id = id,
         guildId = guildId,
@@ -38,32 +37,32 @@ class RaiderTest : UnitTest() {
         rank = rank,
         status = status,
         joinDate = joinDate,
-        wowauditId = wowauditId
+        wowauditId = wowauditId,
     )
 
     // endregion
 
     @Nested
     inner class RaiderCreationTests {
-
         @Test
         fun `should create valid raider with all fields`() {
             // Arrange
             val joinDate = LocalDateTime.of(2024, 3, 1, 20, 0)
 
             // Act
-            val raider = createRaider(
-                id = RaiderId(42L),
-                guildId = GuildId("edge-rush"),
-                characterName = "Thrall",
-                realm = "Draenor",
-                characterClass = CharacterClass.SHAMAN,
-                role = Role.DPS,
-                rank = "Officer",
-                status = RaiderStatus.ACTIVE,
-                joinDate = joinDate,
-                wowauditId = 98765L
-            )
+            val raider =
+                createRaider(
+                    id = RaiderId(42L),
+                    guildId = GuildId("edge-rush"),
+                    characterName = "Thrall",
+                    realm = "Draenor",
+                    characterClass = CharacterClass.SHAMAN,
+                    role = Role.DPS,
+                    rank = "Officer",
+                    status = RaiderStatus.ACTIVE,
+                    joinDate = joinDate,
+                    wowauditId = 98765L,
+                )
 
             // Assert
             raider.id shouldBe RaiderId(42L)
@@ -81,11 +80,12 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should create raider with nullable fields as null`() {
             // Arrange & Act
-            val raider = createRaider(
-                rank = null,
-                joinDate = null,
-                wowauditId = null
-            )
+            val raider =
+                createRaider(
+                    rank = null,
+                    joinDate = null,
+                    wowauditId = null,
+                )
 
             // Assert
             raider.rank.shouldBeNull()
@@ -96,36 +96,40 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should throw exception when character name is blank`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createRaider(characterName = "")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createRaider(characterName = "")
+                }
             exception.message shouldBe "Character name cannot be blank"
         }
 
         @Test
         fun `should throw exception when character name contains only whitespace`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createRaider(characterName = "   ")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createRaider(characterName = "   ")
+                }
             exception.message shouldBe "Character name cannot be blank"
         }
 
         @Test
         fun `should throw exception when realm is blank`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createRaider(realm = "")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createRaider(realm = "")
+                }
             exception.message shouldBe "Realm cannot be blank"
         }
 
         @Test
         fun `should throw exception when realm contains only whitespace`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createRaider(realm = "   \t\n")
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createRaider(realm = "   \t\n")
+                }
             exception.message shouldBe "Realm cannot be blank"
         }
 
@@ -143,7 +147,6 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class IsEligibleForLootTests {
-
         @Test
         fun `should be eligible for loot when status is ACTIVE`() {
             // Arrange
@@ -192,14 +195,14 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class GetFullNameTests {
-
         @Test
         fun `should return name-realm format`() {
             // Arrange
-            val raider = createRaider(
-                characterName = "Illidan",
-                realm = "Black Temple"
-            )
+            val raider =
+                createRaider(
+                    characterName = "Illidan",
+                    realm = "Black Temple",
+                )
 
             // Act
             val fullName = raider.getFullName()
@@ -211,10 +214,11 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should handle single word names and realms`() {
             // Arrange
-            val raider = createRaider(
-                characterName = "Sylvanas",
-                realm = "Silvermoon"
-            )
+            val raider =
+                createRaider(
+                    characterName = "Sylvanas",
+                    realm = "Silvermoon",
+                )
 
             // Act
             val fullName = raider.getFullName()
@@ -226,10 +230,11 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should preserve special characters in name`() {
             // Arrange
-            val raider = createRaider(
-                characterName = "Kael'thas",
-                realm = "Quel'Thalas"
-            )
+            val raider =
+                createRaider(
+                    characterName = "Kael'thas",
+                    realm = "Quel'Thalas",
+                )
 
             // Act
             val fullName = raider.getFullName()
@@ -241,7 +246,6 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class CharacterClassTests {
-
         @Test
         fun `should have all 13 character classes`() {
             // Act
@@ -303,7 +307,6 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class RoleTests {
-
         @Test
         fun `should have all 3 roles`() {
             // Act
@@ -345,7 +348,6 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class RaiderStatusTests {
-
         @Test
         fun `should have all 5 raider statuses`() {
             // Act
@@ -353,13 +355,14 @@ class RaiderTest : UnitTest() {
 
             // Assert
             statuses.size shouldBe 5
-            statuses shouldBe listOf(
-                RaiderStatus.ACTIVE,
-                RaiderStatus.INACTIVE,
-                RaiderStatus.BENCHED,
-                RaiderStatus.TRIAL,
-                RaiderStatus.ALUMNI
-            )
+            statuses shouldBe
+                listOf(
+                    RaiderStatus.ACTIVE,
+                    RaiderStatus.INACTIVE,
+                    RaiderStatus.BENCHED,
+                    RaiderStatus.TRIAL,
+                    RaiderStatus.ALUMNI,
+                )
         }
 
         @Test
@@ -386,7 +389,6 @@ class RaiderTest : UnitTest() {
 
     @Nested
     inner class RaiderCopyTests {
-
         @Test
         fun `should allow status changes via copy`() {
             // Arrange
@@ -404,10 +406,11 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should allow role changes via copy`() {
             // Arrange
-            val tankRaider = createRaider(
-                characterClass = CharacterClass.PALADIN,
-                role = Role.TANK
-            )
+            val tankRaider =
+                createRaider(
+                    characterClass = CharacterClass.PALADIN,
+                    role = Role.TANK,
+                )
 
             // Act
             val healerRaider = tankRaider.copy(role = Role.HEALER)

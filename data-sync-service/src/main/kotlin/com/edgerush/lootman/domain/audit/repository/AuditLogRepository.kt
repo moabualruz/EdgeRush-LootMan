@@ -25,7 +25,10 @@ interface AuditLogRepository {
      * @param entityId The entity's unique identifier
      * @return List of audit logs for the specified entity, ordered by timestamp descending
      */
-    fun findByEntity(entityType: String, entityId: String): List<AuditLog>
+    fun findByEntity(
+        entityType: String,
+        entityId: String,
+    ): List<AuditLog>
 
     /**
      * Find audit logs by user ID.
@@ -42,7 +45,10 @@ interface AuditLogRepository {
      * @param to End of the time range (inclusive)
      * @return List of audit logs within the time range, ordered by timestamp descending
      */
-    fun findByTimeRange(from: Instant, to: Instant): List<AuditLog>
+    fun findByTimeRange(
+        from: Instant,
+        to: Instant,
+    ): List<AuditLog>
 
     /**
      * Find audit logs by operation type.

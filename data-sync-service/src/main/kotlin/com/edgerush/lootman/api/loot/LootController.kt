@@ -2,6 +2,8 @@ package com.edgerush.lootman.api.loot
 
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.api.auth.CurrentUserService
+import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.loot.AwardLootCommand
 import com.edgerush.lootman.application.loot.AwardLootUseCase
 import com.edgerush.lootman.application.loot.CreateLootBanCommand
@@ -13,8 +15,6 @@ import com.edgerush.lootman.application.loot.GetLootHistoryUseCase
 import com.edgerush.lootman.application.loot.ListLootAwardsByGuildPaginatedQuery
 import com.edgerush.lootman.application.loot.ListLootAwardsByGuildQuery
 import com.edgerush.lootman.application.loot.ListLootAwardsUseCase
-import com.edgerush.lootman.api.common.PagedResponse
-import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.loot.ManageLootBansUseCase
 import com.edgerush.lootman.application.loot.RemoveLootBanCommand
 import com.edgerush.lootman.application.loot.RevokeLootAwardCommand
@@ -98,7 +98,7 @@ class LootController(
     @GetMapping("/guilds/{guildId}/me/history")
     @Operation(
         summary = "Get my loot history",
-        description = "Returns loot history for the current user's primary linked character"
+        description = "Returns loot history for the current user's primary linked character",
     )
     fun getMyLootHistory(
         @Parameter(description = "Guild ID")
@@ -107,10 +107,11 @@ class LootController(
         @AuthenticationPrincipal user: AuthenticatedUser,
     ): LootHistoryResponse {
         val raiderId = currentUserService.getCurrentUserPrimaryRaiderIdBlocking(user)
-        val query = com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery(
-            raiderId = raiderId,
-            activeOnly = activeOnly,
-        )
+        val query =
+            com.edgerush.lootman.application.loot.GetLootHistoryByRaiderQuery(
+                raiderId = raiderId,
+                activeOnly = activeOnly,
+            )
         val result = getLootHistoryUseCase.getByRaider(query)
         return result
             .map { awards -> LootHistoryResponse.from(awards) }
@@ -225,7 +226,7 @@ class LootController(
      */
     @GetMapping("/awards/all")
     fun listAllLootAwards(
-        @RequestParam guildId: String
+        @RequestParam guildId: String,
     ): LootAwardsListResponse {
         return listLootAwardsUseCase.executeByGuild(ListLootAwardsByGuildQuery(guildId))
             .map { awards -> LootAwardsListResponse.from(awards) }
@@ -239,21 +240,22 @@ class LootController(
     fun listLootAwards(
         @RequestParam guildId: String,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(required = false) size: Int?
+        @RequestParam(required = false) size: Int?,
     ): PagedResponse<LootAwardDto> {
         val pageRequest = paginationProperties.createPageRequest(page, size)
-        val query = ListLootAwardsByGuildPaginatedQuery(
-            guildId = guildId,
-            offset = pageRequest.offset,
-            limit = pageRequest.size
-        )
+        val query =
+            ListLootAwardsByGuildPaginatedQuery(
+                guildId = guildId,
+                offset = pageRequest.offset,
+                limit = pageRequest.size,
+            )
 
         return listLootAwardsUseCase.executeByGuildPaginated(query)
             .map { result ->
                 PagedResponse.of(
                     content = result.awards.map { LootAwardDto.from(it) },
                     pageRequest = pageRequest,
-                    totalElements = result.totalCount
+                    totalElements = result.totalCount,
                 )
             }
             .getOrThrow()
@@ -263,7 +265,9 @@ class LootController(
      * Get a specific loot award by ID.
      */
     @GetMapping("/awards/{awardId}")
-    fun getLootAward(@PathVariable awardId: String): LootAwardDto {
+    fun getLootAward(
+        @PathVariable awardId: String,
+    ): LootAwardDto {
         return getLootAwardUseCase.execute(GetLootAwardQuery(awardId))
             .map { award -> LootAwardDto.from(award) }
             .getOrThrow()
@@ -273,7 +277,9 @@ class LootController(
      * Revoke/delete a loot award.
      */
     @DeleteMapping("/awards/{awardId}")
-    fun revokeLootAward(@PathVariable awardId: String): ResponseEntity<Void> {
+    fun revokeLootAward(
+        @PathVariable awardId: String,
+    ): ResponseEntity<Void> {
         return revokeLootAwardUseCase.execute(RevokeLootAwardCommand(awardId))
             .map { ResponseEntity.noContent().build<Void>() }
             .getOrThrow()
@@ -283,7 +289,9 @@ class LootController(
      * Get a specific loot ban by ID.
      */
     @GetMapping("/bans/{banId}")
-    fun getLootBan(@PathVariable banId: String): LootBanDto {
+    fun getLootBan(
+        @PathVariable banId: String,
+    ): LootBanDto {
         return getLootBanUseCase.execute(GetLootBanQuery(banId))
             .map { ban -> LootBanDto.from(ban) }
             .getOrThrow()
@@ -295,13 +303,14 @@ class LootController(
     @PutMapping("/bans/{banId}")
     fun updateLootBan(
         @PathVariable banId: String,
-        @RequestBody request: UpdateLootBanRequest
+        @RequestBody request: UpdateLootBanRequest,
     ): LootBanDto {
-        val command = UpdateLootBanCommand(
-            banId = banId,
-            reason = request.reason,
-            expiresAt = request.expiresAt
-        )
+        val command =
+            UpdateLootBanCommand(
+                banId = banId,
+                reason = request.reason,
+                expiresAt = request.expiresAt,
+            )
         return updateLootBanUseCase.execute(command)
             .map { ban -> LootBanDto.from(ban) }
             .getOrThrow()

@@ -29,7 +29,6 @@ import java.time.Instant
  * The repository operates on the guild_configurations table.
  */
 class JdbcGuildRepositoryTest : UnitTest() {
-
     private lateinit var jdbcTemplate: JdbcTemplate
     private lateinit var repository: JdbcGuildRepository
 
@@ -41,7 +40,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindByIdTests {
-
         @Test
         fun `should return guild when found by id`() {
             // Given
@@ -52,7 +50,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
@@ -79,7 +77,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns emptyList()
 
@@ -101,28 +99,29 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
-                val rs = mockResultSet(
-                    guildId = guildId.value,
-                    name = "Full Guild",
-                    createdAt = createdAt,
-                    updatedAt = updatedAt,
-                    description = "A complete guild configuration",
-                    realm = "Area 52",
-                    region = "EU",
-                    syncEnabled = true,
-                    syncCronExpression = "0 0 5 * * *",
-                    syncRunOnStartup = true,
-                    timezone = "America/New_York",
-                    benchmarkMode = "CUSTOM",
-                    customBenchmarkRms = 0.95,
-                    customBenchmarkIpi = 0.90,
-                    syncStatus = "SUCCESS",
-                    isActive = true
-                )
+                val rs =
+                    mockResultSet(
+                        guildId = guildId.value,
+                        name = "Full Guild",
+                        createdAt = createdAt,
+                        updatedAt = updatedAt,
+                        description = "A complete guild configuration",
+                        realm = "Area 52",
+                        region = "EU",
+                        syncEnabled = true,
+                        syncCronExpression = "0 0 5 * * *",
+                        syncRunOnStartup = true,
+                        timezone = "America/New_York",
+                        benchmarkMode = "CUSTOM",
+                        customBenchmarkRms = 0.95,
+                        customBenchmarkIpi = 0.90,
+                        syncStatus = "SUCCESS",
+                        isActive = true,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 
@@ -159,7 +158,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
@@ -185,7 +184,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
@@ -212,7 +211,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
@@ -237,7 +236,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("guild_id = ?") },
                     any<RowMapper<Guild>>(),
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
@@ -255,7 +254,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllTests {
-
         @Test
         fun `should return all guilds`() {
             // Given
@@ -264,14 +262,14 @@ class JdbcGuildRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && !it.contains("is_active = true") },
-                    any<RowMapper<Guild>>()
+                    any<RowMapper<Guild>>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet("guild-1", "Guild One", now), 0),
                     rowMapper.mapRow(mockResultSet("guild-2", "Guild Two", now, isActive = false), 1),
-                    rowMapper.mapRow(mockResultSet("guild-3", "Guild Three", now), 2)
+                    rowMapper.mapRow(mockResultSet("guild-3", "Guild Three", now), 2),
                 )
             }
 
@@ -292,7 +290,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") },
-                    any<RowMapper<Guild>>()
+                    any<RowMapper<Guild>>(),
                 )
             } returns emptyList()
 
@@ -306,7 +304,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class FindAllActiveTests {
-
         @Test
         fun `should return only active guilds`() {
             // Given
@@ -315,13 +312,13 @@ class JdbcGuildRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("is_active = true") },
-                    any<RowMapper<Guild>>()
+                    any<RowMapper<Guild>>(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<Guild>>()
                 listOf(
                     rowMapper.mapRow(mockResultSet("active-1", "Active One", now), 0),
-                    rowMapper.mapRow(mockResultSet("active-2", "Active Two", now), 1)
+                    rowMapper.mapRow(mockResultSet("active-2", "Active Two", now), 1),
                 )
             }
 
@@ -336,7 +333,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class SaveTests {
-
         @Test
         fun `should insert new guild when not exists`() {
             // Given
@@ -369,7 +365,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                     guild.settings.benchmarkMode.name,
                     guild.settings.customBenchmarkRms,
                     guild.settings.customBenchmarkIpi,
-                    guild.isActive
+                    guild.isActive,
                 )
             }
         }
@@ -406,7 +402,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                     guild.settings.customBenchmarkRms,
                     guild.settings.customBenchmarkIpi,
                     guild.isActive,
-                    guild.id.value
+                    guild.id.value,
                 )
             }
         }
@@ -414,7 +410,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class DeleteByIdTests {
-
         @Test
         fun `should return true when guild deleted`() {
             // Given
@@ -423,7 +418,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 1
 
@@ -442,7 +437,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 0
 
@@ -456,7 +451,6 @@ class JdbcGuildRepositoryTest : UnitTest() {
 
     @Nested
     inner class ExistsByIdTests {
-
         @Test
         fun `should return true when guild exists`() {
             // Given
@@ -466,7 +460,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT") },
                     Int::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 1
 
@@ -486,7 +480,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
                 jdbcTemplate.queryForObject(
                     match<String> { it.contains("COUNT") },
                     Int::class.java,
-                    eq(guildId.value)
+                    eq(guildId.value),
                 )
             } returns 0
 
@@ -516,7 +510,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
         customBenchmarkRms: Double? = null,
         customBenchmarkIpi: Double? = null,
         syncStatus: String? = null,
-        isActive: Boolean = true
+        isActive: Boolean = true,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("guild_id") } returns guildId
@@ -542,7 +536,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
     private fun mockResultSetWithNullCronAndTimezone(
         guildId: String,
         name: String,
-        createdAt: Instant
+        createdAt: Instant,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("guild_id") } returns guildId
@@ -568,7 +562,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
     private fun mockResultSetWithUnknownEnums(
         guildId: String,
         name: String,
-        createdAt: Instant
+        createdAt: Instant,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("guild_id") } returns guildId
@@ -594,7 +588,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
     private fun mockResultSetWithNullRegion(
         guildId: String,
         name: String,
-        createdAt: Instant
+        createdAt: Instant,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("guild_id") } returns guildId
@@ -620,7 +614,7 @@ class JdbcGuildRepositoryTest : UnitTest() {
     private fun mockResultSetWithNullBenchmarkMode(
         guildId: String,
         name: String,
-        createdAt: Instant
+        createdAt: Instant,
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("guild_id") } returns guildId
@@ -653,17 +647,18 @@ class JdbcGuildRepositoryTest : UnitTest() {
         syncStatus: SyncStatus = SyncStatus.NEVER_RUN,
         isActive: Boolean = true,
         createdAt: Instant = Instant.now(),
-        updatedAt: Instant = Instant.now()
-    ): Guild = Guild(
-        id = id,
-        name = name,
-        description = description,
-        realm = realm,
-        region = region,
-        settings = settings,
-        syncStatus = syncStatus,
-        isActive = isActive,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+        updatedAt: Instant = Instant.now(),
+    ): Guild =
+        Guild(
+            id = id,
+            name = name,
+            description = description,
+            realm = realm,
+            region = region,
+            settings = settings,
+            syncStatus = syncStatus,
+            isActive = isActive,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 }

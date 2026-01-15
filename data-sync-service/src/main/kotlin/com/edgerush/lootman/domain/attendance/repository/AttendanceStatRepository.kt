@@ -31,7 +31,10 @@ interface AttendanceStatRepository {
      * @param limit The maximum number of records to return
      * @return List of attendance stat entities
      */
-    fun findAll(offset: Long, limit: Int): List<AttendanceStatEntity>
+    fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity>
 
     /**
      * Counts all attendance stats.
@@ -48,7 +51,11 @@ interface AttendanceStatRepository {
      * @param limit The maximum number of records to return
      * @return List of attendance stat entities for the character
      */
-    fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<AttendanceStatEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity>
 
     /**
      * Counts attendance stats for a character.
@@ -66,7 +73,11 @@ interface AttendanceStatRepository {
      * @param limit The maximum number of records to return
      * @return List of attendance stat entities for the team
      */
-    fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<AttendanceStatEntity>
+    fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity>
 
     /**
      * Counts attendance stats for a team.
@@ -84,7 +95,11 @@ interface AttendanceStatRepository {
      * @param limit The maximum number of records to return
      * @return List of attendance stat entities for the season
      */
-    fun findBySeasonId(seasonId: Long, offset: Long, limit: Int): List<AttendanceStatEntity>
+    fun findBySeasonId(
+        seasonId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<AttendanceStatEntity>
 
     /**
      * Counts attendance stats for a season.

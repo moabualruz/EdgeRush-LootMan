@@ -89,6 +89,6 @@ class RaiderWarcraftLogControllerTest : UnitTest() {
         id: Long = 1L,
         raiderId: Long = 1L,
         difficulty: String = "mythic",
-        score: Int? = 95
+        score: Int? = 95,
     ) = RaiderWarcraftLogResponse(id, raiderId, difficulty, score)
 }

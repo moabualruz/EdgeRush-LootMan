@@ -23,7 +23,10 @@ class AuditLogService(
      * @param entityId The entity's unique identifier
      * @return List of audit log responses
      */
-    fun findByEntity(entityType: String, entityId: String): List<AuditLogResponse> {
+    fun findByEntity(
+        entityType: String,
+        entityId: String,
+    ): List<AuditLogResponse> {
         return auditLogRepository.findByEntity(entityType, entityId)
             .map { AuditLogResponse.from(it) }
     }
@@ -46,7 +49,10 @@ class AuditLogService(
      * @param to End of the time range (inclusive)
      * @return List of audit log responses
      */
-    fun findByTimeRange(from: Instant, to: Instant): List<AuditLogResponse> {
+    fun findByTimeRange(
+        from: Instant,
+        to: Instant,
+    ): List<AuditLogResponse> {
         require(!from.isAfter(to)) { "Start time must not be after end time" }
         return auditLogRepository.findByTimeRange(from, to)
             .map { AuditLogResponse.from(it) }
@@ -70,7 +76,10 @@ class AuditLogService(
      * @param entityId The entity's unique identifier
      * @return Count of audit logs
      */
-    fun countByEntity(entityType: String, entityId: String): Long {
+    fun countByEntity(
+        entityType: String,
+        entityId: String,
+    ): Long {
         return auditLogRepository.findByEntity(entityType, entityId).size.toLong()
     }
 

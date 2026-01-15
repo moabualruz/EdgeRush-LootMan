@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
  * Unit tests for Wishlist and WishlistItem.
  */
 class WishlistTest : UnitTest() {
-
     // region Test Fixtures
 
     private fun createWishlistItem(
@@ -24,38 +23,38 @@ class WishlistTest : UnitTest() {
         itemName: String = "Crown of the Firelands",
         priority: Int = 1,
         upgradePercentage: Double = 15.5,
-        specName: String? = "Protection"
+        specName: String? = "Protection",
     ) = WishlistItem(
         itemId = ItemId(itemId),
         itemName = itemName,
         priority = priority,
         upgradePercentage = upgradePercentage,
-        specName = specName
+        specName = specName,
     )
 
     private fun createWishlist(
         raiderId: RaiderId = RaiderId(1L),
-        items: List<WishlistItem> = emptyList()
+        items: List<WishlistItem> = emptyList(),
     ) = Wishlist(
         raiderId = raiderId,
-        items = items
+        items = items,
     )
 
     // endregion
 
     @Nested
     inner class WishlistItemCreationTests {
-
         @Test
         fun `should create valid wishlist item with all fields`() {
             // Arrange & Act
-            val item = createWishlistItem(
-                itemId = 207160L,
-                itemName = "Helm of Domination",
-                priority = 1,
-                upgradePercentage = 18.7,
-                specName = "Frost"
-            )
+            val item =
+                createWishlistItem(
+                    itemId = 207160L,
+                    itemName = "Helm of Domination",
+                    priority = 1,
+                    upgradePercentage = 18.7,
+                    specName = "Frost",
+                )
 
             // Assert
             item.itemId shouldBe ItemId(207160L)
@@ -77,27 +76,30 @@ class WishlistTest : UnitTest() {
         @Test
         fun `should throw exception when priority is zero`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createWishlistItem(priority = 0)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createWishlistItem(priority = 0)
+                }
             exception.message shouldBe "Priority must be positive"
         }
 
         @Test
         fun `should throw exception when priority is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createWishlistItem(priority = -1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createWishlistItem(priority = -1)
+                }
             exception.message shouldBe "Priority must be positive"
         }
 
         @Test
         fun `should throw exception when upgrade percentage is negative`() {
             // Arrange, Act & Assert
-            val exception = shouldThrow<IllegalArgumentException> {
-                createWishlistItem(upgradePercentage = -0.1)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    createWishlistItem(upgradePercentage = -0.1)
+                }
             exception.message shouldBe "Upgrade percentage cannot be negative"
         }
 
@@ -142,7 +144,6 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class GetNormalizedUpgradeValueTests {
-
         @Test
         fun `should return normalized value for typical upgrade percentage`() {
             // Arrange
@@ -218,20 +219,21 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class WishlistCreationTests {
-
         @Test
         fun `should create valid wishlist with items`() {
             // Arrange
-            val items = listOf(
-                createWishlistItem(itemId = 100L, priority = 1),
-                createWishlistItem(itemId = 200L, priority = 2)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(itemId = 100L, priority = 1),
+                    createWishlistItem(itemId = 200L, priority = 2),
+                )
 
             // Act
-            val wishlist = createWishlist(
-                raiderId = RaiderId(42L),
-                items = items
-            )
+            val wishlist =
+                createWishlist(
+                    raiderId = RaiderId(42L),
+                    items = items,
+                )
 
             // Assert
             wishlist.raiderId shouldBe RaiderId(42L)
@@ -250,18 +252,19 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class FindItemTests {
-
         @Test
         fun `should find item by item ID when present`() {
             // Arrange
             val targetItem = createWishlistItem(itemId = 200L, itemName = "Target Item")
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L, itemName = "First Item"),
-                    targetItem,
-                    createWishlistItem(itemId = 300L, itemName = "Third Item")
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L, itemName = "First Item"),
+                            targetItem,
+                            createWishlistItem(itemId = 300L, itemName = "Third Item"),
+                        ),
                 )
-            )
 
             // Act
             val found = wishlist.findItem(ItemId(200L))
@@ -273,12 +276,14 @@ class WishlistTest : UnitTest() {
         @Test
         fun `should return null when item ID not found`() {
             // Arrange
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L),
-                    createWishlistItem(itemId = 200L)
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L),
+                            createWishlistItem(itemId = 200L),
+                        ),
                 )
-            )
 
             // Act
             val found = wishlist.findItem(ItemId(999L))
@@ -316,16 +321,17 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class GetUpgradePercentageTests {
-
         @Test
         fun `should return upgrade percentage for existing item`() {
             // Arrange
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L, upgradePercentage = 12.5),
-                    createWishlistItem(itemId = 200L, upgradePercentage = 25.0)
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L, upgradePercentage = 12.5),
+                            createWishlistItem(itemId = 200L, upgradePercentage = 25.0),
+                        ),
                 )
-            )
 
             // Act
             val percentage = wishlist.getUpgradePercentage(ItemId(200L))
@@ -337,11 +343,13 @@ class WishlistTest : UnitTest() {
         @Test
         fun `should return null for non-existing item`() {
             // Arrange
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L, upgradePercentage = 12.5)
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L, upgradePercentage = 12.5),
+                        ),
                 )
-            )
 
             // Act
             val percentage = wishlist.getUpgradePercentage(ItemId(999L))
@@ -365,17 +373,18 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class ContainsItemTests {
-
         @Test
         fun `should return true when item exists`() {
             // Arrange
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L),
-                    createWishlistItem(itemId = 200L),
-                    createWishlistItem(itemId = 300L)
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L),
+                            createWishlistItem(itemId = 200L),
+                            createWishlistItem(itemId = 300L),
+                        ),
                 )
-            )
 
             // Act & Assert
             wishlist.containsItem(ItemId(200L)) shouldBe true
@@ -384,12 +393,14 @@ class WishlistTest : UnitTest() {
         @Test
         fun `should return false when item does not exist`() {
             // Arrange
-            val wishlist = createWishlist(
-                items = listOf(
-                    createWishlistItem(itemId = 100L),
-                    createWishlistItem(itemId = 200L)
+            val wishlist =
+                createWishlist(
+                    items =
+                        listOf(
+                            createWishlistItem(itemId = 100L),
+                            createWishlistItem(itemId = 200L),
+                        ),
                 )
-            )
 
             // Act & Assert
             wishlist.containsItem(ItemId(999L)) shouldBe false
@@ -407,7 +418,6 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class GetItemsByPriorityTests {
-
         @Test
         fun `should return items sorted by priority descending`() {
             // Arrange
@@ -466,11 +476,12 @@ class WishlistTest : UnitTest() {
         @Test
         fun `should not modify original items list`() {
             // Arrange
-            val items = listOf(
-                createWishlistItem(itemId = 100L, priority = 1),
-                createWishlistItem(itemId = 200L, priority = 10),
-                createWishlistItem(itemId = 300L, priority = 5)
-            )
+            val items =
+                listOf(
+                    createWishlistItem(itemId = 100L, priority = 1),
+                    createWishlistItem(itemId = 200L, priority = 10),
+                    createWishlistItem(itemId = 300L, priority = 5),
+                )
             val wishlist = createWishlist(items = items)
 
             // Act
@@ -485,7 +496,6 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class WishlistImmutabilityTests {
-
         @Test
         fun `should be immutable data class`() {
             // Arrange
@@ -505,10 +515,11 @@ class WishlistTest : UnitTest() {
             val original = createWishlist(raiderId = RaiderId(1L), items = originalItems)
 
             // Act
-            val newItems = listOf(
-                createWishlistItem(itemId = 100L),
-                createWishlistItem(itemId = 200L)
-            )
+            val newItems =
+                listOf(
+                    createWishlistItem(itemId = 100L),
+                    createWishlistItem(itemId = 200L),
+                )
             val modified = original.copy(items = newItems)
 
             // Assert
@@ -519,18 +530,18 @@ class WishlistTest : UnitTest() {
 
     @Nested
     inner class WishlistEdgeCaseTests {
-
         @Test
         fun `should handle large wishlist with many items`() {
             // Arrange
-            val items = (1L..100L).map { id ->
-                createWishlistItem(
-                    itemId = id,
-                    itemName = "Item $id",
-                    priority = id.toInt(),
-                    upgradePercentage = id.toDouble()
-                )
-            }
+            val items =
+                (1L..100L).map { id ->
+                    createWishlistItem(
+                        itemId = id,
+                        itemName = "Item $id",
+                        priority = id.toInt(),
+                        upgradePercentage = id.toDouble(),
+                    )
+                }
             val wishlist = createWishlist(items = items)
 
             // Act & Assert

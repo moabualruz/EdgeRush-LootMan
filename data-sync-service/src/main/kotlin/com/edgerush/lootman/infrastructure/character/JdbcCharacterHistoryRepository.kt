@@ -20,14 +20,14 @@ import java.time.ZoneOffset
 class JdbcCharacterHistoryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : CharacterHistoryRepository {
-
     override fun findById(id: Long): CharacterHistoryEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, character_id, character_name, character_realm, character_region,
                    team_id, season_id, period_id, history_json, best_gear_json, synced_at
             FROM character_history
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, characterHistoryRowMapper, id)
         return results.firstOrNull()
@@ -39,14 +39,18 @@ class JdbcCharacterHistoryRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<CharacterHistoryEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity> {
+        val sql =
+            """
             SELECT id, character_id, character_name, character_realm, character_region,
                    team_id, season_id, period_id, history_json, best_gear_json, synced_at
             FROM character_history
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterHistoryRowMapper, limit, offset)
     }
@@ -56,15 +60,20 @@ class JdbcCharacterHistoryRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByCharacterId(characterId: Long, offset: Long, limit: Int): List<CharacterHistoryEntity> {
-        val sql = """
+    override fun findByCharacterId(
+        characterId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity> {
+        val sql =
+            """
             SELECT id, character_id, character_name, character_realm, character_region,
                    team_id, season_id, period_id, history_json, best_gear_json, synced_at
             FROM character_history
             WHERE character_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterHistoryRowMapper, characterId, limit, offset)
     }
@@ -74,15 +83,20 @@ class JdbcCharacterHistoryRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, characterId) ?: 0L
     }
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<CharacterHistoryEntity> {
-        val sql = """
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<CharacterHistoryEntity> {
+        val sql =
+            """
             SELECT id, character_id, character_name, character_realm, character_region,
                    team_id, season_id, period_id, history_json, best_gear_json, synced_at
             FROM character_history
             WHERE team_id = ?
             ORDER BY synced_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterHistoryRowMapper, teamId, limit, offset)
     }
@@ -107,12 +121,13 @@ class JdbcCharacterHistoryRepository(
     }
 
     private fun insertCharacterHistory(entity: CharacterHistoryEntity): CharacterHistoryEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO character_history (
                 character_id, character_name, character_realm, character_region,
                 team_id, season_id, period_id, history_json, best_gear_json, synced_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -135,12 +150,13 @@ class JdbcCharacterHistoryRepository(
     }
 
     private fun updateCharacterHistory(entity: CharacterHistoryEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE character_history SET
                 character_id = ?, character_name = ?, character_realm = ?, character_region = ?,
                 team_id = ?, season_id = ?, period_id = ?, history_json = ?, best_gear_json = ?, synced_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -158,28 +174,29 @@ class JdbcCharacterHistoryRepository(
         )
     }
 
-    private val characterHistoryRowMapper = RowMapper { rs, _ ->
-        val teamIdValue = rs.getLong("team_id")
-        val teamId = if (rs.wasNull()) null else teamIdValue
+    private val characterHistoryRowMapper =
+        RowMapper { rs, _ ->
+            val teamIdValue = rs.getLong("team_id")
+            val teamId = if (rs.wasNull()) null else teamIdValue
 
-        val seasonIdValue = rs.getLong("season_id")
-        val seasonId = if (rs.wasNull()) null else seasonIdValue
+            val seasonIdValue = rs.getLong("season_id")
+            val seasonId = if (rs.wasNull()) null else seasonIdValue
 
-        val periodIdValue = rs.getLong("period_id")
-        val periodId = if (rs.wasNull()) null else periodIdValue
+            val periodIdValue = rs.getLong("period_id")
+            val periodId = if (rs.wasNull()) null else periodIdValue
 
-        CharacterHistoryEntity(
-            id = rs.getLong("id"),
-            characterId = rs.getLong("character_id"),
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            characterRegion = rs.getString("character_region"),
-            teamId = teamId,
-            seasonId = seasonId,
-            periodId = periodId,
-            historyJson = rs.getString("history_json"),
-            bestGearJson = rs.getString("best_gear_json"),
-            syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
-        )
-    }
+            CharacterHistoryEntity(
+                id = rs.getLong("id"),
+                characterId = rs.getLong("character_id"),
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                characterRegion = rs.getString("character_region"),
+                teamId = teamId,
+                seasonId = seasonId,
+                periodId = periodId,
+                historyJson = rs.getString("history_json"),
+                bestGearJson = rs.getString("best_gear_json"),
+                syncedAt = rs.getTimestamp("synced_at")?.toInstant()?.atOffset(ZoneOffset.UTC) ?: OffsetDateTime.now(),
+            )
+        }
 }

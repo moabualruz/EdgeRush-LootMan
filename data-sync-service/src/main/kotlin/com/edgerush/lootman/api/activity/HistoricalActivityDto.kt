@@ -32,12 +32,14 @@ data class HistoricalActivityResponse(
     val syncedAt: OffsetDateTime,
 ) {
     companion object {
-        fun from(e: HistoricalActivityEntity) = HistoricalActivityResponse(
-            e.id!!, e.characterId, e.characterName, e.characterRealm,
-            e.periodId, e.teamId, e.seasonId, e.dataJson, e.syncedAt
-        )
+        fun from(e: HistoricalActivityEntity) =
+            HistoricalActivityResponse(
+                e.id!!, e.characterId, e.characterName, e.characterRealm,
+                e.periodId, e.teamId, e.seasonId, e.dataJson, e.syncedAt,
+            )
     }
 }
 
 data class HistoricalActivityExistsResponse(val exists: Boolean)
+
 data class HistoricalActivityCountResponse(val count: Long)

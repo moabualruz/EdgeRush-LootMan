@@ -19,13 +19,13 @@ import java.time.LocalDateTime
 class JdbcLootBanEntityRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : LootBanEntityRepository {
-
     override fun findById(id: Long): LootBanEntity? {
-        val sql = """
+        val sql =
+            """
             SELECT id, guild_id, character_name, reason, banned_by, banned_at, expires_at, is_active
             FROM loot_bans
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val results = jdbcTemplate.query(sql, lootBanRowMapper, id)
         return results.firstOrNull()
@@ -37,13 +37,17 @@ class JdbcLootBanEntityRepository(
         return count > 0
     }
 
-    override fun findAll(offset: Long, limit: Int): List<LootBanEntity> {
-        val sql = """
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, reason, banned_by, banned_at, expires_at, is_active
             FROM loot_bans
             ORDER BY banned_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootBanRowMapper, limit, offset)
     }
@@ -53,14 +57,19 @@ class JdbcLootBanEntityRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0L
     }
 
-    override fun findByGuildId(guildId: String, offset: Long, limit: Int): List<LootBanEntity> {
-        val sql = """
+    override fun findByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, reason, banned_by, banned_at, expires_at, is_active
             FROM loot_bans
             WHERE guild_id = ?
             ORDER BY banned_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootBanRowMapper, guildId, limit, offset)
     }
@@ -70,34 +79,44 @@ class JdbcLootBanEntityRepository(
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId) ?: 0L
     }
 
-    override fun findActiveByGuildId(guildId: String, offset: Long, limit: Int): List<LootBanEntity> {
-        val sql = """
+    override fun findActiveByGuildId(
+        guildId: String,
+        offset: Long,
+        limit: Int,
+    ): List<LootBanEntity> {
+        val sql =
+            """
             SELECT id, guild_id, character_name, reason, banned_by, banned_at, expires_at, is_active
             FROM loot_bans
             WHERE guild_id = ? AND is_active = true
             AND (expires_at IS NULL OR expires_at > ?)
             ORDER BY banned_at DESC, id
             LIMIT ? OFFSET ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, lootBanRowMapper, guildId, Timestamp.valueOf(LocalDateTime.now()), limit, offset)
     }
 
     override fun countActiveByGuildId(guildId: String): Long {
-        val sql = """
+        val sql =
+            """
             SELECT COUNT(*) FROM loot_bans
             WHERE guild_id = ? AND is_active = true
             AND (expires_at IS NULL OR expires_at > ?)
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId, Timestamp.valueOf(LocalDateTime.now())) ?: 0L
     }
 
-    override fun isCharacterBanned(guildId: String, characterName: String): Boolean {
-        val sql = """
+    override fun isCharacterBanned(
+        guildId: String,
+        characterName: String,
+    ): Boolean {
+        val sql =
+            """
             SELECT COUNT(*) FROM loot_bans
             WHERE guild_id = ? AND character_name = ? AND is_active = true
             AND (expires_at IS NULL OR expires_at > ?)
-        """.trimIndent()
+            """.trimIndent()
         val count = jdbcTemplate.queryForObject(sql, Int::class.java, guildId, characterName, Timestamp.valueOf(LocalDateTime.now())) ?: 0
         return count > 0
     }
@@ -117,11 +136,12 @@ class JdbcLootBanEntityRepository(
     }
 
     private fun insertLootBan(lootBan: LootBanEntity): LootBanEntity {
-        val sql = """
+        val sql =
+            """
             INSERT INTO loot_bans (
                 guild_id, character_name, reason, banned_by, banned_at, expires_at, is_active
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update({ connection ->
@@ -141,7 +161,8 @@ class JdbcLootBanEntityRepository(
     }
 
     private fun updateLootBan(lootBan: LootBanEntity) {
-        val sql = """
+        val sql =
+            """
             UPDATE loot_bans SET
                 guild_id = ?,
                 character_name = ?,
@@ -151,7 +172,7 @@ class JdbcLootBanEntityRepository(
                 expires_at = ?,
                 is_active = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -166,19 +187,20 @@ class JdbcLootBanEntityRepository(
         )
     }
 
-    private val lootBanRowMapper = RowMapper { rs, _ ->
-        val expiresAtTimestamp = rs.getTimestamp("expires_at")
-        val expiresAt = expiresAtTimestamp?.toLocalDateTime()
+    private val lootBanRowMapper =
+        RowMapper { rs, _ ->
+            val expiresAtTimestamp = rs.getTimestamp("expires_at")
+            val expiresAt = expiresAtTimestamp?.toLocalDateTime()
 
-        LootBanEntity(
-            id = rs.getLong("id"),
-            guildId = rs.getString("guild_id"),
-            characterName = rs.getString("character_name"),
-            reason = rs.getString("reason"),
-            bannedBy = rs.getString("banned_by"),
-            bannedAt = rs.getTimestamp("banned_at").toLocalDateTime(),
-            expiresAt = expiresAt,
-            isActive = rs.getBoolean("is_active"),
-        )
-    }
+            LootBanEntity(
+                id = rs.getLong("id"),
+                guildId = rs.getString("guild_id"),
+                characterName = rs.getString("character_name"),
+                reason = rs.getString("reason"),
+                bannedBy = rs.getString("banned_by"),
+                bannedAt = rs.getTimestamp("banned_at").toLocalDateTime(),
+                expiresAt = expiresAt,
+                isActive = rs.getBoolean("is_active"),
+            )
+        }
 }
