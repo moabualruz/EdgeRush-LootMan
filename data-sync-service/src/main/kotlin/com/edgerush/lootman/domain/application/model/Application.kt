@@ -46,6 +46,64 @@ data class Application private constructor(
         private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 
         /**
+         * Reconstructs an Application from persisted data.
+         *
+         * This is used by repositories to load Application entities from the database.
+         * Unlike [create], this does not generate a new ID or set timestamps.
+         */
+        fun reconstruct(
+            id: ApplicationId,
+            guildId: GuildId,
+            battleNetId: String,
+            discordId: String,
+            email: String,
+            characterName: String,
+            characterRealm: String,
+            characterClass: String,
+            specialization: String,
+            itemLevel: Double,
+            raiderIOScore: Double?,
+            bestParseAverage: Double?,
+            age: Int,
+            location: String,
+            timezone: String,
+            raidDaysAvailable: List<String>,
+            previousGuilds: String,
+            reasonForLeaving: String,
+            whyThisGuild: String,
+            status: ApplicationStatus,
+            reviewedBy: String?,
+            reviewedAt: Instant?,
+            createdAt: Instant,
+            updatedAt: Instant,
+        ): Application = Application(
+            id = id,
+            guildId = guildId,
+            battleNetId = battleNetId,
+            discordId = discordId,
+            email = email,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterClass = characterClass,
+            specialization = specialization,
+            itemLevel = itemLevel,
+            raiderIOScore = raiderIOScore,
+            bestParseAverage = bestParseAverage,
+            age = age,
+            location = location,
+            timezone = timezone,
+            raidDaysAvailable = raidDaysAvailable,
+            previousGuilds = previousGuilds,
+            reasonForLeaving = reasonForLeaving,
+            whyThisGuild = whyThisGuild,
+            status = status,
+            reviewedBy = reviewedBy,
+            reviewedAt = reviewedAt,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
+
+        /**
          * Creates a new Application with PENDING status.
          */
         fun create(

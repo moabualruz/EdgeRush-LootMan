@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
+import { ref, readonly } from 'vue'
 import ApplyPage from './ApplyPage.vue'
 
 // Mock the API module
@@ -8,6 +9,14 @@ vi.mock('@/api/applications', () => ({
   applicationsApi: {
     submitApplication: vi.fn(),
     getMyApplication: vi.fn(),
+  },
+}))
+
+// Mock the recruitment API module
+vi.mock('@/api/recruitment', () => ({
+  recruitmentApi: {
+    lookupCharacterFull: vi.fn(),
+    submitApplication: vi.fn(),
   },
 }))
 
@@ -31,6 +40,26 @@ vi.mock('@/composables/useToast', () => ({
   }),
 }))
 
+// Mock the character lookup composable
+const mockCharacterData = ref(null)
+const mockIsLoading = ref(false)
+const mockError = ref(null)
+const mockHasSearched = ref(false)
+
+vi.mock('@/composables/useCharacterLookup', () => ({
+  useCharacterLookup: () => ({
+    lookupCharacter: vi.fn().mockResolvedValue(null),
+    debouncedLookup: vi.fn(),
+    characterData: readonly(mockCharacterData),
+    isLoading: readonly(mockIsLoading),
+    error: readonly(mockError),
+    hasSearched: readonly(mockHasSearched),
+    hasRaiderIOData: ref(false),
+    hasWarcraftLogsData: ref(false),
+    reset: vi.fn(),
+  }),
+}))
+
 // Mock chart components
 vi.mock('@/components/charts', () => ({
   ProgressBar: {
@@ -43,6 +72,11 @@ vi.mock('@/components/charts', () => ({
 describe('ApplyPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset mock refs
+    mockCharacterData.value = null
+    mockIsLoading.value = false
+    mockError.value = null
+    mockHasSearched.value = false
   })
 
   const mountComponent = () => {
@@ -164,5 +198,18 @@ describe('ApplyPage', () => {
     const wrapper = mountComponent()
     expect(wrapper.text()).toContain('What happens next?')
     expect(wrapper.text()).toContain('officers will review')
+  })
+
+  it('should have fetch character data button on step 2', () => {
+    const wrapper = mountComponent()
+    // The button text should be present (even on step 1, it's in the DOM but hidden)
+    expect(wrapper.text()).toContain('Fetch Character Data')
+  })
+
+  it('should show character data instructions when no data fetched', () => {
+    const wrapper = mountComponent()
+    expect(wrapper.text()).toContain('Enter your character name and realm')
+    expect(wrapper.text()).toContain('Raider.IO score')
+    expect(wrapper.text()).toContain('Warcraft Logs')
   })
 })

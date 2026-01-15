@@ -98,7 +98,13 @@
       "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --tests \"*ApplicationServiceTest\" --no-daemon)",
       "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RaiderIOClientTest\" --no-daemon)",
       "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RecruitmentApplicationControllerTest\" --no-daemon)",
-      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --tests \"*ApplicationServiceTest\" --tests \"*RaiderIOClientTest\" --tests \"*RecruitmentApplicationControllerTest\" --no-daemon)"
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --tests \"*ApplicationServiceTest\" --tests \"*RaiderIOClientTest\" --tests \"*RecruitmentApplicationControllerTest\" --no-daemon)",
+      "Bash(./gradlew.bat:*)",
+      "Bash(for f in build/test-results/test/TEST-com.edgerush.lootman.infrastructure.application.JdbcEnhancedApplicationRepositoryTest*.xml)",
+      "Bash(do grep -oP 'tests=\"\"\\\\d+\"\"' \"$f\")",
+      "Read(//f/work/dod/looter/**)",
+      "Bash(cmd:*)",
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\data-sync-service\\\\gradlew.bat\" test --tests \"*ApplicationServiceTest*\")"
     ]
   }
 }

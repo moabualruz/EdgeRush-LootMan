@@ -7,7 +7,9 @@ import com.edgerush.lootman.domain.application.client.RaiderIOClient
 import com.edgerush.lootman.domain.application.model.Application
 import com.edgerush.lootman.domain.application.model.ApplicationId
 import com.edgerush.lootman.domain.application.model.ApplicationStatus
+import com.edgerush.lootman.domain.application.service.ApplicationDataFetchService
 import com.edgerush.lootman.domain.application.service.ApplicationService
+import com.edgerush.lootman.domain.application.service.CharacterNotFoundException
 import com.edgerush.lootman.domain.shared.GuildId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -43,6 +45,7 @@ import java.time.Instant
 class RecruitmentApplicationController(
     private val applicationService: ApplicationService,
     private val raiderIOClient: RaiderIOClient,
+    private val dataFetchService: ApplicationDataFetchService,
 ) {
 
     @Operation(summary = "Get all applications for a guild", description = "Returns applications for a guild with optional status filter")
@@ -244,6 +247,47 @@ class RecruitmentApplicationController(
         }
     }
 
+    @Operation(
+        summary = "Fetch comprehensive character data",
+        description = "Auto-fetches character data from both Raider.IO and Warcraft Logs APIs",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Character data fetched successfully"),
+        ApiResponse(responseCode = "404", description = "Character not found"),
+    )
+    @GetMapping("/character-lookup/full")
+    fun lookupCharacterFull(
+        @Parameter(description = "Character region (us, eu, kr, tw, cn)")
+        @RequestParam region: String,
+        @Parameter(description = "Character realm")
+        @RequestParam realm: String,
+        @Parameter(description = "Character name")
+        @RequestParam name: String,
+    ): ResponseEntity<CharacterFullLookupResponse> {
+        return try {
+            val result = dataFetchService.fetchCharacterData(region, realm, name)
+            ResponseEntity.ok(
+                CharacterFullLookupResponse(
+                    name = result.characterName,
+                    realm = result.realm,
+                    region = result.region,
+                    characterClass = result.characterClass,
+                    specialization = result.specialization,
+                    role = result.role,
+                    itemLevel = result.itemLevel,
+                    raiderIOScore = result.raiderIOScore,
+                    bestParseAverage = result.bestParseAverage,
+                    medianParseAverage = result.medianParseAverage,
+                    profileUrl = result.profileUrl,
+                )
+            )
+        } catch (e: CharacterNotFoundException) {
+            ResponseEntity.notFound().build()
+        } catch (e: Exception) {
+            ResponseEntity.notFound().build()
+        }
+    }
+
     private fun Application.toResponse() = ApplicationResponse(
         id = id.value,
         guildId = guildId.value,
@@ -359,5 +403,22 @@ data class CharacterLookupResponse(
     val role: String?,
     val itemLevel: Double?,
     val raiderIOScore: Double?,
+    val profileUrl: String,
+)
+
+/**
+ * Enhanced response with data from both Raider.IO and Warcraft Logs.
+ */
+data class CharacterFullLookupResponse(
+    val name: String,
+    val realm: String,
+    val region: String,
+    val characterClass: String,
+    val specialization: String?,
+    val role: String?,
+    val itemLevel: Double?,
+    val raiderIOScore: Double?,
+    val bestParseAverage: Double?,
+    val medianParseAverage: Double?,
     val profileUrl: String,
 )

@@ -8,6 +8,7 @@ import com.edgerush.lootman.domain.application.client.RaiderIOScores
 import com.edgerush.lootman.domain.application.model.Application
 import com.edgerush.lootman.domain.application.model.ApplicationId
 import com.edgerush.lootman.domain.application.model.ApplicationStatus
+import com.edgerush.lootman.domain.application.service.ApplicationDataFetchService
 import com.edgerush.lootman.domain.application.service.ApplicationService
 import com.edgerush.lootman.domain.shared.GuildId
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -35,15 +36,17 @@ class RecruitmentApplicationControllerTest {
     private lateinit var mockMvc: MockMvc
     private lateinit var applicationService: ApplicationService
     private lateinit var raiderIOClient: RaiderIOClient
+    private lateinit var dataFetchService: ApplicationDataFetchService
     private lateinit var objectMapper: ObjectMapper
 
     @BeforeEach
     fun setUp() {
         applicationService = mockk()
         raiderIOClient = mockk()
+        dataFetchService = mockk()
         objectMapper = ObjectMapper().findAndRegisterModules()
 
-        val controller = RecruitmentApplicationController(applicationService, raiderIOClient)
+        val controller = RecruitmentApplicationController(applicationService, raiderIOClient, dataFetchService)
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build()
     }
 

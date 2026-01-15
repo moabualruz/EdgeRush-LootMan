@@ -4,21 +4,43 @@
  *
  * Multi-step form for submitting guild applications:
  * 1. About You - Personal info and availability
- * 2. Character - Main character selection
+ * 2. Character - Main character selection with auto-fetch
  * 3. Guild History - Previous guild and experience
  * 4. Motivation - Why join and what you bring
  * 5. Review - Review and submit
  */
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMutation } from '@tanstack/vue-query'
 import { applicationsApi } from '@/api/applications'
+import { recruitmentApi, type SubmitApplicationRequest } from '@/api/recruitment'
 import { useToast } from '@/composables/useToast'
+import { useCharacterLookup } from '@/composables/useCharacterLookup'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import { ProgressBar } from '@/components/charts'
 
 const router = useRouter()
 const toast = useToast()
+
+// Character lookup composable
+const {
+  lookupCharacter,
+  debouncedLookup,
+  characterData,
+  isLoading: isLoadingCharacter,
+  error: characterError,
+  hasSearched: hasSearchedCharacter,
+  hasRaiderIOData,
+  hasWarcraftLogsData,
+  reset: resetCharacterLookup,
+} = useCharacterLookup()
+
+// Auto-fetched character data storage
+const autoFetchedData = reactive({
+  itemLevel: null as number | null,
+  raiderIOScore: null as number | null,
+  bestParseAverage: null as number | null,
+})
 
 // Form steps
 const steps = [
@@ -183,6 +205,79 @@ function toggleRaidDay(day: string) {
     formData.raidAvailability.splice(index, 1)
   }
 }
+
+// Fetch character data from external APIs
+async function fetchCharacterData() {
+  if (
+    formData.characterName.trim().length < 2 ||
+    formData.realm.trim().length < 2 ||
+    !formData.region
+  ) {
+    return
+  }
+
+  const data = await lookupCharacter(
+    formData.region.toLowerCase(),
+    formData.realm,
+    formData.characterName
+  )
+
+  if (data) {
+    // Auto-populate class and spec if not already set
+    if (!formData.characterClass && data.characterClass) {
+      formData.characterClass = data.characterClass
+    }
+    if (!formData.specialization && data.specialization) {
+      formData.specialization = data.specialization
+    }
+
+    // Store fetched data for submission
+    autoFetchedData.itemLevel = data.itemLevel
+    autoFetchedData.raiderIOScore = data.raiderIOScore
+    autoFetchedData.bestParseAverage = data.bestParseAverage
+
+    toast.success('Character data fetched successfully!')
+  } else if (characterError.value) {
+    toast.warning('Could not fetch character data. You can still proceed with your application.')
+  }
+}
+
+// Watch for character field changes and debounce fetch
+watch(
+  () => [formData.characterName, formData.realm, formData.region],
+  () => {
+    if (
+      formData.characterName.trim().length >= 2 &&
+      formData.realm.trim().length >= 2 &&
+      formData.region
+    ) {
+      debouncedLookup(
+        formData.region.toLowerCase(),
+        formData.realm,
+        formData.characterName
+      )
+    }
+  },
+  { debounce: 500 }
+)
+
+// Update auto-fetched data when characterData changes
+watch(characterData, (data) => {
+  if (data) {
+    // Auto-populate class and spec if not already set
+    if (!formData.characterClass && data.characterClass) {
+      formData.characterClass = data.characterClass
+    }
+    if (!formData.specialization && data.specialization) {
+      formData.specialization = data.specialization
+    }
+
+    // Store fetched data for submission
+    autoFetchedData.itemLevel = data.itemLevel
+    autoFetchedData.raiderIOScore = data.raiderIOScore
+    autoFetchedData.bestParseAverage = data.bestParseAverage
+  }
+})
 
 // Submit mutation
 const submitMutation = useMutation({
@@ -469,10 +564,99 @@ async function submitApplication() {
               />
             </div>
 
-            <div class="bg-gray-800/50 rounded-lg p-4">
+            <!-- Character Data Fetch Button -->
+            <div class="flex items-center gap-4">
+              <button
+                type="button"
+                @click="fetchCharacterData"
+                :disabled="isLoadingCharacter || formData.characterName.length < 2 || formData.realm.length < 2"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <svg
+                  v-if="isLoadingCharacter"
+                  class="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {{ isLoadingCharacter ? 'Fetching...' : 'Fetch Character Data' }}
+              </button>
+              <span v-if="hasSearchedCharacter && !isLoadingCharacter" class="text-sm">
+                <span v-if="characterData" class="text-green-400">Data fetched successfully</span>
+                <span v-else class="text-yellow-400">{{ characterError || 'Character not found' }}</span>
+              </span>
+            </div>
+
+            <!-- Character Data Preview -->
+            <div v-if="characterData" class="bg-gray-800/50 rounded-lg p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-medium text-gray-300">Fetched Character Data</h3>
+                <a
+                  v-if="characterData.profileUrl"
+                  :href="characterData.profileUrl"
+                  target="_blank"
+                  class="text-xs text-blue-400 hover:text-blue-300"
+                >
+                  View on Raider.IO
+                </a>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p class="text-xs text-gray-500">Item Level</p>
+                  <p class="text-lg font-semibold text-white">
+                    {{ characterData.itemLevel?.toFixed(1) || 'N/A' }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Raider.IO Score</p>
+                  <p class="text-lg font-semibold text-orange-400">
+                    {{ characterData.raiderIOScore?.toFixed(0) || 'N/A' }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Best Parse Avg</p>
+                  <p class="text-lg font-semibold" :class="[
+                    characterData.bestParseAverage
+                      ? characterData.bestParseAverage >= 90
+                        ? 'text-orange-400'
+                        : characterData.bestParseAverage >= 75
+                          ? 'text-purple-400'
+                          : characterData.bestParseAverage >= 50
+                            ? 'text-blue-400'
+                            : 'text-green-400'
+                      : 'text-gray-400'
+                  ]">
+                    {{ characterData.bestParseAverage?.toFixed(1) || 'N/A' }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Role</p>
+                  <p class="text-lg font-semibold text-white">
+                    {{ characterData.role || 'N/A' }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-2 pt-2">
+                <span v-if="hasRaiderIOData" class="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded">
+                  Raider.IO
+                </span>
+                <span v-if="hasWarcraftLogsData" class="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded">
+                  Warcraft Logs
+                </span>
+              </div>
+            </div>
+
+            <!-- Info message when no data fetched yet -->
+            <div v-else class="bg-gray-800/50 rounded-lg p-4">
               <p class="text-sm text-gray-400">
-                We will automatically fetch your character data from Blizzard, Warcraft Logs,
-                and Raider.IO to help officers review your application.
+                Enter your character name and realm, then click "Fetch Character Data" to automatically
+                retrieve your item level, Raider.IO score, and Warcraft Logs parses.
               </p>
             </div>
           </div>
@@ -586,6 +770,16 @@ async function submitApplication() {
                 <p class="font-medium">{{ formData.characterName }} - {{ formData.realm }}</p>
                 <p class="text-sm text-gray-400">{{ formData.characterClass }} {{ formData.specialization }}</p>
                 <p class="text-sm text-gray-400">Region: {{ formData.region }}</p>
+                <div v-if="autoFetchedData.itemLevel" class="mt-2 pt-2 border-t border-gray-700">
+                  <p class="text-xs text-gray-500">Auto-fetched data:</p>
+                  <p class="text-sm">
+                    <span class="text-gray-400">iLvl:</span> {{ autoFetchedData.itemLevel?.toFixed(1) }}
+                    <span class="mx-2 text-gray-600">|</span>
+                    <span class="text-gray-400">R.IO:</span> <span class="text-orange-400">{{ autoFetchedData.raiderIOScore?.toFixed(0) || 'N/A' }}</span>
+                    <span class="mx-2 text-gray-600">|</span>
+                    <span class="text-gray-400">Parse:</span> <span class="text-purple-400">{{ autoFetchedData.bestParseAverage?.toFixed(1) || 'N/A' }}</span>
+                  </p>
+                </div>
               </div>
 
               <div class="bg-gray-800/50 rounded-lg p-4">
