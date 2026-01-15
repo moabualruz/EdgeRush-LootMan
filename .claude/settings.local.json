@@ -104,7 +104,8 @@
       "Bash(do grep -oP 'tests=\"\"\\\\d+\"\"' \"$f\")",
       "Read(//f/work/dod/looter/**)",
       "Bash(cmd:*)",
-      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\data-sync-service\\\\gradlew.bat\" test --tests \"*ApplicationServiceTest*\")"
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\data-sync-service\\\\gradlew.bat\" test --tests \"*ApplicationServiceTest*\")",
+      "Bash(comm -23:*)"
     ]
   }
 }
