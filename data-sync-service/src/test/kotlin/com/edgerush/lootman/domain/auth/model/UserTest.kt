@@ -49,11 +49,34 @@ class UserTest : UnitTest() {
         }
 
         @Test
-        fun `should require Discord ID or Battle net ID`() {
-            // Act & Assert
-            shouldThrow<IllegalArgumentException> {
-                User(username = "testuser")
-            }
+        fun `should create local user without OAuth`() {
+            // Act
+            val user =
+                User.fromLocal(
+                    username = "testuser",
+                    email = "test@example.com",
+                    passwordHash = "hashedpassword",
+                )
+
+            // Assert
+            user.discordId shouldBe null
+            user.battlenetId shouldBe null
+            user.username shouldBe "testuser"
+            user.email shouldBe "test@example.com"
+            user.passwordHash shouldBe "hashedpassword"
+            user.role shouldBe UserRole.RAIDER
+        }
+
+        @Test
+        fun `should allow user with just username`() {
+            // Act (Users can exist without OAuth or password - useful for admin-created accounts)
+            val user = User(username = "testuser")
+
+            // Assert
+            user.username shouldBe "testuser"
+            user.discordId shouldBe null
+            user.battlenetId shouldBe null
+            user.passwordHash shouldBe null
         }
 
         @Test

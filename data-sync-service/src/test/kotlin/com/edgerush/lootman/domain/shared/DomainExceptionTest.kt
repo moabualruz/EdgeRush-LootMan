@@ -419,6 +419,8 @@ class DomainExceptionTest : UnitTest() {
                         is AuthenticationFailedException -> "auth_failed"
                         is InvalidRefreshTokenException -> "invalid_refresh_token"
                         is OAuth2AuthenticationException -> "oauth2_error"
+                        is InvalidCredentialsException -> "invalid_credentials"
+                        is UserAlreadyExistsException -> "user_already_exists"
                     }
                 result shouldBe
                     when (exception) {
@@ -434,6 +436,8 @@ class DomainExceptionTest : UnitTest() {
                         is AuthenticationFailedException -> "auth_failed"
                         is InvalidRefreshTokenException -> "invalid_refresh_token"
                         is OAuth2AuthenticationException -> "oauth2_error"
+                        is InvalidCredentialsException -> "invalid_credentials"
+                        is UserAlreadyExistsException -> "user_already_exists"
                     }
             }
         }

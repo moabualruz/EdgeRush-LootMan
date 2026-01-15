@@ -119,7 +119,10 @@
       "Bash(docker-compose:*)",
       "Bash(docker ps:*)",
       "Bash(docker logs:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileKotlin --no-daemon)",
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:test --no-daemon)",
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileTestKotlin --no-daemon)"
     ]
   }
 }
