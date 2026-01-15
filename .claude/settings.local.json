@@ -91,7 +91,8 @@
       "Bash(npm run)",
       "Bash(npx vue-tsc:*)",
       "Bash(gradlew.bat compileKotlin:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RaidPlan*\" --console=plain)"
     ]
   }
 }
