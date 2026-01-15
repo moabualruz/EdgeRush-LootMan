@@ -154,7 +154,7 @@ All planned features have been implemented.
 - Tailwind CSS with WoW class colors
 - TanStack Vue Query + Pinia
 - Axios for REST API
-- Vitest for testing (59 tests passing)
+- Vitest for testing (649 tests passing across 50 test files)
 
 **Implemented Pages:**
 - ✅ LoginPage - OAuth with Discord/Battle.net
@@ -174,11 +174,25 @@ All planned features have been implemented.
 - ✅ attendance.ts, raids.ts, gear.ts
 
 **Test Suite:**
-- 59 tests passing (100% pass rate)
+- 649 tests passing across 50 test files (100% pass rate)
 - Unit tests for utilities, components, stores, router
+- Full page test coverage for all 15+ pages
 
-**Remaining (Phase 2):**
-- ApplicationsPage (Admin) - Guild application management
+**Raid Planning Features (Phase 2 Complete):**
+
+- ✅ RaidPlansPage - Plan listing and creation
+- ✅ RaidPlanPage - Canvas-based plan editor with Konva.js
+- ✅ PlanCanvas - Zoom, pan, markers, shapes
+- ✅ MarkerPalette - Raid markers and shape tools
+- ✅ StepTimeline - Multi-step plan navigation
+- ✅ CooldownsPage - Cooldown assignment page
+- ✅ CooldownGrid - Drag & drop cooldown assignment
+- ✅ MRT/WeakAura export functionality
+- ✅ planEditor Pinia store with undo/redo
+- ✅ useCanvasEditor composable
+
+**Remaining:**
+
 - Real-time WebSocket integration for live updates
 
 ---
@@ -431,7 +445,7 @@ All planned features have been implemented.
 
 - ✅ REST API Layer (44 controllers)
 - ✅ GraphQL API (queries, mutations, subscriptions)
-- ✅ Frontend Application (Vue 3, 59 tests)
+- ✅ Frontend Application (Vue 3, 649 tests, Raid Planning complete)
 - ✅ Discord Bot (JDA 5.x, all commands)
 - ✅ Backend Prerequisites (GAPs 1-6 complete)
 - ❌ WoW Addon (needs specification)

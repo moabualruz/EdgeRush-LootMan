@@ -92,7 +92,13 @@
       "Bash(npx vue-tsc:*)",
       "Bash(gradlew.bat compileKotlin:*)",
       "Bash(npm run test:*)",
-      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RaidPlan*\" --console=plain)"
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RaidPlan*\" --console=plain)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --no-daemon -q)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --tests \"*ApplicationServiceTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RaiderIOClientTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*RecruitmentApplicationControllerTest\" --no-daemon)",
+      "Bash(\"f:/work/dod/looter/gradlew.bat\" :data-sync-service:test --tests \"*ApplicationIdTest\" --tests \"*ApplicationStatusTest\" --tests \"*ApplicationTest\" --tests \"*ApplicationServiceTest\" --tests \"*RaiderIOClientTest\" --tests \"*RecruitmentApplicationControllerTest\" --no-daemon)"
     ]
   }
 }
