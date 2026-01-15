@@ -9,6 +9,7 @@ import java.util.UUID
  * A raid plan contains multiple steps with positioning markers and shapes
  * for organizing raid strategies.
  */
+@ConsistentCopyVisibility
 data class RaidPlan private constructor(
     val id: String,
     val guildId: GuildId,

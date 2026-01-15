@@ -4,6 +4,7 @@ package com.edgerush.lootman.domain.raidplan.model
  * Entity representing a single step/frame in a raid plan.
  * Each step contains markers and shapes for positioning.
  */
+@ConsistentCopyVisibility
 data class PlanStep private constructor(
     val order: Int,
     val notes: String?,
@@ -65,6 +66,16 @@ data class PlanStep private constructor(
      * Returns a copy with updated order.
      */
     fun withOrder(order: Int): PlanStep = copy(order = order)
+
+    /**
+     * Returns a copy with the specified markers.
+     */
+    fun withMarkers(markers: List<PlanMarker>): PlanStep = copy(markers = markers)
+
+    /**
+     * Returns a copy with the specified shapes.
+     */
+    fun withShapes(shapes: List<PlanShape>): PlanStep = copy(shapes = shapes)
 
     companion object {
         /**
