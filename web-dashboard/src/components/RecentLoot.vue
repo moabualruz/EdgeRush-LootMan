@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { toRef } from 'vue'
 import type { LootAward } from '@/types'
 import { formatDate, formatRelativeTime } from '@/utils/date'
+import { useWowhead } from '@/composables/useWowhead'
+import WowheadItem from '@/components/WowheadItem.vue'
 
-defineProps<{
+const props = defineProps<{
   awards: LootAward[]
 }>()
+
+// Initialize Wowhead tooltips and refresh when awards change
+const awardsRef = toRef(props, 'awards')
+useWowhead({}, [awardsRef])
 
 const formatScore = (score: number) => score.toFixed(3)
 </script>
@@ -21,7 +28,11 @@ const formatScore = (score: number) => score.toFixed(3)
       class="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg"
     >
       <div>
-        <span class="font-medium text-primary-300">{{ award.itemName }}</span>
+        <WowheadItem
+          :item-id="award.itemId"
+          :item-name="award.itemName"
+          quality="epic"
+        />
         <p class="text-xs text-gray-400">
           {{ formatDate(award.awardedAt) }} · FLPS: {{ formatScore(award.flpsAtAward) }}
         </p>

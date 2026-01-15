@@ -1,9 +1,23 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import RecentLoot from './RecentLoot.vue'
 import type { LootAward } from '@/types'
 
+// Mock the useWowhead composable
+vi.mock('@/composables/useWowhead', () => ({
+  useWowhead: vi.fn(() => ({
+    isLoaded: { value: true },
+    error: { value: null },
+    refresh: vi.fn(),
+  })),
+  getWowheadItemUrl: (itemId: number) => `https://www.wowhead.com/item=${itemId}`,
+}))
+
 describe('RecentLoot', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   const mockAwards: LootAward[] = [
     {
       id: 1,
