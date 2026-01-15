@@ -22,18 +22,21 @@ const { data: wishlistData, isLoading: wishlistLoading, error: wishlistError } =
   queryFn: () => wishlistApi.getMyWishlist(GUILD_ID),
 })
 
+// Track simulation polling state separately to avoid circular reference
+const shouldPollSimulation = ref(false)
+
 // Simulation status query - polls when running
 const { data: simStatus, isLoading: simStatusLoading } = useQuery({
   queryKey: ['simulationStatus', GUILD_ID, wishlistData.value?.raiderId],
   queryFn: () => wishlistApi.getSimulationStatus(GUILD_ID, wishlistData.value!.raiderId),
   enabled: computed(() => !!wishlistData.value?.raiderId),
-  refetchInterval: computed(() => {
-    if (simStatus.value?.status === 'RUNNING' || simStatus.value?.status === 'QUEUED') {
-      return 3000 // Poll every 3 seconds when simulation is running
-    }
-    return false
-  }),
+  refetchInterval: computed(() => shouldPollSimulation.value ? 3000 : false),
 })
+
+// Watch simulation status to control polling
+watch(() => simStatus.value?.status, (status) => {
+  shouldPollSimulation.value = status === 'RUNNING' || status === 'QUEUED'
+}, { immediate: true })
 
 // Trigger simulation mutation
 const triggerSimMutation = useMutation({
