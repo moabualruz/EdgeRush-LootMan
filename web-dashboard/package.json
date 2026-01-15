@@ -9,7 +9,12 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@tanstack/vue-query": "^5.51.0",
@@ -19,6 +24,8 @@
     "vue-router": "^4.4.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.8.0",
+    "@playwright/test": "^1.42.0",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.19",

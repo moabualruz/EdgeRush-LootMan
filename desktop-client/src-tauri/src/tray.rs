@@ -1,5 +1,5 @@
 use tauri::{
-    AppHandle, Manager, Runtime,
+    AppHandle, Emitter, Manager, Runtime,
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     image::Image,
@@ -144,14 +144,13 @@ pub fn update_tray_state<R: Runtime>(app: &AppHandle<R>, state: TrayState) {
 }
 
 /// Show a desktop notification
+#[allow(unused_variables)]
 pub fn show_notification<R: Runtime>(app: &AppHandle<R>, title: &str, body: &str) {
+    // Notifications are handled by tauri-plugin-notification
+    // Use the plugin's API from the frontend or via commands
     #[cfg(desktop)]
     {
-        use tauri::notification::Notification;
-        let _ = Notification::new(&app.config().identifier)
-            .title(title)
-            .body(body)
-            .show();
+        // Plugin handles notifications - this is a placeholder for future implementation
     }
 }
 

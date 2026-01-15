@@ -158,7 +158,7 @@ impl SavedVariablesParser {
             realm,
             class: Self::extract_string_value(content, "class").unwrap_or_default(),
             spec: Self::extract_string_value(content, "spec").unwrap_or_default(),
-            level: Self::extract_number_value(content, "level").unwrap_or(0) as u32,
+            level: Self::extract_number_value(content, "level").unwrap_or(0.0) as u32,
             item_level: Self::extract_number_value(content, "itemLevel").unwrap_or(0.0),
         })
     }
@@ -213,7 +213,10 @@ impl SavedVariablesParser {
 
     /// Parse FLPS data
     fn parse_flps(content: &str) -> Result<Option<FlpsData>, ParserError> {
-        let score = Self::extract_number_value(content, "score")?;
+        let score = match Self::extract_number_value(content, "score") {
+            Some(s) => s,
+            None => return Ok(None),
+        };
 
         Ok(Some(FlpsData {
             score,
@@ -391,9 +394,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_slot_id_to_name() {
+    fn test_slot_id_to_name_all_slots() {
         assert_eq!(slot_id_to_name(1), "Head");
+        assert_eq!(slot_id_to_name(2), "Neck");
+        assert_eq!(slot_id_to_name(3), "Shoulder");
+        assert_eq!(slot_id_to_name(5), "Chest");
+        assert_eq!(slot_id_to_name(6), "Waist");
+        assert_eq!(slot_id_to_name(7), "Legs");
+        assert_eq!(slot_id_to_name(8), "Feet");
+        assert_eq!(slot_id_to_name(9), "Wrist");
+        assert_eq!(slot_id_to_name(10), "Hands");
+        assert_eq!(slot_id_to_name(11), "Finger1");
+        assert_eq!(slot_id_to_name(12), "Finger2");
+        assert_eq!(slot_id_to_name(13), "Trinket1");
+        assert_eq!(slot_id_to_name(14), "Trinket2");
+        assert_eq!(slot_id_to_name(15), "Back");
         assert_eq!(slot_id_to_name(16), "MainHand");
+        assert_eq!(slot_id_to_name(17), "OffHand");
         assert_eq!(slot_id_to_name(99), "Unknown");
     }
 
@@ -407,12 +424,170 @@ mod tests {
     }
 
     #[test]
+    fn test_extract_string_value_alternative_format() {
+        let content = r#"version = "2.0.0","#;
+        assert_eq!(
+            SavedVariablesParser::extract_string_value(content, "version"),
+            Some("2.0.0".to_string())
+        );
+    }
+
+    #[test]
+    fn test_extract_string_value_not_found() {
+        let content = r#"["other"] = "value","#;
+        assert_eq!(
+            SavedVariablesParser::extract_string_value(content, "notfound"),
+            None
+        );
+    }
+
+    #[test]
     fn test_extract_number_value() {
         let content = r#"["score"] = 0.85,"#;
         assert_eq!(
             SavedVariablesParser::extract_number_value(content, "score"),
             Some(0.85)
         );
+    }
+
+    #[test]
+    fn test_extract_number_value_integer() {
+        let content = r#"["rank"] = 42,"#;
+        assert_eq!(
+            SavedVariablesParser::extract_number_value(content, "rank"),
+            Some(42.0)
+        );
+    }
+
+    #[test]
+    fn test_extract_number_value_not_found() {
+        let content = r#"["other"] = 123,"#;
+        assert_eq!(
+            SavedVariablesParser::extract_number_value(content, "notfound"),
+            None
+        );
+    }
+
+    #[test]
+    fn test_extract_table_simple() {
+        let content = r#"data = { a = 1, b = 2 }"#;
+        let result = SavedVariablesParser::extract_table(content);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "{ a = 1, b = 2 }");
+    }
+
+    #[test]
+    fn test_extract_table_nested() {
+        let content = r#"data = { inner = { value = 1 } }"#;
+        let result = SavedVariablesParser::extract_table(content);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "{ inner = { value = 1 } }");
+    }
+
+    #[test]
+    fn test_extract_table_unbalanced() {
+        let content = r#"data = { a = 1, b = 2"#;
+        let result = SavedVariablesParser::extract_table(content);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_parse_content_empty() {
+        let content = "";
+        let result = SavedVariablesParser::parse_content(content);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert!(data.characters.is_empty());
+        assert!(data.gear.is_empty());
+    }
+
+    #[test]
+    fn test_parse_content_with_version() {
+        let content = r#"
+EdgeRushLootManDB = {
+    ["version"] = "1.0.0",
+    ["lastSync"] = "2024-01-15T10:00:00Z",
+}
+"#;
+        let result = SavedVariablesParser::parse_content(content);
+        assert!(result.is_ok());
+        let data = result.unwrap();
+        assert_eq!(data.version, Some("1.0.0".to_string()));
+        assert_eq!(data.last_sync, Some("2024-01-15T10:00:00Z".to_string()));
+    }
+
+    #[test]
+    fn test_parse_single_character() {
+        let key = "TestChar-TestRealm";
+        let content = r#"{
+            ["class"] = "WARRIOR",
+            ["spec"] = "Arms",
+            ["level"] = 80,
+            ["itemLevel"] = 500.5,
+        }"#;
+
+        let result = SavedVariablesParser::parse_single_character(key, content);
+        assert!(result.is_ok());
+        let char = result.unwrap();
+        assert_eq!(char.name, "TestChar");
+        assert_eq!(char.realm, "TestRealm");
+        assert_eq!(char.class, "WARRIOR");
+        assert_eq!(char.spec, "Arms");
+        assert_eq!(char.level, 80);
+        assert_eq!(char.item_level, 500.5);
+    }
+
+    #[test]
+    fn test_parse_single_character_no_realm() {
+        let key = "CharacterOnly";
+        let content = r#"{ ["class"] = "MAGE" }"#;
+
+        let result = SavedVariablesParser::parse_single_character(key, content);
+        assert!(result.is_ok());
+        let char = result.unwrap();
+        assert_eq!(char.name, "CharacterOnly");
+        assert_eq!(char.realm, "Unknown");
+    }
+
+    #[test]
+    fn test_parse_gear_item() {
+        let content = r#"{
+            ["itemId"] = 12345,
+            ["itemLevel"] = 500,
+            ["quality"] = 4,
+            ["enchantId"] = 6789,
+        }"#;
+
+        let result = SavedVariablesParser::parse_gear_item(1, content);
+        assert!(result.is_ok());
+        let item = result.unwrap();
+        assert_eq!(item.slot_id, 1);
+        assert_eq!(item.slot_name, "Head");
+        assert_eq!(item.item_id, 12345);
+        assert_eq!(item.item_level, 500);
+        assert_eq!(item.quality, 4);
+        assert_eq!(item.enchant_id, Some(6789));
+    }
+
+    #[test]
+    fn test_parse_flps() {
+        let content = r#"{
+            ["score"] = 0.85,
+            ["rms"] = 0.4,
+            ["ipi"] = 0.3,
+            ["rdf"] = 0.15,
+            ["rank"] = 5,
+            ["lastUpdated"] = "2024-01-15",
+        }"#;
+
+        let result = SavedVariablesParser::parse_flps(content);
+        assert!(result.is_ok());
+        let flps = result.unwrap().unwrap();
+        assert_eq!(flps.score, 0.85);
+        assert_eq!(flps.rms, 0.4);
+        assert_eq!(flps.ipi, 0.3);
+        assert_eq!(flps.rdf, 0.15);
+        assert_eq!(flps.rank, 5);
     }
 
     #[test]
@@ -427,6 +602,97 @@ mod tests {
         };
         let lua = generate_flps_lua(&flps);
         assert!(lua.contains("0.85"));
+        assert!(lua.contains("0.4"));
+        assert!(lua.contains("0.3"));
+        assert!(lua.contains("0.15"));
+        assert!(lua.contains("5"));
         assert!(lua.contains("2024-01-15"));
+        assert!(lua.contains("[\"flps\"]"));
+        assert!(lua.contains("[\"score\"]"));
+    }
+
+    #[test]
+    fn test_generate_flps_lua_no_last_updated() {
+        let flps = FlpsData {
+            score: 0.5,
+            rms: 0.2,
+            ipi: 0.2,
+            rdf: 0.1,
+            rank: 10,
+            last_updated: None,
+        };
+        let lua = generate_flps_lua(&flps);
+        assert!(lua.contains("[\"lastUpdated\"] = \"\""));
+    }
+
+    #[test]
+    fn test_addon_data_default() {
+        let data = AddonData::default();
+        assert!(data.characters.is_empty());
+        assert!(data.gear.is_empty());
+        assert!(data.flps.is_none());
+        assert!(data.last_sync.is_none());
+        assert!(data.version.is_none());
+    }
+
+    #[test]
+    fn test_character_data_clone() {
+        let char = CharacterData {
+            name: "Test".to_string(),
+            realm: "Realm".to_string(),
+            class: "WARRIOR".to_string(),
+            spec: "Arms".to_string(),
+            level: 80,
+            item_level: 500.0,
+        };
+        let cloned = char.clone();
+        assert_eq!(cloned.name, char.name);
+        assert_eq!(cloned.realm, char.realm);
+    }
+
+    #[test]
+    fn test_gear_item_clone() {
+        let item = GearItem {
+            slot_id: 1,
+            slot_name: "Head".to_string(),
+            item_id: 12345,
+            item_level: 500,
+            quality: 4,
+            enchant_id: Some(6789),
+            gem_ids: vec![100, 200],
+            bonus_ids: vec![10, 20, 30],
+        };
+        let cloned = item.clone();
+        assert_eq!(cloned.slot_id, item.slot_id);
+        assert_eq!(cloned.gem_ids.len(), 2);
+        assert_eq!(cloned.bonus_ids.len(), 3);
+    }
+
+    #[test]
+    fn test_extract_array_values() {
+        let content = r#"["gems"] = { 100, 200, 300 }"#;
+        let result = SavedVariablesParser::extract_array_values(content, "gems");
+        assert!(result.is_some());
+        let values = result.unwrap();
+        assert_eq!(values.len(), 3);
+        assert_eq!(values[0], 100.0);
+        assert_eq!(values[1], 200.0);
+        assert_eq!(values[2], 300.0);
+    }
+
+    #[test]
+    fn test_extract_array_values_empty() {
+        let content = r#"["gems"] = { }"#;
+        let result = SavedVariablesParser::extract_array_values(content, "gems");
+        assert!(result.is_some());
+        let values = result.unwrap();
+        assert!(values.is_empty());
+    }
+
+    #[test]
+    fn test_extract_array_values_not_found() {
+        let content = r#"["other"] = { 1, 2, 3 }"#;
+        let result = SavedVariablesParser::extract_array_values(content, "gems");
+        assert!(result.is_none());
     }
 }

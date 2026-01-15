@@ -105,7 +105,13 @@
       "Read(//f/work/dod/looter/**)",
       "Bash(cmd:*)",
       "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\data-sync-service\\\\gradlew.bat\" test --tests \"*ApplicationServiceTest*\")",
-      "Bash(comm -23:*)"
+      "Bash(comm -23:*)",
+      "Bash(npx playwright install)",
+      "Bash(npx playwright install chromium)",
+      "Bash(cargo test:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "Bash(cargo build:*)"
     ]
   }
 }

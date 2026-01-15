@@ -37,3 +37,6 @@ build/
 
 # Node Modules
 node_modules/
+
+# Tauri
+target/

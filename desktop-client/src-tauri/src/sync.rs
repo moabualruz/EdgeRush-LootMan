@@ -252,8 +252,11 @@ EdgeRushLootManDB = {
     }
 
     /// Get the current sync status
-    pub async fn get_status(&self) -> SyncStatus {
-        let in_progress = *self.sync_in_progress.lock().await;
+    pub fn get_status(&self) -> SyncStatus {
+        // Use try_lock to avoid blocking - return false if lock can't be acquired
+        let in_progress = self.sync_in_progress.try_lock()
+            .map(|guard| *guard)
+            .unwrap_or(true); // Assume syncing if can't get lock
 
         SyncStatus {
             is_running: self.watcher.is_some(),
@@ -298,11 +301,11 @@ mod tests {
         assert!(service.watcher.is_none());
     }
 
-    #[tokio::test]
-    async fn test_sync_status() {
+    #[test]
+    fn test_sync_status() {
         let config = AppConfig::default();
         let service = SyncService::new(config);
-        let status = service.get_status().await;
+        let status = service.get_status();
 
         assert!(!status.is_running);
         assert!(!status.is_syncing);

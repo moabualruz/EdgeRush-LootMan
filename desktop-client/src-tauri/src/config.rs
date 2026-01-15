@@ -14,7 +14,7 @@ pub enum ConfigError {
 }
 
 /// Application configuration
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     /// Path to WoW installation directory
     pub wow_path: Option<String>,
@@ -47,6 +47,22 @@ fn default_api_url() -> String {
 
 fn default_true() -> bool {
     true
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            wow_path: None,
+            account_name: None,
+            api_url: default_api_url(),
+            api_key: None,
+            guild_id: None,
+            auto_sync: true,
+            notifications_enabled: true,
+            start_minimized: false,
+            start_with_windows: false,
+        }
+    }
 }
 
 impl AppConfig {

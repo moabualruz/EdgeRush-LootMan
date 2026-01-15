@@ -85,7 +85,7 @@ async fn trigger_sync(state: tauri::State<'_, AppState>) -> Result<sync::SyncRes
 async fn get_sync_status(state: tauri::State<'_, AppState>) -> Result<ServiceSyncStatus, String> {
     let sync_service = state.sync_service.lock().await;
     if let Some(ref service) = *sync_service {
-        Ok(service.get_status().await)
+        Ok(service.get_status())
     } else {
         let config = state.config.lock().await;
         Ok(ServiceSyncStatus {

@@ -1,0 +1,8 @@
+return {
+    default = {
+        verbose = true,
+        output = "TAP",
+        pattern = "_spec",
+        ROOT = {"spec"},
+    },
+}
