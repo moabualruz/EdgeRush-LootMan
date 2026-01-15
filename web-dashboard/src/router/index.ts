@@ -65,6 +65,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/RaidDetailPage.vue'),
       },
       {
+        path: 'raid-plans',
+        name: 'raid-plans',
+        component: () => import('@/pages/RaidPlansPage.vue'),
+      },
+      {
+        path: 'raid-plans/:id',
+        name: 'raid-plan-editor',
+        component: () => import('@/pages/RaidPlanPage.vue'),
+      },
+      {
         path: 'gear',
         name: 'gear',
         component: () => import('@/pages/GearPage.vue'),
