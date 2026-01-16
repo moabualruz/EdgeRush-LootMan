@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { RouterView, RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
+import CharacterSelector from '@/components/CharacterSelector.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
+
+// Fetch guilds when layout mounts
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    guildContextStore.fetchGuilds()
+  }
+})
 
 // Mobile sidebar state
 const sidebarOpen = ref(false)
@@ -33,6 +43,7 @@ const adminNavItems = [
 ]
 
 function handleLogout() {
+  guildContextStore.clear()
   authStore.logout()
 }
 </script>
@@ -93,6 +104,11 @@ function handleLogout() {
         </button>
       </div>
 
+      <!-- Character Selector -->
+      <div class="px-4 py-3 border-b border-gray-700">
+        <CharacterSelector />
+      </div>
+
       <!-- Navigation -->
       <nav class="p-4 space-y-1 overflow-y-auto" style="max-height: calc(100vh - 8rem);">
         <RouterLink
@@ -108,6 +124,24 @@ function handleLogout() {
         >
           {{ item.label }}
         </RouterLink>
+
+        <!-- Guild Settings (permission-based) -->
+        <template v-if="guildContextStore.canAccessSettings">
+          <div class="pt-4 mt-4 border-t border-gray-700">
+            <p class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase">Guild</p>
+            <RouterLink
+              to="/guild-settings"
+              class="flex items-center px-4 py-3 md:py-2 rounded-md transition-colors"
+              :class="[
+                route.path === '/guild-settings'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              ]"
+            >
+              Guild Settings
+            </RouterLink>
+          </div>
+        </template>
 
         <!-- Admin section -->
         <template v-if="authStore.isAdmin">

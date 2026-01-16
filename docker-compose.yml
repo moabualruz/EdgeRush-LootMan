@@ -40,6 +40,16 @@ services:
       SIMULATION_DOCKER_IMAGE: ${SIMULATION_DOCKER_IMAGE:-simulationcraftorg/simc}
       SIMULATION_DOCKER_PROFILE_DIR: /home/gradle/project/simc-profiles
       SIMULATION_DOCKER_TIMEOUT_MINUTES: ${SIMULATION_DOCKER_TIMEOUT_MINUTES:-30}
+      # OAuth2 Configuration (Discord & Battle.net)
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost/auth/discord/callback}
+      BATTLENET_CLIENT_ID: ${BATTLENET_CLIENT_ID:-}
+      BATTLENET_CLIENT_SECRET: ${BATTLENET_CLIENT_SECRET:-}
+      BATTLENET_REDIRECT_URI: ${BATTLENET_REDIRECT_URI:-http://localhost/auth/battlenet/callback}
+      BATTLENET_REGION: ${BATTLENET_REGION:-us}
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET:-}
     ports:
       - "8080:8080"
 

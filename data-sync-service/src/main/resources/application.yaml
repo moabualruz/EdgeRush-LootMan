@@ -88,12 +88,12 @@ oauth2:
   discord:
     client-id: ${DISCORD_CLIENT_ID:}
     client-secret: ${DISCORD_CLIENT_SECRET:}
-    redirect-uri: ${DISCORD_REDIRECT_URI:http://localhost:3000/auth/discord/callback}
-    scopes: identify,guilds,email
+    redirect-uri: ${DISCORD_REDIRECT_URI:http://localhost/auth/discord/callback}
+    scopes: identify,email
   battlenet:
     client-id: ${BATTLENET_CLIENT_ID:}
     client-secret: ${BATTLENET_CLIENT_SECRET:}
-    redirect-uri: ${BATTLENET_REDIRECT_URI:http://localhost:3000/auth/battlenet/callback}
+    redirect-uri: ${BATTLENET_REDIRECT_URI:http://localhost/auth/battlenet/callback}
     region: ${BATTLENET_REGION:us}
   jwt:
     secret: ${JWT_SECRET:}

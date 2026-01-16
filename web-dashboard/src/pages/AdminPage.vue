@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { adminApi } from '@/api/admin'
+import { useGuildContextStore } from '@/stores/guildContext'
 import ConfigEditor from '@/components/admin/ConfigEditor.vue'
 import BehavioralActionsPanel from '@/components/admin/BehavioralActionsPanel.vue'
 import LootBansPanel from '@/components/admin/LootBansPanel.vue'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || import.meta.env.VITE_GUILD_ID || 'default')
 
 const activeTab = ref<'config' | 'actions' | 'bans'>('config')
 
@@ -43,9 +45,9 @@ const tabs = [
 
     <!-- Tab content -->
     <div>
-      <ConfigEditor v-if="activeTab === 'config'" :guild-id="GUILD_ID" />
-      <BehavioralActionsPanel v-else-if="activeTab === 'actions'" :guild-id="GUILD_ID" />
-      <LootBansPanel v-else-if="activeTab === 'bans'" :guild-id="GUILD_ID" />
+      <ConfigEditor v-if="activeTab === 'config'" :guild-id="guildId" />
+      <BehavioralActionsPanel v-else-if="activeTab === 'actions'" :guild-id="guildId" />
+      <LootBansPanel v-else-if="activeTab === 'bans'" :guild-id="guildId" />
     </div>
   </div>
 </template>

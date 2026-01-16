@@ -12,6 +12,8 @@ data class RaiderEntity(
     val characterName: String,
     val realm: String,
     val region: String,
+    @Column("guild_id")
+    val guildId: String? = null,
     @Column("wowaudit_id")
     val wowauditId: Long?,
     @Column("class")

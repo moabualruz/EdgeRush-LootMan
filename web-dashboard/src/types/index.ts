@@ -201,3 +201,35 @@ export interface ApiError {
   message: string
   details?: string
 }
+
+// Guild Context types
+export interface GuildContext {
+  guildId: string
+  guildName: string
+  characterName: string
+  characterRealm: string
+  characterClass: string
+  characterMappingId: number
+  rank: string | null
+  permissions: GuildPermissionType[]
+  isActive: boolean
+}
+
+export type GuildPermissionType =
+  | 'SETTINGS_ACCESS'
+  | 'LOOT_MANAGEMENT'
+  | 'MEMBER_MANAGEMENT'
+  | 'VIEW_ALL_SCORES'
+
+export interface GuildPermission {
+  id: number
+  guildId: string
+  rankName: string
+  permissionType: string
+  createdAt: string
+}
+
+export interface PermissionTypeInfo {
+  name: string
+  description: string
+}

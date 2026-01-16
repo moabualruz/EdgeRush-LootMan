@@ -1,12 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
     component: () => import('@/pages/LoginPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/auth/:provider/callback',
+    name: 'oauth-callback',
+    component: () => import('@/pages/OAuthCallbackPage.vue'),
     meta: { requiresAuth: false },
   },
   {
@@ -103,6 +110,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/SyncHistoryPage.vue'),
         meta: { requiresAdmin: true },
       },
+      {
+        path: 'guild-settings',
+        name: 'guild-settings',
+        component: () => import('@/pages/GuildSettingsPage.vue'),
+        meta: { requiresSettingsAccess: true },
+      },
     ],
   },
   {
@@ -118,6 +131,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
+  const guildContextStore = useGuildContextStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
@@ -125,6 +139,11 @@ router.beforeEach((to, _from, next) => {
   }
 
   if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next('/dashboard')
+    return
+  }
+
+  if (to.meta.requiresSettingsAccess && !guildContextStore.canAccessSettings) {
     next('/dashboard')
     return
   }

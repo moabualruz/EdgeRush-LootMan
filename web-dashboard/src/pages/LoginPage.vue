@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const route = useRoute()
 const authStore = useAuthStore()
 
 const isLoading = ref(false)
@@ -16,10 +15,6 @@ const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-
-const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID
-const BATTLENET_CLIENT_ID = import.meta.env.VITE_BATTLENET_CLIENT_ID
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || window.location.origin + '/login'
 
 const isFormValid = computed(() => {
   if (mode.value === 'login') {
@@ -60,64 +55,28 @@ async function handleSubmit() {
   }
 }
 
-function loginWithDiscord() {
-  if (!DISCORD_CLIENT_ID) {
-    error.value = 'Discord login is not configured'
-    return
-  }
-  const params = new URLSearchParams({
-    client_id: DISCORD_CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'code',
-    scope: 'identify email',
-    state: 'discord',
-  })
-  window.location.href = `https://discord.com/api/oauth2/authorize?${params.toString()}`
-}
-
-function loginWithBattlenet() {
-  if (!BATTLENET_CLIENT_ID) {
-    error.value = 'Battle.net login is not configured'
-    return
-  }
-  const params = new URLSearchParams({
-    client_id: BATTLENET_CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'code',
-    scope: 'openid wow.profile',
-    state: 'battlenet',
-  })
-  window.location.href = `https://oauth.battle.net/authorize?${params.toString()}`
-}
-
-// Handle OAuth callback
-async function handleCallback() {
-  const code = route.query.code as string
-  const state = route.query.state as string
-
-  if (!code) return
-
+async function loginWithDiscord() {
   isLoading.value = true
   error.value = null
-
   try {
-    if (state === 'discord') {
-      await authStore.loginWithDiscord(code)
-    } else if (state === 'battlenet') {
-      await authStore.loginWithBattlenet(code)
-    }
-    router.push('/dashboard')
-  } catch (e) {
-    error.value = 'Authentication failed. Please try again.'
-    console.error('Login error:', e)
-  } finally {
+    const url = await authStore.getDiscordAuthUrl()
+    window.location.href = url
+  } catch (e: any) {
+    error.value = e.response?.data?.message || 'Discord login is not configured'
     isLoading.value = false
   }
 }
 
-// Check for callback on mount
-if (route.query.code) {
-  handleCallback()
+async function loginWithBattlenet() {
+  isLoading.value = true
+  error.value = null
+  try {
+    const url = await authStore.getBattlenetAuthUrl()
+    window.location.href = url
+  } catch (e: any) {
+    error.value = e.response?.data?.message || 'Battle.net login is not configured'
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -152,7 +111,7 @@ if (route.query.code) {
         <!-- Loading state -->
         <div v-if="isLoading" class="text-center py-8">
           <div class="animate-spin w-10 h-10 border-3 border-primary-500 border-t-transparent rounded-full mx-auto"></div>
-          <p class="mt-4 text-gray-400">{{ route.query.code ? 'Authenticating...' : 'Please wait...' }}</p>
+          <p class="mt-4 text-gray-400">Please wait...</p>
         </div>
 
         <template v-else>

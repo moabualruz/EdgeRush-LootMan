@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!token.value) return
 
     try {
-      const response = await api.get<User>('/api/v1/auth/me')
+      const response = await api.get<User>('/v1/auth/me')
       user.value = response.data
     } catch {
       logout()
@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function register(username: string, email: string, password: string): Promise<void> {
-    const response = await api.post<TokenResponse>('/api/v1/auth/register', {
+    const response = await api.post<TokenResponse>('/v1/auth/register', {
       username,
       email,
       password,
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loginLocal(usernameOrEmail: string, password: string): Promise<void> {
-    const response = await api.post<TokenResponse>('/api/v1/auth/login', {
+    const response = await api.post<TokenResponse>('/v1/auth/login', {
       usernameOrEmail,
       password,
     })
@@ -59,24 +59,34 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loginWithDiscord(code: string): Promise<void> {
-    const response = await api.post<TokenResponse>('/api/v1/auth/discord/callback', { code })
+    const response = await api.post<TokenResponse>('/v1/auth/discord/callback', { code })
     setToken(response.data.accessToken)
     await fetchUser()
   }
 
+  async function getBattlenetAuthUrl(): Promise<string> {
+    const response = await api.get<{ url: string }>('/v1/auth/battlenet/url')
+    return response.data.url
+  }
+
+  async function getDiscordAuthUrl(): Promise<string> {
+    const response = await api.get<{ url: string }>('/v1/auth/discord/url')
+    return response.data.url
+  }
+
   async function loginWithBattlenet(code: string): Promise<void> {
-    const response = await api.post<TokenResponse>('/api/v1/auth/battlenet/callback', { code })
+    const response = await api.post<TokenResponse>('/v1/auth/battlenet/callback', { code })
     setToken(response.data.accessToken)
     await fetchUser()
   }
 
   async function linkDiscord(code: string): Promise<void> {
-    const response = await api.post<User>('/api/v1/auth/link/discord', { code })
+    const response = await api.post<User>('/v1/auth/link/discord', { code })
     user.value = response.data
   }
 
   async function linkBattlenet(code: string): Promise<void> {
-    const response = await api.post<User>('/api/v1/auth/link/battlenet', { code })
+    const response = await api.post<User>('/v1/auth/link/battlenet', { code })
     user.value = response.data
   }
 
@@ -98,6 +108,8 @@ export const useAuthStore = defineStore('auth', () => {
     loginLocal,
     loginWithDiscord,
     loginWithBattlenet,
+    getDiscordAuthUrl,
+    getBattlenetAuthUrl,
     linkDiscord,
     linkBattlenet,
   }
