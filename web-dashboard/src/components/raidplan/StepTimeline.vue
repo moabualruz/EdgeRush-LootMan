@@ -18,7 +18,7 @@ const emit = defineEmits<{
   'step-change': [index: number]
   'add-step': []
   'delete-step': [index: number]
-  'notes-edit': []
+  'notes-edit': [notes: string]
 }>()
 
 const currentStepData = computed(() => props.steps[props.currentStep])
@@ -53,7 +53,11 @@ function deleteStep() {
 }
 
 function editNotes() {
-  emit('notes-edit')
+  const currentNotes = currentStepData.value?.notes || ''
+  const newNotes = prompt('Enter notes for this step:', currentNotes)
+  if (newNotes !== null) {
+      emit('notes-edit', newNotes)
+  }
 }
 </script>
 

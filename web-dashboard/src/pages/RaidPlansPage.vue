@@ -10,10 +10,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { raidPlanApi, type PlanVisibility } from '@/api/raidplan'
 import { useAuthStore } from '@/stores/auth'
 import SkeletonCard from '@/components/SkeletonCard.vue'
+import EncounterPicker from '@/components/raidplan/EncounterPicker.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const queryClient = useQueryClient()
+
+// ... existing code ...
+
+function handleEncounterSelect(id: number, name: string) {
+    newPlanForm.value.encounterId = id
+    newPlanForm.value.encounterName = name
+}
 
 const currentPage = ref(0)
 const pageSize = 20
@@ -207,25 +215,13 @@ function goToPage(page: number) {
             />
           </div>
 
-          <div>
-            <label class="block text-sm text-gray-400 mb-1">Encounter Name</label>
-            <input
-              v-model="newPlanForm.encounterName"
-              type="text"
-              class="input w-full"
-              placeholder="e.g., Queen Ansurek"
-            />
+          
+          <EncounterPicker @select="handleEncounterSelect" />
+          
+          <div v-show="false">
+             <!-- Hidden inputs to maintain form state logic if needed, or we just rely on handleEncounterSelect updating the ref -->
           </div>
 
-          <div>
-            <label class="block text-sm text-gray-400 mb-1">Encounter ID</label>
-            <input
-              v-model.number="newPlanForm.encounterId"
-              type="number"
-              class="input w-full"
-              placeholder="e.g., 2902"
-            />
-          </div>
 
           <div>
             <label class="block text-sm text-gray-400 mb-1">Visibility</label>

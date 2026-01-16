@@ -23,7 +23,7 @@ services:
     volumes:
       - ./:/home/gradle/project
       - simc_profiles:/home/gradle/project/simc-profiles
-      - /var/run/docker.sock:/var/run/docker.sock  # For running SimC Docker from container
+      - /var/run/docker.sock:/var/run/docker.sock # For running SimC Docker from container
     depends_on:
       - postgres
     environment:
@@ -40,6 +40,10 @@ services:
       SIMULATION_DOCKER_IMAGE: ${SIMULATION_DOCKER_IMAGE:-simulationcraftorg/simc}
       SIMULATION_DOCKER_PROFILE_DIR: /home/gradle/project/simc-profiles
       SIMULATION_DOCKER_TIMEOUT_MINUTES: ${SIMULATION_DOCKER_TIMEOUT_MINUTES:-30}
+      # Raidbots Configuration
+      RAIDBOTS_URL: ${RAIDBOTS_URL:-https://www.raidbots.com}
+      RAIDBOTS_API_KEY: ${RAIDBOTS_API_KEY:-}
+      RAIDBOTS_ENABLED: ${RAIDBOTS_ENABLED:-false}
       # OAuth2 Configuration (Discord & Battle.net)
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}

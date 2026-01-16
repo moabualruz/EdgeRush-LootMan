@@ -31,6 +31,8 @@ interface SimulationExecutor {
 class SimulationService(
     private val simulationRepository: SimulationRepository,
     private val profileGenerator: ProfileGeneratorService,
+    private val raidbotsService: com.edgerush.lootman.infrastructure.external.raidbots.RaidbotsService,
+    private val raidbotsConfig: com.edgerush.lootman.infrastructure.external.raidbots.RaidbotsConfig,
     private val simulationExecutor: SimulationExecutor,
 ) {
     private val logger = LoggerFactory.getLogger(SimulationService::class.java)
@@ -159,7 +161,35 @@ class SimulationService(
         simulationRepository.saveRequest(runningRequest)
 
         // Execute simulation
-        val result = simulationExecutor.execute(runningRequest)
+        // Execute simulation
+        if (raidbotsConfig.enabled) {
+             try {
+                 val simId = raidbotsService.submitSimulation(request.profile.profileContent)
+                 logger.info("Submitted Raidbots sim: $simId")
+                 
+                 // Update request with external ID and mark as running
+                 val raidbotsRequest = SimulationRequest.createRaidbots(request.profile, simId)
+                 // We need to preserve the ID of the original pending request if this was from one
+                 val updatedRequest = if (request.id != null) {
+                    raidbotsRequest.withId(request.id).copy(submittedAt = request.submittedAt)
+                 } else {
+                    raidbotsRequest
+                 }
+                 simulationRepository.saveRequest(updatedRequest)
+             } catch (e: Exception) {
+                 throw e
+             }
+        } else {
+             val result = simulationExecutor.execute(runningRequest)
+             handleLocalResult(request, runningRequest, result)
+        }
+    }
+
+    private suspend fun handleLocalResult(
+        request: SimulationRequest,
+        runningRequest: SimulationRequest,
+        result: Result<List<SimulationResult>>
+    ) {
 
         // Handle result
         result.fold(

@@ -43,6 +43,8 @@ data class SimulationRequestDto(
     val completedAt: Instant?,
     val errorMessage: String?,
     val resultCount: Int,
+    val externalId: String? = null,
+    val source: String? = "LOCAL",
 ) {
     companion object {
         fun from(request: SimulationRequest): SimulationRequestDto {
@@ -56,6 +58,8 @@ data class SimulationRequestDto(
                 completedAt = request.completedAt,
                 errorMessage = request.errorMessage,
                 resultCount = request.results.size,
+                externalId = request.externalId,
+                source = request.source,
             )
         }
     }

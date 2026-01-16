@@ -15,6 +15,7 @@ export interface SimulationStatus {
   lastRunAt?: string
   nextScheduledAt?: string
   error?: string
+  source?: 'LOCAL' | 'RAIDBOTS'
 }
 
 export const wishlistApi = {

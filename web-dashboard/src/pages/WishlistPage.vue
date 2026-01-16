@@ -208,9 +208,12 @@ function getSimulationStatusLabel(status: SimulationStatus['status']): string {
           </div>
         </div>
 
-        <!-- Last Run Info -->
-        <div v-if="simStatus?.lastRunAt" class="mt-4 text-sm text-gray-400">
-          Last simulation: {{ formatRelativeTime(simStatus.lastRunAt) }}
+          <!-- Last Run Info -->
+        <div v-if="simStatus?.lastRunAt" class="mt-4 flex items-center justify-between text-sm text-gray-400">
+           <span>Last simulation: {{ formatRelativeTime(simStatus.lastRunAt) }}</span>
+           <span v-if="simStatus.source" class="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-300 border border-gray-600">
+               {{ simStatus.source === 'RAIDBOTS' ? 'Cloud (Raidbots)' : 'Local (Docker)' }}
+           </span>
         </div>
 
         <!-- Error Display -->

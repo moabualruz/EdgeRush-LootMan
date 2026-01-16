@@ -135,8 +135,8 @@ class JdbcSimulationRepository(
             jdbcTemplate.update(
                 """
                 INSERT INTO simulation_requests
-                (profile_id, iterations, fight_length_seconds, status, submitted_at, completed_at, error_message)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (profile_id, iterations, fight_length_seconds, status, submitted_at, completed_at, error_message, external_id, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent(),
                 profileId,
                 request.iterations,
@@ -145,6 +145,8 @@ class JdbcSimulationRepository(
                 Timestamp.from(request.submittedAt),
                 request.completedAt?.let { Timestamp.from(it) },
                 request.errorMessage,
+                request.externalId,
+                request.source,
             )
 
             // Get generated ID
@@ -262,6 +264,9 @@ class JdbcSimulationRepository(
             profile = profile,
             iterations = rs.getInt("iterations"),
             fightLengthSeconds = rs.getInt("fight_length_seconds"),
+        ).copy(
+            externalId = rs.getString("external_id"),
+            source = rs.getString("source") ?: "LOCAL",
         ).let { request ->
             // Apply state based on database values
             var result = request.withId(rs.getLong("id"))

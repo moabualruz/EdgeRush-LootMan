@@ -9,7 +9,8 @@ import java.time.Instant
  * to run gear upgrade simulations via Docker.
  */
 @ConsistentCopyVisibility
-data class SimulationProfile private constructor(
+data class SimulationProfile(
+    val id: Long? = null,
     val guildId: String,
     val characterName: String,
     val characterRealm: String,
@@ -47,6 +48,7 @@ data class SimulationProfile private constructor(
             require(profileContent.isNotBlank()) { "profileContent must not be blank" }
 
             return SimulationProfile(
+                id = null,
                 guildId = guildId.trim(),
                 characterName = characterName.trim(),
                 characterRealm = characterRealm.trim(),

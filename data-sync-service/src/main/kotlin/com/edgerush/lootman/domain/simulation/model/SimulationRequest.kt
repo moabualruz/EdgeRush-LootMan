@@ -8,7 +8,7 @@ import java.time.Instant
  * Tracks the state of a simulation from submission through completion or failure.
  */
 @ConsistentCopyVisibility
-data class SimulationRequest private constructor(
+data class SimulationRequest(
     val id: Long? = null,
     val profile: SimulationProfile,
     val iterations: Int,
@@ -18,6 +18,8 @@ data class SimulationRequest private constructor(
     val completedAt: Instant?,
     val results: List<SimulationResult>,
     val errorMessage: String?,
+    val externalId: String? = null,
+    val source: String = "LOCAL",
 ) {
     val isPending: Boolean get() = status == SimulationStatus.PENDING
     val isRunning: Boolean get() = status == SimulationStatus.RUNNING
@@ -107,6 +109,26 @@ data class SimulationRequest private constructor(
                 completedAt = null,
                 results = emptyList(),
                 errorMessage = null,
+                externalId = null,
+                source = "LOCAL",
+            )
+        }
+
+        fun createRaidbots(
+            profile: SimulationProfile,
+            externalId: String,
+        ): SimulationRequest {
+            return SimulationRequest(
+                profile = profile,
+                iterations = DEFAULT_ITERATIONS, // Not used for Raidbots directly but kept for compatibility
+                fightLengthSeconds = DEFAULT_FIGHT_LENGTH_SECONDS,
+                status = SimulationStatus.RUNNING, // Raidbots sims start as running/queued
+                submittedAt = Instant.now(),
+                completedAt = null,
+                results = emptyList(),
+                errorMessage = null,
+                externalId = externalId,
+                source = "RAIDBOTS",
             )
         }
     }

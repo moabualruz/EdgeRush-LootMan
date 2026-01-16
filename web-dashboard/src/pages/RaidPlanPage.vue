@@ -43,9 +43,19 @@ const panX = ref(0)
 const panY = ref(0)
 
 // Computed current step data
-const currentStepData = computed(() => plan.value?.steps[currentStep.value])
+const currentStepData = computed(() => {
+    if (!plan.value || !plan.value.steps[currentStep.value]) return null
+    return plan.value.steps[currentStep.value]
+})
 const currentMarkers = computed(() => currentStepData.value?.markers ?? [])
 const currentShapes = computed(() => currentStepData.value?.shapes ?? [])
+
+// Background Image (Mock or Derived)
+const backgroundImage = computed(() => {
+    // In a real app we'd fetch the specific map image URL for this encounter
+    // For now, return a placeholder or specific URL based on ID
+    return `/maps/encounter_${plan.value?.encounterId}.jpg` 
+})
 
 // Whether we can delete selected item
 const canDelete = computed(() => selectedMarkerIndex.value >= 0 || selectedShapeIndex.value >= 0)
@@ -81,13 +91,40 @@ function handleColorSelect(color: string) {
   selectedColor.value = color
 }
 
+// Drawing State
+const drawingShape = ref<{ startX: number; startY: number } | null>(null)
+
 function handleCanvasClick(position: { x: number; y: number }) {
+  if (!plan.value || !currentStepData.value) return;
+
   if (currentTool.value === 'marker' && selectedMarker.value) {
-    // Add marker at clicked position (would call API in real implementation)
-    console.log('Add marker:', selectedMarker.value, 'at', position)
+    const newMarker: PlanMarker = {
+        type: selectedMarker.value,
+        x: position.x,
+        y: position.y,
+        color: selectedColor.value
+    }
+    // Mutate local state
+    currentStepData.value.markers.push(newMarker)
+    
   } else if (currentTool.value === 'shape' && selectedShape.value) {
-    // Start drawing shape (would call API in real implementation)
-    console.log('Add shape:', selectedShape.value, 'at', position)
+     if (!drawingShape.value) {
+         // Start drawing
+         drawingShape.value = { startX: position.x, startY: position.y }
+     } else {
+         // Finish drawing
+         const newShape: PlanShape = {
+             shapeType: selectedShape.value,
+             x1: drawingShape.value.startX,
+             y1: drawingShape.value.startY,
+             x2: position.x,
+             y2: position.y,
+             color: selectedColor.value,
+             strokeWidth: 2
+         }
+         currentStepData.value.shapes.push(newShape)
+         drawingShape.value = null
+     }
   } else if (currentTool.value === 'select') {
     selectedMarkerIndex.value = -1
     selectedShapeIndex.value = -1
@@ -116,33 +153,65 @@ function handlePanChange(newPan: { x: number; y: number }) {
 }
 
 function handleDelete() {
+  if (!currentStepData.value) return;
+
   if (selectedMarkerIndex.value >= 0) {
-    console.log('Delete marker:', selectedMarkerIndex.value)
+    currentStepData.value.markers.splice(selectedMarkerIndex.value, 1)
     selectedMarkerIndex.value = -1
   } else if (selectedShapeIndex.value >= 0) {
-    console.log('Delete shape:', selectedShapeIndex.value)
+    currentStepData.value.shapes.splice(selectedShapeIndex.value, 1)
     selectedShapeIndex.value = -1
   }
 }
 
 function handleAddStep() {
-  console.log('Add step')
+    if (!plan.value) return;
+    const newStep = {
+        order: plan.value.steps.length,
+        notes: "New Phase",
+        markers: [],
+        shapes: []
+    }
+    plan.value.steps.push(newStep)
+    currentStep.value = plan.value.steps.length - 1
 }
 
 function handleDeleteStep(index: number) {
-  console.log('Delete step:', index)
+  if (!plan.value || plan.value.steps.length <= 1) return;
+  plan.value.steps.splice(index, 1)
+  // Re-order remaining steps? Backend might handle or we need to re-index locally
+  plan.value.steps.forEach((s, i) => s.order = i)
+  currentStep.value = Math.max(0, Math.min(index, plan.value.steps.length - 1))
 }
 
-function handleNotesEdit() {
-  console.log('Edit notes for step:', currentStep.value)
+function handleNotesEdit(notes: string) {
+    if (currentStepData.value) {
+        currentStepData.value.notes = notes
+    }
 }
 
 function goBack() {
   router.back()
 }
 
-function save() {
-  console.log('Save plan')
+const saving = ref(false)
+
+async function save() {
+  if (!plan.value) return
+  saving.value = true
+  try {
+      await raidPlanApi.updatePlan(plan.value.id, {
+          name: plan.value.name,
+          visibility: plan.value.visibility,
+          steps: plan.value.steps
+      })
+      alert("Plan Saved Successfully!")
+  } catch (e) {
+      console.error("Failed to save plan", e)
+      alert("Failed to save plan.")
+  } finally {
+      saving.value = false
+  }
 }
 
 function share() {

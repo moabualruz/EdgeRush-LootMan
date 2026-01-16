@@ -84,6 +84,7 @@ export interface CreateRaidPlanRequest {
 export interface UpdateRaidPlanRequest {
   name?: string
   visibility?: PlanVisibility
+  steps?: PlanStep[]
 }
 
 export interface AddStepRequest {

@@ -22,10 +22,11 @@ import java.time.Instant
  * - Retrieving simulation results
  */
 @RestController
-@RequestMapping("/api/v1/simulation")
+@RequestMapping("/api/v1/simulations")
 class SimulationController(
     private val simulationService: SimulationService,
     private val simulationRepository: SimulationRepository,
+    private val getRaiderUseCase: com.edgerush.lootman.application.raider.GetRaiderUseCase,
 ) {
     /**
      * Submit a new simulation request for a character.
@@ -147,5 +148,61 @@ class SimulationController(
                     ),
             ),
         )
+        /**
+     * Trigger simulation for a raider.
+     */
+    @PostMapping("/guilds/{guildId}/raiders/{raiderId}/run")
+    fun triggerSimulation(
+        @PathVariable guildId: String,
+        @PathVariable raiderId: Long,
+    ): ResponseEntity<SimulationRequestDto> {
+        val raider =
+            getRaiderUseCase.execute(com.edgerush.lootman.application.raider.GetRaiderQuery(raiderId)).getOrThrow()
+
+        // Ensure guild matches
+        if (raider.guildId.value != guildId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val simulationRequest =
+            simulationService.submitSimulation(
+                guildId = guildId,
+                characterName = raider.characterName,
+                characterRealm = raider.realm,
+                characterClass = raider.characterClass.name.lowercase(),
+                characterSpec = "unknown", 
+            )
+        
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .body(SimulationRequestDto.from(simulationRequest))
     }
+
+    /**
+     * Get simulation status for a raider.
+     */
+    @GetMapping("/guilds/{guildId}/raiders/{raiderId}/status")
+    fun getRaiderSimulationStatus(
+        @PathVariable guildId: String,
+        @PathVariable raiderId: Long,
+    ): ResponseEntity<SimulationRequestDto> {
+         val raider =
+            getRaiderUseCase.execute(com.edgerush.lootman.application.raider.GetRaiderQuery(raiderId)).getOrThrow()
+         
+         val profileId = simulationRepository.findProfileIdByCharacter(guildId, raider.characterName, raider.realm)
+         
+         if (profileId == null) {
+              return ResponseEntity.notFound().build()
+         }
+         
+         
+         val pending = simulationRepository.findPendingRequests().find { it.profile.id == profileId }
+         
+         if (pending != null) {
+             return ResponseEntity.ok(SimulationRequestDto.from(pending))
+         }
+         
+         return ResponseEntity.notFound().build()
+    }
+}
 }
