@@ -40,7 +40,7 @@ class OAuth2Service(
             .queryParam("client_id", properties.discord.clientId)
             .queryParam("redirect_uri", URLEncoder.encode(properties.discord.redirectUri, StandardCharsets.UTF_8))
             .queryParam("response_type", "code")
-            .queryParam("scope", properties.discord.scopes)
+            .queryParam("scope", URLEncoder.encode(properties.discord.scopes, StandardCharsets.UTF_8))
             .apply { state?.let { queryParam("state", it) } }
             .build(true)
             .toUriString()
@@ -129,18 +129,22 @@ class OAuth2Service(
 
     /**
      * Generates the Battle.net OAuth2 authorization URL.
+     * Note: Battle.net requires the state parameter for CSRF protection.
      */
     fun getBattlenetAuthorizationUrl(state: String? = null): String {
         if (!properties.battlenet.isConfigured()) {
             throw OAuth2AuthenticationException("Battle.net", "Battle.net OAuth2 is not configured")
         }
 
+        // Battle.net requires state parameter - generate one if not provided
+        val stateValue = state ?: java.util.UUID.randomUUID().toString()
+
         return UriComponentsBuilder.fromHttpUrl(properties.battlenet.authorizationUrl)
             .queryParam("client_id", properties.battlenet.clientId)
             .queryParam("redirect_uri", URLEncoder.encode(properties.battlenet.redirectUri, StandardCharsets.UTF_8))
             .queryParam("response_type", "code")
             .queryParam("scope", "openid")
-            .apply { state?.let { queryParam("state", it) } }
+            .queryParam("state", stateValue)
             .build(true)
             .toUriString()
     }

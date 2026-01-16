@@ -105,315 +105,184 @@ async function save() {
 </script>
 
 <template>
-  <div class="settings">
-    <div class="header">
-      <h2 class="title">Settings</h2>
-      <button class="save-btn" :disabled="saving" @click="save">
-        {{ saved ? "Saved!" : saving ? "Saving..." : "Save" }}
+  <div class="space-y-6 max-w-2xl mx-auto pb-10">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Settings</h2>
+        <p class="text-muted-foreground">Configure connection and behavior</p>
+      </div>
+      <button
+        class="px-6 py-2.5 rounded-lg font-bold text-sm transition-all duration-300 transform shadow-lg"
+        :class="saved 
+          ? 'bg-green-500 text-white shadow-green-500/25' 
+          : saving 
+            ? 'bg-muted text-muted-foreground cursor-wait' 
+            : 'bg-primary hover:bg-primary-600 hover:-translate-y-0.5 text-white shadow-primary/25'"
+        :disabled="saving"
+        @click="save"
+      >
+        {{ saved ? "Changes Saved!" : saving ? "Saving..." : "Save Changes" }}
       </button>
     </div>
 
     <!-- WoW Configuration -->
-    <div class="section">
-      <h3 class="section-title">World of Warcraft</h3>
+    <div class="glass-card p-6 border-white/5">
+      <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+         <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+         Game Client
+      </h3>
 
-      <div class="field">
-        <label class="field-label">WoW Installation</label>
-        <select
-          v-model="localConfig.wow_path"
-          class="field-select"
-          @change="handleWowPathChange"
-        >
-          <option :value="null">Select WoW installation...</option>
-          <option
-            v-for="install in wowInstallations"
-            :key="install.path"
-            :value="install.path"
-          >
-            {{ install.flavor }} - {{ install.path }}
-          </option>
-        </select>
-        <p class="field-hint">Select your World of Warcraft installation folder</p>
-      </div>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-300">WoW Installation</label>
+           <div class="relative">
+            <select
+              v-model="localConfig.wow_path"
+              class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white appearance-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+              @change="handleWowPathChange"
+            >
+              <option :value="null" class="bg-gray-900 text-gray-400">Select WoW installation directory...</option>
+              <option
+                v-for="install in wowInstallations"
+                :key="install.path"
+                :value="install.path"
+                class="bg-gray-900"
+              >
+                {{ install.flavor }} - {{ install.path }}
+              </option>
+            </select>
+             <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+             </div>
+           </div>
+          <p class="text-xs text-muted-foreground">The root folder containing the _retail_, _classic_, or _classic_era_ directories.</p>
+        </div>
 
-      <div class="field">
-        <label class="field-label">Account Name</label>
-        <select
-          v-model="localConfig.account_name"
-          class="field-select"
-          :disabled="!localConfig.wow_path"
-        >
-          <option :value="null">Select account...</option>
-          <option v-for="account in wowAccounts" :key="account" :value="account">
-            {{ account }}
-          </option>
-        </select>
-        <p class="field-hint">The account folder name in WTF/Account/</p>
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-300">Account Name</label>
+           <div class="relative">
+            <select
+              v-model="localConfig.account_name"
+              class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white appearance-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="!localConfig.wow_path"
+            >
+              <option :value="null" class="bg-gray-900 text-gray-400">Select account...</option>
+              <option v-for="account in wowAccounts" :key="account" :value="account" class="bg-gray-900">
+                {{ account }}
+              </option>
+            </select>
+             <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+             </div>
+           </div>
+          <p class="text-xs text-muted-foreground">The specific account folder name found in WTF/Account/.</p>
+        </div>
       </div>
     </div>
 
     <!-- API Configuration -->
-    <div class="section">
-      <h3 class="section-title">EdgeRush API</h3>
+    <div class="glass-card p-6 border-white/5">
+      <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        EdgeRush API
+      </h3>
 
-      <div class="field">
-        <label class="field-label">API URL</label>
-        <input
-          v-model="localConfig.api_url"
-          type="text"
-          class="field-input"
-          placeholder="https://api.edgerush.gg"
-        />
-      </div>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-300">API URL</label>
+          <input
+            v-model="localConfig.api_url"
+            type="text"
+             class="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+            placeholder="https://api.edgerush.gg"
+          />
+        </div>
 
-      <div class="field">
-        <label class="field-label">API Key</label>
-        <input
-          v-model="localConfig.api_key"
-          type="password"
-          class="field-input"
-          placeholder="Enter your API key"
-        />
-        <p class="field-hint">Get your API key from the EdgeRush web dashboard</p>
-      </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-300">API Key</label>
+          <input
+            v-model="localConfig.api_key"
+            type="password"
+             class="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono"
+            placeholder="Enter your API key"
+          />
+          <p class="text-xs text-muted-foreground">Obtain this key from your EdgeRush web dashboard profile.</p>
+        </div>
 
-      <div class="field">
-        <label class="field-label">Guild ID</label>
-        <input
-          v-model="localConfig.guild_id"
-          type="text"
-          class="field-input"
-          placeholder="Enter your guild ID"
-        />
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-300">Guild ID</label>
+          <input
+            v-model="localConfig.guild_id"
+            type="text"
+             class="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+            placeholder="Enter your guild ID"
+          />
+        </div>
       </div>
     </div>
 
     <!-- Sync Settings -->
-    <div class="section">
-      <h3 class="section-title">Sync Settings</h3>
+    <div class="glass-card p-6 border-white/5">
+      <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Sync Behavior
+      </h3>
 
-      <div class="toggle-field">
-        <div class="toggle-info">
-          <span class="toggle-label">Auto Sync</span>
-          <span class="toggle-hint">Automatically sync when SavedVariables changes</span>
+      <div class="space-y-6">
+        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">Auto Sync</div>
+            <div class="text-xs text-muted-foreground">Automatically sync when you reload UI</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input v-model="localConfig.auto_sync" type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
         </div>
-        <label class="toggle">
-          <input v-model="localConfig.auto_sync" type="checkbox" />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
 
-      <div class="toggle-field">
-        <div class="toggle-info">
-          <span class="toggle-label">Desktop Notifications</span>
-          <span class="toggle-hint">Show notifications on sync completion</span>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">Desktop Notifications</div>
+            <div class="text-xs text-muted-foreground">Show popup when sync completes</div>
+          </div>
+           <label class="relative inline-flex items-center cursor-pointer">
+            <input v-model="localConfig.notifications_enabled" type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
         </div>
-        <label class="toggle">
-          <input v-model="localConfig.notifications_enabled" type="checkbox" />
-          <span class="toggle-slider"></span>
-        </label>
       </div>
     </div>
 
     <!-- Startup Settings -->
-    <div class="section">
-      <h3 class="section-title">Startup</h3>
+    <div class="glass-card p-6 border-white/5">
+      <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        Startup
+      </h3>
 
-      <div class="toggle-field">
-        <div class="toggle-info">
-          <span class="toggle-label">Start Minimized</span>
-          <span class="toggle-hint">Start in system tray</span>
+      <div class="space-y-6">
+        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">Start Minimized</div>
+            <div class="text-xs text-muted-foreground">Start quietly in system tray</div>
+          </div>
+           <label class="relative inline-flex items-center cursor-pointer">
+            <input v-model="localConfig.start_minimized" type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
         </div>
-        <label class="toggle">
-          <input v-model="localConfig.start_minimized" type="checkbox" />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
 
-      <div class="toggle-field">
-        <div class="toggle-info">
-          <span class="toggle-label">Start with Windows</span>
-          <span class="toggle-hint">Launch automatically on system startup</span>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">Start with Windows</div>
+            <div class="text-xs text-muted-foreground">Launch automatically on booting</div>
+          </div>
+           <label class="relative inline-flex items-center cursor-pointer">
+            <input v-model="localConfig.start_with_windows" type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
         </div>
-        <label class="toggle">
-          <input v-model="localConfig.start_with_windows" type="checkbox" />
-          <span class="toggle-slider"></span>
-        </label>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.settings {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.save-btn {
-  padding: 8px 24px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.save-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-
-.save-btn:disabled {
-  opacity: 0.7;
-}
-
-.section {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.section-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.field {
-  margin-bottom: 16px;
-}
-
-.field:last-child {
-  margin-bottom: 0;
-}
-
-.field-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.field-input,
-.field-select {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--bg-tertiary);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: 14px;
-  border-radius: 6px;
-  transition: border-color 0.2s;
-}
-
-.field-input:focus,
-.field-select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.field-select {
-  cursor: pointer;
-}
-
-.field-select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.field-hint {
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.toggle-field {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--bg-tertiary);
-}
-
-.toggle-field:last-child {
-  border-bottom: none;
-}
-
-.toggle-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.toggle-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.toggle {
-  position: relative;
-  width: 48px;
-  height: 26px;
-}
-
-.toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--bg-tertiary);
-  transition: 0.3s;
-  border-radius: 26px;
-}
-
-.toggle-slider::before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
-  border-radius: 50%;
-}
-
-.toggle input:checked + .toggle-slider {
-  background-color: var(--accent);
-}
-
-.toggle input:checked + .toggle-slider::before {
-  transform: translateX(22px);
-}
-</style>

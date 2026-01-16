@@ -11,6 +11,7 @@ mod watcher;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::Manager;
+use tauri::Emitter;
 use tokio::sync::Mutex;
 
 use crate::config::AppConfig;
@@ -124,6 +125,64 @@ fn get_wow_accounts(wow_path: String) -> Vec<String> {
     get_accounts(&PathBuf::from(wow_path))
 }
 
+mod simc;
+
+/// Generate SimC input for a character
+#[tauri::command]
+async fn generate_simc_input(
+    state: tauri::State<'_, AppState>,
+    character_name: String,
+    realm: String,
+) -> Result<String, String> {
+    let config = state.config.lock().await;
+    
+    // Check if configured
+    if !config.is_configured() {
+        return Err("App not configured".to_string());
+    }
+
+    let saved_vars_path = config.saved_variables_path()
+        .ok_or_else(|| "Cannot determine SavedVariables path".to_string())?;
+
+    if !saved_vars_path.exists() {
+        return Err("SavedVariables file not found".to_string());
+    }
+
+    // Parse DB
+    let addon_data = parser::SavedVariablesParser::parse(&saved_vars_path)
+        .map_err(|e| format!("Failed to parse SavedVariables: {}", e))?;
+
+    // Find character
+    let character = addon_data.characters.iter()
+        .find(|c| c.name.eq_ignore_ascii_case(&character_name) && c.realm.eq_ignore_ascii_case(&realm))
+        .ok_or_else(|| format!("Character {} not found in SavedVariables", character_name))?;
+
+    // Generate SimC
+    Ok(simc::generate_simc(character))
+}
+
+/// Get available characters from SavedVariables
+#[tauri::command]
+async fn get_characters(state: tauri::State<'_, AppState>) -> Result<Vec<String>, String> {
+    let config = state.config.lock().await;
+    
+    if !config.is_configured() {
+        return Ok(Vec::new());
+    }
+
+    let saved_vars_path = config.saved_variables_path()
+        .ok_or_else(|| "Cannot determine SavedVariables path".to_string())?;
+
+    if !saved_vars_path.exists() {
+        return Ok(Vec::new());
+    }
+
+    let addon_data = parser::SavedVariablesParser::parse(&saved_vars_path)
+        .map_err(|e| format!("Failed to parse SavedVariables: {}", e))?;
+
+    Ok(addon_data.characters.into_iter().map(|c| format!("{} - {}", c.name, c.realm)).collect())
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -151,6 +210,27 @@ fn main() {
                 }
             }
 
+            // Spawn background sync task
+            let service_state = state.sync_service.clone();
+            let app_handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    
+                    let mut guard = service_state.lock().await;
+                    if let Some(ref mut service) = *guard {
+                        match service.check_and_sync().await {
+                            Ok(Some(result)) => {
+                                println!("Auto-sync completed: {:?}", result);
+                                let _ = app_handle.emit("sync-complete", result);
+                            }
+                            Ok(None) => {} // No action needed
+                            Err(e) => eprintln!("Auto-sync error: {}", e),
+                        }
+                    }
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -160,6 +240,8 @@ fn main() {
             get_sync_status,
             detect_wow_paths,
             get_wow_accounts,
+            generate_simc_input,
+            get_characters,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

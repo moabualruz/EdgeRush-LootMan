@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+// Types (Keep existing types)
 interface AppConfig {
   wow_path: string | null;
   account_name: string | null;
@@ -71,221 +72,100 @@ const configItems = computed(() => [
 </script>
 
 <template>
-  <div class="status-panel">
+  <div class="space-y-6">
+    <div class="flex items-center justify-between mb-2">
+       <div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">System Status</h2>
+        <p class="text-muted-foreground">Monitor sync activity and configuration</p>
+      </div>
+    </div>
+
     <!-- Sync Status Card -->
-    <div class="card">
-      <h2 class="card-title">Sync Status</h2>
-      <div class="status-grid">
-        <div class="status-item">
-          <span class="label">Status</span>
-          <span class="value" :class="{ syncing: isSyncing }">
+    <div class="glass-card p-6 border-white/5 bg-gradient-to-br from-black/40 to-black/20">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+          <span class="w-1 h-6 bg-primary rounded-full"></span>
+          Sync Operations
+        </h3>
+        <button
+            class="px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-lg shadow-primary/10"
+            :class="isSyncing || !isConfigured ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-primary hover:bg-primary-600 text-white shadow-primary/20'"
+            :disabled="!isConfigured || isSyncing"
+            @click="emit('sync')"
+          >
+            <span v-if="isSyncing" class="flex items-center gap-2">
+              <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              Syncing...
+            </span>
+            <span v-else>Sync Now</span>
+          </button>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
+          <div class="text-xs uppercase tracking-wider text-muted-foreground mb-1">Status</div>
+          <div class="text-lg font-medium" :class="isSyncing ? 'text-primary' : isConfigured ? 'text-green-400' : 'text-yellow-400'">
             {{ isSyncing ? "Syncing..." : isConfigured ? "Ready" : "Not Configured" }}
-          </span>
+          </div>
         </div>
-        <div class="status-item">
-          <span class="label">Last Sync</span>
-          <span class="value">{{ lastSyncText }}</span>
+
+        <div class="p-4 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
+          <div class="text-xs uppercase tracking-wider text-muted-foreground mb-1">Last Sync</div>
+          <div class="text-lg font-medium text-white">{{ lastSyncText }}</div>
         </div>
-        <div class="status-item">
-          <span class="label">Auto Sync</span>
-          <span class="value" :class="{ enabled: syncStatus?.auto_sync_enabled }">
+
+        <div class="p-4 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
+          <div class="text-xs uppercase tracking-wider text-muted-foreground mb-1">Auto Sync</div>
+           <div class="text-lg font-medium" :class="syncStatus?.auto_sync_enabled ? 'text-green-400' : 'text-muted-foreground'">
             {{ syncStatus?.auto_sync_enabled ? "Enabled" : "Disabled" }}
-          </span>
+          </div>
         </div>
-        <div class="status-item">
-          <span class="label">Watching</span>
-          <span class="value path">{{ syncStatus?.watched_path ?? "N/A" }}</span>
+
+         <div class="p-4 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
+          <div class="text-xs uppercase tracking-wider text-muted-foreground mb-1">Watching</div>
+          <div class="text-sm font-medium text-white/80 truncate" :title="syncStatus?.watched_path ?? ''">
+             {{ syncStatus?.watched_path ?? "N/A" }}
+          </div>
         </div>
       </div>
-      <button
-        class="sync-btn"
-        :disabled="!isConfigured || isSyncing"
-        @click="emit('sync')"
-      >
-        {{ isSyncing ? "Syncing..." : "Sync Now" }}
-      </button>
     </div>
 
     <!-- Configuration Status Card -->
-    <div class="card">
-      <h2 class="card-title">Configuration</h2>
-      <div class="config-list">
-        <div
+     <div class="glass-card p-6 border-white/5 bg-gradient-to-br from-black/40 to-black/20">
+      <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-6">
+          <span class="w-1 h-6 bg-purple-500 rounded-full"></span>
+          Configuration Check
+      </h3>
+      
+      <div class="space-y-3">
+         <div
           v-for="item in configItems"
           :key="item.label"
-          class="config-item"
+          class="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5"
         >
-          <div class="config-status">
-            <span class="config-dot" :class="{ configured: item.configured }"></span>
-            <span class="config-label">{{ item.label }}</span>
+          <div class="flex items-center gap-3">
+             <div class="w-2 h-2 rounded-full" :class="item.configured ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-destructive'"></div>
+             <span class="text-sm font-medium text-white">{{ item.label }}</span>
           </div>
-          <span class="config-value" :class="{ missing: !item.configured }">
-            {{ item.value }}
-          </span>
+          <div class="text-sm text-muted-foreground max-w-[200px] truncate" :class="{ 'text-yellow-500/80': !item.configured }">
+             {{ item.value }}
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Quick Help -->
-    <div class="card help">
-      <h2 class="card-title">Quick Start</h2>
-      <ol class="help-list">
-        <li>Configure your WoW installation path in Settings</li>
-        <li>Select your WoW account name</li>
-        <li>Enter your EdgeRush API key (from web dashboard)</li>
-        <li>Enable auto-sync to sync automatically when you /reload</li>
+    <div class="rounded-xl border border-primary/20 bg-primary/5 p-6">
+      <h3 class="text-sm font-bold text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
+         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+         Quick Start Guide
+      </h3>
+      <ol class="space-y-2 text-sm text-muted-foreground list-decimal list-inside marker:text-primary">
+        <li>Configure your <span class="text-white font-medium">WoW installation path</span> in Settings</li>
+        <li>Select your <span class="text-white font-medium">WoW account name</span></li>
+        <li>Enter your <span class="text-white font-medium">EdgeRush API key</span> (from web dashboard)</li>
+        <li>Enable <span class="text-white font-medium">auto-sync</span> to sync automatically when you /reload</li>
       </ol>
     </div>
   </div>
 </template>
-
-<style scoped>
-.status-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.card {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
-
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.status-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.value {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.value.syncing {
-  color: var(--accent);
-}
-
-.value.enabled {
-  color: var(--success);
-}
-
-.value.path {
-  font-size: 12px;
-  word-break: break-all;
-  color: var(--text-secondary);
-}
-
-.sync-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.sync-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-
-.sync-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.config-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.config-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--bg-tertiary);
-}
-
-.config-item:last-child {
-  border-bottom: none;
-}
-
-.config-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.config-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--error);
-}
-
-.config-dot.configured {
-  background: var(--success);
-}
-
-.config-label {
-  font-size: 14px;
-}
-
-.config-value {
-  font-size: 14px;
-  color: var(--text-secondary);
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.config-value.missing {
-  color: var(--warning);
-}
-
-.help {
-  background: var(--bg-tertiary);
-}
-
-.help-list {
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.help-list li {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-</style>

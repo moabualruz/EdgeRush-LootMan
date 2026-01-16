@@ -73,187 +73,65 @@ function formatDate(date: Date): string {
 </script>
 
 <template>
-  <div class="sync-history">
-    <div class="header">
-      <h2 class="title">Sync History</h2>
-      <span class="count">{{ history.length }} syncs</span>
+  <div class="space-y-6 pb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Sync Logs</h2>
+        <p class="text-muted-foreground">Historical record of all sync operations</p>
+      </div>
+      <div class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-muted-foreground">
+        {{ history.length }} Records
+      </div>
     </div>
 
-    <div v-if="history.length === 0" class="empty">
-      <p>No sync history yet</p>
-      <p class="hint">Syncs will appear here after your first sync</p>
+    <div v-if="history.length === 0" class="flex flex-col items-center justify-center p-12 glass-card border-white/5 text-center">
+      <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <h3 class="text-lg font-medium text-white">No sync history yet</h3>
+      <p class="text-muted-foreground mt-1">Syncs will appear here after your first operation</p>
     </div>
 
-    <div v-else class="history-list">
+    <div v-else class="space-y-4">
       <div
         v-for="record in history"
         :key="record.id"
-        class="history-item"
-        :class="{ error: !record.success }"
+        class="glass-card p-0 border-white/5 overflow-hidden transition-all hover:bg-white/5"
       >
-        <div class="item-header">
-          <div class="status-badge" :class="{ success: record.success, error: !record.success }">
-            {{ record.success ? "Success" : "Failed" }}
+        <div class="p-4 border-l-4" :class="record.success ? 'border-l-green-500' : 'border-l-destructive'">
+          <div class="flex items-start justify-between mb-4">
+             <div class="flex items-center gap-3">
+               <span 
+                class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
+                :class="record.success ? 'bg-green-500/10 text-green-500' : 'bg-destructive/10 text-destructive'"
+              >
+                {{ record.success ? "Success" : "Failed" }}
+              </span>
+              <span v-if="record.message" class="text-sm text-destructive">{{ record.message }}</span>
+             </div>
+             
+             <div class="text-right">
+               <div class="text-sm font-medium text-white">{{ formatDate(record.timestamp) }}</div>
+               <div class="text-xs text-muted-foreground">{{ formatTime(record.timestamp) }}</div>
+             </div>
           </div>
-          <div class="timestamp">
-            <span class="date">{{ formatDate(record.timestamp) }}</span>
-            <span class="time">{{ formatTime(record.timestamp) }}</span>
-          </div>
-        </div>
 
-        <div class="item-details">
-          <div class="detail">
-            <span class="detail-label">Characters</span>
-            <span class="detail-value">{{ record.characters_synced }}</span>
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/5">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Characters</div>
+              <div class="text-sm font-medium text-white">{{ record.characters_synced }}</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Gear Items</div>
+              <div class="text-sm font-medium text-white">{{ record.gear_items_synced }}</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">FLPS Updated</div>
+              <div class="text-sm font-medium" :class="record.flps_updated ? 'text-green-400' : 'text-muted-foreground'">{{ record.flps_updated ? "Yes" : "No" }}</div>
+            </div>
           </div>
-          <div class="detail">
-            <span class="detail-label">Gear Items</span>
-            <span class="detail-value">{{ record.gear_items_synced }}</span>
-          </div>
-          <div class="detail">
-            <span class="detail-label">FLPS Updated</span>
-            <span class="detail-value">{{ record.flps_updated ? "Yes" : "No" }}</span>
-          </div>
-        </div>
-
-        <div v-if="record.message" class="item-message">
-          {{ record.message }}
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.sync-history {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.count {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.empty {
-  text-align: center;
-  padding: 40px 20px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-}
-
-.empty p {
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.empty .hint {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.history-item {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px;
-  border-left: 4px solid var(--success);
-}
-
-.history-item.error {
-  border-left-color: var(--error);
-}
-
-.item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.status-badge.success {
-  background: rgba(74, 222, 128, 0.2);
-  color: var(--success);
-}
-
-.status-badge.error {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--error);
-}
-
-.timestamp {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-}
-
-.date {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.time {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.item-details {
-  display: flex;
-  gap: 24px;
-  padding: 12px 0;
-  border-top: 1px solid var(--bg-tertiary);
-}
-
-.detail {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.detail-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detail-value {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.item-message {
-  margin-top: 12px;
-  padding: 10px;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--error);
-}
-</style>

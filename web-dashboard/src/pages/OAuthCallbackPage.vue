@@ -14,6 +14,8 @@ onMounted(async () => {
   const code = route.query.code as string
   const provider = route.params.provider as string
   const errorParam = route.query.error as string
+  // Check if this is an account linking flow (user already has a token)
+  const isLinking = route.query.link === 'true' || !!authStore.token
 
   if (errorParam) {
     error.value = `OAuth error: ${errorParam}`
@@ -28,44 +30,71 @@ onMounted(async () => {
   }
 
   try {
-    if (provider === 'discord') {
-      await authStore.loginWithDiscord(code)
-    } else if (provider === 'battlenet') {
-      await authStore.loginWithBattlenet(code)
+    if (isLinking && authStore.token) {
+      // User is already logged in - link the account instead of creating new
+      if (provider === 'discord') {
+        await authStore.linkDiscord(code)
+      } else if (provider === 'battlenet') {
+        await authStore.linkBattlenet(code)
+      } else {
+        error.value = `Unknown OAuth provider: ${provider}`
+        loading.value = false
+        return
+      }
     } else {
-      error.value = `Unknown OAuth provider: ${provider}`
-      loading.value = false
-      return
+      // User is not logged in - this is a login/register flow
+      if (provider === 'discord') {
+        await authStore.loginWithDiscord(code)
+      } else if (provider === 'battlenet') {
+        await authStore.loginWithBattlenet(code)
+      } else {
+        error.value = `Unknown OAuth provider: ${provider}`
+        loading.value = false
+        return
+      }
     }
 
     // Redirect to dashboard on success
     router.push('/dashboard')
-  } catch (err) {
+  } catch (err: any) {
     console.error('OAuth callback error:', err)
-    error.value = err instanceof Error ? err.message : 'Authentication failed'
+    error.value = err.response?.data?.message || err.message || 'Authentication failed'
     loading.value = false
   }
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-900 flex items-center justify-center">
-    <div class="text-center">
-      <div v-if="loading" class="space-y-4">
-        <div class="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-        <p class="text-slate-300 text-lg">Completing authentication...</p>
+  <div class="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+    <!-- Background element -->
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5"></div>
+    <div class="absolute inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+
+    <div class="text-center relative z-10 p-8 glass-card border-white/5 animate-fade-in-up">
+      <div v-if="loading" class="space-y-6">
+        <div class="relative w-16 h-16 mx-auto">
+          <div class="absolute inset-0 rounded-full border-4 border-primary/30"></div>
+          <div class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-2 text-glow">Connecting...</h2>
+          <p class="text-muted-foreground">Securing your connection to the grid.</p>
+        </div>
       </div>
 
-      <div v-else-if="error" class="space-y-4">
-        <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-6 max-w-md">
-          <h2 class="text-xl font-bold text-red-400 mb-2">Authentication Failed</h2>
-          <p class="text-red-300">{{ error }}</p>
+      <div v-else-if="error" class="space-y-6 max-w-md">
+        <div class="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto text-destructive border border-destructive/20">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <div class="bg-destructive/5 border border-destructive/20 rounded-xl p-6">
+          <h2 class="text-xl font-bold text-destructive-foreground mb-2">Authentication Failed</h2>
+          <p class="text-muted-foreground text-sm">{{ error }}</p>
         </div>
         <button
           @click="router.push('/login')"
-          class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+          class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-300 font-medium shadow-lg shadow-primary/20"
         >
-          Back to Login
+          Return to Login
         </button>
       </div>
     </div>

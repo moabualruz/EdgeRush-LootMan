@@ -117,6 +117,11 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAdmin: true },
       },
       {
+        path: 'recruitment',
+        name: 'recruitment',
+        component: () => import('@/pages/recruitment/RecruitmentPage.vue'),
+      },
+      {
         path: 'guild-settings',
         name: 'guild-settings',
         component: () => import('@/pages/GuildSettingsPage.vue'),

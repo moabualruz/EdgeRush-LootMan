@@ -129,7 +129,7 @@ impl ApiClient {
                 level: c.level,
                 item_level: c.item_level,
             }).collect(),
-            gear: data.gear.iter().map(|g| GearItemRequest {
+            gear: data.characters.iter().flat_map(|c| c.gear.iter().map(|g| GearItemRequest {
                 slot_id: g.slot_id,
                 item_id: g.item_id,
                 item_level: g.item_level,
@@ -137,7 +137,7 @@ impl ApiClient {
                 enchant_id: g.enchant_id,
                 gem_ids: g.gem_ids.clone(),
                 bonus_ids: g.bonus_ids.clone(),
-            }).collect(),
+            })).collect(),
             version: data.version.clone(),
             timestamp: chrono::Utc::now().to_rfc3339(),
         };

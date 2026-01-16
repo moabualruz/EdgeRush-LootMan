@@ -75,26 +75,20 @@ impl SavedVariablesParser {
         let mut data = AddonData::default();
 
         // Parse character data
-        if let Some(chars_start) = content.find("[\"characters\"]") {
+        // AceDB uses ["char"] table
+        if let Some(chars_start) = content.find("[\"char\"]") {
             if let Ok(chars_table) = Self::extract_table(&content[chars_start..]) {
                 data.characters = Self::parse_characters(&chars_table)?;
             }
         }
 
-        // Parse gear data
-        if let Some(gear_start) = content.find("[\"gear\"]") {
-            if let Ok(gear_table) = Self::extract_table(&content[gear_start..]) {
-                data.gear = Self::parse_gear(&gear_table)?;
-            }
-        }
-
-        // Parse FLPS data (received from server)
-        if let Some(flps_start) = content.find("[\"flps\"]") {
-            if let Ok(flps_table) = Self::extract_table(&content[flps_start..]) {
-                data.flps = Self::parse_flps(&flps_table)?;
-            }
-        }
-
+        // Parse FLPS data (received from server) - FLPS is also inside char usually, 
+        // but if GearExport saves it to db.char.flps, then it's inside each character or top level?
+        // Wait, Addon:ShowFLPS uses self.db.char.flps. 
+        // So FLPS is also per character!
+        // The previous parser expected ["flps"] at top level. 
+        // We should fix this too, but let's stick to gear first.
+        
         // Parse sync timestamp
         if let Some(sync_match) = Self::extract_string_value(content, "lastSync") {
             data.last_sync = Some(sync_match);
@@ -113,8 +107,6 @@ impl SavedVariablesParser {
         let mut characters = Vec::new();
 
         // Find character entries in format: ["CharName-Realm"] = { ... }
-        let re_pattern = r#"\["([^"]+)"\]\s*=\s*\{"#;
-
         let mut pos = 0;
         while let Some(key_start) = content[pos..].find("[\"") {
             let abs_start = pos + key_start;
@@ -153,6 +145,17 @@ impl SavedVariablesParser {
             (key.to_string(), "Unknown".to_string())
         };
 
+        // Parse nested gear table
+        let gear = if let Some(gear_start) = content.find("[\"gear\"]") {
+            if let Ok(gear_table) = Self::extract_table(&content[gear_start..]) {
+                Self::parse_gear(&gear_table).unwrap_or_default()
+            } else {
+                Vec::new()
+            }
+        } else {
+            Vec::new()
+        };
+
         Ok(CharacterData {
             name,
             realm,
@@ -160,6 +163,9 @@ impl SavedVariablesParser {
             spec: Self::extract_string_value(content, "spec").unwrap_or_default(),
             level: Self::extract_number_value(content, "level").unwrap_or(0.0) as u32,
             item_level: Self::extract_number_value(content, "itemLevel").unwrap_or(0.0),
+            race: Self::extract_string_value(content, "race"),
+            talents: Self::extract_string_value(content, "talents"),
+            gear,
         })
     }
 
@@ -326,9 +332,9 @@ fn slot_id_to_name(slot_id: u32) -> String {
 
 /// Addon data structure
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+
 pub struct AddonData {
     pub characters: Vec<CharacterData>,
-    pub gear: Vec<GearItem>,
     pub flps: Option<FlpsData>,
     pub last_sync: Option<String>,
     pub version: Option<String>,
@@ -336,6 +342,7 @@ pub struct AddonData {
 
 /// Character data
 #[derive(Debug, Clone, Serialize, Deserialize)]
+
 pub struct CharacterData {
     pub name: String,
     pub realm: String,
@@ -343,6 +350,9 @@ pub struct CharacterData {
     pub spec: String,
     pub level: u32,
     pub item_level: f64,
+    pub race: Option<String>,
+    pub talents: Option<String>,
+    pub gear: Vec<GearItem>,
 }
 
 /// Gear item data

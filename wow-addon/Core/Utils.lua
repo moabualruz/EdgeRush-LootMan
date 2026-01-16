@@ -43,6 +43,19 @@ function ELM.Utils:GetCharacterLevel()
     return UnitLevel("player")
 end
 
+-- Get character race (file format)
+function ELM.Utils:GetCharacterRace()
+    local _, raceFile = UnitRace("player")
+    return raceFile
+end
+
+-- Get talent export string
+function ELM.Utils:GetTalentString()
+    local configID = C_ClassTalents.GetActiveConfigID()
+    if not configID then return nil end
+    return C_Traits.GenerateImportString(configID)
+end
+
 -- Get average item level
 function ELM.Utils:GetItemLevel()
     local overall, equipped = GetAverageItemLevel()

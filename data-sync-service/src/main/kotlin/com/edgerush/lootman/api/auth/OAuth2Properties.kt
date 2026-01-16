@@ -19,7 +19,7 @@ data class DiscordOAuth2Properties(
     val clientId: String = "",
     val clientSecret: String = "",
     val redirectUri: String = "",
-    val scopes: String = "identify,guilds",
+    val scopes: String = "identify email",
 ) {
     val authorizationUrl: String
         get() = "https://discord.com/api/oauth2/authorize"

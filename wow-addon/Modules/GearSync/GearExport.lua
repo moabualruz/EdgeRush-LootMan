@@ -33,6 +33,8 @@ function GearExport:Export()
     db.class = ELM.Utils:GetCharacterClass()
     db.spec = ELM.Utils:GetCharacterSpec()
     db.level = ELM.Utils:GetCharacterLevel()
+    db.race = ELM.Utils:GetCharacterRace()
+    db.talents = ELM.Utils:GetTalentString()
 
     local equipped, overall = ELM.Utils:GetItemLevel()
     db.itemLevel = equipped

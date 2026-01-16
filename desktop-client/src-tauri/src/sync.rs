@@ -150,11 +150,12 @@ impl SyncService {
         };
 
         // Sync data to server
-        if !addon_data.characters.is_empty() || !addon_data.gear.is_empty() {
+        let has_gear = addon_data.characters.iter().any(|c| !c.gear.is_empty());
+        if !addon_data.characters.is_empty() || has_gear {
             match self.api_client.sync_addon_data(&addon_data).await {
                 Ok(response) => {
                     result.characters_synced = addon_data.characters.len();
-                    result.gear_items_synced = addon_data.gear.len();
+                    result.gear_items_synced = addon_data.characters.iter().map(|c| c.gear.len()).sum();
                     if let Some(msg) = response.message {
                         result.message = Some(msg);
                     }
