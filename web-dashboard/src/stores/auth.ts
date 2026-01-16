@@ -39,11 +39,12 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token')
   }
 
-  async function register(username: string, email: string, password: string): Promise<void> {
+  async function register(username: string, email: string, password: string, role: string = 'RAIDER'): Promise<void> {
     const response = await api.post<TokenResponse>('/v1/auth/register', {
       username,
       email,
       password,
+      role,
     })
     setToken(response.data.accessToken)
     await fetchUser()

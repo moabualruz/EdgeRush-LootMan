@@ -12,10 +12,12 @@ import { useQuery } from '@tanstack/vue-query'
 import { raidsApi, type Raid, type RaidStatus } from '@/api/raids'
 import { formatDate, formatRelativeTime } from '@/utils/date'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import RaidCalendar from '@/components/RaidCalendar.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildId = computed(() => authStore.user?.guildId)
 const router = useRouter()
 
 // View mode
@@ -26,13 +28,15 @@ const activeTab = ref<'upcoming' | 'past'>('upcoming')
 
 // Queries
 const { data: upcomingRaids, isLoading: upcomingLoading } = useQuery({
-  queryKey: ['upcomingRaids', GUILD_ID],
-  queryFn: () => raidsApi.getUpcomingRaids(GUILD_ID, 20),
+  queryKey: ['upcomingRaids', guildId],
+  queryFn: () => raidsApi.getUpcomingRaids(guildId.value!, 20),
+  enabled: computed(() => !!guildId.value),
 })
 
 const { data: pastRaids, isLoading: pastLoading } = useQuery({
-  queryKey: ['pastRaids', GUILD_ID],
-  queryFn: () => raidsApi.getPastRaids(GUILD_ID, 20),
+  queryKey: ['pastRaids', guildId],
+  queryFn: () => raidsApi.getPastRaids(guildId.value!, 20),
+  enabled: computed(() => !!guildId.value),
 })
 
 const isLoading = computed(() =>
@@ -203,8 +207,16 @@ function handleRaidClick(raid: Raid) {
       </div>
 
       <!-- Loading state -->
-      <div v-if="isLoading" class="space-y-4">
+      <div v-if="isLoading && guildId" class="space-y-4">
         <SkeletonCard :lines="3" v-for="i in 3" :key="i" />
+      </div>
+
+      <!-- No Guild state -->
+      <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
+         <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
+         <p class="text-blue-300">
+           You are not currently a member of any guild.
+         </p>
       </div>
 
       <!-- Content -->

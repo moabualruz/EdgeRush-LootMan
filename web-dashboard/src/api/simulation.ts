@@ -64,7 +64,7 @@ export const simulationApi = {
     request: SubmitSimulationRequest
   ): Promise<SimulationRequestDto> {
     const response = await api.post<SimulationRequestDto>(
-      `/api/v1/simulation/guilds/${guildId}/characters/${characterName}`,
+      `/v1/simulation/guilds/${guildId}/characters/${characterName}`,
       request
     )
     return response.data
@@ -75,7 +75,7 @@ export const simulationApi = {
    */
   async getSimulationStatus(requestId: number): Promise<SimulationRequestDto> {
     const response = await api.get<SimulationRequestDto>(
-      `/api/v1/simulation/requests/${requestId}`
+      `/v1/simulation/requests/${requestId}`
     )
     return response.data
   },
@@ -89,7 +89,7 @@ export const simulationApi = {
     characterRealm: string
   ): Promise<SimulationResultsResponse> {
     const response = await api.get<SimulationResultsResponse>(
-      `/api/v1/simulation/guilds/${guildId}/characters/${characterName}/realms/${characterRealm}/results`
+      `/v1/simulation/guilds/${guildId}/characters/${characterName}/realms/${characterRealm}/results`
     )
     return response.data
   },
@@ -99,7 +99,7 @@ export const simulationApi = {
    */
   async getPendingSimulations(guildId: string): Promise<SimulationRequestDto[]> {
     const response = await api.get<SimulationRequestDto[]>(
-      `/api/v1/simulation/guilds/${guildId}/pending`
+      `/v1/simulation/guilds/${guildId}/pending`
     )
     return response.data
   },
@@ -109,7 +109,7 @@ export const simulationApi = {
    */
   async executePendingSimulations(): Promise<ExecutionSummaryResponse> {
     const response = await api.post<ExecutionSummaryResponse>(
-      '/api/v1/simulation/execute-pending'
+      '/v1/simulation/execute-pending'
     )
     return response.data
   },
@@ -119,7 +119,7 @@ export const simulationApi = {
    */
   async getServiceStatus(): Promise<SimulationStatusResponse> {
     const response = await api.get<SimulationStatusResponse>(
-      '/api/v1/simulation/status'
+      '/v1/simulation/status'
     )
     return response.data
   },

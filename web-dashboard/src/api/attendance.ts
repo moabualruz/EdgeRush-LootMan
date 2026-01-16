@@ -50,22 +50,22 @@ export interface AttendanceCalendarEntry {
 
 export const attendanceApi = {
   async getMyAttendance(guildId: string): Promise<AttendanceReport> {
-    const response = await api.get<AttendanceReport>(`/api/v1/attendance/guilds/${guildId}/me`)
+    const response = await api.get<AttendanceReport>(`/v1/attendance/guilds/${guildId}/me`)
     return response.data
   },
 
   async getAttendanceReport(guildId: string, raiderId: number): Promise<AttendanceReport> {
-    const response = await api.get<AttendanceReport>(`/api/v1/attendance/raiders/${raiderId}/report`)
+    const response = await api.get<AttendanceReport>(`/v1/attendance/raiders/${raiderId}/report`)
     return response.data
   },
 
   async getGuildSummary(guildId: string): Promise<GuildAttendanceSummary> {
-    const response = await api.get<GuildAttendanceSummary>(`/api/v1/attendance/guild/${guildId}/summary`)
+    const response = await api.get<GuildAttendanceSummary>(`/v1/attendance/guild/${guildId}/summary`)
     return response.data
   },
 
   async getRaiderRecords(raiderId: number, limit = 50): Promise<AttendanceRecord[]> {
-    const response = await api.get<AttendanceRecord[]>(`/api/v1/attendance/raider/${raiderId}?limit=${limit}`)
+    const response = await api.get<AttendanceRecord[]>(`/v1/attendance/raider/${raiderId}?limit=${limit}`)
     return response.data
   },
 }

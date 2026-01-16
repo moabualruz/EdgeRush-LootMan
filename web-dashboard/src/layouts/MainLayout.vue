@@ -167,14 +167,14 @@ function handleLogout() {
       <!-- User section -->
       <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700 safe-area-inset">
         <div class="flex items-center justify-between">
-          <div class="flex items-center min-w-0">
+          <RouterLink to="/profile" class="flex items-center min-w-0 hover:opacity-80 transition-opacity">
             <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center">
               {{ authStore.user?.username?.charAt(0).toUpperCase() }}
             </div>
             <span class="ml-3 text-sm font-medium text-gray-300 truncate">
               {{ authStore.user?.username }}
             </span>
-          </div>
+          </RouterLink>
           <button
             @click="handleLogout"
             class="flex-shrink-0 ml-2 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"

@@ -2,17 +2,20 @@
 import { computed, toRef } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { lootApi } from '@/api/loot'
+import { useAuthStore } from '@/stores/auth'
 import { formatDate, formatRelativeTime } from '@/utils/date'
 import { useWowhead } from '@/composables/useWowhead'
 import WowheadItem from '@/components/WowheadItem.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import { DonutChart, BarChart } from '@/components/charts'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildId = computed(() => authStore.user?.guildId)
 
 const { data, isLoading, error } = useQuery({
-  queryKey: ['myLootHistory', GUILD_ID, 50],
-  queryFn: () => lootApi.getMyLootHistory(GUILD_ID, 50),
+  queryKey: ['myLootHistory', guildId, 50],
+  queryFn: () => lootApi.getMyLootHistory(guildId.value!, 50),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Initialize Wowhead tooltips
@@ -61,13 +64,21 @@ const averageFlps = computed(() => {
     <h1 class="text-2xl font-bold mb-6">Loot History</h1>
 
     <!-- Loading state with skeletons -->
-    <div v-if="isLoading" class="space-y-6">
+    <div v-if="isLoading && guildId" class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <SkeletonCard :lines="2" />
         <SkeletonCard :lines="2" />
         <SkeletonCard :lines="2" />
       </div>
       <SkeletonCard :lines="5" />
+    </div>
+
+    <!-- No Guild state -->
+    <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
+       <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
+       <p class="text-blue-300">
+         You are not currently a member of any guild.
+       </p>
     </div>
 
     <!-- Error state -->

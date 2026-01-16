@@ -3,6 +3,7 @@ package com.edgerush.lootman.api.auth
 import com.edgerush.lootman.domain.auth.model.User
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.model.UserRefreshToken
+import com.edgerush.lootman.domain.auth.model.UserRole
 import com.edgerush.lootman.domain.auth.repository.RefreshTokenRepository
 import com.edgerush.lootman.domain.auth.repository.UserRepository
 import com.edgerush.lootman.domain.shared.InvalidCredentialsException
@@ -146,6 +147,7 @@ class AuthenticationService(
         username: String,
         email: String,
         password: String,
+        role: String? = null,
     ): TokenResponse {
         // Validate username uniqueness
         if (userRepository.existsByUsername(username)) {
@@ -167,6 +169,7 @@ class AuthenticationService(
                     username = username,
                     email = email,
                     passwordHash = passwordHash,
+                    role = role?.let { UserRole.fromString(it) } ?: UserRole.RAIDER,
                 ).recordLogin(),
             )
 

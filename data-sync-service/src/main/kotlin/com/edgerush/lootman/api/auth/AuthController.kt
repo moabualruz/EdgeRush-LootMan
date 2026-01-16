@@ -35,7 +35,7 @@ class AuthController(
     fun register(
         @RequestBody request: RegisterRequest,
     ): ResponseEntity<TokenResponse> {
-        val tokens = authenticationService.registerLocal(request.username, request.email, request.password)
+        val tokens = authenticationService.registerLocal(request.username, request.email, request.password, request.role)
         return ResponseEntity.ok(tokens)
     }
 

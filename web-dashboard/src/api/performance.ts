@@ -23,18 +23,18 @@ export interface WarcraftLogsEntry {
 
 export const performanceApi = {
   async getMyPerformance(guildId: string): Promise<PerformanceMetrics> {
-    const response = await api.get<PerformanceMetrics>(`/api/v1/performance/guilds/${guildId}/me`)
+    const response = await api.get<PerformanceMetrics>(`/v1/performance/guilds/${guildId}/me`)
     return response.data
   },
 
   async getPerformance(guildId: string, raiderId: number): Promise<PerformanceMetrics> {
-    const response = await api.get<PerformanceMetrics>(`/api/v1/performance/guilds/${guildId}/raiders/${raiderId}`)
+    const response = await api.get<PerformanceMetrics>(`/v1/performance/guilds/${guildId}/raiders/${raiderId}`)
     return response.data
   },
 
   async getWarcraftLogsReports(guildId: string, raiderId: number, limit = 20): Promise<WarcraftLogsReport> {
     const response = await api.get<WarcraftLogsReport>(
-      `/api/v1/warcraftlogs/guilds/${guildId}/raiders/${raiderId}/reports?limit=${limit}`
+      `/v1/warcraftlogs/guilds/${guildId}/raiders/${raiderId}/reports?limit=${limit}`
     )
     return response.data
   },

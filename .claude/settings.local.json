@@ -125,7 +125,8 @@
       "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileTestKotlin --no-daemon)",
       "Bash(docker exec:*)",
       "Bash(npm run test:e2e:*)",
-      "Bash(npx playwright show-trace:*)"
+      "Bash(npx playwright show-trace:*)",
+      "Bash(winpty docker exec edgerush-web-dashboard ls -la //usr/share/nginx/html/)"
     ]
   }
 }

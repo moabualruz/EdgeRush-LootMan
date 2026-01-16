@@ -78,22 +78,22 @@ export interface VaultOptions {
 
 export const gearApi = {
   async getMyGear(guildId: string): Promise<RaiderGear> {
-    const response = await api.get<RaiderGear>(`/api/v1/gear/guilds/${guildId}/me`)
+    const response = await api.get<RaiderGear>(`/v1/gear/guilds/${guildId}/me`)
     return response.data
   },
 
   async getRaiderGear(raiderId: number): Promise<RaiderGear> {
-    const response = await api.get<RaiderGear>(`/api/raider-gear-items/raider/${raiderId}`)
+    const response = await api.get<RaiderGear>(`/v1/gear/raider-gear-items/raider/${raiderId}`)
     return response.data
   },
 
   async getMyVaultOptions(guildId: string): Promise<VaultOptions> {
-    const response = await api.get<VaultOptions>(`/api/v1/vault/guilds/${guildId}/me`)
+    const response = await api.get<VaultOptions>(`/v1/vault/guilds/${guildId}/me`)
     return response.data
   },
 
   async getVaultOptions(raiderId: number): Promise<VaultOptions> {
-    const response = await api.get<VaultOptions>(`/api/raider-vault-slots/raider/${raiderId}`)
+    const response = await api.get<VaultOptions>(`/v1/vault/raider-vault-slots/raider/${raiderId}`)
     return response.data
   },
 }

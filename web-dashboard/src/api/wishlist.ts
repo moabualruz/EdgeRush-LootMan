@@ -19,22 +19,22 @@ export interface SimulationStatus {
 
 export const wishlistApi = {
   async getMyWishlist(guildId: string): Promise<WishlistResponse> {
-    const response = await api.get<WishlistResponse>(`/api/v1/wishlists/guilds/${guildId}/me`)
+    const response = await api.get<WishlistResponse>(`/v1/wishlists/guilds/${guildId}/me`)
     return response.data
   },
 
   async getWishlist(guildId: string, raiderId: number): Promise<WishlistResponse> {
-    const response = await api.get<WishlistResponse>(`/api/v1/wishlists/raider/${raiderId}`)
+    const response = await api.get<WishlistResponse>(`/v1/wishlists/raider/${raiderId}`)
     return response.data
   },
 
   async getSimulationStatus(guildId: string, raiderId: number): Promise<SimulationStatus> {
-    const response = await api.get<SimulationStatus>(`/api/v1/simulations/guilds/${guildId}/raiders/${raiderId}/status`)
+    const response = await api.get<SimulationStatus>(`/v1/simulations/guilds/${guildId}/raiders/${raiderId}/status`)
     return response.data
   },
 
   async triggerSimulation(guildId: string, raiderId: number): Promise<SimulationStatus> {
-    const response = await api.post<SimulationStatus>(`/api/v1/simulations/guilds/${guildId}/raiders/${raiderId}/run`)
+    const response = await api.post<SimulationStatus>(`/v1/simulations/guilds/${guildId}/raiders/${raiderId}/run`)
     return response.data
   },
 }

@@ -116,11 +116,13 @@ data class User(
             username: String,
             email: String,
             passwordHash: String,
+            role: UserRole = UserRole.RAIDER,
         ): User =
             User(
                 username = username,
                 email = email,
                 passwordHash = passwordHash,
+                role = role,
             )
 
         /**

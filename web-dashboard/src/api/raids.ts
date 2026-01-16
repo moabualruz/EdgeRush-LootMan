@@ -56,37 +56,37 @@ export interface CreateRaidSignup {
 export const raidsApi = {
   async getRaids(teamId?: number): Promise<Raid[]> {
     const params = teamId ? `?teamId=${teamId}` : ''
-    const response = await api.get<Raid[]>(`/api/v1/raids${params}`)
+    const response = await api.get<Raid[]>(`/v1/raids${params}`)
     return response.data
   },
 
   async getUpcomingRaids(guildId: string, limit = 10): Promise<Raid[]> {
-    const response = await api.get<Raid[]>(`/api/v1/raids/guilds/${guildId}/upcoming?limit=${limit}`)
+    const response = await api.get<Raid[]>(`/v1/raids/guilds/${guildId}/upcoming?limit=${limit}`)
     return response.data
   },
 
   async getPastRaids(guildId: string, limit = 10): Promise<Raid[]> {
-    const response = await api.get<Raid[]>(`/api/v1/raids/guilds/${guildId}/past?limit=${limit}`)
+    const response = await api.get<Raid[]>(`/v1/raids/guilds/${guildId}/past?limit=${limit}`)
     return response.data
   },
 
   async getRaidById(raidId: number): Promise<RaidDetail> {
-    const response = await api.get<RaidDetail>(`/api/v1/raids/${raidId}`)
+    const response = await api.get<RaidDetail>(`/v1/raids/${raidId}`)
     return response.data
   },
 
   async getRaidEncounters(raidId: number): Promise<RaidEncounter[]> {
-    const response = await api.get<{ content: RaidEncounter[] }>(`/api/v1/raid-encounters/raid/${raidId}`)
+    const response = await api.get<{ content: RaidEncounter[] }>(`/v1/raid-encounters/raid/${raidId}`)
     return response.data.content
   },
 
   async getRaidSignups(raidId: number): Promise<RaidSignup[]> {
-    const response = await api.get<{ content: RaidSignup[] }>(`/api/v1/raid-signups/raid/${raidId}`)
+    const response = await api.get<{ content: RaidSignup[] }>(`/v1/raid-signups/raid/${raidId}`)
     return response.data.content
   },
 
   async createSignup(raidId: number, signup: CreateRaidSignup): Promise<RaidSignup> {
-    const response = await api.post<RaidSignup>(`/api/v1/raid-signups`, {
+    const response = await api.post<RaidSignup>(`/v1/raid-signups`, {
       raidId,
       ...signup,
     })
@@ -94,11 +94,11 @@ export const raidsApi = {
   },
 
   async updateSignup(signupId: number, update: Partial<CreateRaidSignup>): Promise<RaidSignup> {
-    const response = await api.put<RaidSignup>(`/api/v1/raid-signups/${signupId}`, update)
+    const response = await api.put<RaidSignup>(`/v1/raid-signups/${signupId}`, update)
     return response.data
   },
 
   async deleteSignup(signupId: number): Promise<void> {
-    await api.delete(`/api/v1/raid-signups/${signupId}`)
+    await api.delete(`/v1/raid-signups/${signupId}`)
   },
 }

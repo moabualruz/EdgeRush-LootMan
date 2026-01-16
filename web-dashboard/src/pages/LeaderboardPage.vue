@@ -6,14 +6,14 @@ import { useAuthStore } from '@/stores/auth'
 import type { Role } from '@/types'
 import { getClassColor } from '@/utils/classColors'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
-
 const authStore = useAuthStore()
+const guildId = computed(() => authStore.user?.guildId)
 const roleFilter = ref<Role | ''>('')
 
 const { data, isLoading, error } = useQuery({
-  queryKey: ['leaderboard', GUILD_ID, roleFilter],
-  queryFn: () => flpsApi.getLeaderboard(GUILD_ID, roleFilter.value || undefined, 50),
+  queryKey: ['leaderboard', guildId, roleFilter],
+  queryFn: () => flpsApi.getLeaderboard(guildId.value!, roleFilter.value || undefined, 50),
+  enabled: computed(() => !!guildId.value),
 })
 
 const formatScore = (score: number) => score.toFixed(3)
@@ -38,8 +38,16 @@ const isCurrentUser = (characterName: string) => {
     </div>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
+    <div v-if="isLoading && guildId" class="flex items-center justify-center py-12">
       <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+    </div>
+
+    <!-- No Guild state -->
+    <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
+       <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
+       <p class="text-blue-300">
+         You are not currently a member of any guild.
+       </p>
     </div>
 
     <!-- Error state -->

@@ -83,7 +83,7 @@ export const recruitmentApi = {
   ): Promise<CharacterLookupResponse | null> {
     try {
       const response = await api.get<CharacterLookupResponse>(
-        '/api/v1/recruitment/applications/character-lookup',
+        '/v1/recruitment/applications/character-lookup',
         { params: { region, realm, name } }
       )
       return response.data
@@ -102,7 +102,7 @@ export const recruitmentApi = {
   ): Promise<CharacterFullLookupResponse | null> {
     try {
       const response = await api.get<CharacterFullLookupResponse>(
-        '/api/v1/recruitment/applications/character-lookup/full',
+        '/v1/recruitment/applications/character-lookup/full',
         { params: { region, realm, name } }
       )
       return response.data
@@ -119,7 +119,7 @@ export const recruitmentApi = {
     request: SubmitApplicationRequest
   ): Promise<ApplicationResponse> {
     const response = await api.post<ApplicationResponse>(
-      `/api/v1/recruitment/applications/guilds/${guildId}`,
+      `/v1/recruitment/applications/guilds/${guildId}`,
       request
     )
     return response.data
@@ -138,7 +138,7 @@ export const recruitmentApi = {
       params.status = status
     }
     const response = await api.get<ApplicationResponse[]>(
-      `/api/v1/recruitment/applications/guilds/${guildId}`,
+      `/v1/recruitment/applications/guilds/${guildId}`,
       { params }
     )
     return response.data
@@ -153,7 +153,7 @@ export const recruitmentApi = {
     limit = 50
   ): Promise<ApplicationResponse[]> {
     const response = await api.get<ApplicationResponse[]>(
-      `/api/v1/recruitment/applications/guilds/${guildId}/pending`,
+      `/v1/recruitment/applications/guilds/${guildId}/pending`,
       { params: { offset, limit } }
     )
     return response.data
@@ -165,7 +165,7 @@ export const recruitmentApi = {
   async getApplicationById(applicationId: string): Promise<ApplicationResponse | null> {
     try {
       const response = await api.get<ApplicationResponse>(
-        `/api/v1/recruitment/applications/${applicationId}`
+        `/v1/recruitment/applications/${applicationId}`
       )
       return response.data
     } catch {
@@ -178,7 +178,7 @@ export const recruitmentApi = {
    */
   async startReview(applicationId: string, reviewerId: string): Promise<ApplicationResponse> {
     const response = await api.put<ApplicationResponse>(
-      `/api/v1/recruitment/applications/${applicationId}/review`,
+      `/v1/recruitment/applications/${applicationId}/review`,
       { reviewerId }
     )
     return response.data
@@ -189,7 +189,7 @@ export const recruitmentApi = {
    */
   async approveApplication(applicationId: string, reviewerId: string): Promise<ApplicationResponse> {
     const response = await api.put<ApplicationResponse>(
-      `/api/v1/recruitment/applications/${applicationId}/approve`,
+      `/v1/recruitment/applications/${applicationId}/approve`,
       { reviewerId }
     )
     return response.data
@@ -200,7 +200,7 @@ export const recruitmentApi = {
    */
   async rejectApplication(applicationId: string, reviewerId: string): Promise<ApplicationResponse> {
     const response = await api.put<ApplicationResponse>(
-      `/api/v1/recruitment/applications/${applicationId}/reject`,
+      `/v1/recruitment/applications/${applicationId}/reject`,
       { reviewerId }
     )
     return response.data
@@ -211,7 +211,7 @@ export const recruitmentApi = {
    */
   async withdrawApplication(applicationId: string): Promise<ApplicationResponse> {
     const response = await api.put<ApplicationResponse>(
-      `/api/v1/recruitment/applications/${applicationId}/withdraw`
+      `/v1/recruitment/applications/${applicationId}/withdraw`
     )
     return response.data
   },
@@ -225,7 +225,7 @@ export const recruitmentApi = {
       params.status = status
     }
     const response = await api.get<{ count: number }>(
-      `/api/v1/recruitment/applications/guilds/${guildId}/count`,
+      `/v1/recruitment/applications/guilds/${guildId}/count`,
       { params }
     )
     return response.data.count

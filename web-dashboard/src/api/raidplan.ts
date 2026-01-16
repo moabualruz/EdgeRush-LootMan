@@ -120,7 +120,7 @@ export const raidPlanApi = {
    * Create a new raid plan
    */
   async createPlan(request: CreateRaidPlanRequest): Promise<RaidPlan> {
-    const response = await api.post<RaidPlan>('/api/v1/raid-plans', request)
+    const response = await api.post<RaidPlan>('/v1/raid-plans', request)
     return response.data
   },
 
@@ -128,7 +128,7 @@ export const raidPlanApi = {
    * Get a raid plan by ID
    */
   async getPlan(id: string): Promise<RaidPlan> {
-    const response = await api.get<RaidPlan>(`/api/v1/raid-plans/${id}`)
+    const response = await api.get<RaidPlan>(`/v1/raid-plans/${id}`)
     return response.data
   },
 
@@ -136,7 +136,7 @@ export const raidPlanApi = {
    * Get a raid plan by share token (public access)
    */
   async getPlanByShareToken(shareToken: string): Promise<RaidPlan> {
-    const response = await api.get<RaidPlan>(`/api/v1/raid-plans/shared/${shareToken}`)
+    const response = await api.get<RaidPlan>(`/v1/raid-plans/shared/${shareToken}`)
     return response.data
   },
 
@@ -153,7 +153,7 @@ export const raidPlanApi = {
     if (size) params.append('size', size.toString())
 
     const response = await api.get<PagedRaidPlans>(
-      `/api/v1/raid-plans/guild/${guildId}?${params.toString()}`
+      `/v1/raid-plans/guild/${guildId}?${params.toString()}`
     )
     return response.data
   },
@@ -163,7 +163,7 @@ export const raidPlanApi = {
    */
   async getPlansByEncounter(guildId: string, encounterId: number): Promise<RaidPlan[]> {
     const response = await api.get<RaidPlan[]>(
-      `/api/v1/raid-plans/guild/${guildId}/encounter/${encounterId}`
+      `/v1/raid-plans/guild/${guildId}/encounter/${encounterId}`
     )
     return response.data
   },
@@ -172,7 +172,7 @@ export const raidPlanApi = {
    * Update a raid plan
    */
   async updatePlan(id: string, request: UpdateRaidPlanRequest): Promise<RaidPlan> {
-    const response = await api.put<RaidPlan>(`/api/v1/raid-plans/${id}`, request)
+    const response = await api.put<RaidPlan>(`/v1/raid-plans/${id}`, request)
     return response.data
   },
 
@@ -180,7 +180,7 @@ export const raidPlanApi = {
    * Delete a raid plan
    */
   async deletePlan(id: string): Promise<void> {
-    await api.delete(`/api/v1/raid-plans/${id}`)
+    await api.delete(`/v1/raid-plans/${id}`)
   },
 
   // === Step Management ===
@@ -190,7 +190,7 @@ export const raidPlanApi = {
    */
   async addStep(planId: string, request: AddStepRequest): Promise<RaidPlan> {
     const response = await api.post<RaidPlan>(
-      `/api/v1/raid-plans/${planId}/steps`,
+      `/v1/raid-plans/${planId}/steps`,
       request
     )
     return response.data
@@ -205,7 +205,7 @@ export const raidPlanApi = {
     request: UpdateStepRequest
   ): Promise<RaidPlan> {
     const response = await api.put<RaidPlan>(
-      `/api/v1/raid-plans/${planId}/steps/${stepOrder}`,
+      `/v1/raid-plans/${planId}/steps/${stepOrder}`,
       request
     )
     return response.data
@@ -216,7 +216,7 @@ export const raidPlanApi = {
    */
   async removeStep(planId: string, stepOrder: number): Promise<RaidPlan> {
     const response = await api.delete<RaidPlan>(
-      `/api/v1/raid-plans/${planId}/steps/${stepOrder}`
+      `/v1/raid-plans/${planId}/steps/${stepOrder}`
     )
     return response.data
   },
@@ -228,7 +228,7 @@ export const raidPlanApi = {
    */
   async generateShareToken(planId: string): Promise<{ shareToken: string }> {
     const response = await api.post<{ shareToken: string }>(
-      `/api/v1/raid-plans/${planId}/share`
+      `/v1/raid-plans/${planId}/share`
     )
     return response.data
   },
@@ -237,6 +237,6 @@ export const raidPlanApi = {
    * Revoke a plan's share token
    */
   async revokeShareToken(planId: string): Promise<void> {
-    await api.delete(`/api/v1/raid-plans/${planId}/share`)
+    await api.delete(`/v1/raid-plans/${planId}/share`)
   },
 }

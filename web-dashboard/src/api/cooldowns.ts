@@ -84,7 +84,7 @@ export const cooldownsApi = {
    * Get a cooldown plan by ID
    */
   async getCooldownPlan(id: string): Promise<CooldownPlan> {
-    const response = await api.get<CooldownPlan>(`/api/v1/cooldown-plans/${id}`)
+    const response = await api.get<CooldownPlan>(`/v1/cooldown-plans/${id}`)
     return response.data
   },
 
@@ -101,7 +101,7 @@ export const cooldownsApi = {
     if (size) params.append('size', size.toString())
 
     const response = await api.get<PagedCooldownPlans>(
-      `/api/v1/cooldown-plans/guild/${guildId}?${params.toString()}`
+      `/v1/cooldown-plans/guild/${guildId}?${params.toString()}`
     )
     return response.data
   },
@@ -114,7 +114,7 @@ export const cooldownsApi = {
     encounterId: number
   ): Promise<CooldownPlan[]> {
     const response = await api.get<CooldownPlan[]>(
-      `/api/v1/cooldown-plans/guild/${guildId}/encounter/${encounterId}`
+      `/v1/cooldown-plans/guild/${guildId}/encounter/${encounterId}`
     )
     return response.data
   },
@@ -123,7 +123,7 @@ export const cooldownsApi = {
    * Create a new cooldown plan
    */
   async createCooldownPlan(request: CreateCooldownPlanRequest): Promise<CooldownPlan> {
-    const response = await api.post<CooldownPlan>('/api/v1/cooldown-plans', request)
+    const response = await api.post<CooldownPlan>('/v1/cooldown-plans', request)
     return response.data
   },
 
@@ -134,7 +134,7 @@ export const cooldownsApi = {
     id: string,
     request: UpdateCooldownPlanRequest
   ): Promise<CooldownPlan> {
-    const response = await api.put<CooldownPlan>(`/api/v1/cooldown-plans/${id}`, request)
+    const response = await api.put<CooldownPlan>(`/v1/cooldown-plans/${id}`, request)
     return response.data
   },
 
@@ -142,7 +142,7 @@ export const cooldownsApi = {
    * Delete a cooldown plan
    */
   async deleteCooldownPlan(id: string): Promise<void> {
-    await api.delete(`/api/v1/cooldown-plans/${id}`)
+    await api.delete(`/v1/cooldown-plans/${id}`)
   },
 
   // === Assignment Management ===
@@ -155,7 +155,7 @@ export const cooldownsApi = {
     assignment: AddAssignmentRequest
   ): Promise<CooldownPlan> {
     const response = await api.post<CooldownPlan>(
-      `/api/v1/cooldown-plans/${planId}/assignments`,
+      `/v1/cooldown-plans/${planId}/assignments`,
       assignment
     )
     return response.data
@@ -166,7 +166,7 @@ export const cooldownsApi = {
    */
   async removeAssignment(planId: string, assignmentId: string): Promise<CooldownPlan> {
     const response = await api.delete<CooldownPlan>(
-      `/api/v1/cooldown-plans/${planId}/assignments/${assignmentId}`
+      `/v1/cooldown-plans/${planId}/assignments/${assignmentId}`
     )
     return response.data
   },
@@ -178,7 +178,7 @@ export const cooldownsApi = {
    */
   async exportToMRT(planId: string): Promise<string> {
     const response = await api.get<{ note: string }>(
-      `/api/v1/cooldown-plans/${planId}/export/mrt`
+      `/v1/cooldown-plans/${planId}/export/mrt`
     )
     return response.data.note
   },
@@ -188,7 +188,7 @@ export const cooldownsApi = {
    */
   async exportToWeakAura(planId: string): Promise<string> {
     const response = await api.get<{ data: string }>(
-      `/api/v1/cooldown-plans/${planId}/export/weakaura`
+      `/v1/cooldown-plans/${planId}/export/weakaura`
     )
     return response.data.data
   },
@@ -199,7 +199,7 @@ export const cooldownsApi = {
    * Get available cooldowns grouped by class
    */
   async getAvailableCooldowns(): Promise<Record<string, Cooldown[]>> {
-    const response = await api.get<Record<string, Cooldown[]>>('/api/v1/cooldowns/available')
+    const response = await api.get<Record<string, Cooldown[]>>('/v1/cooldowns/available')
     return response.data
   },
 
@@ -208,7 +208,7 @@ export const cooldownsApi = {
    */
   async getBossAbilities(encounterId: number): Promise<BossAbility[]> {
     const response = await api.get<BossAbility[]>(
-      `/api/v1/cooldowns/encounters/${encounterId}/abilities`
+      `/v1/cooldowns/encounters/${encounterId}/abilities`
     )
     return response.data
   },

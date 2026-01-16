@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { lootApi } from '@/api/loot'
+import { useAuthStore } from '@/stores/auth'
 import ScoreCard from '@/components/ScoreCard.vue'
 import ScoreBreakdown from '@/components/ScoreBreakdown.vue'
 import FlpsVisualization from '@/components/FlpsVisualization.vue'
@@ -10,19 +11,22 @@ import RecentLoot from '@/components/RecentLoot.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import SkeletonProfile from '@/components/SkeletonProfile.vue'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildId = computed(() => authStore.user?.guildId)
 
 // View mode for FLPS breakdown
 const detailedView = ref(false)
 
 const { data: flpsData, isLoading: flpsLoading, error: flpsError } = useQuery({
-  queryKey: ['myFlps', GUILD_ID],
-  queryFn: () => flpsApi.getMyFlps(GUILD_ID),
+  queryKey: ['myFlps', guildId],
+  queryFn: () => flpsApi.getMyFlps(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 const { data: lootData, isLoading: lootLoading } = useQuery({
-  queryKey: ['myLootHistory', GUILD_ID],
-  queryFn: () => lootApi.getMyLootHistory(GUILD_ID, 5),
+  queryKey: ['myLootHistory', guildId],
+  queryFn: () => lootApi.getMyLootHistory(guildId.value!, 5),
+  enabled: computed(() => !!guildId.value),
 })
 
 const scoreColor = computed(() => {
@@ -39,7 +43,7 @@ const scoreColor = computed(() => {
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
     <!-- Loading state with skeletons -->
-    <div v-if="flpsLoading" class="space-y-6">
+    <div v-if="flpsLoading && guildId" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <SkeletonProfile :stats-count="2" />
         <div class="lg:col-span-2">
@@ -47,6 +51,14 @@ const scoreColor = computed(() => {
         </div>
       </div>
       <SkeletonCard :lines="4" />
+    </div>
+
+    <!-- No Guild state -->
+    <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
+      <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
+      <p class="text-blue-300">
+        You are not currently a member of any guild. Please ask an officer to invite you to view your dashboard.
+      </p>
     </div>
 
     <!-- Error state -->

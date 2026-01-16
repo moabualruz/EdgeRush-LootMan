@@ -40,7 +40,7 @@ export interface TestNotificationResponse {
 export const discordApi = {
   async getConfigs(guildId: string): Promise<GuildNotificationConfigsResponse> {
     const response = await api.get<GuildNotificationConfigsResponse>(
-      `/api/v1/guilds/${guildId}/discord/config`
+      `/v1/guilds/${guildId}/discord/config`
     )
     return response.data
   },
@@ -51,7 +51,7 @@ export const discordApi = {
   ): Promise<DiscordNotificationConfig | null> {
     try {
       const response = await api.get<DiscordNotificationConfig>(
-        `/api/v1/guilds/${guildId}/discord/config/${type}`
+        `/v1/guilds/${guildId}/discord/config/${type}`
       )
       return response.data
     } catch (error: unknown) {
@@ -68,7 +68,7 @@ export const discordApi = {
     request: UpsertNotificationConfigRequest
   ): Promise<DiscordNotificationConfig> {
     const response = await api.put<DiscordNotificationConfig>(
-      `/api/v1/guilds/${guildId}/discord/config`,
+      `/v1/guilds/${guildId}/discord/config`,
       request
     )
     return response.data
@@ -80,19 +80,19 @@ export const discordApi = {
     request: UpdateNotificationConfigRequest
   ): Promise<DiscordNotificationConfig> {
     const response = await api.patch<DiscordNotificationConfig>(
-      `/api/v1/guilds/${guildId}/discord/config/${configId}`,
+      `/v1/guilds/${guildId}/discord/config/${configId}`,
       request
     )
     return response.data
   },
 
   async deleteConfig(guildId: string, configId: number): Promise<void> {
-    await api.delete(`/api/v1/guilds/${guildId}/discord/config/${configId}`)
+    await api.delete(`/v1/guilds/${guildId}/discord/config/${configId}`)
   },
 
   async testNotification(guildId: string, type: string): Promise<TestNotificationResponse> {
     const response = await api.post<TestNotificationResponse>(
-      `/api/v1/guilds/${guildId}/discord/config/test/${type}`
+      `/v1/guilds/${guildId}/discord/config/test/${type}`
     )
     return response.data
   },

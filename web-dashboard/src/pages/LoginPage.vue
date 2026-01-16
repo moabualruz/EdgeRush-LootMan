@@ -15,6 +15,7 @@ const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const role = ref('RAIDER')
 
 const isFormValid = computed(() => {
   if (mode.value === 'login') {
@@ -44,7 +45,7 @@ async function handleSubmit() {
     if (mode.value === 'login') {
       await authStore.loginLocal(username.value, password.value)
     } else {
-      await authStore.register(username.value, email.value, password.value)
+      await authStore.register(username.value, email.value, password.value, role.value)
     }
     router.push('/dashboard')
   } catch (e: any) {
@@ -181,6 +182,22 @@ async function loginWithBattlenet() {
               />
               <p v-if="confirmPassword && password !== confirmPassword" class="mt-1 text-xs text-red-400">
                 Passwords do not match
+              </p>
+            </div>
+
+            <!-- Role Selection (register only) -->
+            <div v-if="mode === 'register'">
+              <label for="role" class="block text-sm font-medium text-gray-300 mb-2">Account Type</label>
+              <select
+                id="role"
+                v-model="role"
+                class="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all appearance-none"
+              >
+                <option value="RAIDER">Raider</option>
+                <option value="GUILD_ADMIN">Guild Admin</option>
+              </select>
+              <p class="mt-1 text-xs text-gray-500">
+                Admins can create guilds and manage loot configurations.
               </p>
             </div>
 
