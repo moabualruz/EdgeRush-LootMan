@@ -210,6 +210,7 @@ export interface GuildContext {
   characterRealm: string
   characterClass: string
   characterMappingId: number
+  raiderId: number
   rank: string | null
   permissions: GuildPermissionType[]
   isActive: boolean

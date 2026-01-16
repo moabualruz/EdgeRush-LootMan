@@ -122,7 +122,10 @@
       "Bash(docker compose:*)",
       "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileKotlin --no-daemon)",
       "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:test --no-daemon)",
-      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileTestKotlin --no-daemon)"
+      "Bash(\"F:\\\\work\\\\dod\\\\looter\\\\gradlew.bat\" :data-sync-service:compileTestKotlin --no-daemon)",
+      "Bash(docker exec:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(npx playwright show-trace:*)"
     ]
   }
 }

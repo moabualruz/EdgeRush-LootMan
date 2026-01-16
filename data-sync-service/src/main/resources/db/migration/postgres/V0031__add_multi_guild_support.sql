@@ -39,24 +39,25 @@ CREATE INDEX IF NOT EXISTS idx_user_preferences_user ON user_preferences(user_id
 
 -- 4. Insert default permissions for existing guilds
 -- Default: Guild Master and Officer ranks get SETTINGS_ACCESS permission
+-- Note: guildId column uses camelCase, so we quote it
 INSERT INTO guild_permissions (guild_id, rank_name, permission_type)
-SELECT DISTINCT gc.guild_id, 'Guild Master', 'SETTINGS_ACCESS'
+SELECT DISTINCT gc."guildId", 'Guild Master', 'SETTINGS_ACCESS'
 FROM guild_configurations gc
 ON CONFLICT ON CONSTRAINT uq_guild_rank_permission DO NOTHING;
 
 INSERT INTO guild_permissions (guild_id, rank_name, permission_type)
-SELECT DISTINCT gc.guild_id, 'Officer', 'SETTINGS_ACCESS'
+SELECT DISTINCT gc."guildId", 'Officer', 'SETTINGS_ACCESS'
 FROM guild_configurations gc
 ON CONFLICT ON CONSTRAINT uq_guild_rank_permission DO NOTHING;
 
 -- Also add LOOT_MANAGEMENT for Guild Master
 INSERT INTO guild_permissions (guild_id, rank_name, permission_type)
-SELECT DISTINCT gc.guild_id, 'Guild Master', 'LOOT_MANAGEMENT'
+SELECT DISTINCT gc."guildId", 'Guild Master', 'LOOT_MANAGEMENT'
 FROM guild_configurations gc
 ON CONFLICT ON CONSTRAINT uq_guild_rank_permission DO NOTHING;
 
 INSERT INTO guild_permissions (guild_id, rank_name, permission_type)
-SELECT DISTINCT gc.guild_id, 'Officer', 'LOOT_MANAGEMENT'
+SELECT DISTINCT gc."guildId", 'Officer', 'LOOT_MANAGEMENT'
 FROM guild_configurations gc
 ON CONFLICT ON CONSTRAINT uq_guild_rank_permission DO NOTHING;
 
