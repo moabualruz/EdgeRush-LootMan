@@ -28,8 +28,8 @@ class JdbcRaiderRepository(
     override fun findById(id: RaiderId): Raider? {
         val sql =
             """
-            SELECT id, guild_id, characterName, realm, characterClass, role,
-                   rank, status, joinDate, wowauditId
+            SELECT id, guild_id, "characterName", realm, "characterClass", role,
+                   rank, status, "joinDate", "wowauditId"
             FROM raiders
             WHERE id = ?
             """.trimIndent()
@@ -41,11 +41,11 @@ class JdbcRaiderRepository(
     override fun findByGuildId(guildId: GuildId): List<Raider> {
         val sql =
             """
-            SELECT id, guild_id, characterName, realm, characterClass, role,
-                   rank, status, joinDate, wowauditId
+            SELECT id, guild_id, "characterName", realm, "characterClass", role,
+                   rank, status, "joinDate", "wowauditId"
             FROM raiders
             WHERE guild_id = ?
-            ORDER BY characterName
+            ORDER BY "characterName"
             """.trimIndent()
 
         return jdbcTemplate.query(sql, raiderRowMapper, guildId.value)
@@ -58,11 +58,11 @@ class JdbcRaiderRepository(
     ): List<Raider> {
         val sql =
             """
-            SELECT id, guild_id, characterName, realm, characterClass, role,
-                   rank, status, joinDate, wowauditId
+            SELECT id, guild_id, "characterName", realm, "characterClass", role,
+                   rank, status, "joinDate", "wowauditId"
             FROM raiders
             WHERE guild_id = ?
-            ORDER BY characterName
+            ORDER BY "characterName"
             LIMIT ? OFFSET ?
             """.trimIndent()
 
@@ -80,10 +80,10 @@ class JdbcRaiderRepository(
     ): Raider? {
         val sql =
             """
-            SELECT id, guild_id, characterName, realm, characterClass, role,
-                   rank, status, joinDate, wowauditId
+            SELECT id, guild_id, "characterName", realm, "characterClass", role,
+                   rank, status, "joinDate", "wowauditId"
             FROM raiders
-            WHERE characterName = ? AND realm = ?
+            WHERE "characterName" = ? AND realm = ?
             """.trimIndent()
 
         val results = jdbcTemplate.query(sql, raiderRowMapper, characterName, realm)
@@ -113,8 +113,8 @@ class JdbcRaiderRepository(
         val placeholders = ids.joinToString(", ") { "?" }
         val sql =
             """
-            SELECT id, guild_id, characterName, realm, characterClass, role,
-                   rank, status, joinDate, wowauditId
+            SELECT id, guild_id, "characterName", realm, "characterClass", role,
+                   rank, status, "joinDate", "wowauditId"
             FROM raiders
             WHERE id IN ($placeholders)
             """.trimIndent()
@@ -132,8 +132,8 @@ class JdbcRaiderRepository(
         val sql =
             """
             INSERT INTO raiders (
-                guild_id, characterName, realm, characterClass, role,
-                rank, status, joinDate, wowauditId
+                guild_id, "characterName", realm, "characterClass", role,
+                rank, status, "joinDate", "wowauditId"
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
@@ -156,14 +156,14 @@ class JdbcRaiderRepository(
             """
             UPDATE raiders SET
                 guild_id = ?,
-                characterName = ?,
+                "characterName" = ?,
                 realm = ?,
-                characterClass = ?,
+                "characterClass" = ?,
                 role = ?,
                 rank = ?,
                 status = ?,
-                joinDate = ?,
-                wowauditId = ?
+                "joinDate" = ?,
+                "wowauditId" = ?
             WHERE id = ?
             """.trimIndent()
 

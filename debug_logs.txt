@@ -1,0 +1,300 @@
+edgerush-data-sync  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+edgerush-data-sync  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+edgerush-data-sync  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+edgerush-data-sync  |  =========|_|==============|___/=/_/_/_/
+edgerush-data-sync  | 
+edgerush-data-sync  |  :: Spring Boot ::                (v3.5.7)
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:13:21.686Z  INFO 243 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Starting DataSyncApplicationKt using Java 21.0.9 with PID 243 (/home/gradle/project/data-sync-service/build/classes/kotlin/main started by root in /home/gradle/project/data-sync-service)
+edgerush-data-sync  | 2026-01-16T12:13:21.695Z  INFO 243 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : The following 1 profile is active: "default"
+edgerush-data-sync  | 2026-01-16T12:13:55.318Z  INFO 243 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+edgerush-data-sync  | 2026-01-16T12:13:55.557Z  INFO 243 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 187 ms. Found 0 JDBC repository interfaces.
+edgerush-data-sync  | 2026-01-16T12:14:04.009Z  INFO 243 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+edgerush-data-sync  | 2026-01-16T12:14:05.040Z  INFO 243 --- [data-sync-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7097ead6
+edgerush-data-sync  | 2026-01-16T12:14:05.058Z  INFO 243 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+edgerush-data-sync  | 2026-01-16T12:14:05.256Z  INFO 243 --- [data-sync-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/edgerush (PostgreSQL 18.1)
+edgerush-data-sync  | 2026-01-16T12:14:05.326Z  WARN 243 --- [data-sync-service] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.1 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+edgerush-data-sync  | 2026-01-16T12:14:06.272Z  INFO 243 --- [data-sync-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 33 migrations (execution time 00:00.864s)
+edgerush-data-sync  | 2026-01-16T12:14:06.319Z  INFO 243 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 0034
+edgerush-data-sync  | 2026-01-16T12:14:06.326Z  INFO 243 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+edgerush-data-sync  | 2026-01-16T12:14:07.598Z  INFO 243 --- [data-sync-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoints beneath base path '/actuator'
+edgerush-data-sync  | 2026-01-16T12:14:11.132Z  WARN 243 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:14:11.132Z  WARN 243 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ADMIN MODE ENABLED - Authentication bypassed for all requests!
+edgerush-data-sync  | 2026-01-16T12:14:11.132Z  WARN 243 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  This should ONLY be used in development/testing environments
+edgerush-data-sync  | 2026-01-16T12:14:11.133Z  WARN 243 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:14:30.050Z  INFO 243 --- [data-sync-service] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
+edgerush-data-sync  | 2026-01-16T12:14:30.061Z  INFO 243 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Started DataSyncApplicationKt in 79.203 seconds (process running for 70.716)
+edgerush-data-sync  | [entrypoint] SOPS_AGE_KEY_FILE not set, skipping secrets decryption
+edgerush-data-sync  | [entrypoint] Starting application: gradle :data-sync-service:bootRun
+edgerush-data-sync  | Starting a Gradle Daemon, 1 busy Daemon could not be reused, use --status for details
+edgerush-data-sync  | > Task :data-sync-service:checkKotlinGradlePluginConfigurationErrors SKIPPED
+edgerush-data-sync  | > Task :data-sync-service:compileKotlin UP-TO-DATE
+edgerush-data-sync  | > Task :data-sync-service:compileJava NO-SOURCE
+edgerush-data-sync  | > Task :data-sync-service:processResources
+edgerush-data-sync  | > Task :data-sync-service:classes
+edgerush-data-sync  | [entrypoint] SOPS_AGE_KEY_FILE not set, skipping secrets decryption
+edgerush-data-sync  | [entrypoint] Starting application: gradle :data-sync-service:bootRun
+edgerush-data-sync  | Starting a Gradle Daemon, 2 busy Daemons could not be reused, use --status for details
+edgerush-data-sync  | > Task :data-sync-service:checkKotlinGradlePluginConfigurationErrors SKIPPED
+edgerush-data-sync  | > Task :data-sync-service:processResources UP-TO-DATE
+edgerush-data-sync  | > Task :data-sync-service:compileKotlin
+edgerush-data-sync  | > Task :data-sync-service:compileJava NO-SOURCE
+edgerush-data-sync  | > Task :data-sync-service:classes UP-TO-DATE
+edgerush-data-sync  | > Task :data-sync-service:resolveMainClassName
+edgerush-data-sync  | 
+edgerush-data-sync  | > Task :data-sync-service:bootRun
+edgerush-data-sync  | 
+edgerush-data-sync  |   .   ____          _            __ _ _
+edgerush-data-sync  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+edgerush-data-sync  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+edgerush-data-sync  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+edgerush-data-sync  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+edgerush-data-sync  |  =========|_|==============|___/=/_/_/_/
+edgerush-data-sync  | 
+edgerush-data-sync  |  :: Spring Boot ::                (v3.5.7)
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:18:22.886Z  INFO 240 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Starting DataSyncApplicationKt using Java 21.0.9 with PID 240 (/home/gradle/project/data-sync-service/build/classes/kotlin/main started by root in /home/gradle/project/data-sync-service)
+edgerush-data-sync  | 2026-01-16T12:18:22.894Z DEBUG 240 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Running with Spring Boot v3.5.7, Spring v6.2.12
+edgerush-data-sync  | 2026-01-16T12:18:22.894Z  INFO 240 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : The following 1 profile is active: "default"
+edgerush-data-sync  | 2026-01-16T12:18:53.930Z  INFO 240 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+edgerush-data-sync  | 2026-01-16T12:18:54.131Z  INFO 240 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 155 ms. Found 0 JDBC repository interfaces.
+edgerush-data-sync  | 2026-01-16T12:19:00.446Z  WARN 240 --- [data-sync-service] [           main] onfigReactiveWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'deprecationHeaderFilter' defined in file [/home/gradle/project/data-sync-service/build/classes/kotlin/main/com/edgerush/datasync/config/DeprecationHeaderFilter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration$EnableWebFluxConfiguration': Unsatisfied dependency expressed through method 'setConfigurers' parameter 0: Error creating bean with name 'swaggerWebFluxConfigurer' defined in class path resource [org/springdoc/webflux/ui/SwaggerConfig.class]: Unsatisfied dependency expressed through method 'swaggerWebFluxConfigurer' parameter 3: Error creating bean with name 'actuatorProvider' defined in class path resource [org/springdoc/webflux/core/configuration/SpringDocWebFluxConfiguration$SpringDocWebFluxActuatorConfiguration.class]: Unsatisfied dependency expressed through method 'actuatorProvider' parameter 4: Error creating bean with name 'webEndpointReactiveHandlerMapping' defined in class path resource [org/springframework/boot/actuate/autoconfigure/endpoint/web/reactive/WebFluxEndpointManagementContextConfiguration.class]: Failed to instantiate [org.springframework.boot.actuate.endpoint.web.reactive.WebFluxEndpointHandlerMapping]: Factory method 'webEndpointReactiveHandlerMapping' threw exception with message: Error creating bean with name 'healthEndpoint' defined in class path resource [org/springframework/boot/actuate/autoconfigure/health/HealthEndpointConfiguration.class]: Unsatisfied dependency expressed through method 'healthEndpoint' parameter 0: Error creating bean with name 'healthContributorRegistry' defined in class path resource [org/springframework/boot/actuate/autoconfigure/health/HealthEndpointConfiguration.class]: Unsatisfied dependency expressed through method 'healthContributorRegistry' parameter 2: Error creating bean with name 'databaseHealthIndicator' defined in file [/home/gradle/project/data-sync-service/build/classes/kotlin/main/com/edgerush/lootman/infrastructure/health/DatabaseHealthIndicator.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'flyway' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Failed to instantiate [org.flywaydb.core.Flyway]: Factory method 'flyway' threw exception with message: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+edgerush-data-sync  | 2026-01-16T12:19:00.473Z  INFO 240 --- [data-sync-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+edgerush-data-sync  | 
+edgerush-data-sync  | Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+edgerush-data-sync  | 2026-01-16T12:19:00.684Z ERROR 240 --- [data-sync-service] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+edgerush-data-sync  | 
+edgerush-data-sync  | 
+edgerush-data-sync  | FAILURE: Build failed with an exception.
+edgerush-data-sync  | 
+edgerush-data-sync  | ***************************
+edgerush-data-sync  | APPLICATION FAILED TO START
+edgerush-data-sync  | ***************************
+edgerush-data-sync  | 
+edgerush-data-sync  | Description:
+edgerush-data-sync  | 
+edgerush-data-sync  | Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+edgerush-data-sync  | 
+edgerush-data-sync  | Reason: Failed to determine a suitable driver class
+edgerush-data-sync  | 
+edgerush-data-sync  | 
+edgerush-data-sync  | Action:
+edgerush-data-sync  | 
+edgerush-data-sync  | Consider the following:
+edgerush-data-sync  | 	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
+edgerush-data-sync  | 	If you have database settings to be loaded from a particular profile you may need to activate it (the profiles default are currently active).
+edgerush-data-sync  | 
+edgerush-data-sync  | 
+edgerush-data-sync  | > Task :data-sync-service:bootRun FAILED
+edgerush-data-sync  | * What went wrong:
+edgerush-data-sync  | Execution failed for task ':data-sync-service:bootRun'.
+edgerush-data-sync  | > Process 'command '/opt/java/openjdk/bin/java'' finished with non-zero exit value 1
+edgerush-data-sync  | 
+edgerush-data-sync  | * Try:
+edgerush-data-sync  | > Run with --stacktrace option to get the stack trace.
+edgerush-data-sync  | > Run with --info or --debug option to get more log output.
+edgerush-data-sync  | > Run with --scan to get full insights.
+edgerush-data-sync  | > Get more help at https://help.gradle.org.
+edgerush-data-sync  | 
+edgerush-data-sync  | BUILD FAILED in 2m 15s
+edgerush-data-sync  | 4 actionable tasks: 3 executed, 1 up-to-date
+edgerush-data-sync  | [entrypoint] SOPS_AGE_KEY_FILE not set, skipping secrets decryption
+edgerush-data-sync  | [entrypoint] Starting application: gradle :data-sync-service:bootRun
+edgerush-data-sync  | Starting a Gradle Daemon, 2 busy and 1 incompatible and 1 stopped Daemons could not be reused, use --status for details
+edgerush-data-sync  | > Task :data-sync-service:checkKotlinGradlePluginConfigurationErrors SKIPPED
+edgerush-data-sync  | > Task :data-sync-service:compileKotlin UP-TO-DATE
+edgerush-data-sync  | > Task :data-sync-service:compileJava NO-SOURCE
+edgerush-data-sync  | > Task :data-sync-service:processResources
+edgerush-data-sync  | > Task :data-sync-service:classes
+edgerush-data-sync  | > Task :data-sync-service:resolveMainClassName
+edgerush-data-sync  | 
+edgerush-data-sync  | > Task :data-sync-service:bootRun
+edgerush-data-sync  | 
+edgerush-data-sync  |   .   ____          _            __ _ _
+edgerush-data-sync  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+edgerush-data-sync  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+edgerush-data-sync  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+edgerush-data-sync  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+edgerush-data-sync  |  =========|_|==============|___/=/_/_/_/
+edgerush-data-sync  | 
+edgerush-data-sync  |  :: Spring Boot ::                (v3.5.7)
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:21:03.306Z  INFO 197 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Starting DataSyncApplicationKt using Java 21.0.9 with PID 197 (/home/gradle/project/data-sync-service/build/classes/kotlin/main started by root in /home/gradle/project/data-sync-service)
+edgerush-data-sync  | 2026-01-16T12:21:03.313Z DEBUG 197 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Running with Spring Boot v3.5.7, Spring v6.2.12
+edgerush-data-sync  | 2026-01-16T12:21:03.314Z  INFO 197 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : The following 1 profile is active: "default"
+edgerush-data-sync  | 2026-01-16T12:21:31.379Z  INFO 197 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+edgerush-data-sync  | 2026-01-16T12:21:31.576Z  INFO 197 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 149 ms. Found 0 JDBC repository interfaces.
+edgerush-data-sync  | 2026-01-16T12:21:42.565Z  INFO 197 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+edgerush-data-sync  | 2026-01-16T12:21:43.495Z  INFO 197 --- [data-sync-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@22561412
+edgerush-data-sync  | 2026-01-16T12:21:43.511Z  INFO 197 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+edgerush-data-sync  | 2026-01-16T12:21:43.662Z  INFO 197 --- [data-sync-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/edgerush (PostgreSQL 18.1)
+edgerush-data-sync  | 2026-01-16T12:21:43.723Z  WARN 197 --- [data-sync-service] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.1 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+edgerush-data-sync  | 2026-01-16T12:21:44.608Z  INFO 197 --- [data-sync-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 33 migrations (execution time 00:00.809s)
+edgerush-data-sync  | 2026-01-16T12:21:44.649Z  INFO 197 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 0034
+edgerush-data-sync  | 2026-01-16T12:21:44.654Z  INFO 197 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+edgerush-data-sync  | 2026-01-16T12:21:45.807Z  INFO 197 --- [data-sync-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoints beneath base path '/actuator'
+edgerush-data-sync  | 2026-01-16T12:21:49.039Z DEBUG 197 --- [data-sync-service] [           main] s.w.r.r.m.a.RequestMappingHandlerMapping : 464 mappings in 'requestMappingHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:21:49.111Z  WARN 197 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:21:49.111Z  WARN 197 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ADMIN MODE ENABLED - Authentication bypassed for all requests!
+edgerush-data-sync  | 2026-01-16T12:21:49.111Z  WARN 197 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  This should ONLY be used in development/testing environments
+edgerush-data-sync  | 2026-01-16T12:21:49.111Z  WARN 197 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:22:00.546Z DEBUG 197 --- [data-sync-service] [           main] o.s.w.r.f.s.s.RouterFunctionMapping      : 4 RouterFunction(s) in 'routerFunctionMapping'
+edgerush-data-sync  | 2026-01-16T12:22:00.619Z DEBUG 197 --- [data-sync-service] [           main] o.s.w.r.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:22:00.801Z DEBUG 197 --- [data-sync-service] [           main] o.s.w.r.handler.SimpleUrlHandlerMapping  : Patterns [/subscriptions] in 'subscriptionHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:22:01.027Z DEBUG 197 --- [data-sync-service] [           main] o.s.w.r.r.m.a.ControllerMethodResolver   : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 2 @ExceptionHandler
+edgerush-data-sync  | 2026-01-16T12:22:01.204Z DEBUG 197 --- [data-sync-service] [           main] o.s.w.s.adapter.HttpWebHandlerAdapter    : enableLoggingRequestDetails='false': form data and headers will be masked to prevent unsafe logging of potentially sensitive data
+edgerush-data-sync  | 2026-01-16T12:22:04.407Z  INFO 197 --- [data-sync-service] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
+edgerush-data-sync  | 2026-01-16T12:22:04.417Z  INFO 197 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Started DataSyncApplicationKt in 71.437 seconds (process running for 66.268)
+edgerush-data-sync  | 2026-01-16T12:22:12.027Z DEBUG 197 --- [data-sync-service] [or-http-epoll-3] o.s.w.s.adapter.HttpWebHandlerAdapter    : [648a754c-1] HTTP GET "/actuator/health"
+edgerush-data-sync  | 2026-01-16T12:22:12.340Z DEBUG 197 --- [data-sync-service] [     parallel-1] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:22:12.571Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [648a754c-1] Using 'application/vnd.spring-boot.actuator.v3+json' given [*/*] and supported [application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json]
+edgerush-data-sync  | 2026-01-16T12:22:12.571Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [648a754c-1] 0..1 [org.springframework.boot.actuate.health.SystemHealth]
+edgerush-data-sync  | 2026-01-16T12:22:13.333Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] org.springframework.web.HttpLogging      : [648a754c-1] Encoding [org.springframework.boot.actuate.health.SystemHealth@45ae994f]
+edgerush-data-sync  | 2026-01-16T12:22:13.515Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] o.s.w.s.adapter.HttpWebHandlerAdapter    : [648a754c-1] Completed 503 SERVICE_UNAVAILABLE
+edgerush-data-sync  | 2026-01-16T12:22:21.634Z DEBUG 197 --- [data-sync-service] [or-http-epoll-4] o.s.w.s.adapter.HttpWebHandlerAdapter    : [0298a05c-2] HTTP GET "/actuator/health"
+edgerush-data-sync  | 2026-01-16T12:22:21.636Z DEBUG 197 --- [data-sync-service] [     parallel-2] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:22:21.643Z DEBUG 197 --- [data-sync-service] [oundedElastic-1] .s.w.r.r.m.a.ResponseEntityResultHandler : [0298a05c-2] Using 'application/vnd.spring-boot.actuator.v3+json' given [*/*] and supported [application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json]
+edgerush-data-sync  | 2026-01-16T12:22:21.643Z DEBUG 197 --- [data-sync-service] [oundedElastic-1] .s.w.r.r.m.a.ResponseEntityResultHandler : [0298a05c-2] 0..1 [org.springframework.boot.actuate.health.SystemHealth]
+edgerush-data-sync  | 2026-01-16T12:22:21.643Z DEBUG 197 --- [data-sync-service] [oundedElastic-1] org.springframework.web.HttpLogging      : [0298a05c-2] Encoding [org.springframework.boot.actuate.health.SystemHealth@64b43cf9]
+edgerush-data-sync  | 2026-01-16T12:22:21.647Z DEBUG 197 --- [data-sync-service] [oundedElastic-1] o.s.w.s.adapter.HttpWebHandlerAdapter    : [0298a05c-2] Completed 503 SERVICE_UNAVAILABLE
+edgerush-data-sync  | 2026-01-16T12:22:31.798Z DEBUG 197 --- [data-sync-service] [or-http-epoll-5] o.s.w.s.adapter.HttpWebHandlerAdapter    : [303e557d-3] HTTP GET "/actuator/health"
+edgerush-data-sync  | 2026-01-16T12:22:31.800Z DEBUG 197 --- [data-sync-service] [     parallel-3] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:22:31.805Z DEBUG 197 --- [data-sync-service] [oundedElastic-3] .s.w.r.r.m.a.ResponseEntityResultHandler : [303e557d-3] Using 'application/vnd.spring-boot.actuator.v3+json' given [*/*] and supported [application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json]
+edgerush-data-sync  | 2026-01-16T12:22:31.805Z DEBUG 197 --- [data-sync-service] [oundedElastic-3] .s.w.r.r.m.a.ResponseEntityResultHandler : [303e557d-3] 0..1 [org.springframework.boot.actuate.health.SystemHealth]
+edgerush-data-sync  | 2026-01-16T12:22:31.806Z DEBUG 197 --- [data-sync-service] [oundedElastic-3] org.springframework.web.HttpLogging      : [303e557d-3] Encoding [org.springframework.boot.actuate.health.SystemHealth@d6bb0bd]
+edgerush-data-sync  | 2026-01-16T12:22:31.809Z DEBUG 197 --- [data-sync-service] [oundedElastic-3] o.s.w.s.adapter.HttpWebHandlerAdapter    : [303e557d-3] Completed 503 SERVICE_UNAVAILABLE
+edgerush-data-sync  | 2026-01-16T12:22:52.846Z DEBUG 197 --- [data-sync-service] [or-http-epoll-6] o.s.w.s.adapter.HttpWebHandlerAdapter    : [503b9c53-4] HTTP GET "/actuator/health"
+edgerush-data-sync  | 2026-01-16T12:22:52.847Z DEBUG 197 --- [data-sync-service] [     parallel-4] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:22:52.853Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [503b9c53-4] Using 'application/vnd.spring-boot.actuator.v3+json' given [*/*] and supported [application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json]
+edgerush-data-sync  | 2026-01-16T12:22:52.853Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [503b9c53-4] 0..1 [org.springframework.boot.actuate.health.SystemHealth]
+edgerush-data-sync  | 2026-01-16T12:22:52.854Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] org.springframework.web.HttpLogging      : [503b9c53-4] Encoding [org.springframework.boot.actuate.health.SystemHealth@4466ec85]
+edgerush-data-sync  | 2026-01-16T12:22:52.855Z DEBUG 197 --- [data-sync-service] [oundedElastic-2] o.s.w.s.adapter.HttpWebHandlerAdapter    : [503b9c53-4] Completed 503 SERVICE_UNAVAILABLE
+edgerush-data-sync  | 2026-01-16T12:23:07.392Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] o.s.w.s.adapter.HttpWebHandlerAdapter    : [1ae0924b-5] HTTP POST "/api/v1/auth/login"
+edgerush-data-sync  | 2026-01-16T12:23:07.394Z DEBUG 197 --- [data-sync-service] [     parallel-5] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:23:07.403Z DEBUG 197 --- [data-sync-service] [     parallel-5] s.w.r.r.m.a.RequestMappingHandlerMapping : [1ae0924b-5] Mapped to com.edgerush.lootman.api.auth.AuthController#login(LoginRequest)
+edgerush-data-sync  | 2026-01-16T12:23:07.438Z DEBUG 197 --- [data-sync-service] [     parallel-5] s.w.r.r.m.a.RequestMappingHandlerMapping : [1ae0924b-5] Mapped to com.edgerush.lootman.api.auth.AuthController#login(LoginRequest)
+edgerush-data-sync  | 2026-01-16T12:23:07.442Z DEBUG 197 --- [data-sync-service] [     parallel-5] .r.m.a.RequestBodyMethodArgumentResolver : [1ae0924b-5] No Content-Type, using application/octet-stream
+edgerush-data-sync  | 2026-01-16T12:23:07.461Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] o.s.web.method.HandlerMethod             : [1ae0924b-5] Could not resolve parameter [0] in public org.springframework.http.ResponseEntity<com.edgerush.lootman.api.auth.TokenResponse> com.edgerush.lootman.api.auth.AuthController.login(com.edgerush.lootman.api.auth.LoginRequest): 400 BAD_REQUEST "No request body"
+edgerush-data-sync  | 2026-01-16T12:23:07.462Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] s.w.r.r.m.a.RequestMappingHandlerAdapter : [1ae0924b-5] Using @ExceptionHandler com.edgerush.lootman.api.common.GlobalExceptionHandler#handleException(Exception)
+edgerush-data-sync  | 2026-01-16T12:23:07.544Z ERROR 197 --- [data-sync-service] [or-http-epoll-7] c.e.l.api.common.GlobalExceptionHandler  : Unhandled exception occurred
+edgerush-data-sync  | 
+edgerush-data-sync  | org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "No request body"
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleMissingBody(AbstractMessageReaderArgumentResolver.java:252) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.lambda$readBody$7(AbstractMessageReaderArgumentResolver.java:228) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.Mono.subscribe(Mono.java:4576) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:82) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.netty.channel.FluxReceive.startReceiver(FluxReceive.java:164) ~[reactor-netty-core-1.2.11.jar:1.2.11]
+edgerush-data-sync  | 	at reactor.netty.channel.FluxReceive.lambda$subscribe$2(FluxReceive.java:148) ~[reactor-netty-core-1.2.11.jar:1.2.11]
+edgerush-data-sync  | 	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:472) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.channel.epoll.EpollEventLoop.run(EpollEventLoop.java:405) ~[netty-transport-classes-epoll-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+edgerush-data-sync  | Caused by: org.springframework.core.codec.DecodingException: No request body for: public org.springframework.http.ResponseEntity<com.edgerush.lootman.api.auth.TokenResponse> com.edgerush.lootman.api.auth.AuthController.login(com.edgerush.lootman.api.auth.LoginRequest)
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleMissingBody(AbstractMessageReaderArgumentResolver.java:250) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	... 19 common frames omitted
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:23:07.604Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] .s.w.r.r.m.a.ResponseEntityResultHandler : [1ae0924b-5] Using 'application/json' given [*/*] and supported [application/json, application/*+json, application/x-ndjson, text/event-stream]
+edgerush-data-sync  | 2026-01-16T12:23:07.604Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] .s.w.r.r.m.a.ResponseEntityResultHandler : [1ae0924b-5] 0..1 [com.edgerush.lootman.api.common.ErrorResponse]
+edgerush-data-sync  | 2026-01-16T12:23:07.605Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] org.springframework.web.HttpLogging      : [1ae0924b-5] Encoding [ErrorResponse(status=500, error=Internal Server Error, message=An unexpected error occurred)]
+edgerush-data-sync  | 2026-01-16T12:23:07.607Z DEBUG 197 --- [data-sync-service] [or-http-epoll-7] o.s.w.s.adapter.HttpWebHandlerAdapter    : [1ae0924b-5] Completed 500 INTERNAL_SERVER_ERROR
+edgerush-data-sync  | [entrypoint] SOPS_AGE_KEY_FILE not set, skipping secrets decryption
+edgerush-data-sync  | [entrypoint] Starting application: gradle :data-sync-service:bootRun
+edgerush-data-sync  | Starting a Gradle Daemon, 3 busy and 1 incompatible and 2 stopped Daemons could not be reused, use --status for details
+edgerush-data-sync  | > Task :data-sync-service:checkKotlinGradlePluginConfigurationErrors SKIPPED
+edgerush-data-sync  | > Task :data-sync-service:compileKotlin FROM-CACHE
+edgerush-data-sync  | > Task :data-sync-service:compileJava NO-SOURCE
+edgerush-data-sync  | > Task :data-sync-service:processResources
+edgerush-data-sync  | > Task :data-sync-service:classes
+edgerush-data-sync  | > Task :data-sync-service:resolveMainClassName
+edgerush-data-sync  | 
+edgerush-data-sync  | > Task :data-sync-service:bootRun
+edgerush-data-sync  | 
+edgerush-data-sync  |   .   ____          _            __ _ _
+edgerush-data-sync  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+edgerush-data-sync  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+edgerush-data-sync  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+edgerush-data-sync  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+edgerush-data-sync  |  =========|_|==============|___/=/_/_/_/
+edgerush-data-sync  | 
+edgerush-data-sync  |  :: Spring Boot ::                (v3.5.7)
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:26:46.593Z  INFO 194 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Starting DataSyncApplicationKt using Java 21.0.9 with PID 194 (/home/gradle/project/data-sync-service/build/classes/kotlin/main started by root in /home/gradle/project/data-sync-service)
+edgerush-data-sync  | 2026-01-16T12:26:46.600Z DEBUG 194 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Running with Spring Boot v3.5.7, Spring v6.2.12
+edgerush-data-sync  | 2026-01-16T12:26:46.601Z  INFO 194 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : The following 1 profile is active: "default"
+edgerush-data-sync  | 2026-01-16T12:27:17.987Z  INFO 194 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+edgerush-data-sync  | 2026-01-16T12:27:18.183Z  INFO 194 --- [data-sync-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 151 ms. Found 0 JDBC repository interfaces.
+edgerush-data-sync  | 2026-01-16T12:27:25.975Z  INFO 194 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+edgerush-data-sync  | 2026-01-16T12:27:26.879Z  INFO 194 --- [data-sync-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@15f229e8
+edgerush-data-sync  | 2026-01-16T12:27:26.895Z  INFO 194 --- [data-sync-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+edgerush-data-sync  | 2026-01-16T12:27:27.031Z  INFO 194 --- [data-sync-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/edgerush (PostgreSQL 18.1)
+edgerush-data-sync  | 2026-01-16T12:27:27.087Z  WARN 194 --- [data-sync-service] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.1 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+edgerush-data-sync  | 2026-01-16T12:27:27.904Z  INFO 194 --- [data-sync-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 33 migrations (execution time 00:00.747s)
+edgerush-data-sync  | 2026-01-16T12:27:27.946Z  INFO 194 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 0034
+edgerush-data-sync  | 2026-01-16T12:27:27.952Z  INFO 194 --- [data-sync-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+edgerush-data-sync  | 2026-01-16T12:27:29.170Z  INFO 194 --- [data-sync-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoints beneath base path '/actuator'
+edgerush-data-sync  | 2026-01-16T12:27:32.310Z DEBUG 194 --- [data-sync-service] [           main] s.w.r.r.m.a.RequestMappingHandlerMapping : 464 mappings in 'requestMappingHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:27:32.376Z  WARN 194 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:27:32.377Z  WARN 194 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ADMIN MODE ENABLED - Authentication bypassed for all requests!
+edgerush-data-sync  | 2026-01-16T12:27:32.377Z  WARN 194 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  This should ONLY be used in development/testing environments
+edgerush-data-sync  | 2026-01-16T12:27:32.377Z  WARN 194 --- [data-sync-service] [           main] c.e.d.s.AdminModeConfig$$SpringCGLIB$$0  : ⚠️  ═══════════════════════════════════════════════════════════
+edgerush-data-sync  | 2026-01-16T12:27:47.386Z DEBUG 194 --- [data-sync-service] [           main] o.s.w.r.f.s.s.RouterFunctionMapping      : 4 RouterFunction(s) in 'routerFunctionMapping'
+edgerush-data-sync  | 2026-01-16T12:27:47.457Z DEBUG 194 --- [data-sync-service] [           main] o.s.w.r.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:27:47.655Z DEBUG 194 --- [data-sync-service] [           main] o.s.w.r.handler.SimpleUrlHandlerMapping  : Patterns [/subscriptions] in 'subscriptionHandlerMapping'
+edgerush-data-sync  | 2026-01-16T12:27:47.917Z DEBUG 194 --- [data-sync-service] [           main] o.s.w.r.r.m.a.ControllerMethodResolver   : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 2 @ExceptionHandler
+edgerush-data-sync  | 2026-01-16T12:27:48.126Z DEBUG 194 --- [data-sync-service] [           main] o.s.w.s.adapter.HttpWebHandlerAdapter    : enableLoggingRequestDetails='false': form data and headers will be masked to prevent unsafe logging of potentially sensitive data
+edgerush-data-sync  | 2026-01-16T12:27:51.267Z  INFO 194 --- [data-sync-service] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
+edgerush-data-sync  | 2026-01-16T12:27:51.278Z  INFO 194 --- [data-sync-service] [           main] c.e.datasync.DataSyncApplicationKt       : Started DataSyncApplicationKt in 71.585 seconds (process running for 66.334)
+edgerush-data-sync  | 2026-01-16T12:28:04.267Z DEBUG 194 --- [data-sync-service] [or-http-epoll-3] o.s.w.s.adapter.HttpWebHandlerAdapter    : [50cbcb46-1] HTTP GET "/actuator/health"
+edgerush-data-sync  | 2026-01-16T12:28:04.594Z DEBUG 194 --- [data-sync-service] [     parallel-1] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:28:04.838Z DEBUG 194 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [50cbcb46-1] Using 'application/vnd.spring-boot.actuator.v3+json' given [*/*] and supported [application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json]
+edgerush-data-sync  | 2026-01-16T12:28:04.838Z DEBUG 194 --- [data-sync-service] [oundedElastic-2] .s.w.r.r.m.a.ResponseEntityResultHandler : [50cbcb46-1] 0..1 [org.springframework.boot.actuate.health.SystemHealth]
+edgerush-data-sync  | 2026-01-16T12:28:05.648Z DEBUG 194 --- [data-sync-service] [oundedElastic-2] org.springframework.web.HttpLogging      : [50cbcb46-1] Encoding [org.springframework.boot.actuate.health.SystemHealth@3d49800a]
+edgerush-data-sync  | 2026-01-16T12:28:05.836Z DEBUG 194 --- [data-sync-service] [oundedElastic-2] o.s.w.s.adapter.HttpWebHandlerAdapter    : [50cbcb46-1] Completed 503 SERVICE_UNAVAILABLE
+edgerush-data-sync  | 2026-01-16T12:28:11.952Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] o.s.w.s.adapter.HttpWebHandlerAdapter    : [a95afbd4-2] HTTP POST "/api/v1/auth/login"
+edgerush-data-sync  | 2026-01-16T12:28:11.953Z DEBUG 194 --- [data-sync-service] [     parallel-2] o.s.w.s.s.DefaultWebSessionManager       : Created new WebSession.
+edgerush-data-sync  | 2026-01-16T12:28:11.963Z DEBUG 194 --- [data-sync-service] [     parallel-2] s.w.r.r.m.a.RequestMappingHandlerMapping : [a95afbd4-2] Mapped to com.edgerush.lootman.api.auth.AuthController#login(LoginRequest)
+edgerush-data-sync  | 2026-01-16T12:28:11.998Z DEBUG 194 --- [data-sync-service] [     parallel-2] s.w.r.r.m.a.RequestMappingHandlerMapping : [a95afbd4-2] Mapped to com.edgerush.lootman.api.auth.AuthController#login(LoginRequest)
+edgerush-data-sync  | 2026-01-16T12:28:12.004Z DEBUG 194 --- [data-sync-service] [     parallel-2] .r.m.a.RequestBodyMethodArgumentResolver : [a95afbd4-2] No Content-Type, using application/octet-stream
+edgerush-data-sync  | 2026-01-16T12:28:12.024Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] o.s.web.method.HandlerMethod             : [a95afbd4-2] Could not resolve parameter [0] in public org.springframework.http.ResponseEntity<com.edgerush.lootman.api.auth.TokenResponse> com.edgerush.lootman.api.auth.AuthController.login(com.edgerush.lootman.api.auth.LoginRequest): 400 BAD_REQUEST "No request body"
+edgerush-data-sync  | 2026-01-16T12:28:12.025Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] s.w.r.r.m.a.RequestMappingHandlerAdapter : [a95afbd4-2] Using @ExceptionHandler com.edgerush.lootman.api.common.GlobalExceptionHandler#handleException(Exception)
+edgerush-data-sync  | 2026-01-16T12:28:12.112Z ERROR 194 --- [data-sync-service] [or-http-epoll-4] c.e.l.api.common.GlobalExceptionHandler  : Unhandled exception occurred
+edgerush-data-sync  | 
+edgerush-data-sync  | org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "No request body"
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleMissingBody(AbstractMessageReaderArgumentResolver.java:252) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.lambda$readBody$7(AbstractMessageReaderArgumentResolver.java:228) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.Mono.subscribe(Mono.java:4576) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:82) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.7.12.jar:3.7.12]
+edgerush-data-sync  | 	at reactor.netty.channel.FluxReceive.startReceiver(FluxReceive.java:164) ~[reactor-netty-core-1.2.11.jar:1.2.11]
+edgerush-data-sync  | 	at reactor.netty.channel.FluxReceive.lambda$subscribe$2(FluxReceive.java:148) ~[reactor-netty-core-1.2.11.jar:1.2.11]
+edgerush-data-sync  | 	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:472) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.channel.epoll.EpollEventLoop.run(EpollEventLoop.java:405) ~[netty-transport-classes-epoll-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.128.Final.jar:4.1.128.Final]
+edgerush-data-sync  | 	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+edgerush-data-sync  | Caused by: org.springframework.core.codec.DecodingException: No request body for: public org.springframework.http.ResponseEntity<com.edgerush.lootman.api.auth.TokenResponse> com.edgerush.lootman.api.auth.AuthController.login(com.edgerush.lootman.api.auth.LoginRequest)
+edgerush-data-sync  | 	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleMissingBody(AbstractMessageReaderArgumentResolver.java:250) ~[spring-webflux-6.2.12.jar:6.2.12]
+edgerush-data-sync  | 	... 19 common frames omitted
+edgerush-data-sync  | 
+edgerush-data-sync  | 2026-01-16T12:28:12.155Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] .s.w.r.r.m.a.ResponseEntityResultHandler : [a95afbd4-2] Using 'application/json' given [*/*] and supported [application/json, application/*+json, application/x-ndjson, text/event-stream]
+edgerush-data-sync  | 2026-01-16T12:28:12.155Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] .s.w.r.r.m.a.ResponseEntityResultHandler : [a95afbd4-2] 0..1 [com.edgerush.lootman.api.common.ErrorResponse]
+edgerush-data-sync  | 2026-01-16T12:28:12.156Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] org.springframework.web.HttpLogging      : [a95afbd4-2] Encoding [ErrorResponse(status=500, error=Internal Server Error, message=An unexpected error occurred)]
+edgerush-data-sync  | 2026-01-16T12:28:12.158Z DEBUG 194 --- [data-sync-service] [or-http-epoll-4] o.s.w.s.adapter.HttpWebHandlerAdapter    : [a95afbd4-2] Completed 500 INTERNAL_SERVER_ERROR

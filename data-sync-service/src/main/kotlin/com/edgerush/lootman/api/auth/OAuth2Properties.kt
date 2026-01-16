@@ -2,24 +2,27 @@ package com.edgerush.lootman.api.auth
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
+import org.springframework.stereotype.Component
+
 /**
  * Configuration properties for OAuth2 authentication.
  */
+@Component
 @ConfigurationProperties(prefix = "oauth2")
 data class OAuth2Properties(
-    val discord: DiscordOAuth2Properties = DiscordOAuth2Properties(),
-    val battlenet: BattlenetOAuth2Properties = BattlenetOAuth2Properties(),
-    val jwt: JwtProperties = JwtProperties(),
+    var discord: DiscordOAuth2Properties = DiscordOAuth2Properties(),
+    var battlenet: BattlenetOAuth2Properties = BattlenetOAuth2Properties(),
+    var jwt: JwtProperties = JwtProperties(),
 )
 
 /**
  * Discord OAuth2 configuration.
  */
 data class DiscordOAuth2Properties(
-    val clientId: String = "",
-    val clientSecret: String = "",
-    val redirectUri: String = "",
-    val scopes: String = "identify email",
+    var clientId: String = "",
+    var clientSecret: String = "",
+    var redirectUri: String = "",
+    var scopes: String = "identify email",
 ) {
     val authorizationUrl: String
         get() = "https://discord.com/api/oauth2/authorize"
@@ -35,10 +38,10 @@ data class DiscordOAuth2Properties(
  * Battle.net OAuth2 configuration.
  */
 data class BattlenetOAuth2Properties(
-    val clientId: String = "",
-    val clientSecret: String = "",
-    val redirectUri: String = "",
-    val region: String = "us",
+    var clientId: String = "",
+    var clientSecret: String = "",
+    var redirectUri: String = "",
+    var region: String = "us",
 ) {
     val authorizationUrl: String
         get() = "https://$region.battle.net/oauth/authorize"
@@ -54,8 +57,8 @@ data class BattlenetOAuth2Properties(
  * JWT token configuration.
  */
 data class JwtProperties(
-    val secret: String = "",
-    val accessTokenValidityMinutes: Long = 15,
-    val refreshTokenValidityDays: Long = 30,
-    val issuer: String = "edgerush-lootman",
+    var secret: String = "",
+    var accessTokenValidityMinutes: Long = 15,
+    var refreshTokenValidityDays: Long = 90,
+    var issuer: String = "edgerush-lootman",
 )

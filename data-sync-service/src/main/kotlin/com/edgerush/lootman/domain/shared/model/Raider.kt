@@ -55,10 +55,16 @@ enum class CharacterClass {
     SHAMAN,
     WARLOCK,
     WARRIOR,
+    UNKNOWN,
     ;
 
     companion object {
-        fun fromString(value: String): CharacterClass = entries.first { it.name.replace("_", " ").equals(value, ignoreCase = true) }
+        fun fromString(value: String): CharacterClass {
+            val normalized = value.uppercase().replace(" ", "_").replace("-", "_")
+            return entries.firstOrNull { it.name == normalized }
+                ?: entries.firstOrNull { it.name.replace("_", "").equals(normalized.replace("_", ""), ignoreCase = true) }
+                ?: UNKNOWN
+        }
     }
 }
 

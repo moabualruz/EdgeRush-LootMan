@@ -25,7 +25,13 @@ function closeDropdown() {
 }
 
 async function selectCharacter(mappingId: number) {
-  await guildContextStore.switchCharacter(mappingId)
+  // If we have guild contexts, use the API to switch
+  if (guildContextStore.guilds.length > 0) {
+    await guildContextStore.switchCharacter(mappingId)
+  } else {
+    // Otherwise, just select the Battle.net character locally
+    guildContextStore.selectBattlenetCharacter(mappingId)
+  }
   closeDropdown()
 }
 
@@ -89,29 +95,29 @@ function getClassColor(characterClass: string): string {
 
     <!-- Dropdown menu -->
     <div
-      v-if="isOpen && guildContextStore.guilds.length > 0"
+      v-if="isOpen && guildContextStore.allCharacters.length > 0"
       class="absolute left-0 right-0 z-50 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg overflow-hidden"
     >
       <div class="max-h-64 overflow-y-auto">
         <button
-          v-for="guild in guildContextStore.guilds"
-          :key="guild.characterMappingId"
-          @click="selectCharacter(guild.characterMappingId)"
+          v-for="character in guildContextStore.allCharacters"
+          :key="character.characterMappingId"
+          @click="selectCharacter(character.characterMappingId)"
           class="flex items-center w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors"
-          :class="{ 'bg-gray-700/50': guild.isActive }"
+          :class="{ 'bg-gray-700/50': character.isActive || character.characterName === currentCharacter?.name }"
         >
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate" :class="getClassColor(guild.characterClass)">
-              {{ guild.characterName }}
-              <span class="text-gray-500 text-xs">({{ guild.characterRealm }})</span>
+            <p class="text-sm font-medium truncate" :class="getClassColor(character.characterClass)">
+              {{ character.characterName }}
+              <span class="text-gray-500 text-xs">({{ character.characterRealm }})</span>
             </p>
             <p class="text-xs text-gray-400 truncate">
-              {{ guild.guildName }}
-              <span v-if="guild.rank" class="text-gray-500">- {{ guild.rank }}</span>
+              {{ character.guildName }}
+              <span v-if="character.rank" class="text-gray-500">- {{ character.rank }}</span>
             </p>
           </div>
           <svg
-            v-if="guild.isActive"
+            v-if="character.isActive || character.characterName === currentCharacter?.name"
             class="flex-shrink-0 w-4 h-4 text-primary-500"
             fill="currentColor"
             viewBox="0 0 20 20"

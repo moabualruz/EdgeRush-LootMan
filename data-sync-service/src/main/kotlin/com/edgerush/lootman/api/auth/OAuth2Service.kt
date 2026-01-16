@@ -143,16 +143,16 @@ class OAuth2Service(
             .queryParam("client_id", properties.battlenet.clientId)
             .queryParam("redirect_uri", URLEncoder.encode(properties.battlenet.redirectUri, StandardCharsets.UTF_8))
             .queryParam("response_type", "code")
-            .queryParam("scope", "openid")
+            .queryParam("scope", URLEncoder.encode("openid wow.profile", StandardCharsets.UTF_8))
             .queryParam("state", stateValue)
             .build(true)
             .toUriString()
     }
 
     /**
-     * Exchanges a Battle.net authorization code for user info.
+     * Exchanges a Battle.net authorization code for user info and access token.
      */
-    fun exchangeBattlenetCode(code: String): BattlenetUserInfo {
+    fun exchangeBattlenetCode(code: String): BattlenetAuthResult {
         if (!properties.battlenet.isConfigured()) {
             throw OAuth2AuthenticationException("Battle.net", "Battle.net OAuth2 is not configured")
         }
@@ -164,7 +164,9 @@ class OAuth2Service(
                 ?: throw OAuth2AuthenticationException("Battle.net", "No access token in response")
 
         // Get user info
-        return getBattlenetUserInfo(accessToken)
+        val userInfo = getBattlenetUserInfo(accessToken)
+        
+        return BattlenetAuthResult(userInfo, accessToken)
     }
 
     private fun exchangeBattlenetCodeForToken(code: String): Map<*, *> {
@@ -224,3 +226,8 @@ class OAuth2Service(
         }
     }
 }
+
+data class BattlenetAuthResult(
+    val userInfo: BattlenetUserInfo,
+    val accessToken: String
+)

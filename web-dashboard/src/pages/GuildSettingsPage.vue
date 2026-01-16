@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useGuildContextStore } from '@/stores/guildContext'
@@ -10,16 +10,22 @@ import {
   removeGuildPermission,
   fetchPermissionTypes,
 } from '@/api/guildContext'
+import {
+  fetchGuildSyncConfig,
+  updateGuildSyncConfig,
+  triggerBnetSync,
+  type GuildSyncConfig,
+} from '@/api/guildSync'
 import type { GuildPermission, PermissionTypeInfo } from '@/types'
 
 const router = useRouter()
 const guildContextStore = useGuildContextStore()
 const queryClient = useQueryClient()
 
-const activeTab = ref<'wowaudit' | 'flps' | 'permissions'>('wowaudit')
+const activeTab = ref<'sync' | 'flps' | 'permissions'>('sync')
 
 const tabs = [
-  { key: 'wowaudit', label: 'WoWAudit Integration' },
+  { key: 'sync', label: 'Data Sync' },
   { key: 'flps', label: 'FLPS Configuration' },
   { key: 'permissions', label: 'Permissions' },
 ] as const
@@ -34,10 +40,32 @@ onMounted(() => {
   }
 })
 
-// WoWAudit config state
+// Sync config query
+const { data: syncConfig, isLoading: syncConfigLoading, refetch: refetchSyncConfig } = useQuery({
+  queryKey: ['guildSyncConfig', guildId],
+  queryFn: () => fetchGuildSyncConfig(guildId.value),
+  enabled: computed(() => !!guildId.value),
+})
+
+// Sync config form state
 const wowauditApiKey = ref('')
 const wowauditGuildUri = ref('')
-const wowauditSaving = ref(false)
+const bnetRealmSlug = ref('')
+const bnetGuildNameSlug = ref('')
+const bnetRegion = ref('eu')
+const syncSaving = ref(false)
+const bnetSyncing = ref(false)
+const syncMessage = ref<{ type: 'success' | 'error'; text: string } | null>(null)
+
+// Populate form when sync config loads
+watch(syncConfig, (config) => {
+  if (config) {
+    wowauditGuildUri.value = config.wowauditGuildUri ?? ''
+    bnetRealmSlug.value = config.bnetRealmSlug ?? ''
+    bnetGuildNameSlug.value = config.bnetGuildNameSlug ?? ''
+    bnetRegion.value = config.bnetRegion ?? 'eu'
+  }
+})
 
 // Permissions queries
 const { data: permissions, isLoading: permissionsLoading } = useQuery({
@@ -85,11 +113,50 @@ function handleRemovePermission(permission: GuildPermission) {
   removePermissionMutation.mutate(permission.id)
 }
 
-async function saveWowauditConfig() {
-  wowauditSaving.value = true
-  // TODO: Implement WoWAudit config save API
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  wowauditSaving.value = false
+async function saveSyncConfig() {
+  syncSaving.value = true
+  syncMessage.value = null
+  try {
+    await updateGuildSyncConfig(guildId.value, {
+      wowauditGuildUri: wowauditGuildUri.value || undefined,
+      wowauditApiKey: wowauditApiKey.value || undefined,
+      bnetRealmSlug: bnetRealmSlug.value || undefined,
+      bnetGuildNameSlug: bnetGuildNameSlug.value || undefined,
+      bnetRegion: bnetRegion.value || undefined,
+    })
+    wowauditApiKey.value = '' // Clear the API key field after save
+    syncMessage.value = { type: 'success', text: 'Configuration saved successfully!' }
+    refetchSyncConfig()
+  } catch (error) {
+    syncMessage.value = { type: 'error', text: 'Failed to save configuration. Please try again.' }
+  } finally {
+    syncSaving.value = false
+  }
+}
+
+async function handleBnetSync() {
+  bnetSyncing.value = true
+  syncMessage.value = null
+  try {
+    const result = await triggerBnetSync(guildId.value)
+    if (result.success) {
+      syncMessage.value = { type: 'success', text: result.message }
+      // Refresh the guild context to pick up new raiders
+      guildContextStore.fetchGuilds()
+    } else {
+      syncMessage.value = { type: 'error', text: result.message }
+    }
+    refetchSyncConfig()
+  } catch (error) {
+    syncMessage.value = { type: 'error', text: 'Failed to trigger sync. Please try again.' }
+  } finally {
+    bnetSyncing.value = false
+  }
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return 'Never'
+  return new Date(dateStr).toLocaleString()
 }
 
 // Group permissions by rank for display
@@ -137,61 +204,180 @@ function getPermissionDescription(type: string): string {
 
     <!-- Tab content -->
     <div>
-      <!-- WoWAudit Configuration -->
-      <div v-if="activeTab === 'wowaudit'" class="space-y-6">
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4">WoWAudit API Configuration</h3>
-          <p class="text-sm text-gray-400 mb-4">
-            Configure your WoWAudit integration to sync character, attendance, and loot data.
-          </p>
+      <!-- Data Sync Configuration -->
+      <div v-if="activeTab === 'sync'" class="space-y-6">
+        <!-- Message display -->
+        <div
+          v-if="syncMessage"
+          :class="[
+            'p-4 rounded-lg',
+            syncMessage.type === 'success' ? 'bg-green-900/30 border border-green-700 text-green-300' : 'bg-red-900/30 border border-red-700 text-red-300'
+          ]"
+        >
+          {{ syncMessage.text }}
+        </div>
 
-          <div class="space-y-4">
-            <div>
-              <label class="label">API Key</label>
-              <input
-                v-model="wowauditApiKey"
-                type="password"
-                placeholder="Enter your WoWAudit API key"
-                class="input"
-              />
-              <p class="text-xs text-gray-500 mt-1">
-                You can find your API key in the WoWAudit dashboard under Settings.
-              </p>
-            </div>
+        <!-- Loading state -->
+        <div v-if="syncConfigLoading" class="flex items-center justify-center py-8">
+          <div class="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+        </div>
 
-            <div>
-              <label class="label">Guild URI</label>
-              <input
-                v-model="wowauditGuildUri"
-                type="text"
-                placeholder="e.g., eu/tarren-mill/your-guild-name"
-                class="input"
-              />
-              <p class="text-xs text-gray-500 mt-1">
-                The URI format is: region/realm/guild-name (all lowercase, hyphens for spaces)
-              </p>
-            </div>
+        <template v-else>
+          <!-- Battle.net Guild Roster Sync -->
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-4">Battle.net Guild Roster</h3>
+            <p class="text-sm text-gray-400 mb-4">
+              Sync your complete guild roster directly from Battle.net. This will import all guild members with their ranks.
+            </p>
 
-            <div class="flex justify-end">
-              <button
-                @click="saveWowauditConfig"
-                class="btn-primary"
-                :disabled="wowauditSaving"
-              >
-                {{ wowauditSaving ? 'Saving...' : 'Save Configuration' }}
-              </button>
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="label">Region</label>
+                  <select v-model="bnetRegion" class="input">
+                    <option value="eu">Europe (EU)</option>
+                    <option value="us">Americas (US)</option>
+                    <option value="kr">Korea (KR)</option>
+                    <option value="tw">Taiwan (TW)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="label">Realm Slug</label>
+                  <input
+                    v-model="bnetRealmSlug"
+                    type="text"
+                    placeholder="e.g., twisting-nether"
+                    class="input"
+                  />
+                  <p class="text-xs text-gray-500 mt-1">
+                    Lowercase, hyphens for spaces
+                  </p>
+                </div>
+
+                <div>
+                  <label class="label">Guild Name Slug</label>
+                  <input
+                    v-model="bnetGuildNameSlug"
+                    type="text"
+                    placeholder="e.g., dod"
+                    class="input"
+                  />
+                  <p class="text-xs text-gray-500 mt-1">
+                    Lowercase, hyphens for spaces
+                  </p>
+                </div>
+              </div>
+
+              <!-- Sync status -->
+              <div v-if="syncConfig" class="p-4 bg-gray-700/50 rounded-lg">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p class="text-gray-400">Last Sync</p>
+                    <p class="font-medium">{{ formatDate(syncConfig.bnetLastSyncAt) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-400">Status</p>
+                    <p :class="[
+                      'font-medium',
+                      syncConfig.bnetLastSyncStatus === 'SUCCESS' ? 'text-green-400' :
+                      syncConfig.bnetLastSyncStatus === 'FAILED' ? 'text-red-400' :
+                      syncConfig.bnetLastSyncStatus === 'IN_PROGRESS' ? 'text-yellow-400' : 'text-gray-400'
+                    ]">
+                      {{ syncConfig.bnetLastSyncStatus ?? 'Never synced' }}
+                    </p>
+                  </div>
+                  <div v-if="syncConfig.bnetLastSyncError" class="col-span-2">
+                    <p class="text-gray-400">Error</p>
+                    <p class="text-red-400 text-xs">{{ syncConfig.bnetLastSyncError }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end gap-4">
+                <button
+                  @click="handleBnetSync"
+                  class="btn-secondary"
+                  :disabled="bnetSyncing || !bnetRealmSlug || !bnetGuildNameSlug"
+                >
+                  {{ bnetSyncing ? 'Syncing...' : 'Sync Now' }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="card bg-blue-900/20 border-blue-700">
-          <h4 class="font-semibold text-blue-400 mb-2">Sync Status</h4>
-          <p class="text-sm text-gray-300">
-            WoWAudit sync runs automatically every hour. You can also trigger a manual sync from the
-            <RouterLink to="/admin/sync" class="text-primary-400 hover:underline">Sync History</RouterLink>
-            page.
-          </p>
-        </div>
+          <!-- WoWAudit Configuration -->
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-4">WoWAudit Integration</h3>
+            <p class="text-sm text-gray-400 mb-4">
+              Configure WoWAudit to sync attendance, loot history, and wishlist data.
+            </p>
+
+            <div class="space-y-4">
+              <div>
+                <label class="label">API Key</label>
+                <input
+                  v-model="wowauditApiKey"
+                  type="password"
+                  placeholder="Enter your WoWAudit API key (leave blank to keep existing)"
+                  class="input"
+                />
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ syncConfig?.wowauditApiKeyConfigured ? 'API key is configured.' : 'No API key configured.' }}
+                </p>
+              </div>
+
+              <div>
+                <label class="label">Guild URI</label>
+                <input
+                  v-model="wowauditGuildUri"
+                  type="text"
+                  placeholder="e.g., eu/tarren-mill/your-guild-name"
+                  class="input"
+                />
+                <p class="text-xs text-gray-500 mt-1">
+                  Format: region/realm/guild-name (all lowercase, hyphens for spaces)
+                </p>
+              </div>
+
+              <!-- WoWAudit sync status -->
+              <div v-if="syncConfig" class="p-4 bg-gray-700/50 rounded-lg">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p class="text-gray-400">Last Sync</p>
+                    <p class="font-medium">{{ formatDate(syncConfig.lastSyncAt) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-400">Status</p>
+                    <p :class="[
+                      'font-medium',
+                      syncConfig.lastSyncStatus === 'SUCCESS' ? 'text-green-400' :
+                      syncConfig.lastSyncStatus === 'FAILED' ? 'text-red-400' :
+                      syncConfig.lastSyncStatus === 'IN_PROGRESS' ? 'text-yellow-400' : 'text-gray-400'
+                    ]">
+                      {{ syncConfig.lastSyncStatus ?? 'Never synced' }}
+                    </p>
+                  </div>
+                  <div v-if="syncConfig.lastSyncError" class="col-span-2">
+                    <p class="text-gray-400">Error</p>
+                    <p class="text-red-400 text-xs">{{ syncConfig.lastSyncError }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save button -->
+          <div class="flex justify-end">
+            <button
+              @click="saveSyncConfig"
+              class="btn-primary"
+              :disabled="syncSaving"
+            >
+              {{ syncSaving ? 'Saving...' : 'Save All Settings' }}
+            </button>
+          </div>
+        </template>
       </div>
 
       <!-- FLPS Configuration -->

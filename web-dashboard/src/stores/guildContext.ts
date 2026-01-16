@@ -6,15 +6,39 @@ import {
   fetchActiveGuildContext,
   setActiveCharacter as apiSetActiveCharacter,
 } from '@/api/guildContext'
+import { fetchUserCharacters, type UserCharacter } from '@/api/user'
 
 export const useGuildContextStore = defineStore('guildContext', () => {
   const guilds = ref<GuildContext[]>([])
   const activeGuild = ref<GuildContext | null>(null)
+  const battlenetCharacters = ref<UserCharacter[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
   // Computed properties
   const hasMultipleGuilds = computed(() => guilds.value.length > 1)
+  const hasMultipleCharacters = computed(() => battlenetCharacters.value.length > 1)
+
+  // Combined characters: guild contexts + unlinked Battle.net characters
+  const allCharacters = computed(() => {
+    // If we have guild contexts, use those
+    if (guilds.value.length > 0) {
+      return guilds.value
+    }
+    // Otherwise, convert Battle.net characters to a compatible format
+    return battlenetCharacters.value.map((char): GuildContext => ({
+      guildId: 'default',
+      guildName: 'No Guild',
+      characterName: char.name,
+      characterRealm: char.realm,
+      characterClass: char.className?.toUpperCase().replace(/ /g, '_') || 'WARRIOR',
+      characterMappingId: char.id, // Use character ID as mapping ID
+      raiderId: 0, // No raider linked
+      rank: null,
+      permissions: [],
+      isActive: false,
+    }))
+  })
 
   const canAccessSettings = computed(
     () => activeGuild.value?.permissions.includes('SETTINGS_ACCESS') ?? false
@@ -43,13 +67,21 @@ export const useGuildContextStore = defineStore('guildContext', () => {
 
   /**
    * Fetch all guilds for the current user.
+   * Also fetches Battle.net characters as fallback.
    */
   async function fetchGuilds(): Promise<void> {
     loading.value = true
     error.value = null
 
     try {
-      guilds.value = await fetchUserGuilds()
+      // Fetch both in parallel
+      const [guildContexts, bnetChars] = await Promise.all([
+        fetchUserGuilds(),
+        fetchUserCharacters(),
+      ])
+
+      guilds.value = guildContexts
+      battlenetCharacters.value = bnetChars
 
       // Find and set the active guild
       const active = guilds.value.find((g) => g.isActive)
@@ -58,10 +90,25 @@ export const useGuildContextStore = defineStore('guildContext', () => {
       } else if (guilds.value.length > 0) {
         // Auto-select first guild if none is active
         activeGuild.value = guilds.value[0]
+      } else if (bnetChars.length > 0) {
+        // Fall back to first Battle.net character if no guild contexts
+        activeGuild.value = {
+          guildId: 'default',
+          guildName: 'No Guild',
+          characterName: bnetChars[0].name,
+          characterRealm: bnetChars[0].realm,
+          characterClass: bnetChars[0].className?.toUpperCase().replace(/ /g, '_') || 'WARRIOR',
+          characterMappingId: bnetChars[0].id,
+          raiderId: 0,
+          rank: null,
+          permissions: [],
+          isActive: true,
+        }
       }
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch guilds'
       guilds.value = []
+      battlenetCharacters.value = []
       activeGuild.value = null
     } finally {
       loading.value = false
@@ -98,19 +145,44 @@ export const useGuildContextStore = defineStore('guildContext', () => {
    */
   function clear(): void {
     guilds.value = []
+    battlenetCharacters.value = []
     activeGuild.value = null
     error.value = null
+  }
+
+  /**
+   * Select a Battle.net character (when no guild contexts exist).
+   */
+  function selectBattlenetCharacter(characterId: number): void {
+    const char = battlenetCharacters.value.find((c) => c.id === characterId)
+    if (char) {
+      activeGuild.value = {
+        guildId: 'default',
+        guildName: 'No Guild',
+        characterName: char.name,
+        characterRealm: char.realm,
+        characterClass: char.className?.toUpperCase().replace(/ /g, '_') || 'WARRIOR',
+        characterMappingId: char.id,
+        raiderId: 0,
+        rank: null,
+        permissions: [],
+        isActive: true,
+      }
+    }
   }
 
   return {
     // State
     guilds,
     activeGuild,
+    battlenetCharacters,
     loading,
     error,
 
     // Computed
     hasMultipleGuilds,
+    hasMultipleCharacters,
+    allCharacters,
     canAccessSettings,
     canManageLoot,
     canManageMembers,
@@ -121,6 +193,7 @@ export const useGuildContextStore = defineStore('guildContext', () => {
     hasPermission,
     fetchGuilds,
     switchCharacter,
+    selectBattlenetCharacter,
     clear,
   }
 })

@@ -1,15 +1,19 @@
 package com.edgerush.lootman.api.auth
 
 import com.edgerush.lootman.domain.auth.model.User
+import com.edgerush.lootman.domain.auth.model.UserCharacterMapping
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.model.UserRefreshToken
 import com.edgerush.lootman.domain.auth.model.UserRole
 import com.edgerush.lootman.domain.auth.repository.RefreshTokenRepository
+import com.edgerush.lootman.domain.auth.repository.UserCharacterMappingRepository
 import com.edgerush.lootman.domain.auth.repository.UserRepository
 import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import com.edgerush.lootman.domain.shared.InvalidRefreshTokenException
+import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.UserAlreadyExistsException
 import com.edgerush.lootman.domain.shared.UserNotFoundException
+import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -33,6 +37,10 @@ class AuthenticationService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val oauth2Service: OAuth2Service,
     private val properties: OAuth2Properties,
+    private val blizzardDataService: com.edgerush.lootman.infrastructure.external.blizzard.BlizzardDataService,
+    private val userCharacterRepository: com.edgerush.lootman.domain.auth.repository.UserCharacterRepository,
+    private val raiderRepository: RaiderRepository,
+    private val userCharacterMappingRepository: UserCharacterMappingRepository,
 ) {
     private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
     private val secureRandom = SecureRandom()
@@ -105,11 +113,89 @@ class AuthenticationService(
         )
     }
 
+    // ============= Account Linking =============
+
     /**
-     * Authenticates a user via Battle.net OAuth2 callback.
+     * Links a Discord account to an existing user.
+     *
+     * @param userId The ID of the user to link
+     * @param code The OAuth2 authorization code from Discord
+     * @return Updated user profile
+     * @throws UserNotFoundException if user doesn't exist
+     * @throws UserAlreadyExistsException if Discord account is already linked to another user
+     */
+    fun linkDiscordAccount(
+        userId: UserId,
+        code: String,
+    ): UserProfileResponse {
+        val user =
+            userRepository.findById(userId)
+                ?: throw UserNotFoundException(userId.value)
+
+        val discordUser = oauth2Service.exchangeDiscordCode(code)
+
+        // Check if this Discord ID is already linked to another user
+        val existingUser = userRepository.findByDiscordId(discordUser.id)
+        if (existingUser != null && existingUser.id != userId) {
+            throw UserAlreadyExistsException("discordId", discordUser.id)
+        }
+
+        // Link Discord and update profile
+        val updatedUser =
+            userRepository.save(
+                user
+                    .linkDiscord(discordUser.id)
+                    .updateProfile(
+                        avatarUrl = discordUser.avatarUrl ?: user.avatarUrl,
+                    ),
+            )
+
+        logger.info("Discord account linked for user ${userId.value}: ${discordUser.id}")
+        return UserProfileResponse.from(updatedUser)
+    }
+
+    /**
+     * Links a Battle.net account to an existing user and syncs characters.
+     *
+     * @param userId The ID of the user to link
+     * @param code The OAuth2 authorization code from Battle.net
+     * @return Updated user profile
+     * @throws UserNotFoundException if user doesn't exist
+     * @throws UserAlreadyExistsException if Battle.net account is already linked to another user
+     */
+    fun linkBattlenetAccount(
+        userId: UserId,
+        code: String,
+    ): UserProfileResponse {
+        val user =
+            userRepository.findById(userId)
+                ?: throw UserNotFoundException(userId.value)
+
+        val authResult = oauth2Service.exchangeBattlenetCode(code)
+        val battlenetUser = authResult.userInfo
+
+        // Check if this Battle.net ID is already linked to another user
+        val existingUser = userRepository.findByBattlenetId(battlenetUser.sub)
+        if (existingUser != null && existingUser.id != userId) {
+            throw UserAlreadyExistsException("battlenetId", battlenetUser.sub)
+        }
+
+        // Link Battle.net account
+        val updatedUser = userRepository.save(user.linkBattlenet(battlenetUser.sub))
+        
+        // Sync characters
+        syncBattlenetCharacters(updatedUser, authResult.accessToken)
+
+        logger.info("Battle.net account linked for user ${userId.value}: ${battlenetUser.sub}")
+        return UserProfileResponse.from(updatedUser)
+    }
+    
+    /**
+     * Authenticates a user via Battle.net OAuth2 callback and syncs characters.
      */
     fun authenticateWithBattlenet(code: String): TokenResponse {
-        val battlenetUser = oauth2Service.exchangeBattlenetCode(code)
+        val authResult = oauth2Service.exchangeBattlenetCode(code)
+        val battlenetUser = authResult.userInfo
 
         // Find or create user
         val user =
@@ -128,6 +214,9 @@ class AuthenticationService(
                         username = battlenetUser.battletag,
                     ).recordLogin(),
                 )
+
+        // Sync characters
+        syncBattlenetCharacters(user, authResult.accessToken)
 
         return generateTokens(user)
     }
@@ -205,78 +294,76 @@ class AuthenticationService(
         logger.info("Local user logged in: ${updatedUser.username} (id=${updatedUser.id?.value})")
         return generateTokens(updatedUser)
     }
+    
+    private fun syncBattlenetCharacters(user: User, accessToken: String) {
+        try {
+            val characters = blizzardDataService.getAccountCharacters(accessToken)
+            val userCharacters = characters.map { char ->
+                com.edgerush.lootman.domain.auth.model.UserCharacter(
+                    userId = user.id!!,
+                    name = char.name,
+                    realm = char.realm.name,
+                    className = char.playable_class.name,  // Store raw class name from Blizzard
+                    level = char.level,
+                    race = char.playable_race.name,
+                    faction = char.faction.name,
+                    blizzardId = char.id
+                )
+            }.filter { it.level >= 70 } // Only sync max/near-max level chars to reduce noise, assuming TWW level cap is 80, 70 is decent start
 
-    // ============= Account Linking =============
+            userCharacterRepository.saveAll(userCharacters)
+            logger.info("Synced ${userCharacters.size} characters for user ${user.id!!.value}")
 
-    /**
-     * Links a Discord account to an existing user.
-     *
-     * @param userId The ID of the user to link
-     * @param code The OAuth2 authorization code from Discord
-     * @return Updated user profile
-     * @throws UserNotFoundException if user doesn't exist
-     * @throws UserAlreadyExistsException if Discord account is already linked to another user
-     */
-    fun linkDiscordAccount(
-        userId: UserId,
-        code: String,
-    ): UserProfileResponse {
-        val user =
-            userRepository.findById(userId)
-                ?: throw UserNotFoundException(userId.value)
-
-        val discordUser = oauth2Service.exchangeDiscordCode(code)
-
-        // Check if this Discord ID is already linked to another user
-        val existingUser = userRepository.findByDiscordId(discordUser.id)
-        if (existingUser != null && existingUser.id != userId) {
-            throw UserAlreadyExistsException("discordId", discordUser.id)
+            // Auto-link characters to raiders in guild roster
+            autoLinkCharactersToRaiders(user.id!!, userCharacters)
+        } catch (e: Exception) {
+            logger.error("Failed to sync Battle.net characters for user ${user.id?.value}", e)
+            // Swallow exception to not block login/linking
         }
-
-        // Link Discord and update profile
-        val updatedUser =
-            userRepository.save(
-                user
-                    .linkDiscord(discordUser.id)
-                    .updateProfile(
-                        avatarUrl = discordUser.avatarUrl ?: user.avatarUrl,
-                    ),
-            )
-
-        logger.info("Discord account linked for user ${userId.value}: ${discordUser.id}")
-        return UserProfileResponse.from(updatedUser)
     }
 
     /**
-     * Links a Battle.net account to an existing user.
-     *
-     * @param userId The ID of the user to link
-     * @param code The OAuth2 authorization code from Battle.net
-     * @return Updated user profile
-     * @throws UserNotFoundException if user doesn't exist
-     * @throws UserAlreadyExistsException if Battle.net account is already linked to another user
+     * Automatically links user's Battle.net characters to matching raiders in guild rosters.
+     * This allows the character selector dropdown to show all characters with their guild roles.
      */
-    fun linkBattlenetAccount(
-        userId: UserId,
-        code: String,
-    ): UserProfileResponse {
-        val user =
-            userRepository.findById(userId)
-                ?: throw UserNotFoundException(userId.value)
+    private fun autoLinkCharactersToRaiders(userId: UserId, characters: List<com.edgerush.lootman.domain.auth.model.UserCharacter>) {
+        var linkedCount = 0
+        var skippedCount = 0
 
-        val battlenetUser = oauth2Service.exchangeBattlenetCode(code)
+        for (character in characters) {
+            try {
+                // Find matching raider by character name and realm
+                val raider = raiderRepository.findByCharacterNameAndRealm(character.name, character.realm)
 
-        // Check if this Battle.net ID is already linked to another user
-        val existingUser = userRepository.findByBattlenetId(battlenetUser.sub)
-        if (existingUser != null && existingUser.id != userId) {
-            throw UserAlreadyExistsException("battlenetId", battlenetUser.sub)
+                if (raider != null) {
+                    val raiderId = raider.id  // Already a RaiderId
+
+                    // Check if already linked
+                    if (!userCharacterMappingRepository.existsByUserIdAndRaiderId(userId, raiderId)) {
+                        // Check if this is the first character for the user
+                        val isPrimary = userCharacterMappingRepository.countByUserId(userId) == 0L
+
+                        val mapping = UserCharacterMapping.create(
+                            userId = userId,
+                            raiderId = raiderId,
+                            isPrimary = isPrimary
+                        )
+
+                        userCharacterMappingRepository.save(mapping)
+                        linkedCount++
+                        logger.info("Auto-linked character ${character.name}-${character.realm} to raider ${raider.id.value} (guild: ${raider.guildId.value}, rank: ${raider.rank})")
+                    } else {
+                        skippedCount++
+                    }
+                }
+            } catch (e: Exception) {
+                logger.warn("Failed to auto-link character ${character.name}-${character.realm}: ${e.message}")
+            }
         }
 
-        // Link Battle.net account
-        val updatedUser = userRepository.save(user.linkBattlenet(battlenetUser.sub))
-
-        logger.info("Battle.net account linked for user ${userId.value}: ${battlenetUser.sub}")
-        return UserProfileResponse.from(updatedUser)
+        if (linkedCount > 0 || skippedCount > 0) {
+            logger.info("Auto-link complete for user ${userId.value}: $linkedCount new links, $skippedCount already linked")
+        }
     }
 
     // ============= Token Management =============

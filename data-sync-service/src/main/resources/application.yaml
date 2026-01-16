@@ -1,3 +1,8 @@
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    com.edgerush: DEBUG
 spring:
   application:
     name: data-sync-service
@@ -10,6 +15,23 @@ spring:
     enabled: true
     locations: classpath:db/migration/postgres
     baseline-on-migrate: true
+
+oauth2:
+  discord:
+    client-id: ${DISCORD_CLIENT_ID:}
+    client-secret: ${DISCORD_CLIENT_SECRET:}
+    redirect-uri: ${DISCORD_REDIRECT_URI:http://localhost/auth/discord/callback}
+    scopes: identify email
+  battlenet:
+    client-id: ${BATTLENET_CLIENT_ID:}
+    client-secret: ${BATTLENET_CLIENT_SECRET:}
+    redirect-uri: ${BATTLENET_REDIRECT_URI:http://localhost/auth/battlenet/callback}
+    region: ${BATTLENET_REGION:us}
+  jwt:
+    secret: ${JWT_SECRET:}
+    access-token-validity-minutes: 15
+    refresh-token-validity-days: 30
+    issuer: edgerush-lootman
 
 sync:
   cron: "0 0 4 * * *"
@@ -84,22 +106,7 @@ jwt:
   issuer: edgerush-lootman
 
 # OAuth2 Configuration
-oauth2:
-  discord:
-    client-id: ${DISCORD_CLIENT_ID:}
-    client-secret: ${DISCORD_CLIENT_SECRET:}
-    redirect-uri: ${DISCORD_REDIRECT_URI:http://localhost/auth/discord/callback}
-    scopes: identify email
-  battlenet:
-    client-id: ${BATTLENET_CLIENT_ID:}
-    client-secret: ${BATTLENET_CLIENT_SECRET:}
-    redirect-uri: ${BATTLENET_REDIRECT_URI:http://localhost/auth/battlenet/callback}
-    region: ${BATTLENET_REGION:us}
-  jwt:
-    secret: ${JWT_SECRET:}
-    access-token-validity-minutes: 15
-    refresh-token-validity-days: 30
-    issuer: edgerush-lootman
+
 
 # GraphQL Configuration
 graphql:

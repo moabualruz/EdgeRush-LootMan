@@ -126,7 +126,8 @@
       "Bash(docker exec:*)",
       "Bash(npm run test:e2e:*)",
       "Bash(npx playwright show-trace:*)",
-      "Bash(winpty docker exec edgerush-web-dashboard ls -la //usr/share/nginx/html/)"
+      "Bash(winpty docker exec edgerush-web-dashboard ls -la //usr/share/nginx/html/)",
+      "Bash(openssl rand:*)"
     ]
   }
 }

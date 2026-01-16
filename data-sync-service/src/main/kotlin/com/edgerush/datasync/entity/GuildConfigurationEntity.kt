@@ -29,4 +29,12 @@ data class GuildConfigurationEntity(
     val customBenchmarkRms: BigDecimal?,
     val customBenchmarkIpi: BigDecimal?,
     val benchmarkUpdatedAt: OffsetDateTime?,
+    // Battle.net guild roster config
+    val bnetRealmSlug: String? = null,
+    val bnetGuildNameSlug: String? = null,
+    val bnetRegion: String = "eu",
+    val bnetLastSyncAt: OffsetDateTime? = null,
+    val bnetLastSyncStatus: String? = null,
+    val bnetLastSyncError: String? = null,
+    val bnetSyncEnabled: Boolean = true,
 )

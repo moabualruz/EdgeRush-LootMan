@@ -92,7 +92,7 @@ onMounted(async () => {
         </div>
         <button
           @click="router.push('/login')"
-          class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-300 font-medium shadow-lg shadow-primary/20"
+          class="px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 font-medium shadow-lg shadow-primary/20"
         >
           Return to Login
         </button>

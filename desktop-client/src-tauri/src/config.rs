@@ -27,6 +27,8 @@ pub struct AppConfig {
     pub api_key: Option<String>,
     /// Guild ID for syncing
     pub guild_id: Option<String>,
+    /// Refresh token for session persistence
+    pub refresh_token: Option<String>,
     /// Enable automatic sync on file change
     #[serde(default = "default_true")]
     pub auto_sync: bool,
@@ -57,6 +59,7 @@ impl Default for AppConfig {
             api_url: default_api_url(),
             api_key: None,
             guild_id: None,
+            refresh_token: None,
             auto_sync: true,
             notifications_enabled: true,
             start_minimized: false,

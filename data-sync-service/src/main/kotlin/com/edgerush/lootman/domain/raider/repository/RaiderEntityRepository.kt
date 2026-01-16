@@ -33,4 +33,12 @@ interface RaiderEntityRepository {
     fun save(entity: RaiderEntity): RaiderEntity
 
     fun delete(id: Long)
+
+    fun findByCharacterNameAndRealm(characterName: String, realm: String): RaiderEntity?
+
+    fun findByBlizzardId(blizzardId: Long): RaiderEntity?
+
+    fun findByGuildId(guildId: String, offset: Long, limit: Int): List<RaiderEntity>
+
+    fun countByGuildId(guildId: String): Long
 }

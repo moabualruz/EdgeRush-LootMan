@@ -27,7 +27,9 @@ class JdbcGuildConfigurationRepository(
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
                    timezone, is_active, created_at, updated_at, benchmark_mode,
-                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
+                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at,
+                   bnet_realm_slug, bnet_guild_name_slug, bnet_region,
+                   bnet_last_sync_at, bnet_last_sync_status, bnet_last_sync_error, bnet_sync_enabled
             FROM guild_configurations
             WHERE id = ?
             """.trimIndent()
@@ -43,7 +45,9 @@ class JdbcGuildConfigurationRepository(
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
                    timezone, is_active, created_at, updated_at, benchmark_mode,
-                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
+                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at,
+                   bnet_realm_slug, bnet_guild_name_slug, bnet_region,
+                   bnet_last_sync_at, bnet_last_sync_status, bnet_last_sync_error, bnet_sync_enabled
             FROM guild_configurations
             WHERE guild_id = ?
             """.trimIndent()
@@ -68,7 +72,9 @@ class JdbcGuildConfigurationRepository(
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
                    timezone, is_active, created_at, updated_at, benchmark_mode,
-                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
+                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at,
+                   bnet_realm_slug, bnet_guild_name_slug, bnet_region,
+                   bnet_last_sync_at, bnet_last_sync_status, bnet_last_sync_error, bnet_sync_enabled
             FROM guild_configurations
             ORDER BY guild_name, id
             LIMIT ? OFFSET ?
@@ -92,7 +98,9 @@ class JdbcGuildConfigurationRepository(
                    wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                    sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
                    timezone, is_active, created_at, updated_at, benchmark_mode,
-                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
+                   custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at,
+                   bnet_realm_slug, bnet_guild_name_slug, bnet_region,
+                   bnet_last_sync_at, bnet_last_sync_status, bnet_last_sync_error, bnet_sync_enabled
             FROM guild_configurations
             WHERE is_active = true
             ORDER BY guild_name, id
@@ -129,8 +137,10 @@ class JdbcGuildConfigurationRepository(
                 wowaudit_guild_uri, wowaudit_base_url, sync_enabled, sync_cron_expression,
                 sync_run_on_startup, last_sync_at, last_sync_status, last_sync_error,
                 timezone, is_active, created_at, updated_at, benchmark_mode,
-                custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                custom_benchmark_rms, custom_benchmark_ipi, benchmark_updated_at,
+                bnet_realm_slug, bnet_guild_name_slug, bnet_region,
+                bnet_last_sync_at, bnet_last_sync_status, bnet_last_sync_error, bnet_sync_enabled
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -156,6 +166,13 @@ class JdbcGuildConfigurationRepository(
             entity.customBenchmarkRms?.let { ps.setBigDecimal(18, it) } ?: ps.setNull(18, java.sql.Types.DECIMAL)
             entity.customBenchmarkIpi?.let { ps.setBigDecimal(19, it) } ?: ps.setNull(19, java.sql.Types.DECIMAL)
             entity.benchmarkUpdatedAt?.let { ps.setTimestamp(20, Timestamp.from(it.toInstant())) } ?: ps.setNull(20, java.sql.Types.TIMESTAMP)
+            entity.bnetRealmSlug?.let { ps.setString(21, it) } ?: ps.setNull(21, java.sql.Types.VARCHAR)
+            entity.bnetGuildNameSlug?.let { ps.setString(22, it) } ?: ps.setNull(22, java.sql.Types.VARCHAR)
+            ps.setString(23, entity.bnetRegion)
+            entity.bnetLastSyncAt?.let { ps.setTimestamp(24, Timestamp.from(it.toInstant())) } ?: ps.setNull(24, java.sql.Types.TIMESTAMP)
+            entity.bnetLastSyncStatus?.let { ps.setString(25, it) } ?: ps.setNull(25, java.sql.Types.VARCHAR)
+            entity.bnetLastSyncError?.let { ps.setString(26, it) } ?: ps.setNull(26, java.sql.Types.VARCHAR)
+            ps.setBoolean(27, entity.bnetSyncEnabled)
             ps
         }, keyHolder)
 
@@ -185,7 +202,14 @@ class JdbcGuildConfigurationRepository(
                 benchmark_mode = ?,
                 custom_benchmark_rms = ?,
                 custom_benchmark_ipi = ?,
-                benchmark_updated_at = ?
+                benchmark_updated_at = ?,
+                bnet_realm_slug = ?,
+                bnet_guild_name_slug = ?,
+                bnet_region = ?,
+                bnet_last_sync_at = ?,
+                bnet_last_sync_status = ?,
+                bnet_last_sync_error = ?,
+                bnet_sync_enabled = ?
             WHERE id = ?
             """.trimIndent()
 
@@ -210,6 +234,13 @@ class JdbcGuildConfigurationRepository(
             entity.customBenchmarkRms,
             entity.customBenchmarkIpi,
             entity.benchmarkUpdatedAt?.let { Timestamp.from(it.toInstant()) },
+            entity.bnetRealmSlug,
+            entity.bnetGuildNameSlug,
+            entity.bnetRegion,
+            entity.bnetLastSyncAt?.let { Timestamp.from(it.toInstant()) },
+            entity.bnetLastSyncStatus,
+            entity.bnetLastSyncError,
+            entity.bnetSyncEnabled,
             entity.id,
         )
     }
@@ -238,6 +269,13 @@ class JdbcGuildConfigurationRepository(
                 customBenchmarkRms = rs.getBigDecimal("custom_benchmark_rms"),
                 customBenchmarkIpi = rs.getBigDecimal("custom_benchmark_ipi"),
                 benchmarkUpdatedAt = rs.getTimestamp("benchmark_updated_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                bnetRealmSlug = rs.getString("bnet_realm_slug"),
+                bnetGuildNameSlug = rs.getString("bnet_guild_name_slug"),
+                bnetRegion = rs.getString("bnet_region") ?: "eu",
+                bnetLastSyncAt = rs.getTimestamp("bnet_last_sync_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                bnetLastSyncStatus = rs.getString("bnet_last_sync_status"),
+                bnetLastSyncError = rs.getString("bnet_last_sync_error"),
+                bnetSyncEnabled = rs.getBoolean("bnet_sync_enabled"),
             )
         }
 }

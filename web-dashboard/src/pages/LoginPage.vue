@@ -212,7 +212,7 @@ async function loginWithBattlenet() {
             <button
               type="submit"
               :disabled="!isFormValid"
-              class="w-full py-3.5 px-4 bg-primary hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-0.5"
+              class="w-full py-3.5 px-4 bg-primary hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-bold rounded-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-0.5"
             >
               {{ mode === 'login' ? 'Sign In' : 'Create Account' }}
             </button>

@@ -43,6 +43,7 @@ impl SyncService {
             config.api_url.clone(),
             config.api_key.clone(),
             config.guild_id.clone(),
+            config.refresh_token.clone(),
         );
 
         Self {
@@ -123,6 +124,16 @@ impl SyncService {
         // Ensure cleanup happens
         let result = self.do_sync().await;
 
+        // Check for token refresh *after* sync, regardless of result
+        if let Some((new_access, new_refresh)) = self.api_client.take_refreshed_tokens() {
+            println!("Persisting refreshed tokens to config");
+            self.config.api_key = Some(new_access);
+            self.config.refresh_token = Some(new_refresh);
+            if let Err(e) = self.config.save() {
+                eprintln!("Failed to save config after token refresh: {}", e);
+            }
+        }
+
         let mut in_progress = self.sync_in_progress.lock().await;
         *in_progress = false;
 
@@ -161,6 +172,8 @@ impl SyncService {
                     }
                 }
                 Err(e) => {
+                    // Start of block that was not closed properly in previous view? 
+                    // No, it's just handling the error.
                     result.success = false;
                     result.message = Some(format!("Upload failed: {}", e));
                 }
@@ -243,7 +256,7 @@ EdgeRushLootManDB = {
         }
 
         self.config = config.clone();
-        self.api_client.update_config(config.api_key.clone(), config.guild_id.clone());
+        self.api_client.update_config(config.api_key.clone(), config.guild_id.clone(), config.refresh_token.clone());
 
         if was_running && config.is_configured() {
             self.start()?;

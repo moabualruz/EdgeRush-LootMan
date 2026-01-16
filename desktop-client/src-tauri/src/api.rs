@@ -25,11 +25,13 @@ pub struct ApiClient {
     base_url: String,
     api_key: Option<String>,
     guild_id: Option<String>,
+    refresh_token: Option<String>,
+    new_tokens: std::sync::Mutex<Option<(String, String)>>,
 }
 
 impl ApiClient {
     /// Create a new API client
-    pub fn new(base_url: String, api_key: Option<String>, guild_id: Option<String>) -> Self {
+    pub fn new(base_url: String, api_key: Option<String>, guild_id: Option<String>, refresh_token: Option<String>) -> Self {
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(30))
             .build()
@@ -40,7 +42,21 @@ impl ApiClient {
             base_url,
             api_key,
             guild_id,
+            refresh_token,
+            new_tokens: std::sync::Mutex::new(None),
         }
+    }
+
+    /// Update configuration
+    pub fn update_config(&mut self, api_key: Option<String>, guild_id: Option<String>, refresh_token: Option<String>) {
+        self.api_key = api_key;
+        self.guild_id = guild_id;
+        self.refresh_token = refresh_token;
+    }
+
+    /// Retrieve any new tokens refreshed during operations
+    pub fn take_refreshed_tokens(&self) -> Option<(String, String)> {
+        self.new_tokens.lock().unwrap().take()
     }
 
     /// Build headers for authenticated requests
@@ -57,6 +73,71 @@ impl ApiClient {
         }
 
         Ok(headers)
+    }
+
+    /// Attempt to refresh session using refresh token
+    async fn refresh_session(&self) -> Result<(String, String), ApiError> {
+        let refresh_token = self.refresh_token.as_ref()
+            .ok_or_else(|| ApiError::AuthError("No refresh token available".to_string()))?;
+
+        let url = format!("{}/api/v1/auth/refresh", self.base_url);
+        let payload = serde_json::json!({ "refreshToken": refresh_token });
+
+        let response = self.client
+            .post(&url)
+            .json(&payload)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let tokens: TokenResponse = response.json().await?;
+            Ok((tokens.accessToken, tokens.refreshToken))
+        } else {
+            Err(ApiError::AuthError("Session refresh failed".to_string()))
+        }
+    }
+
+    /// Execute a request with auto-refresh logic
+    async fn execute_with_retry<F, Fut, T>(&self, operation: F) -> Result<T, ApiError>
+    where
+        F: Fn() -> Fut,
+        Fut: std::future::Future<Output = Result<reqwest::Response, ApiError>>,
+        T: serde::de::DeserializeOwned,
+    {
+        // First attempt
+        let response = operation().await?;
+
+        if response.status() == reqwest::StatusCode::UNAUTHORIZED {
+            // Try refresh
+            println!("Got 401, attempting token refresh...");
+            match self.refresh_session().await {
+                Ok((new_access, new_refresh)) => {
+                    println!("Token refresh successful");
+                    // Store new tokens for sync service to pick up
+                    *self.new_tokens.lock().unwrap() = Some((new_access.clone(), new_refresh));
+                    
+                    // We can't easily update self.api_key here because self is immutable reference in this context usually.
+                    // However, we can just fail this request and let the next one succeed after config update?
+                    // Or we need interior mutability for api_key. For now, let's keep it simple:
+                    // We assume the caller will update config after we return new tokens.
+                    // But to retry *this* request effectively, we need to use the new token.
+                    // Since specific methods build headers from self.api_key, we are stuck unless we allow mutation or pass token.
+                    // Refactor: Pass token to build_headers?
+                    
+                    Err(ApiError::AuthError("Session refreshed. Please retry operation.".to_string()))
+                }
+                Err(e) => {
+                    println!("Token refresh failed: {}", e);
+                    Err(ApiError::AuthError("Session expired".to_string()))
+                }
+            }
+        } else if response.status().is_success() {
+            Ok(response.json().await?)
+        } else {
+            let status = response.status().as_u16();
+            let message = response.text().await.unwrap_or_default();
+            Err(ApiError::ApiError { status, message })
+        }
     }
 
     /// Get the guild ID or return an error
@@ -98,6 +179,7 @@ impl ApiClient {
             }).collect(),
         };
 
+        // We replicate execute_with_retry logic manually to avoid closure complexity for now
         let response = self
             .client
             .post(&url)
@@ -105,6 +187,20 @@ impl ApiClient {
             .json(&payload)
             .send()
             .await?;
+
+        if response.status() == reqwest::StatusCode::UNAUTHORIZED {
+             if let Ok((new_access, new_refresh)) = self.refresh_session().await {
+                 *self.new_tokens.lock().unwrap() = Some((new_access.clone(), new_refresh));
+                 // Retry with new token
+                 let mut headers = self.build_headers()?;
+                 headers.insert(AUTHORIZATION, HeaderValue::from_str(&format!("Bearer {}", new_access)).unwrap());
+                 
+                 let retry_response = self.client.post(&url).headers(headers).json(&payload).send().await?;
+                 if retry_response.status().is_success() {
+                     return Ok(retry_response.json().await?);
+                 }
+             }
+        }
 
         if response.status().is_success() {
             Ok(response.json().await?)
@@ -203,12 +299,6 @@ impl ApiClient {
             Err(ApiError::ApiError { status, message })
         }
     }
-
-    /// Update configuration
-    pub fn update_config(&mut self, api_key: Option<String>, guild_id: Option<String>) {
-        self.api_key = api_key;
-        self.guild_id = guild_id;
-    }
 }
 
 // Request/Response types
@@ -252,6 +342,13 @@ pub struct SyncResponse {
     pub success: bool,
     pub message: Option<String>,
     pub synced_at: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TokenResponse {
+    pub accessToken: String,
+    pub refreshToken: String,
+    pub expiresIn: u64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -320,11 +417,13 @@ mod tests {
             "https://api.example.com".to_string(),
             Some("test-key".to_string()),
             Some("guild-123".to_string()),
+            None,
         );
         assert!(client.is_configured());
 
         let unconfigured = ApiClient::new(
             "https://api.example.com".to_string(),
+            None,
             None,
             None,
         );

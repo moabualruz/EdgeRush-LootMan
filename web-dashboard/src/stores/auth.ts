@@ -12,6 +12,7 @@ interface TokenResponse {
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(localStorage.getItem('token'))
+  const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'))
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'ADMIN' || user.value?.role === 'OFFICER')
@@ -24,19 +25,30 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.get<User>('/v1/auth/me')
       user.value = response.data
     } catch {
-      logout()
+      // Don't logout immediately on fetch failure, let interceptor handle 401
+      // But if it's a hard failure (e.g. 404), maybe we should.
+      // For now, assume interceptor handles auth failures.
     }
   }
 
-  function setToken(newToken: string) {
+  function setTokens(newToken: string, newRefreshToken: string) {
     token.value = newToken
+    refreshToken.value = newRefreshToken
     localStorage.setItem('token', newToken)
+    localStorage.setItem('refreshToken', newRefreshToken)
   }
 
   function logout() {
+    // Optional: Call backend logout
+    if (token.value) {
+        api.post('/v1/auth/logout').catch(() => {})
+    }
+    
     user.value = null
     token.value = null
+    refreshToken.value = null
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
   }
 
   async function register(username: string, email: string, password: string, role: string = 'RAIDER'): Promise<void> {
@@ -46,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
       password,
       role,
     })
-    setToken(response.data.accessToken)
+    setTokens(response.data.accessToken, response.data.refreshToken)
     await fetchUser()
   }
 
@@ -55,13 +67,13 @@ export const useAuthStore = defineStore('auth', () => {
       usernameOrEmail,
       password,
     })
-    setToken(response.data.accessToken)
+    setTokens(response.data.accessToken, response.data.refreshToken)
     await fetchUser()
   }
 
   async function loginWithDiscord(code: string): Promise<void> {
     const response = await api.post<TokenResponse>('/v1/auth/discord/callback', { code })
-    setToken(response.data.accessToken)
+    setTokens(response.data.accessToken, response.data.refreshToken)
     await fetchUser()
   }
 
@@ -77,7 +89,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function loginWithBattlenet(code: string): Promise<void> {
     const response = await api.post<TokenResponse>('/v1/auth/battlenet/callback', { code })
-    setToken(response.data.accessToken)
+    setTokens(response.data.accessToken, response.data.refreshToken)
     await fetchUser()
   }
 
@@ -99,11 +111,12 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     token,
+    refreshToken,
     isAuthenticated,
     isAdmin,
     guildId,
     fetchUser,
-    setToken,
+    setTokens,
     logout,
     register,
     loginLocal,

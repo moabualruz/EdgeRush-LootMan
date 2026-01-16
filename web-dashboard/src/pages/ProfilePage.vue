@@ -2,12 +2,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/api/client'
+import { fetchUserCharacters, type UserCharacter } from '@/api/user'
 
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
 const discordUrl = ref('')
 const battlenetUrl = ref('')
+const characters = ref<UserCharacter[]>([])
+const loadingCharacters = ref(false)
 
 // Format date helper
 const formatDate = (dateStr: string | undefined) => {
@@ -17,6 +20,45 @@ const formatDate = (dateStr: string | undefined) => {
     month: 'long',
     day: 'numeric'
   })
+}
+
+// Class color helper
+const getClassColor = (className: string) => {
+  const map: Record<string, string> = {
+    'DEATH_KNIGHT': 'bg-[#C41E3A]/20 text-[#C41E3A]',
+    'DEMON_HUNTER': 'bg-[#A330C9]/20 text-[#A330C9]',
+    'DRUID': 'bg-[#FF7D0A]/20 text-[#FF7D0A]',
+    'EVOKER': 'bg-[#33937F]/20 text-[#33937F]',
+    'HUNTER': 'bg-[#ABD473]/20 text-[#ABD473]',
+    'MAGE': 'bg-[#69CCF0]/20 text-[#69CCF0]',
+    'MONK': 'bg-[#00FF96]/20 text-[#00FF96]',
+    'PALADIN': 'bg-[#F58CBA]/20 text-[#F58CBA]',
+    'PRIEST': 'bg-[#FFFFFF]/20 text-[#FFFFFF]',
+    'ROGUE': 'bg-[#FFF569]/20 text-[#FFF569]',
+    'SHAMAN': 'bg-[#0070DE]/20 text-[#0070DE]',
+    'WARLOCK': 'bg-[#9482C9]/20 text-[#9482C9]',
+    'WARRIOR': 'bg-[#C79C6E]/20 text-[#C79C6E]',
+  }
+  return map[className] || 'bg-gray-500/20 text-gray-500'
+}
+
+const getClassColorText = (className: string) => {
+   const map: Record<string, string> = {
+    'DEATH_KNIGHT': 'text-[#C41E3A]',
+    'DEMON_HUNTER': 'text-[#A330C9]',
+    'DRUID': 'text-[#FF7D0A]',
+    'EVOKER': 'text-[#33937F]',
+    'HUNTER': 'text-[#ABD473]',
+    'MAGE': 'text-[#69CCF0]',
+    'MONK': 'text-[#00FF96]',
+    'PALADIN': 'text-[#F58CBA]',
+    'PRIEST': 'text-[#FFFFFF]',
+    'ROGUE': 'text-[#FFF569]',
+    'SHAMAN': 'text-[#0070DE]',
+    'WARLOCK': 'text-[#9482C9]',
+    'WARRIOR': 'text-[#C79C6E]',
+  }
+  return map[className] || 'text-gray-500'
 }
 
 // Fetch OAuth URLs
@@ -32,8 +74,22 @@ const fetchOAuthUrls = async () => {
   }
 }
 
+const loadCharacters = async () => {
+  if (!user.value?.battlenetId) return
+  
+  loadingCharacters.value = true
+  try {
+    characters.value = await fetchUserCharacters()
+  } catch (e) {
+    console.error("Failed to load characters", e)
+  } finally {
+    loadingCharacters.value = false
+  }
+}
+
 onMounted(() => {
   fetchOAuthUrls()
+  loadCharacters()
 })
 </script>
 
@@ -147,6 +203,42 @@ onMounted(() => {
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
               Account Linked
             </button>
+          </div>
+        </div>
+      </div>
+      <!-- User Characters Card -->
+      <div class="glass-card p-6 border-white/10 flex flex-col h-full bg-gradient-to-br from-black/40 to-black/20 lg:col-span-2">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            My Characters
+          </h2>
+          <a v-if="user?.battlenetId" :href="battlenetUrl" class="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            Refresh Characters
+          </a>
+        </div>
+
+        <div v-if="loadingCharacters" class="text-center py-8 text-muted-foreground">
+          <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Loading characters...
+        </div>
+
+        <div v-else-if="characters.length === 0" class="text-center py-8 text-muted-foreground border border-dashed border-white/10 rounded-xl bg-white/5">
+          <div v-if="!user?.battlenetId">Link your Battle.net account to see your characters.</div>
+          <div v-else>No max-level characters found on your Battle.net account.</div>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-for="char in characters" :key="char.id" class="p-3 rounded-lg bg-white/5 border border-white/10 flex items-center gap-3 hover:bg-white/10 transition-colors">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border border-white/20" :class="getClassColor(char.className)">
+              {{ char.level }}
+            </div>
+            <div class="overflow-hidden">
+               <div class="font-medium text-white truncate" :class="getClassColorText(char.className)">{{ char.name }}</div>
+               <div class="text-xs text-muted-foreground truncate">{{ char.realm }} ({{ char.faction }})</div>
+               <div class="text-[10px] text-muted-foreground/60 uppercase tracking-widest">{{ char.className }} - {{ char.race }}</div>
+            </div>
           </div>
         </div>
       </div>

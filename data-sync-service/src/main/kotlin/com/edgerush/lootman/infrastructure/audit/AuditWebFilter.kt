@@ -60,7 +60,7 @@ class AuditWebFilter(
         method: HttpMethod?,
         path: String,
     ): Boolean {
-        if (method !in WRITE_METHODS) {
+        if (method == null || method !in WRITE_METHODS) {
             return false
         }
 

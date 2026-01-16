@@ -4,6 +4,7 @@ import com.edgerush.lootman.domain.shared.GuildNotFoundException
 import com.edgerush.lootman.domain.shared.ItemNotFoundException
 import com.edgerush.lootman.domain.shared.LootBanActiveException
 import com.edgerush.lootman.domain.shared.RaiderNotFoundException
+import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -86,6 +87,23 @@ class GlobalExceptionHandler {
     }
 
     /**
+     * Handle InvalidCredentialsException as 401 Unauthorized.
+     */
+    @ExceptionHandler(InvalidCredentialsException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleInvalidCredentialsException(ex: InvalidCredentialsException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.UNAUTHORIZED.value(),
+                    error = "Unauthorized",
+                    message = ex.message ?: "Invalid credentials",
+                ),
+            )
+    }
+
+    /**
      * Handle IllegalArgumentException as 400 Bad Request.
      */
     @ExceptionHandler(IllegalArgumentException::class)
@@ -140,11 +158,19 @@ class GlobalExceptionHandler {
      * Handle generic exceptions.
      * This catches Spring's parameter binding exceptions and other errors.
      */
+    private val logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
+    /**
+     * Handle generic exceptions.
+     * This catches Spring's parameter binding exceptions and other errors.
+     */
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResponseEntity<ErrorResponse> {
         return if (isParameterBindingException(ex)) {
+            logger.warn("Parameter binding exception: ${ex.message}", ex)
             createBadRequestResponse(ex.message)
         } else {
+            logger.error("Unhandled exception occurred", ex)
             createInternalServerErrorResponse()
         }
     }
@@ -156,7 +182,8 @@ class GlobalExceptionHandler {
         val exceptionName = ex::class.simpleName ?: ""
         return exceptionName.contains("MissingServletRequestParameter") ||
             exceptionName.contains("MethodArgumentTypeMismatch") ||
-            exceptionName.contains("BindException")
+            exceptionName.contains("BindException") ||
+            ex is org.springframework.web.server.ServerWebInputException
     }
 
     /**
