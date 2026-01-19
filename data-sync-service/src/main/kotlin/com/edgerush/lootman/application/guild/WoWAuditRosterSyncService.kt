@@ -157,7 +157,8 @@ class WoWAuditRosterSyncService(
         val wowauditId = element.path("id").asLong(-1).takeIf { it > 0 }
         val clazz = element.path("class").asText("")
         val spec = element.path("spec").asText("")
-        val role = element.path("role").asText("")
+        val rawRole = element.path("role").asText("")
+        val role = normalizeRole(rawRole)
         val rank = element.path("rank").asText(null)?.takeIf { it.isNotBlank() }
         val status = element.path("status").asText(null)?.takeIf { it.isNotBlank() }
         val note = element.path("note").asText(null)?.takeIf { it.isNotBlank() }
@@ -349,6 +350,21 @@ class WoWAuditRosterSyncService(
 
     private fun JsonNode.asDoubleOrNull(): Double? {
         return if (this.isNumber) this.asDouble() else null
+    }
+
+    /**
+     * Normalize WoWAudit role names to FLPS domain roles.
+     *
+     * WoWAudit uses: Melee, Ranged, Heal, Tank
+     * FLPS expects: DPS, HEALER, TANK
+     */
+    private fun normalizeRole(wowauditRole: String): String {
+        return when (wowauditRole.lowercase()) {
+            "melee", "ranged" -> "DPS"
+            "heal", "healer" -> "HEALER"
+            "tank" -> "TANK"
+            else -> "DPS" // Default to DPS for unknown/empty roles
+        }
     }
 
     private enum class UpsertResult {

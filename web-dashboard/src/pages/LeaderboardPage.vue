@@ -89,38 +89,21 @@ const isCurrentUser = (characterName: string) => {
           <tr
             v-for="entry in data.entries"
             :key="entry.raiderId"
-            :class="[
-              isCurrentUser(entry.characterName) ? 'bg-primary-900/30' : 'hover:bg-gray-700/30',
-              'transition-colors'
-            ]"
+            class="hover:bg-gray-700/30 transition-colors"
           >
             <td class="px-4 py-3">
-              <span
-                :class="[
-                  'font-semibold',
-                  entry.rank === 1 ? 'text-yellow-400' : '',
-                  entry.rank === 2 ? 'text-gray-300' : '',
-                  entry.rank === 3 ? 'text-amber-600' : ''
-                ]"
-              >
-                {{ entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}` }}
+              <span class="font-semibold">
+                {{ entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : `#${entry.rank}` }}
               </span>
             </td>
             <td class="px-4 py-3">
-              <span :class="['font-medium', getClassColor(entry.characterClass)]">
+              <span class="font-medium" :class="getClassColor(entry.characterClass)">
                 {{ entry.characterName }}
               </span>
-              <span v-if="isCurrentUser(entry.characterName)" class="ml-2 text-xs text-primary-400">(You)</span>
             </td>
             <td class="px-4 py-3 text-gray-400">{{ entry.role }}</td>
-            <td class="px-4 py-3 text-right font-mono">
-              <span
-                :class="[
-                  entry.flps >= 0.8 ? 'text-score-high' : entry.flps >= 0.5 ? 'text-score-medium' : 'text-score-low'
-                ]"
-              >
+            <td class="px-4 py-3 text-right font-mono text-score-low">
                 {{ formatScore(entry.flps) }}
-              </span>
             </td>
             <td class="px-4 py-3 text-center">
               <span :class="entry.eligible ? 'text-green-400' : 'text-red-400'">
