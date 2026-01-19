@@ -1,6 +1,7 @@
 package com.edgerush.lootman.infrastructure.shared
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -198,7 +199,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("characterName = ?") && it.contains("realm = ?") },
+                    match<String> { it.contains("character_name") && it.contains("realm = ?") },
                     any<RowMapper<Raider>>(),
                     eq(characterName),
                     eq(realm),
@@ -213,7 +214,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
             // Then
             result shouldNotBe null
-            result?.characterName shouldBe characterName
+            result?.name shouldBe characterName
             result?.realm shouldBe realm
         }
 
@@ -225,7 +226,7 @@ class JdbcRaiderRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("characterName = ?") && it.contains("realm = ?") },
+                    match<String> { it.contains("character_name") && it.contains("realm = ?") },
                     any<RowMapper<Raider>>(),
                     eq(characterName),
                     eq(realm),
@@ -825,19 +826,31 @@ class JdbcRaiderRepositoryTest : UnitTest() {
         status: String? = "ACTIVE",
         joinDate: LocalDateTime? = null,
         wowauditId: Long? = null,
+        characterId: Long = id + 10000L,
+        region: String = "eu",
+        blizzardId: Long? = null,
+        accountId: Long? = null,
     ): ResultSet {
-        val rs = mockk<ResultSet>()
+        val rs = mockk<ResultSet>(relaxed = true)
         every { rs.getLong("id") } returns id
-        every { rs.getString("characterName") } returns characterName
+        every { rs.getString("character_name") } returns characterName
         every { rs.getString("realm") } returns realm
         every { rs.getString("guild_id") } returns guildId
-        every { rs.getString("characterClass") } returns characterClass
+        every { rs.getString("character_class") } returns characterClass
         every { rs.getString("role") } returns role
         every { rs.getString("rank") } returns rank
         every { rs.getString("status") } returns status
-        every { rs.getTimestamp("joinDate") } returns joinDate?.let { Timestamp.valueOf(it) }
-        every { rs.getLong("wowauditId") } returns (wowauditId ?: 0L)
-        every { rs.wasNull() } returns (wowauditId == null)
+        every { rs.getTimestamp("join_date") } returns joinDate?.let { Timestamp.valueOf(it) }
+        every { rs.getLong("wowaudit_id") } returns (wowauditId ?: 0L)
+        // New columns for WoWCharacter hierarchy
+        every { rs.getLong("character_id") } returns characterId
+        every { rs.getString("region") } returns region
+        every { rs.getLong("blizzard_id") } returns (blizzardId ?: 0L)
+        every { rs.getLong("account_id") } returns (accountId ?: 0L)
+        every { rs.getTimestamp("created_at") } returns Timestamp.valueOf(LocalDateTime.now())
+        every { rs.getTimestamp("updated_at") } returns Timestamp.valueOf(LocalDateTime.now())
+        // wasNull needs to handle multiple nullable columns
+        every { rs.wasNull() } returns false
         return rs
     }
 
@@ -846,23 +859,24 @@ class JdbcRaiderRepositoryTest : UnitTest() {
         guildId: GuildId = GuildId("test-guild"),
         characterName: String = "TestRaider",
         realm: String = "Area52",
+        region: String = "eu",
         characterClass: CharacterClass = CharacterClass.WARRIOR,
         role: Role = Role.DPS,
         rank: String? = null,
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = null,
         wowauditId: Long? = null,
-    ): Raider =
-        Raider(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = id,
+        guildId = guildId,
+        name = characterName,
+        realm = realm,
+        region = region,
+        characterClass = characterClass,
+        role = role,
+        rank = rank,
+        status = status,
+        joinDate = joinDate,
+        wowauditId = wowauditId,
+    )
 }

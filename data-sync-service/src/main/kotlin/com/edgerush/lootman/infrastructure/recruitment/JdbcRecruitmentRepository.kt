@@ -55,10 +55,11 @@ class JdbcRecruitmentRepository(
             """
             jdbcTemplate.update(
                 sql,
-                entity.status, entity.reviewedBy, 
+                entity.status,
+                entity.reviewedBy,
                 entity.reviewedAt?.let { Timestamp.from(it.toInstant()) },
                 Timestamp.from(entity.updatedAt.toInstant()),
-                entity.id
+                entity.id,
             )
         } else {
             val sql = """

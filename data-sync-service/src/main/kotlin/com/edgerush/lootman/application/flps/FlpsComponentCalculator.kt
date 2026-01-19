@@ -286,17 +286,18 @@ class FlpsComponentCalculator(
 
     /**
      * Calculate Role Multiplier based on raider's role.
+     *
+     * Role multipliers give priority to DPS since they compete for more loot:
+     * - DPS: 1.0 (baseline)
+     * - Tank: 0.8 (fewer gear slots contested, lower priority)
+     * - Healer: 0.7 (fewer gear slots contested, lowest priority)
      */
     fun calculateRoleMultiplier(role: Role): RoleMultiplier {
-        // Default multipliers (can be made guild-configurable)
-        val value =
-            when (role) {
-                Role.TANK -> 1.0
-                Role.HEALER -> 1.0
-                Role.DPS -> 1.0
-            }
-
-        return RoleMultiplier.of(value)
+        return when (role) {
+            Role.DPS -> RoleMultiplier.dps()       // 1.0
+            Role.TANK -> RoleMultiplier.tank()     // 0.8
+            Role.HEALER -> RoleMultiplier.healer() // 0.7
+        }
     }
 
     /**

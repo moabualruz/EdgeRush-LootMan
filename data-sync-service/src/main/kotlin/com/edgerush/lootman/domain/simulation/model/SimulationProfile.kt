@@ -8,7 +8,6 @@ import java.time.Instant
  * Contains the SimC-formatted profile content that can be used
  * to run gear upgrade simulations via Docker.
  */
-@ConsistentCopyVisibility
 data class SimulationProfile(
     val id: Long? = null,
     val guildId: String,

@@ -171,7 +171,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> {
                         it.contains("SELECT") &&
-                            it.contains("raiderId = ?") &&
+                            it.contains("raider_id = ?") &&
                             it.contains("guild_id = ?") &&
                             it.contains("is_active = true")
                     },
@@ -206,7 +206,7 @@ class JdbcLootBanRepositoryTest : UnitTest() {
                 jdbcTemplate.query(
                     match<String> {
                         it.contains("SELECT") &&
-                            it.contains("raiderId = ?") &&
+                            it.contains("raider_id = ?") &&
                             it.contains("guild_id = ?")
                     },
                     any<RowMapper<LootBan>>(),
@@ -392,11 +392,11 @@ class JdbcLootBanRepositoryTest : UnitTest() {
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("id") } returns id
-        every { rs.getString("raiderId") } returns raiderId.toString()
+        every { rs.getString("raider_id") } returns raiderId.toString()
         every { rs.getString("guild_id") } returns guildId
         every { rs.getString("reason") } returns reason
-        every { rs.getTimestamp("bannedAt") } returns Timestamp.from(bannedAt)
-        every { rs.getTimestamp("expiresAt") } returns expiresAt?.let { Timestamp.from(it) }
+        every { rs.getTimestamp("banned_at") } returns Timestamp.from(bannedAt)
+        every { rs.getTimestamp("expires_at") } returns expiresAt?.let { Timestamp.from(it) }
         every { rs.getBoolean("is_active") } returns true
         return rs
     }

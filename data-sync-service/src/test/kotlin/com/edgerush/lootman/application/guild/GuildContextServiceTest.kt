@@ -94,6 +94,9 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId(guildId) } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(GuildId(guildId), "Officer") } returns listOf(permission)
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns mapOf(
+                Pair(guildId, "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS)
+            )
 
             // When
             val result = service.getUserGuilds(userId)
@@ -124,6 +127,7 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId(guildId) } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(GuildId(guildId), "Officer") } returns emptyList()
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns emptyMap()
 
             // When
             val result = service.getUserGuilds(userId)
@@ -149,6 +153,7 @@ class GuildContextServiceTest : UnitTest() {
             every { guildConfigurationRepository.findByGuildId("guild-1") } returns null
             every { guildConfigurationRepository.findByGuildId("guild-2") } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(any(), any()) } returns emptyList()
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns emptyMap()
 
             // When
             val result = service.getUserGuilds(userId)
@@ -244,6 +249,7 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId("test-guild") } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(any(), any()) } returns emptyList()
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns emptyMap()
 
             // When
             val result = service.getActiveGuildContext(userId)
@@ -268,6 +274,7 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(200L) } returns raider2
             every { guildConfigurationRepository.findByGuildId(any()) } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(any(), any()) } returns emptyList()
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns emptyMap()
 
             // When
             val result = service.getActiveGuildContext(userId)
@@ -297,6 +304,7 @@ class GuildContextServiceTest : UnitTest() {
             every { userPreferencesRepository.findByUserId(userId) } returns preferences
             every { guildConfigurationRepository.findByGuildId("test-guild") } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(any(), any()) } returns emptyList()
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns emptyMap()
 
             // When
             val result = service.setActiveCharacter(userId, mappingId)
@@ -520,6 +528,9 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId("test-guild") } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(GuildId("test-guild"), "Officer") } returns listOf(permission)
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns mapOf(
+                Pair("test-guild", "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS)
+            )
 
             // When
             val result = service.hasActiveGuildPermission(userId, GuildPermissionType.SETTINGS_ACCESS)

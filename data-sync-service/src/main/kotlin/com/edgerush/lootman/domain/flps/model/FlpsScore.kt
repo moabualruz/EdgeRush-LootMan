@@ -8,6 +8,7 @@ package com.edgerush.lootman.domain.flps.model
  *
  * This is an immutable value object that validates its range on construction.
  */
+@ConsistentCopyVisibility
 data class FlpsScore private constructor(val value: Double) {
     init {
         require(value in 0.0..1.0) {

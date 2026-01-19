@@ -13,15 +13,15 @@ import org.springframework.stereotype.Repository
  * JDBC implementation of WishlistRepository.
  *
  * Persists Wishlist aggregates to the wishlist_items table.
- * Column names follow the JPA naming conventions from V0021 migration.
+ * Uses snake_case column names as per V0046 migration.
  *
  * Database column mappings:
- * - raiderId -> raider ID (Long)
- * - itemId -> WoW item ID (Long)
- * - itemName -> item name (String)
+ * - raider_id -> raider ID (Long)
+ * - item_id -> WoW item ID (Long)
+ * - item_name -> item name (String)
  * - priority -> priority rank (Int)
- * - upgradePercentage -> upgrade value percentage (Double)
- * - specName -> specialization name (String?)
+ * - upgrade_percentage -> upgrade value percentage (Double)
+ * - spec_name -> specialization name (String?)
  */
 @Repository
 class JdbcWishlistRepository(
@@ -30,9 +30,9 @@ class JdbcWishlistRepository(
     override fun findByRaiderId(raiderId: RaiderId): Wishlist? {
         val sql =
             """
-            SELECT itemId, itemName, priority, upgradePercentage, specName
+            SELECT item_id, item_name, priority, upgrade_percentage, spec_name
             FROM wishlist_items
-            WHERE raiderId = ?
+            WHERE raider_id = ?
             ORDER BY priority ASC
             """.trimIndent()
 
@@ -47,14 +47,14 @@ class JdbcWishlistRepository(
 
     override fun save(wishlist: Wishlist): Wishlist {
         // Delete existing wishlist items for this raider
-        val deleteSql = "DELETE FROM wishlist_items WHERE raiderId = ?"
+        val deleteSql = "DELETE FROM wishlist_items WHERE raider_id = ?"
         jdbcTemplate.update(deleteSql, wishlist.raiderId.value)
 
         // Insert new wishlist items
         val insertSql =
             """
             INSERT INTO wishlist_items (
-                raiderId, itemId, itemName, priority, upgradePercentage, specName
+                raider_id, item_id, item_name, priority, upgrade_percentage, spec_name
             ) VALUES (?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
@@ -74,18 +74,18 @@ class JdbcWishlistRepository(
     }
 
     override fun delete(raiderId: RaiderId) {
-        val sql = "DELETE FROM wishlist_items WHERE raiderId = ?"
+        val sql = "DELETE FROM wishlist_items WHERE raider_id = ?"
         jdbcTemplate.update(sql, raiderId.value)
     }
 
     private val wishlistItemRowMapper =
         RowMapper { rs, _ ->
             WishlistItem(
-                itemId = ItemId(rs.getLong("itemId")),
-                itemName = rs.getString("itemName") ?: "Unknown Item",
+                itemId = ItemId(rs.getLong("item_id")),
+                itemName = rs.getString("item_name") ?: "Unknown Item",
                 priority = rs.getInt("priority"),
-                upgradePercentage = rs.getDouble("upgradePercentage"),
-                specName = rs.getString("specName"),
+                upgradePercentage = rs.getDouble("upgrade_percentage"),
+                specName = rs.getString("spec_name"),
             )
         }
 }

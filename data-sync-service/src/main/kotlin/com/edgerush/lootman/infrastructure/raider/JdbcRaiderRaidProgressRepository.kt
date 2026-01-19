@@ -2,96 +2,53 @@ package com.edgerush.lootman.infrastructure.raider
 
 import com.edgerush.datasync.entity.RaiderRaidProgressEntity
 import com.edgerush.lootman.domain.raider.repository.RaiderRaidProgressRepository
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
+import com.edgerush.lootman.infrastructure.springdata.RaiderRaidProgressEntitySpringRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
-import java.sql.Statement
 
+/**
+ * Implementation of RaiderRaidProgressRepository that delegates to Spring Data JDBC.
+ */
 @Repository
-class JdbcRaiderRaidProgressRepository(private val jdbcTemplate: JdbcTemplate) : RaiderRaidProgressRepository {
+class JdbcRaiderRaidProgressRepository(
+    private val springRepository: RaiderRaidProgressEntitySpringRepository,
+) : RaiderRaidProgressRepository {
+
     override fun findById(id: Long): RaiderRaidProgressEntity? =
-        jdbcTemplate.query("SELECT * FROM raider_raid_progress WHERE id = ?", rowMapper, id).firstOrNull()
+        springRepository.findById(id).orElse(null)
 
     override fun existsById(id: Long): Boolean =
-        (jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_raid_progress WHERE id = ?", Int::class.java, id) ?: 0) > 0
+        springRepository.existsById(id)
 
-    override fun findAll(
-        offset: Long,
-        limit: Int,
-    ): List<RaiderRaidProgressEntity> =
-        jdbcTemplate.query("SELECT * FROM raider_raid_progress ORDER BY id LIMIT ? OFFSET ?", rowMapper, limit, offset)
-
-    override fun count(): Long = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_raid_progress", Long::class.java) ?: 0L
-
-    override fun findByRaiderId(
-        raiderId: Long,
-        offset: Long,
-        limit: Int,
-    ): List<RaiderRaidProgressEntity> =
-        jdbcTemplate.query(
-            "SELECT * FROM raider_raid_progress WHERE raider_id = ? ORDER BY raid, difficulty LIMIT ? OFFSET ?",
-            rowMapper,
-            raiderId,
+    override fun findAll(offset: Long, limit: Int): List<RaiderRaidProgressEntity> {
+        val pageRequest = PageRequest.of(
+            (offset / limit).toInt(),
             limit,
-            offset,
+            Sort.by("id"),
         )
+        return springRepository.findAll(pageRequest).content
+    }
+
+    override fun count(): Long =
+        springRepository.count()
+
+    override fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderRaidProgressEntity> {
+        val pageRequest = PageRequest.of(
+            (offset / limit).toInt(),
+            limit,
+            Sort.by("raid").and(Sort.by("difficulty")),
+        )
+        return springRepository.findByRaiderId(raiderId, pageRequest).content
+    }
 
     override fun countByRaiderId(raiderId: Long): Long =
-        jdbcTemplate.queryForObject("SELECT COUNT(*) FROM raider_raid_progress WHERE raider_id = ?", Long::class.java, raiderId) ?: 0L
+        springRepository.countByRaiderId(raiderId)
 
     override fun save(entity: RaiderRaidProgressEntity): RaiderRaidProgressEntity =
-        if (entity.id == null) {
-            insert(entity)
-        } else {
-            update(entity)
-            entity
-        }
+        springRepository.save(entity)
 
     override fun delete(id: Long) {
-        jdbcTemplate.update("DELETE FROM raider_raid_progress WHERE id = ?", id)
+        springRepository.deleteById(id)
     }
-
-    private fun insert(entity: RaiderRaidProgressEntity): RaiderRaidProgressEntity {
-        val keyHolder = GeneratedKeyHolder()
-        jdbcTemplate.update({ conn ->
-            val ps =
-                conn.prepareStatement(
-                    "INSERT INTO raider_raid_progress (raider_id, raid, difficulty, bosses_defeated) VALUES (?,?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS,
-                )
-            ps.setLong(1, entity.raiderId)
-            ps.setString(2, entity.raid)
-            ps.setString(3, entity.difficulty)
-            entity.bossesDefeated?.let { ps.setInt(4, it) } ?: ps.setNull(4, java.sql.Types.INTEGER)
-            ps
-        }, keyHolder)
-        return entity.copy(id = (keyHolder.keys?.get("id") as? Number)?.toLong())
-    }
-
-    private fun update(entity: RaiderRaidProgressEntity) {
-        jdbcTemplate.update(
-            "UPDATE raider_raid_progress SET raider_id=?, raid=?, difficulty=?, bosses_defeated=? WHERE id=?",
-            entity.raiderId,
-            entity.raid,
-            entity.difficulty,
-            entity.bossesDefeated,
-            entity.id,
-        )
-    }
-
-    private val rowMapper =
-        RowMapper { rs, _ ->
-            fun getIntOrNull(col: String): Int? {
-                val v = rs.getInt(col)
-                return if (rs.wasNull()) null else v
-            }
-            RaiderRaidProgressEntity(
-                rs.getLong("id"),
-                rs.getLong("raider_id"),
-                rs.getString("raid"),
-                rs.getString("difficulty"),
-                getIntOrNull("bosses_defeated"),
-            )
-        }
 }

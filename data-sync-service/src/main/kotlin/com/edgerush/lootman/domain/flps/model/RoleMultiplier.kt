@@ -7,6 +7,7 @@ package com.edgerush.lootman.domain.flps.model
  * Values typically range from 0.7 (Healer) to 1.0 (DPS).
  * Stored as value between 0.0 and 2.0 to allow for multipliers.
  */
+@ConsistentCopyVisibility
 data class RoleMultiplier private constructor(val value: Double) {
     init {
         require(value in 0.0..2.0) {

@@ -5,14 +5,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { raidsApi, type RaidSignup, type RaidEncounter, type SignupStatus } from '@/api/raids'
 import { flpsApi } from '@/api/flps'
 import { formatDate, formatRelativeTime } from '@/utils/date'
+import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 import type { Role } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
+const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
 const raidId = computed(() => Number(route.params.id))
-
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 // Queries
 const { data: raid, isLoading, error } = useQuery({
@@ -22,8 +25,9 @@ const { data: raid, isLoading, error } = useQuery({
 })
 
 const { data: flpsData } = useQuery({
-  queryKey: ['myFlps', GUILD_ID],
-  queryFn: () => flpsApi.getMyFlps(GUILD_ID),
+  queryKey: ['myFlps', guildId],
+  queryFn: () => flpsApi.getMyFlps(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Signup modal state
@@ -228,8 +232,12 @@ function cancelMySignup() {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load raid details. Please try again.</p>
+    <div v-else-if="error" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Raid</h5>
+        <div class="alert-description">Failed to load raid details. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Content -->
@@ -452,8 +460,11 @@ function cancelMySignup() {
           </button>
         </div>
 
-        <div v-if="createSignupMutation.isError.value || updateSignupMutation.isError.value" class="mt-4 p-3 bg-red-900/20 rounded-lg">
-          <p class="text-sm text-red-400">Failed to save signup. Please try again.</p>
+        <div v-if="createSignupMutation.isError.value || updateSignupMutation.isError.value" class="mt-4 alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="alert-description">
+            Failed to save signup. Please try again.
+          </div>
         </div>
       </div>
     </div>

@@ -2,38 +2,36 @@ package com.edgerush.lootman.infrastructure.application
 
 import com.edgerush.datasync.entity.ApplicationEntity
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.infrastructure.springdata.ApplicationEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import java.sql.ResultSet
-import java.sql.Timestamp
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.Optional
 
 /**
  * Unit tests for JdbcApplicationRepository.
  *
- * These tests mock the JdbcTemplate to verify SQL queries and mappings.
- * The repository operates on the applications table.
+ * These tests mock the Spring Data repository to verify delegation behavior.
  */
 class JdbcApplicationRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: ApplicationEntitySpringRepository
     private lateinit var repository: JdbcApplicationRepository
 
     private val now = OffsetDateTime.now(ZoneOffset.UTC)
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcApplicationRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcApplicationRepository(springRepository)
     }
 
     @Nested
@@ -42,17 +40,8 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         fun `should return application when found`() {
             // Given
             val applicationId = 123L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(applicationId), 0))
-            }
+            val entity = createApplicationEntity(applicationId = applicationId)
+            every { springRepository.findById(applicationId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(applicationId)
@@ -61,26 +50,21 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             result shouldNotBe null
             result?.applicationId shouldBe applicationId
             result?.status shouldBe "pending"
+            verify { springRepository.findById(applicationId) }
         }
 
         @Test
         fun `should return null when application not found`() {
             // Given
             val applicationId = 999L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId),
-                )
-            } returns emptyList()
+            every { springRepository.findById(applicationId) } returns Optional.empty()
 
             // When
             val result = repository.findById(applicationId)
 
             // Then
             result shouldBe null
+            verify { springRepository.findById(applicationId) }
         }
 
         @Test
@@ -88,36 +72,25 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Given
             val applicationId = 456L
             val appliedAt = OffsetDateTime.parse("2024-06-01T12:00:00Z")
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                val rs =
-                    mockResultSet(
-                        applicationId = applicationId,
-                        appliedAt = appliedAt,
-                        status = "approved",
-                        role = "Healer",
-                        age = 25,
-                        country = "US",
-                        battletag = "Player#1234",
-                        discordId = "discord123",
-                        mainCharacterName = "TestChar",
-                        mainCharacterRealm = "Illidan",
-                        mainCharacterClass = "Priest",
-                        mainCharacterRole = "Healer",
-                        mainCharacterRace = "Human",
-                        mainCharacterFaction = "Alliance",
-                        mainCharacterLevel = 70,
-                        mainCharacterRegion = "US",
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
+            val entity = createApplicationEntity(
+                applicationId = applicationId,
+                appliedAt = appliedAt,
+                status = "approved",
+                role = "Healer",
+                age = 25,
+                country = "US",
+                battletag = "Player#1234",
+                discordId = "discord123",
+                mainCharacterName = "TestChar",
+                mainCharacterRealm = "Illidan",
+                mainCharacterClass = "Priest",
+                mainCharacterRole = "Healer",
+                mainCharacterRace = "Human",
+                mainCharacterFaction = "Alliance",
+                mainCharacterLevel = 70,
+                mainCharacterRegion = "US",
+            )
+            every { springRepository.findById(applicationId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(applicationId)
@@ -139,42 +112,32 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             result?.mainCharacterFaction shouldBe "Alliance"
             result?.mainCharacterLevel shouldBe 70
             result?.mainCharacterRegion shouldBe "US"
+            verify { springRepository.findById(applicationId) }
         }
 
         @Test
         fun `should handle null optional fields`() {
             // Given
             val applicationId = 789L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(applicationId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                val rs =
-                    mockResultSet(
-                        applicationId = applicationId,
-                        appliedAt = null,
-                        status = null,
-                        role = null,
-                        age = null,
-                        country = null,
-                        battletag = null,
-                        discordId = null,
-                        mainCharacterName = null,
-                        mainCharacterRealm = null,
-                        mainCharacterClass = null,
-                        mainCharacterRole = null,
-                        mainCharacterRace = null,
-                        mainCharacterFaction = null,
-                        mainCharacterLevel = null,
-                        mainCharacterRegion = null,
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
+            val entity = createApplicationEntity(
+                applicationId = applicationId,
+                appliedAt = null,
+                status = null,
+                role = null,
+                age = null,
+                country = null,
+                battletag = null,
+                discordId = null,
+                mainCharacterName = null,
+                mainCharacterRealm = null,
+                mainCharacterClass = null,
+                mainCharacterRole = null,
+                mainCharacterRace = null,
+                mainCharacterFaction = null,
+                mainCharacterLevel = null,
+                mainCharacterRegion = null,
+            )
+            every { springRepository.findById(applicationId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(applicationId)
@@ -186,6 +149,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             result?.status shouldBe null
             result?.age shouldBe null
             result?.mainCharacterLevel shouldBe null
+            verify { springRepository.findById(applicationId) }
         }
     }
 
@@ -196,46 +160,35 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
+            val entities = listOf(
+                createApplicationEntity(1L),
+                createApplicationEntity(2L),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(limit),
-                    eq(offset),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L), 0),
-                    rowMapper.mapRow(mockResultSet(2L), 1),
-                )
-            }
+            every { springRepository.findAll(any<Pageable>()) } returns page
 
             // When
             val result = repository.findAll(offset, limit)
 
             // Then
             result.size shouldBe 2
+            verify { springRepository.findAll(any<Pageable>()) }
         }
 
         @Test
         fun `should return empty list when no applications`() {
             // Given
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("LIMIT") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } returns emptyList()
+            val page = PageImpl(emptyList<ApplicationEntity>())
+
+            every { springRepository.findAll(any<Pageable>()) } returns page
 
             // When
             val result = repository.findAll(0L, 10)
 
             // Then
             result shouldBe emptyList()
+            verify { springRepository.findAll(any<Pageable>()) }
         }
     }
 
@@ -245,22 +198,13 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         fun `should return applications with matching status`() {
             // Given
             val status = "pending"
+            val entities = listOf(
+                createApplicationEntity(1L, status = status),
+                createApplicationEntity(2L, status = status),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("status = ?") },
-                    any<RowMapper<ApplicationEntity>>(),
-                    eq(status),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, status = status), 0),
-                    rowMapper.mapRow(mockResultSet(2L, status = status), 1),
-                )
-            }
+            every { springRepository.findByStatus(status, any<Pageable>()) } returns page
 
             // When
             val result = repository.findByStatus(status, 0L, 10)
@@ -268,6 +212,23 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Then
             result.size shouldBe 2
             result.all { it.status == status } shouldBe true
+            verify { springRepository.findByStatus(status, any<Pageable>()) }
+        }
+
+        @Test
+        fun `should return empty list when no applications with status`() {
+            // Given
+            val status = "rejected"
+            val page = PageImpl(emptyList<ApplicationEntity>())
+
+            every { springRepository.findByStatus(status, any<Pageable>()) } returns page
+
+            // When
+            val result = repository.findByStatus(status, 0L, 10)
+
+            // Then
+            result shouldBe emptyList()
+            verify { springRepository.findByStatus(status, any<Pageable>()) }
         }
     }
 
@@ -276,55 +237,28 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         @Test
         fun `should return total count`() {
             // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("applications") },
-                    Long::class.java,
-                )
-            } returns 42L
+            every { springRepository.count() } returns 42L
 
             // When
             val result = repository.count()
 
             // Then
             result shouldBe 42L
-        }
-
-        @Test
-        fun `should handle null count result`() {
-            // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") },
-                    Long::class.java,
-                )
-            } returns null
-
-            // When
-            val result = repository.count()
-
-            // Then
-            result shouldBe 0L
+            verify { springRepository.count() }
         }
 
         @Test
         fun `should return count by status`() {
             // Given
             val status = "approved"
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("status = ?") },
-                    Long::class.java,
-                    eq(status),
-                )
-            } returns 15L
+            every { springRepository.countByStatus(status) } returns 15L
 
             // When
             val result = repository.countByStatus(status)
 
             // Then
             result shouldBe 15L
+            verify { springRepository.countByStatus(status) }
         }
     }
 
@@ -334,120 +268,66 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         fun `should return true when application exists`() {
             // Given
             val applicationId = 123L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
-                    Int::class.java,
-                    eq(applicationId),
-                )
-            } returns 1
+            every { springRepository.existsById(applicationId) } returns true
 
             // When
             val result = repository.existsById(applicationId)
 
             // Then
             result shouldBe true
+            verify { springRepository.existsById(applicationId) }
         }
 
         @Test
         fun `should return false when application does not exist`() {
             // Given
             val applicationId = 999L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
-                    Int::class.java,
-                    eq(applicationId),
-                )
-            } returns 0
+            every { springRepository.existsById(applicationId) } returns false
 
             // When
             val result = repository.existsById(applicationId)
 
             // Then
             result shouldBe false
-        }
-
-        @Test
-        fun `should handle null count result as false`() {
-            // Given
-            val applicationId = 123L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
-                    Int::class.java,
-                    eq(applicationId),
-                )
-            } returns null
-
-            // When
-            val result = repository.existsById(applicationId)
-
-            // Then
-            result shouldBe false
+            verify { springRepository.existsById(applicationId) }
         }
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert new application when not exists`() {
+        fun `should save new entity and return saved result`() {
             // Given
             val entity = createApplicationEntity()
-            val sqlSlot = slot<String>()
-
-            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, entity.applicationId) } returns 0
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
+            every { springRepository.save(entity) } returns entity
 
             // When
             val result = repository.save(entity)
 
             // Then
             result shouldBe entity
-            sqlSlot.captured.contains("INSERT INTO") shouldBe true
-
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("INSERT INTO") },
-                    *anyVararg(),
-                )
-            }
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should update existing application when exists`() {
+        fun `should update existing application`() {
             // Given
-            val entity = createApplicationEntity()
-            val sqlSlot = slot<String>()
-
-            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, entity.applicationId) } returns 1
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
+            val entity = createApplicationEntity(applicationId = 123L)
+            every { springRepository.save(entity) } returns entity
 
             // When
             val result = repository.save(entity)
 
             // Then
             result shouldBe entity
-            sqlSlot.captured.contains("UPDATE") shouldBe true
-
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("UPDATE") },
-                    *anyVararg(),
-                )
-            }
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should handle null appliedAt in insert`() {
+        fun `should handle null appliedAt in save`() {
             // Given
             val entity = createApplicationEntity(appliedAt = null)
-
-            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, entity.applicationId) } returns 0
-            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+            every { springRepository.save(entity) } returns entity
 
             // When
             val result = repository.save(entity)
@@ -455,6 +335,7 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Then
             result shouldBe entity
             result.appliedAt shouldBe null
+            verify { springRepository.save(entity) }
         }
     }
 
@@ -465,67 +346,15 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Given
             val applicationId = 123L
 
-            every {
-                jdbcTemplate.update(
-                    match<String> { it.contains("DELETE") },
-                    eq(applicationId),
-                )
-            } returns 1
-
             // When
             repository.delete(applicationId)
 
             // Then
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("DELETE") && it.contains("application_id = ?") },
-                    applicationId,
-                )
-            }
+            verify { springRepository.deleteById(applicationId) }
         }
     }
 
     // Helper methods
-
-    private fun mockResultSet(
-        applicationId: Long,
-        appliedAt: OffsetDateTime? = now,
-        status: String? = "pending",
-        role: String? = "DPS",
-        age: Int? = 30,
-        country: String? = "US",
-        battletag: String? = "TestPlayer#1234",
-        discordId: String? = "discord456",
-        mainCharacterName: String? = "MainChar",
-        mainCharacterRealm: String? = "Illidan",
-        mainCharacterClass: String? = "Mage",
-        mainCharacterRole: String? = "DPS",
-        mainCharacterRace: String? = "Human",
-        mainCharacterFaction: String? = "Alliance",
-        mainCharacterLevel: Int? = 70,
-        mainCharacterRegion: String? = "US",
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("application_id") } returns applicationId
-        every { rs.getTimestamp("applied_at") } returns appliedAt?.let { Timestamp.from(it.toInstant()) }
-        every { rs.getString("status") } returns status
-        every { rs.getString("role") } returns role
-        every { rs.getInt("age") } returns (age ?: 0)
-        every { rs.wasNull() } returns (age == null)
-        every { rs.getString("country") } returns country
-        every { rs.getString("battletag") } returns battletag
-        every { rs.getString("discord_id") } returns discordId
-        every { rs.getString("main_character_name") } returns mainCharacterName
-        every { rs.getString("main_character_realm") } returns mainCharacterRealm
-        every { rs.getString("main_character_class") } returns mainCharacterClass
-        every { rs.getString("main_character_role") } returns mainCharacterRole
-        every { rs.getString("main_character_race") } returns mainCharacterRace
-        every { rs.getString("main_character_faction") } returns mainCharacterFaction
-        every { rs.getInt("main_character_level") } returns (mainCharacterLevel ?: 0)
-        every { rs.getString("main_character_region") } returns mainCharacterRegion
-        every { rs.getTimestamp("synced_at") } returns Timestamp.from(now.toInstant())
-        return rs
-    }
 
     private fun createApplicationEntity(
         applicationId: Long = 123L,

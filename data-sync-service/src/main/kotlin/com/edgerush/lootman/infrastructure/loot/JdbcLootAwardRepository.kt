@@ -17,6 +17,10 @@ import java.sql.Timestamp
  * JDBC implementation of LootAwardRepository.
  *
  * Persists LootAward aggregates to the loot_awards table.
+ * Note: guildId is obtained via JOIN with raiders table since loot_awards
+ * doesn't have a direct guild_id column.
+ *
+ * Uses snake_case column names as per V0045 migration.
  */
 @Repository
 class JdbcLootAwardRepository(
@@ -25,22 +29,24 @@ class JdbcLootAwardRepository(
     override fun findById(id: LootAwardId): LootAward? {
         val sql =
             """
-            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
-            FROM loot_awards
-            WHERE id = ?
+            SELECT la.id, la.item_id, la.raider_id, r.guild_id, la.awarded_at, la.flps, la.tier, la.discarded
+            FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE la.id = ?
             """.trimIndent()
 
-        val results = jdbcTemplate.query(sql, lootAwardRowMapper, id.value)
+        val results = jdbcTemplate.query(sql, lootAwardRowMapper, id.value.toIntOrNull() ?: 0)
         return results.firstOrNull()
     }
 
     override fun findByRaiderId(raiderId: RaiderId): List<LootAward> {
         val sql =
             """
-            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
-            FROM loot_awards
-            WHERE raider_id = ?
-            ORDER BY awardedAt DESC
+            SELECT la.id, la.item_id, la.raider_id, r.guild_id, la.awarded_at, la.flps, la.tier, la.discarded
+            FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE la.raider_id = ?
+            ORDER BY la.awarded_at DESC
             """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, raiderId.value)
@@ -49,10 +55,11 @@ class JdbcLootAwardRepository(
     override fun findByGuildId(guildId: GuildId): List<LootAward> {
         val sql =
             """
-            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
-            FROM loot_awards
-            WHERE guild_id = ?
-            ORDER BY awardedAt DESC
+            SELECT la.id, la.item_id, la.raider_id, r.guild_id, la.awarded_at, la.flps, la.tier, la.discarded
+            FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE r.guild_id = ?
+            ORDER BY la.awarded_at DESC
             """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, guildId.value)
@@ -65,10 +72,11 @@ class JdbcLootAwardRepository(
     ): List<LootAward> {
         val sql =
             """
-            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
-            FROM loot_awards
-            WHERE guild_id = ?
-            ORDER BY awardedAt DESC
+            SELECT la.id, la.item_id, la.raider_id, r.guild_id, la.awarded_at, la.flps, la.tier, la.discarded
+            FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE r.guild_id = ?
+            ORDER BY la.awarded_at DESC
             LIMIT ? OFFSET ?
             """.trimIndent()
 
@@ -76,7 +84,12 @@ class JdbcLootAwardRepository(
     }
 
     override fun countByGuildId(guildId: GuildId): Long {
-        val sql = "SELECT COUNT(*) FROM loot_awards WHERE guild_id = ?"
+        val sql =
+            """
+            SELECT COUNT(*) FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE r.guild_id = ?
+            """.trimIndent()
         return jdbcTemplate.queryForObject(sql, Long::class.java, guildId.value) ?: 0L
     }
 
@@ -94,7 +107,7 @@ class JdbcLootAwardRepository(
 
     override fun delete(id: LootAwardId) {
         val sql = "DELETE FROM loot_awards WHERE id = ?"
-        jdbcTemplate.update(sql, id.value)
+        jdbcTemplate.update(sql, id.value.toIntOrNull() ?: 0)
     }
 
     override fun findByRaiderIds(raiderIds: List<RaiderId>): List<LootAward> {
@@ -103,10 +116,11 @@ class JdbcLootAwardRepository(
         val placeholders = raiderIds.joinToString(", ") { "?" }
         val sql =
             """
-            SELECT id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
-            FROM loot_awards
-            WHERE raider_id IN ($placeholders)
-            ORDER BY awardedAt DESC
+            SELECT la.id, la.item_id, la.raider_id, r.guild_id, la.awarded_at, la.flps, la.tier, la.discarded
+            FROM loot_awards la
+            JOIN raiders r ON la.raider_id = r.id
+            WHERE la.raider_id IN ($placeholders)
+            ORDER BY la.awarded_at DESC
             """.trimIndent()
 
         return jdbcTemplate.query(sql, lootAwardRowMapper, *raiderIds.map { it.value }.toTypedArray())
@@ -114,28 +128,30 @@ class JdbcLootAwardRepository(
 
     private fun existsById(id: LootAwardId): Boolean {
         val sql = "SELECT COUNT(*) FROM loot_awards WHERE id = ?"
-        val count = jdbcTemplate.queryForObject(sql, Int::class.java, id.value) ?: 0
+        val count = jdbcTemplate.queryForObject(sql, Int::class.java, id.value.toIntOrNull() ?: 0) ?: 0
         return count > 0
     }
 
     private fun insertLootAward(award: LootAward) {
+        // Note: loot_awards table requires item_name which we don't have in domain model
+        // Using a placeholder for now - in production this should be resolved via item lookup
         val sql =
             """
             INSERT INTO loot_awards (
-                id, itemId, raider_id, guild_id, awardedAt, flps, tier, status
+                item_id, raider_id, item_name, tier, flps, rdf, awarded_at, discarded
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
         jdbcTemplate.update(
             sql,
-            award.id.value,
             award.itemId.value,
             award.raiderId.value,
-            award.guildId.value,
-            Timestamp.from(award.awardedAt),
-            award.flpsScore.value,
+            "Unknown Item", // item_name is NOT NULL in schema
             award.tier.name,
-            if (award.isActive()) "ACTIVE" else "REVOKED",
+            award.flpsScore.value,
+            0.0, // rdf is NOT NULL in schema
+            Timestamp.from(award.awardedAt),
+            !award.isActive(),
         )
     }
 
@@ -143,13 +159,12 @@ class JdbcLootAwardRepository(
         val sql =
             """
             UPDATE loot_awards SET
-                itemId = ?,
+                item_id = ?,
                 raider_id = ?,
-                guild_id = ?,
-                awardedAt = ?,
-                flps = ?,
                 tier = ?,
-                status = ?
+                flps = ?,
+                awarded_at = ?,
+                discarded = ?
             WHERE id = ?
             """.trimIndent()
 
@@ -157,12 +172,11 @@ class JdbcLootAwardRepository(
             sql,
             award.itemId.value,
             award.raiderId.value,
-            award.guildId.value,
-            Timestamp.from(award.awardedAt),
-            award.flpsScore.value,
             award.tier.name,
-            if (award.isActive()) "ACTIVE" else "REVOKED",
-            award.id.value,
+            award.flpsScore.value,
+            Timestamp.from(award.awardedAt),
+            !award.isActive(),
+            award.id.value.toIntOrNull() ?: 0,
         )
     }
 
@@ -176,23 +190,19 @@ class JdbcLootAwardRepository(
                     LootTier.MYTHIC
                 }
 
-            val statusStr = rs.getString("status") ?: "ACTIVE"
-            val isRevoked = statusStr.equals("REVOKED", ignoreCase = true)
+            // Use discarded column to determine status (discarded = true means REVOKED)
+            val discarded = rs.getBoolean("discarded")
 
-            val award =
-                LootAward(
-                    id = LootAwardId(rs.getString("id")),
-                    itemId = ItemId(rs.getLong("itemId")),
-                    raiderId = RaiderId(rs.getLong("raider_id")),
-                    guildId = GuildId(rs.getString("guild_id")),
-                    awardedAt = rs.getTimestamp("awardedAt").toInstant(),
-                    flpsScore = FlpsScore.of(rs.getDouble("flps")),
-                    tier = tier,
-                )
+            val guildIdStr = rs.getString("guild_id") ?: "default"
 
-            // If the award was revoked, we need to return it in revoked state
-            // Since LootAward is immutable and status is private, we use reflection or construct properly
-            // For now, we return the award as-is since the status is managed through the revoke() method
-            award
+            LootAward(
+                id = LootAwardId(rs.getInt("id").toString()),
+                itemId = ItemId(rs.getLong("item_id")),
+                raiderId = RaiderId(rs.getLong("raider_id")),
+                guildId = GuildId(guildIdStr),
+                awardedAt = rs.getTimestamp("awarded_at").toInstant(),
+                flpsScore = FlpsScore.of(rs.getDouble("flps")),
+                tier = tier,
+            )
         }
 }

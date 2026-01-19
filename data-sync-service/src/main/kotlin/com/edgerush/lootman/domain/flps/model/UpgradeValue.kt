@@ -6,6 +6,7 @@ package com.edgerush.lootman.domain.flps.model
  * UV measures the relative power gain from an item upgrade.
  * Normalized value between 0.0 and 1.0.
  */
+@ConsistentCopyVisibility
 data class UpgradeValue private constructor(val value: Double) {
     init {
         require(value in 0.0..1.0) {

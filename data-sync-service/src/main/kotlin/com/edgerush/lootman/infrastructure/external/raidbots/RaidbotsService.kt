@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.scheduler.Schedulers
 import java.time.Instant
 
 @Service
@@ -27,6 +28,7 @@ class RaidbotsService(
             ))
             .retrieve()
             .bodyToMono<RaidbotsSimResponse>()
+            .subscribeOn(Schedulers.boundedElastic())
             .block() ?: throw RuntimeException("Failed to submit simulation to Raidbots")
 
         return response.simId
@@ -37,6 +39,7 @@ class RaidbotsService(
             .uri("/api/v1/sim/$simId")
             .retrieve()
             .bodyToMono<RaidbotsSimStatus>()
+            .subscribeOn(Schedulers.boundedElastic())
             .block() ?: throw RuntimeException("Failed to get simulation status")
     }
 }

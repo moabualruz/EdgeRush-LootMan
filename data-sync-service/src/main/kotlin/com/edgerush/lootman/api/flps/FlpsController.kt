@@ -183,8 +183,8 @@ class FlpsController(
         val allEntries =
             raiderDataList.map { raiderData ->
                 val acs = componentCalculator.calculateACS(raiderData.attendance)
-                val mas = componentCalculator.calculateMAS()
-                val eps = componentCalculator.calculateEPS(raiderData.gear)
+                val mas = componentCalculator.calculateMAS(raiderData.performanceData)
+                val eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation)
                 val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
                 val tb = componentCalculator.calculateTierBonus(raiderData.gear)
                 val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
@@ -203,10 +203,10 @@ class FlpsController(
                 LeaderboardEntry(
                     rank = 0, // Will be set after filtering/sorting
                     raiderId = raiderData.raider.id.value,
-                    raiderName = raiderData.raider.characterName,
+                    characterName = raiderData.raider.characterName,
                     characterClass = raiderData.raider.characterClass.name,
                     role = raiderData.raider.role.name,
-                    flpsScore = result.flps.value,
+                    flps = result.flps.value,
                     eligible = result.eligible,
                 )
             }
@@ -229,7 +229,7 @@ class FlpsController(
         // Sort by score descending and assign ranks
         val sorted =
             filtered
-                .sortedByDescending { it.flpsScore }
+                .sortedByDescending { it.flps }
                 .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
 
         // Apply pagination
@@ -349,8 +349,8 @@ class FlpsController(
                     raiderId = raiderData.raider.id,
                     itemId = exampleItemId,
                     acs = componentCalculator.calculateACS(raiderData.attendance),
-                    mas = componentCalculator.calculateMAS(),
-                    eps = componentCalculator.calculateEPS(raiderData.gear),
+                    mas = componentCalculator.calculateMAS(raiderData.performanceData),
+                    eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation),
                     uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId),
                     tb = componentCalculator.calculateTierBonus(raiderData.gear),
                     rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role),
@@ -372,8 +372,8 @@ class FlpsController(
         // Calculate FLPS for each raider
         return raiderDataList.map { raiderData ->
             val acs = componentCalculator.calculateACS(raiderData.attendance)
-            val mas = componentCalculator.calculateMAS()
-            val eps = componentCalculator.calculateEPS(raiderData.gear)
+            val mas = componentCalculator.calculateMAS(raiderData.performanceData)
+            val eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation)
             val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
             val tb = componentCalculator.calculateTierBonus(raiderData.gear)
             val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
@@ -445,8 +445,8 @@ class FlpsController(
 
         // Calculate components
         val acs = componentCalculator.calculateACS(raiderData.attendance)
-        val mas = componentCalculator.calculateMAS()
-        val eps = componentCalculator.calculateEPS(raiderData.gear)
+        val mas = componentCalculator.calculateMAS(raiderData.performanceData)
+        val eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation)
         val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
         val tb = componentCalculator.calculateTierBonus(raiderData.gear)
         val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)
@@ -466,8 +466,8 @@ class FlpsController(
         val allScores =
             raiderDataList.map { rd ->
                 val rdAcs = componentCalculator.calculateACS(rd.attendance)
-                val rdMas = componentCalculator.calculateMAS()
-                val rdEps = componentCalculator.calculateEPS(rd.gear)
+                val rdMas = componentCalculator.calculateMAS(rd.performanceData)
+                val rdEps = componentCalculator.calculateEPS(rd.gear, rd.preparation)
                 val rdUv = componentCalculator.calculateUV(rd.wishlist, exampleItemId)
                 val rdTb = componentCalculator.calculateTierBonus(rd.gear)
                 val rdRm = componentCalculator.calculateRoleMultiplier(rd.raider.role)

@@ -2,34 +2,32 @@ package com.edgerush.lootman.infrastructure.raider
 
 import com.edgerush.datasync.entity.RaiderRenownEntity
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.infrastructure.springdata.RaiderRenownEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import java.sql.ResultSet
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import java.util.Optional
 
 /**
  * Unit tests for JdbcRaiderRenownRepository.
  *
- * These tests mock the JdbcTemplate to verify SQL queries and mappings.
- * The repository operates on the raider_renown table.
+ * These tests mock the Spring Data repository to verify delegation behavior.
  */
 class JdbcRaiderRenownRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: RaiderRenownEntitySpringRepository
     private lateinit var repository: JdbcRaiderRenownRepository
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcRaiderRenownRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcRaiderRenownRepository(springRepository)
     }
 
     @Nested
@@ -38,17 +36,8 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         fun `should return renown when found`() {
             // Given
             val id = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id, 100L), 0))
-            }
+            val entity = createRenownEntity(id = id)
+            every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(id)
@@ -57,91 +46,21 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             result shouldNotBe null
             result?.id shouldBe id
             result?.raiderId shouldBe 100L
+            verify { springRepository.findById(id) }
         }
 
         @Test
         fun `should return null when renown not found`() {
             // Given
             val id = 999L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id),
-                )
-            } returns emptyList()
+            every { springRepository.findById(id) } returns Optional.empty()
 
             // When
             val result = repository.findById(id)
 
             // Then
             result shouldBe null
-        }
-
-        @Test
-        fun `should map all database fields to entity`() {
-            // Given
-            val id = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                val rs =
-                    mockResultSet(
-                        id = id,
-                        raiderId = 100L,
-                        faction = "The Assembly of the Deeps",
-                        level = 25,
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
-
-            // When
-            val result = repository.findById(id)
-
-            // Then
-            result shouldNotBe null
-            result?.id shouldBe id
-            result?.raiderId shouldBe 100L
-            result?.faction shouldBe "The Assembly of the Deeps"
-            result?.level shouldBe 25
-        }
-
-        @Test
-        fun `should handle null level`() {
-            // Given
-            val id = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                val rs =
-                    mockResultSet(
-                        id = id,
-                        raiderId = 100L,
-                        faction = "Council of Dornogal",
-                        level = null,
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
-
-            // When
-            val result = repository.findById(id)
-
-            // Then
-            result shouldNotBe null
-            result?.level shouldBe null
+            verify { springRepository.findById(id) }
         }
     }
 
@@ -152,27 +71,20 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
+            val entities = listOf(
+                createRenownEntity(1L, 100L),
+                createRenownEntity(2L, 100L),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(limit),
-                    eq(offset),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
-                )
-            }
+            every { springRepository.findAll(any<Pageable>()) } returns page
 
             // When
             val result = repository.findAll(offset, limit)
 
             // Then
             result.size shouldBe 2
+            verify { springRepository.findAll(any<Pageable>()) }
         }
     }
 
@@ -182,22 +94,13 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         fun `should return renown for raider`() {
             // Given
             val raiderId = 100L
+            val entities = listOf(
+                createRenownEntity(1L, raiderId, faction = "The Assembly of the Deeps"),
+                createRenownEntity(2L, raiderId, faction = "Council of Dornogal"),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("raider_id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(raiderId),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderRenownEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, raiderId, faction = "The Assembly of the Deeps"), 0),
-                    rowMapper.mapRow(mockResultSet(2L, raiderId, faction = "Council of Dornogal"), 1),
-                )
-            }
+            every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page
 
             // When
             val result = repository.findByRaiderId(raiderId, 0L, 10)
@@ -205,28 +108,23 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             // Then
             result.size shouldBe 2
             result.all { it.raiderId == raiderId } shouldBe true
+            verify { springRepository.findByRaiderId(raiderId, any<Pageable>()) }
         }
 
         @Test
         fun `should return empty list when raider has no renown`() {
             // Given
             val raiderId = 999L
+            val page = PageImpl(emptyList<RaiderRenownEntity>())
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("raider_id = ?") },
-                    any<RowMapper<RaiderRenownEntity>>(),
-                    eq(raiderId),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } returns emptyList()
+            every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page
 
             // When
             val result = repository.findByRaiderId(raiderId, 0L, 10)
 
             // Then
             result shouldBe emptyList()
+            verify { springRepository.findByRaiderId(raiderId, any<Pageable>()) }
         }
     }
 
@@ -235,55 +133,28 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         @Test
         fun `should return total count`() {
             // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("raider_renown") },
-                    Long::class.java,
-                )
-            } returns 42L
+            every { springRepository.count() } returns 42L
 
             // When
             val result = repository.count()
 
             // Then
             result shouldBe 42L
-        }
-
-        @Test
-        fun `should handle null count result`() {
-            // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") },
-                    Long::class.java,
-                )
-            } returns null
-
-            // When
-            val result = repository.count()
-
-            // Then
-            result shouldBe 0L
+            verify { springRepository.count() }
         }
 
         @Test
         fun `should return count by raider id`() {
             // Given
             val raiderId = 100L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("raider_id = ?") },
-                    Long::class.java,
-                    eq(raiderId),
-                )
-            } returns 4L
+            every { springRepository.countByRaiderId(raiderId) } returns 4L
 
             // When
             val result = repository.countByRaiderId(raiderId)
 
             // Then
             result shouldBe 4L
+            verify { springRepository.countByRaiderId(raiderId) }
         }
     }
 
@@ -293,108 +164,61 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         fun `should return true when renown exists`() {
             // Given
             val id = 1L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(id),
-                )
-            } returns 1
+            every { springRepository.existsById(id) } returns true
 
             // When
             val result = repository.existsById(id)
 
             // Then
             result shouldBe true
+            verify { springRepository.existsById(id) }
         }
 
         @Test
         fun `should return false when renown does not exist`() {
             // Given
             val id = 999L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(id),
-                )
-            } returns 0
+            every { springRepository.existsById(id) } returns false
 
             // When
             val result = repository.existsById(id)
 
             // Then
             result shouldBe false
-        }
-
-        @Test
-        fun `should handle null count result as false`() {
-            // Given
-            val id = 1L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(id),
-                )
-            } returns null
-
-            // When
-            val result = repository.existsById(id)
-
-            // Then
-            result shouldBe false
+            verify { springRepository.existsById(id) }
         }
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert new renown when id is null`() {
+        fun `should save entity and return saved result`() {
             // Given
             val entity = createRenownEntity(id = null)
-            val generatedId = 1L
-
-            every {
-                jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>())
-            } answers {
-                val keyHolder = secondArg<GeneratedKeyHolder>()
-                keyHolder.keyList.add(mapOf("id" to generatedId))
-                1
-            }
+            val savedEntity = createRenownEntity(id = 1L)
+            every { springRepository.save(entity) } returns savedEntity
 
             // When
             val result = repository.save(entity)
 
             // Then
-            result.id shouldBe generatedId
+            result.id shouldBe 1L
             result.raiderId shouldBe entity.raiderId
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should update existing renown when id is not null`() {
+        fun `should update existing renown`() {
             // Given
             val entity = createRenownEntity(id = 1L)
-            val sqlSlot = slot<String>()
-
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
+            every { springRepository.save(entity) } returns entity
 
             // When
             val result = repository.save(entity)
 
             // Then
             result shouldBe entity
-            sqlSlot.captured.contains("UPDATE") shouldBe true
-
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("UPDATE") },
-                    *anyVararg(),
-                )
-            }
+            verify { springRepository.save(entity) }
         }
     }
 
@@ -405,42 +229,15 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             // Given
             val id = 1L
 
-            every {
-                jdbcTemplate.update(
-                    match<String> { it.contains("DELETE") },
-                    eq(id),
-                )
-            } returns 1
-
             // When
             repository.delete(id)
 
             // Then
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("DELETE") && it.contains("id = ?") },
-                    id,
-                )
-            }
+            verify { springRepository.deleteById(id) }
         }
     }
 
     // Helper methods
-
-    private fun mockResultSet(
-        id: Long,
-        raiderId: Long,
-        faction: String = "The Assembly of the Deeps",
-        level: Int? = 20,
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("id") } returns id
-        every { rs.getLong("raider_id") } returns raiderId
-        every { rs.getString("faction") } returns faction
-        every { rs.getInt("level") } returns (level ?: 0)
-        every { rs.wasNull() } returns (level == null)
-        return rs
-    }
 
     private fun createRenownEntity(
         id: Long? = 1L,

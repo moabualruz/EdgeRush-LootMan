@@ -26,7 +26,10 @@ import java.time.LocalDate
  * Unit tests for JdbcAttendanceRepository.
  *
  * These tests mock the JdbcTemplate to verify SQL queries and mappings.
- * The repository operates on the attendance_stats table.
+ * The repository operates on the attendance_stats table with snake_case columns.
+ *
+ * Database columns: id (int), character_id, team_id, instance, encounter,
+ * start_date, end_date, attended_amount_of_raids, total_amount_of_raids, synced_at
  */
 class JdbcAttendanceRepositoryTest : UnitTest() {
     private lateinit var jdbcTemplate: JdbcTemplate
@@ -48,17 +51,17 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should return attendance record when found`() {
             // Given
-            val recordId = AttendanceRecordId("test-record-id")
+            val recordId = AttendanceRecordId("123")
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(123),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
-                listOf(rowMapper.mapRow(mockResultSet(recordId.value), 0))
+                listOf(rowMapper.mapRow(mockResultSet(123), 0))
             }
 
             // When
@@ -66,20 +69,20 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
             // Then
             result shouldNotBe null
-            result?.id shouldBe recordId
+            result?.id?.value shouldBe "123"
             result?.instance shouldBe "Nerub-ar Palace"
         }
 
         @Test
         fun `should return null when attendance record not found`() {
             // Given
-            val recordId = AttendanceRecordId("non-existent")
+            val recordId = AttendanceRecordId("999")
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(999),
                 )
             } returns emptyList()
 
@@ -93,29 +96,29 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should map all database fields to domain model`() {
             // Given
-            val recordId = AttendanceRecordId("full-record")
+            val recordId = AttendanceRecordId("456")
             val startDate = LocalDate.of(2024, 6, 1)
             val endDate = LocalDate.of(2024, 6, 30)
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(456),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 val rs =
                     mockResultSet(
-                        id = recordId.value,
-                        raiderId = 100L,
-                        guildId = "test-guild",
+                        id = 456,
+                        characterId = 100L,
+                        teamId = 1L,
                         instance = "Vault of the Incarnates",
                         encounter = "Raszageth",
                         startDate = startDate,
                         endDate = endDate,
-                        attendedRaids = 8,
-                        totalRaids = 10,
+                        attendedAmount = 8,
+                        totalAmount = 10,
                     )
                 listOf(rowMapper.mapRow(rs, 0))
             }
@@ -125,9 +128,9 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
             // Then
             result shouldNotBe null
-            result?.id?.value shouldBe "full-record"
+            result?.id?.value shouldBe "456"
             result?.raiderId?.value shouldBe 100L
-            result?.guildId?.value shouldBe "test-guild"
+            result?.guildId?.value shouldBe "1"
             result?.instance shouldBe "Vault of the Incarnates"
             result?.encounter shouldBe "Raszageth"
             result?.startDate shouldBe startDate
@@ -139,19 +142,19 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should handle null encounter for overall instance attendance`() {
             // Given
-            val recordId = AttendanceRecordId("instance-only")
+            val recordId = AttendanceRecordId("789")
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(789),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 val rs =
                     mockResultSet(
-                        id = recordId.value,
+                        id = 789,
                         encounter = null,
                     )
                 listOf(rowMapper.mapRow(rs, 0))
@@ -167,21 +170,21 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
         @Test
         fun `should handle null team_id with default value`() {
-            // Given - tests branch: rs.getString("team_id") ?: "default"
-            val recordId = AttendanceRecordId("null-team-record")
+            // Given - tests branch when team_id is null
+            val recordId = AttendanceRecordId("101")
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(101),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 val rs =
                     mockResultSetWithNullableFields(
-                        id = recordId.value,
-                        teamId = null,
+                        id = 101,
+                        teamIdNull = true,
                     )
                 listOf(rowMapper.mapRow(rs, 0))
             }
@@ -191,25 +194,25 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
             // Then
             result shouldNotBe null
-            result?.guildId?.value shouldBe "default"
+            result?.guildId?.value shouldBe "0"
         }
 
         @Test
         fun `should handle null instance with empty string default`() {
-            // Given - tests branch: rs.getString("instance") ?: ""
-            val recordId = AttendanceRecordId("null-instance-record")
+            // Given - tests branch when instance is null
+            val recordId = AttendanceRecordId("102")
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(102),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 val rs =
                     mockResultSetWithNullableFields(
-                        id = recordId.value,
+                        id = 102,
                         instance = null,
                     )
                 listOf(rowMapper.mapRow(rs, 0))
@@ -225,21 +228,21 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
         @Test
         fun `should handle null syncedAt with current time default`() {
-            // Given - tests branch: rs.getTimestamp("syncedAt")?.toInstant() ?: Instant.now()
-            val recordId = AttendanceRecordId("null-synced-record")
+            // Given - tests branch when synced_at is null
+            val recordId = AttendanceRecordId("103")
             val testTimeBeforeCall = Instant.now()
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("WHERE id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(recordId.value),
+                    eq(103),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 val rs =
                     mockResultSetWithNullableFields(
-                        id = recordId.value,
+                        id = 103,
                         syncedAt = null,
                     )
                 listOf(rowMapper.mapRow(rs, 0))
@@ -263,28 +266,26 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         fun `should return attendance records for raider in date range`() {
             // Given
             val raiderId = RaiderId(100L)
-            val guildId = GuildId("test-guild")
+            val guildId = GuildId("1")
 
             every {
                 jdbcTemplate.query(
                     match<String> {
                         it.contains("SELECT") &&
                             it.contains("character_id = ?") &&
-                            it.contains("team_id = ?") &&
-                            it.contains("startDate") &&
-                            it.contains("endDate")
+                            it.contains("team_id = ?")
                     },
                     any<RowMapper<AttendanceRecord>>(),
                     eq(raiderId.value),
-                    eq(guildId.value),
+                    eq(1L),
                     any(),
                     any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value), 0),
-                    rowMapper.mapRow(mockResultSet("record-2", raiderId = raiderId.value, guildId = guildId.value), 1),
+                    rowMapper.mapRow(mockResultSet(1, characterId = raiderId.value, teamId = 1L), 0),
+                    rowMapper.mapRow(mockResultSet(2, characterId = raiderId.value, teamId = 1L), 1),
                 )
             }
 
@@ -301,14 +302,14 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         fun `should return empty list when no records found`() {
             // Given
             val raiderId = RaiderId(999L)
-            val guildId = GuildId("test-guild")
+            val guildId = GuildId("1")
 
             every {
                 jdbcTemplate.query(
                     match<String> { it.contains("SELECT") && it.contains("character_id = ?") },
                     any<RowMapper<AttendanceRecord>>(),
                     eq(raiderId.value),
-                    eq(guildId.value),
+                    eq(1L),
                     any(),
                     any(),
                 )
@@ -328,7 +329,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         fun `should return records for specific instance`() {
             // Given
             val raiderId = RaiderId(100L)
-            val guildId = GuildId("test-guild")
+            val guildId = GuildId("1")
             val instance = "Nerub-ar Palace"
 
             every {
@@ -341,7 +342,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<AttendanceRecord>>(),
                     eq(raiderId.value),
-                    eq(guildId.value),
+                    eq(1L),
                     eq(instance),
                     any(),
                     any(),
@@ -349,7 +350,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value, instance = instance), 0),
+                    rowMapper.mapRow(mockResultSet(1, characterId = raiderId.value, teamId = 1L, instance = instance), 0),
                 )
             }
 
@@ -375,7 +376,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         fun `should return records for specific encounter`() {
             // Given
             val raiderId = RaiderId(100L)
-            val guildId = GuildId("test-guild")
+            val guildId = GuildId("1")
             val instance = "Nerub-ar Palace"
             val encounter = "Queen Ansurek"
 
@@ -390,7 +391,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                     },
                     any<RowMapper<AttendanceRecord>>(),
                     eq(raiderId.value),
-                    eq(guildId.value),
+                    eq(1L),
                     eq(instance),
                     eq(encounter),
                     any(),
@@ -400,7 +401,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
                     rowMapper.mapRow(
-                        mockResultSet("record-1", raiderId = raiderId.value, guildId = guildId.value, instance = instance, encounter = encounter),
+                        mockResultSet(1, characterId = raiderId.value, teamId = 1L, instance = instance, encounter = encounter),
                         0,
                     ),
                 )
@@ -428,7 +429,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should return all records for guild in date range`() {
             // Given
-            val guildId = GuildId("test-guild")
+            val guildId = GuildId("1")
 
             every {
                 jdbcTemplate.query(
@@ -438,16 +439,16 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
                             !it.contains("character_id = ?")
                     },
                     any<RowMapper<AttendanceRecord>>(),
-                    eq(guildId.value),
+                    eq(1L),
                     any(),
                     any(),
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<AttendanceRecord>>()
                 listOf(
-                    rowMapper.mapRow(mockResultSet("record-1", raiderId = 100L, guildId = guildId.value), 0),
-                    rowMapper.mapRow(mockResultSet("record-2", raiderId = 101L, guildId = guildId.value), 1),
-                    rowMapper.mapRow(mockResultSet("record-3", raiderId = 102L, guildId = guildId.value), 2),
+                    rowMapper.mapRow(mockResultSet(1, characterId = 100L, teamId = 1L), 0),
+                    rowMapper.mapRow(mockResultSet(2, characterId = 101L, teamId = 1L), 1),
+                    rowMapper.mapRow(mockResultSet(3, characterId = 102L, teamId = 1L), 2),
                 )
             }
 
@@ -465,10 +466,10 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should insert new attendance record when not exists`() {
             // Given
-            val record = createAttendanceRecord()
+            val record = createAttendanceRecord(id = AttendanceRecordId("200"))
             val sqlSlot = slot<String>()
 
-            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, record.id.value) } returns 0
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, eq(200)) } returns 0
             every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
 
             // When
@@ -489,10 +490,10 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should update existing attendance record when exists`() {
             // Given
-            val record = createAttendanceRecord()
+            val record = createAttendanceRecord(id = AttendanceRecordId("201"))
             val sqlSlot = slot<String>()
 
-            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, record.id.value) } returns 1
+            every { jdbcTemplate.queryForObject(any<String>(), Int::class.java, eq(201)) } returns 1
             every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
 
             // When
@@ -516,12 +517,12 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
         @Test
         fun `should delete attendance record by id`() {
             // Given
-            val recordId = AttendanceRecordId("to-delete")
+            val recordId = AttendanceRecordId("300")
 
             every {
                 jdbcTemplate.update(
                     match<String> { it.contains("DELETE") },
-                    eq(recordId.value),
+                    eq(300),
                 )
             } returns 1
 
@@ -532,7 +533,7 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
             verify {
                 jdbcTemplate.update(
                     match { it.contains("DELETE") && it.contains("id = ?") },
-                    recordId.value,
+                    300,
                 )
             }
         }
@@ -540,98 +541,84 @@ class JdbcAttendanceRepositoryTest : UnitTest() {
 
     // Helper methods
 
+    /**
+     * Creates a mock ResultSet matching the actual repository's RowMapper column access.
+     * Database columns: id, character_id, team_id, instance, encounter,
+     * start_date, end_date, attended_amount_of_raids, total_amount_of_raids, synced_at
+     */
     private fun mockResultSet(
-        id: String,
-        raiderId: Long = 100L,
-        guildId: String = "test-guild",
+        id: Int,
+        characterId: Long = 100L,
+        teamId: Long = 1L,
         instance: String = "Nerub-ar Palace",
         encounter: String? = "Ulgrax",
         startDate: LocalDate = oneMonthAgo,
         endDate: LocalDate = today,
-        attendedRaids: Int = 8,
-        totalRaids: Int = 10,
-        recordedAt: Instant = now,
+        attendedAmount: Int = 8,
+        totalAmount: Int = 10,
+        syncedAt: Instant = now,
     ): ResultSet {
         val rs = mockk<ResultSet>()
-        every { rs.getString("id") } returns id
-        every { rs.getLong("character_id") } returns raiderId
-        every { rs.getString("team_id") } returns guildId
+        every { rs.getInt("id") } returns id
+        every { rs.getLong("character_id") } returns characterId
+        every { rs.getLong("team_id") } returns teamId
+        every { rs.wasNull() } returns false
         every { rs.getString("instance") } returns instance
         every { rs.getString("encounter") } returns encounter
-        every { rs.getDate("startDate") } returns Date.valueOf(startDate)
-        every { rs.getDate("endDate") } returns Date.valueOf(endDate)
-        every { rs.getInt("attendedAmount") } returns attendedRaids
-        every { rs.getInt("totalAmount") } returns totalRaids
-        every { rs.getTimestamp("syncedAt") } returns Timestamp.from(recordedAt)
+        every { rs.getDate("start_date") } returns Date.valueOf(startDate)
+        every { rs.getDate("end_date") } returns Date.valueOf(endDate)
+        every { rs.getInt("attended_amount_of_raids") } returns attendedAmount
+        every { rs.getInt("total_amount_of_raids") } returns totalAmount
+        every { rs.getTimestamp("synced_at") } returns Timestamp.from(syncedAt)
         return rs
     }
 
+    /**
+     * Creates a mock ResultSet with nullable fields for testing edge cases.
+     */
     private fun mockResultSetWithNullableFields(
-        id: String,
-        raiderId: Long = 100L,
-        teamId: String? = "test-guild",
+        id: Int,
+        characterId: Long = 100L,
+        teamIdNull: Boolean = false,
         instance: String? = "Nerub-ar Palace",
         encounter: String? = "Ulgrax",
         startDate: LocalDate = oneMonthAgo,
         endDate: LocalDate = today,
-        attendedRaids: Int = 8,
-        totalRaids: Int = 10,
+        attendedAmount: Int = 8,
+        totalAmount: Int = 10,
         syncedAt: Timestamp? = Timestamp.from(now),
     ): ResultSet {
         val rs = mockk<ResultSet>()
-        every { rs.getString("id") } returns id
-        every { rs.getLong("character_id") } returns raiderId
-        every { rs.getString("team_id") } returns teamId
+        every { rs.getInt("id") } returns id
+        every { rs.getLong("character_id") } returns characterId
+        every { rs.getLong("team_id") } returns if (teamIdNull) 0L else 1L
+        every { rs.wasNull() } returns teamIdNull
         every { rs.getString("instance") } returns instance
         every { rs.getString("encounter") } returns encounter
-        every { rs.getDate("startDate") } returns Date.valueOf(startDate)
-        every { rs.getDate("endDate") } returns Date.valueOf(endDate)
-        every { rs.getInt("attendedAmount") } returns attendedRaids
-        every { rs.getInt("totalAmount") } returns totalRaids
-        every { rs.getTimestamp("syncedAt") } returns syncedAt
+        every { rs.getDate("start_date") } returns Date.valueOf(startDate)
+        every { rs.getDate("end_date") } returns Date.valueOf(endDate)
+        every { rs.getInt("attended_amount_of_raids") } returns attendedAmount
+        every { rs.getInt("total_amount_of_raids") } returns totalAmount
+        every { rs.getTimestamp("synced_at") } returns syncedAt
         return rs
     }
 
+    /**
+     * Creates an AttendanceRecord with a specific ID for testing.
+     * Uses reflection to access the private constructor since the domain model
+     * is designed to be created through the companion object's create() method.
+     */
     private fun createAttendanceRecord(
-        id: AttendanceRecordId = AttendanceRecordId("test-record"),
+        id: AttendanceRecordId = AttendanceRecordId("100"),
         raiderId: RaiderId = RaiderId(100L),
-        guildId: GuildId = GuildId("test-guild"),
+        guildId: GuildId = GuildId("1"),
         instance: String = "Nerub-ar Palace",
         encounter: String? = "Ulgrax",
         startDate: LocalDate = oneMonthAgo,
         endDate: LocalDate = today,
         attendedRaids: Int = 8,
         totalRaids: Int = 10,
-    ): AttendanceRecord =
-        createAttendanceRecordWithId(
-            id = id,
-            raiderId = raiderId,
-            guildId = guildId,
-            instance = instance,
-            encounter = encounter,
-            startDate = startDate,
-            endDate = endDate,
-            attendedRaids = attendedRaids,
-            totalRaids = totalRaids,
-        )
-
-    /**
-     * Helper to create AttendanceRecord with a specific ID for testing.
-     * Since AttendanceRecord.create() generates a new ID, we use reflection
-     * or a test-specific construction approach.
-     */
-    private fun createAttendanceRecordWithId(
-        id: AttendanceRecordId,
-        raiderId: RaiderId,
-        guildId: GuildId,
-        instance: String,
-        encounter: String?,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        attendedRaids: Int,
-        totalRaids: Int,
     ): AttendanceRecord {
-        // Use the private constructor via reflection for testing
         val constructor =
             AttendanceRecord::class.java.getDeclaredConstructor(
                 AttendanceRecordId::class.java,

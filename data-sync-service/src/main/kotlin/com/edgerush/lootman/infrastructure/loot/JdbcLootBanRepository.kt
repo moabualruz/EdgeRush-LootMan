@@ -14,7 +14,7 @@ import java.sql.Timestamp
  * JDBC implementation of LootBanRepository.
  *
  * Persists LootBan aggregates to the loot_bans table.
- * Column names follow the JPA naming conventions from V0019 migration.
+ * Uses snake_case column names as per V0045 migration.
  */
 @Repository
 class JdbcLootBanRepository(
@@ -23,7 +23,7 @@ class JdbcLootBanRepository(
     override fun findById(id: LootBanId): LootBan? {
         val sql =
             """
-            SELECT id, raiderId, guild_id, reason, bannedAt, expiresAt, is_active
+            SELECT id, raider_id, guild_id, reason, banned_at, expires_at, is_active
             FROM loot_bans
             WHERE id = ?
             """.trimIndent()
@@ -38,11 +38,11 @@ class JdbcLootBanRepository(
     ): List<LootBan> {
         val sql =
             """
-            SELECT id, raiderId, guild_id, reason, bannedAt, expiresAt, is_active
+            SELECT id, raider_id, guild_id, reason, banned_at, expires_at, is_active
             FROM loot_bans
-            WHERE raiderId = ? AND guild_id = ? AND is_active = true
-            AND (expiresAt IS NULL OR expiresAt > NOW())
-            ORDER BY bannedAt DESC
+            WHERE raider_id = ? AND guild_id = ? AND is_active = true
+            AND (expires_at IS NULL OR expires_at > NOW())
+            ORDER BY banned_at DESC
             """.trimIndent()
 
         return jdbcTemplate.query(sql, lootBanRowMapper, raiderId.value.toString(), guildId.value)
@@ -75,7 +75,7 @@ class JdbcLootBanRepository(
         val sql =
             """
             INSERT INTO loot_bans (
-                id, raiderId, guild_id, reason, bannedAt, expiresAt, is_active
+                id, raider_id, guild_id, reason, banned_at, expires_at, is_active
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
@@ -95,11 +95,11 @@ class JdbcLootBanRepository(
         val sql =
             """
             UPDATE loot_bans SET
-                raiderId = ?,
+                raider_id = ?,
                 guild_id = ?,
                 reason = ?,
-                bannedAt = ?,
-                expiresAt = ?,
+                banned_at = ?,
+                expires_at = ?,
                 is_active = ?
             WHERE id = ?
             """.trimIndent()
@@ -118,15 +118,15 @@ class JdbcLootBanRepository(
 
     private val lootBanRowMapper =
         RowMapper { rs, _ ->
-            val expiresAtTimestamp = rs.getTimestamp("expiresAt")
+            val expiresAtTimestamp = rs.getTimestamp("expires_at")
             val expiresAt = expiresAtTimestamp?.toInstant()
 
             LootBan(
                 id = LootBanId(rs.getString("id")),
-                raiderId = RaiderId(rs.getString("raiderId").toLong()),
+                raiderId = RaiderId(rs.getString("raider_id").toLong()),
                 guildId = GuildId(rs.getString("guild_id")),
                 reason = rs.getString("reason"),
-                bannedAt = rs.getTimestamp("bannedAt").toInstant(),
+                bannedAt = rs.getTimestamp("banned_at").toInstant(),
                 expiresAt = expiresAt,
             )
         }

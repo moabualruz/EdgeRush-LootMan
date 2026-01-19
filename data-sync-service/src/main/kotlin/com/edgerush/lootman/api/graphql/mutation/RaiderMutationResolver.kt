@@ -34,15 +34,19 @@ class RaiderMutationResolver(
         val command =
             CreateRaiderCommand(
                 id = input.id.toLong(),
+                characterId = input.characterId.toLong(),
                 guildId = input.guildId,
                 characterName = input.characterName,
                 realm = input.realm,
+                region = input.region,
                 characterClass = input.characterClass,
                 role = input.role,
                 rank = input.rank,
                 status = input.status ?: "ACTIVE",
                 joinDate = null,
                 wowauditId = input.wowauditId?.toLong(),
+                blizzardId = input.blizzardId?.toLong(),
+                accountId = input.accountId?.toLong(),
             )
         return createRaiderUseCase.execute(command)
             .map { it.toGraphQLType() }
@@ -92,14 +96,18 @@ class RaiderMutationResolver(
  */
 data class CreateRaiderInput(
     val id: String,
+    val characterId: String,
     val guildId: String,
     val characterName: String,
     val realm: String,
+    val region: String = "eu",
     val characterClass: String,
     val role: String,
     val rank: String? = null,
     val status: String? = null,
     val wowauditId: String? = null,
+    val blizzardId: String? = null,
+    val accountId: String? = null,
 )
 
 /**
@@ -128,6 +136,6 @@ private fun Raider.toGraphQLType(): RaiderType =
         role = this.role,
         rank = this.rank,
         status = this.status,
-        fullName = this.getFullName(),
+        fullName = this.displayName,
         isEligibleForLoot = this.isEligibleForLoot(),
     )

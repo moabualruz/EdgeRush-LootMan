@@ -3,18 +3,24 @@ import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { gearApi, type GearSlot, type ItemQuality, type GearItem, type VaultSlot } from '@/api/gear'
 import { formatRelativeTime } from '@/utils/date'
+import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 // Queries
 const { data: gearData, isLoading: gearLoading, error: gearError } = useQuery({
-  queryKey: ['myGear', GUILD_ID],
-  queryFn: () => gearApi.getMyGear(GUILD_ID),
+  queryKey: ['myGear', guildId],
+  queryFn: () => gearApi.getMyGear(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 const { data: vaultData, isLoading: vaultLoading } = useQuery({
-  queryKey: ['myVault', GUILD_ID],
-  queryFn: () => gearApi.getMyVaultOptions(GUILD_ID),
+  queryKey: ['myVault', guildId],
+  queryFn: () => gearApi.getMyVaultOptions(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Slot display order
@@ -112,8 +118,12 @@ function getVaultProgress(slot: VaultSlot): string {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="gearError" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load gear data. Please try again.</p>
+    <div v-else-if="gearError" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Gear</h5>
+        <div class="alert-description">Failed to load gear data. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Content -->
@@ -147,12 +157,11 @@ function getVaultProgress(slot: VaultSlot): string {
       </div>
 
       <!-- Warnings -->
-      <div v-if="gearData.missingEnchants.length > 0 || gearData.missingGems.length > 0" class="card bg-yellow-900/20 border-yellow-700">
-        <div class="flex items-start space-x-3">
-          <span class="text-yellow-400 text-xl">⚠</span>
-          <div>
-            <h3 class="font-semibold text-yellow-400">Equipment Issues</h3>
-            <ul class="text-yellow-300 text-sm mt-2 space-y-1">
+      <div v-if="gearData.missingEnchants.length > 0 || gearData.missingGems.length > 0" class="alert alert-warning border-l-yellow-500 bg-yellow-950/20 text-yellow-200 border-y border-r border-yellow-500/20">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-yellow-500"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+           <h5 class="alert-title text-yellow-500">Equipment Issues</h5>
+           <ul class="text-sm mt-1 space-y-1 opacity-90">
               <li v-for="slot in gearData.missingEnchants" :key="`enchant-${slot}`">
                 Missing enchant on {{ getSlotName(slot) }}
               </li>
@@ -160,7 +169,6 @@ function getVaultProgress(slot: VaultSlot): string {
                 Missing gem on {{ getSlotName(slot) }}
               </li>
             </ul>
-          </div>
         </div>
       </div>
 

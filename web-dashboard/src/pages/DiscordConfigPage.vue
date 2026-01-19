@@ -6,8 +6,12 @@ import {
   type DiscordNotificationConfig,
   type UpsertNotificationConfigRequest,
 } from '@/api/discord'
+import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 const queryClient = useQueryClient()
 
@@ -25,14 +29,15 @@ const formMentionRoleId = ref('')
 
 // Query for configs
 const { data: configsData, isLoading, error, refetch } = useQuery({
-  queryKey: ['discordConfigs', GUILD_ID],
-  queryFn: () => discordApi.getConfigs(GUILD_ID),
+  queryKey: ['discordConfigs', guildId],
+  queryFn: () => discordApi.getConfigs(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Mutations
 const upsertMutation = useMutation({
   mutationFn: (request: UpsertNotificationConfigRequest) =>
-    discordApi.upsertConfig(GUILD_ID, request),
+    discordApi.upsertConfig(guildId.value!, request),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['discordConfigs'] })
     closeModal()
@@ -41,7 +46,7 @@ const upsertMutation = useMutation({
 
 const updateMutation = useMutation({
   mutationFn: ({ configId, request }: { configId: number; request: { channelId?: string; enabled?: boolean; mentionRoleId?: string | null } }) =>
-    discordApi.updateConfig(GUILD_ID, configId, request),
+    discordApi.updateConfig(guildId.value!, configId, request),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['discordConfigs'] })
     closeModal()
@@ -49,14 +54,14 @@ const updateMutation = useMutation({
 })
 
 const deleteMutation = useMutation({
-  mutationFn: (configId: number) => discordApi.deleteConfig(GUILD_ID, configId),
+  mutationFn: (configId: number) => discordApi.deleteConfig(guildId.value!, configId),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['discordConfigs'] })
   },
 })
 
 const testMutation = useMutation({
-  mutationFn: (type: string) => discordApi.testNotification(GUILD_ID, type),
+  mutationFn: (type: string) => discordApi.testNotification(guildId.value!, type),
 })
 
 // Computed
@@ -191,8 +196,12 @@ function testNotification(type: string) {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load configurations. Please try again.</p>
+    <div v-else-if="error" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Configurations</h5>
+        <div class="alert-description">Failed to load configurations. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Empty state -->

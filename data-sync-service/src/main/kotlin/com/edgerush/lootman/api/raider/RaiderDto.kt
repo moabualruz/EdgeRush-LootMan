@@ -12,6 +12,8 @@ import java.time.LocalDateTime
 data class CreateRaiderRequest(
     @field:Min(value = 1, message = "ID must be positive")
     val id: Long,
+    @field:Min(value = 1, message = "Character ID must be positive")
+    val characterId: Long,
     @field:NotBlank(message = "Guild ID is required")
     val guildId: String,
     @field:NotBlank(message = "Character name is required")
@@ -19,6 +21,7 @@ data class CreateRaiderRequest(
     val characterName: String,
     @field:NotBlank(message = "Realm is required")
     val realm: String,
+    val region: String = "eu",
     @field:NotBlank(message = "Character class is required")
     val characterClass: String,
     @field:NotBlank(message = "Role is required")
@@ -27,6 +30,8 @@ data class CreateRaiderRequest(
     val status: String = "ACTIVE",
     val joinDate: LocalDateTime? = null,
     val wowauditId: Long? = null,
+    val blizzardId: Long? = null,
+    val accountId: Long? = null,
 )
 
 /**
@@ -72,7 +77,7 @@ data class RaiderResponse(
                 status = raider.status.name,
                 joinDate = raider.joinDate,
                 wowauditId = raider.wowauditId,
-                fullName = raider.getFullName(),
+                fullName = raider.displayName,
                 isEligibleForLoot = raider.isEligibleForLoot(),
             )
     }

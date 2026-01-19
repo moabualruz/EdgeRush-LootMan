@@ -148,7 +148,9 @@ class SimulationController(
                     ),
             ),
         )
-        /**
+    }
+
+    /**
      * Trigger simulation for a raider.
      */
     @PostMapping("/guilds/{guildId}/raiders/{raiderId}/run")
@@ -170,9 +172,9 @@ class SimulationController(
                 characterName = raider.characterName,
                 characterRealm = raider.realm,
                 characterClass = raider.characterClass.name.lowercase(),
-                characterSpec = "unknown", 
+                characterSpec = "unknown",
             )
-        
+
         return ResponseEntity
             .status(HttpStatus.ACCEPTED)
             .body(SimulationRequestDto.from(simulationRequest))
@@ -180,29 +182,44 @@ class SimulationController(
 
     /**
      * Get simulation status for a raider.
+     * Returns IDLE status if no simulation has been run.
      */
     @GetMapping("/guilds/{guildId}/raiders/{raiderId}/status")
     fun getRaiderSimulationStatus(
         @PathVariable guildId: String,
         @PathVariable raiderId: Long,
-    ): ResponseEntity<SimulationRequestDto> {
-         val raider =
+    ): ResponseEntity<RaiderSimulationStatusResponse> {
+        val raider =
             getRaiderUseCase.execute(com.edgerush.lootman.application.raider.GetRaiderQuery(raiderId)).getOrThrow()
-         
-         val profileId = simulationRepository.findProfileIdByCharacter(guildId, raider.characterName, raider.realm)
-         
-         if (profileId == null) {
-              return ResponseEntity.notFound().build()
-         }
-         
-         
-         val pending = simulationRepository.findPendingRequests().find { it.profile.id == profileId }
-         
-         if (pending != null) {
-             return ResponseEntity.ok(SimulationRequestDto.from(pending))
-         }
-         
-         return ResponseEntity.notFound().build()
+
+        val profileId = simulationRepository.findProfileIdByCharacter(guildId, raider.characterName, raider.realm)
+
+        if (profileId == null) {
+            // No simulation profile exists - return IDLE status
+            return ResponseEntity.ok(RaiderSimulationStatusResponse.idle(raiderId))
+        }
+
+        // Check for pending/running simulation
+        val pending = simulationRepository.findPendingRequests().find { it.profile.id == profileId }
+        if (pending != null) {
+            return ResponseEntity.ok(RaiderSimulationStatusResponse.from(raiderId, pending))
+        }
+
+        // Check if there are any completed results - if so, status is COMPLETED
+        val results = simulationRepository.findResultsByProfile(profileId)
+        if (results.isNotEmpty()) {
+            val latestResult = results.maxByOrNull { it.simulatedAt }
+            return ResponseEntity.ok(
+                RaiderSimulationStatusResponse(
+                    raiderId = raiderId,
+                    status = "COMPLETED",
+                    lastRunAt = latestResult?.simulatedAt,
+                    source = "LOCAL",
+                ),
+            )
+        }
+
+        // No simulation found - return IDLE status
+        return ResponseEntity.ok(RaiderSimulationStatusResponse.idle(raiderId))
     }
-}
 }

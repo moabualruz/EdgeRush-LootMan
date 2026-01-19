@@ -3,11 +3,14 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 import type { Role } from '@/types'
 import { getClassColor } from '@/utils/classColors'
 
 const authStore = useAuthStore()
-const guildId = computed(() => authStore.user?.guildId)
+const guildContextStore = useGuildContextStore()
+// Default to 'dod' guild for development when no guild context is set
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId || 'dod')
 const roleFilter = ref<Role | ''>('')
 
 const { data, isLoading, error } = useQuery({
@@ -29,12 +32,21 @@ const isCurrentUser = (characterName: string) => {
       <h1 class="text-2xl font-bold">FLPS Leaderboard</h1>
 
       <!-- Role filter -->
-      <select v-model="roleFilter" class="input w-40">
-        <option value="">All Roles</option>
-        <option value="TANK">Tank</option>
-        <option value="HEALER">Healer</option>
-        <option value="DPS">DPS</option>
-      </select>
+      <!-- Role filter -->
+      <div class="relative w-48">
+        <select
+          v-model="roleFilter"
+          class="w-full appearance-none bg-secondary text-foreground border border-input rounded-md px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer shadow-sm hover:bg-secondary/80 transition-colors"
+        >
+          <option value="" class="bg-card text-foreground">All Roles</option>
+          <option value="TANK" class="bg-card text-foreground">Tank</option>
+          <option value="HEALER" class="bg-card text-foreground">Healer</option>
+          <option value="DPS" class="bg-card text-foreground">DPS</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+        </div>
+      </div>
     </div>
 
     <!-- Loading state -->
@@ -43,16 +55,21 @@ const isCurrentUser = (characterName: string) => {
     </div>
 
     <!-- No Guild state -->
-    <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
-       <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
-       <p class="text-blue-300">
-         You are not currently a member of any guild.
-       </p>
+    <div v-else-if="!guildId" class="alert alert-info mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div>
+        <h5 class="alert-title">No Guild Found</h5>
+        <div class="alert-description">You are not currently a member of any guild. Please join a guild to view the leaderboard.</div>
+      </div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load leaderboard. Please try again.</p>
+    <div v-else-if="error" class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Leaderboard</h5>
+        <div class="alert-description">Failed to load leaderboard data. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Leaderboard table -->

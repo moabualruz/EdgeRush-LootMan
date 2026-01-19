@@ -1,6 +1,9 @@
 package com.edgerush.lootman.domain.shared.model
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
+import com.edgerush.lootman.domain.shared.AccountId
+import com.edgerush.lootman.domain.shared.CharacterId
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import io.kotest.assertions.throwables.shouldThrow
@@ -8,6 +11,7 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.time.LocalDateTime
 
 /**
@@ -18,26 +22,38 @@ class RaiderTest : UnitTest() {
 
     private fun createRaider(
         id: RaiderId = RaiderId(1L),
+        characterId: CharacterId = CharacterId(1000L),
         guildId: GuildId = GuildId("guild-123"),
-        characterName: String = "Arthas",
+        name: String = "Arthas",
         realm: String = "Icecrown",
+        region: String = "eu",
         characterClass: CharacterClass = CharacterClass.DEATH_KNIGHT,
         role: Role = Role.TANK,
         rank: String? = "Raider",
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.of(2024, 1, 15, 10, 30),
         wowauditId: Long? = 12345L,
-    ) = Raider(
+        blizzardId: Long? = null,
+        accountId: AccountId? = null,
+        createdAt: Instant = Instant.now(),
+        updatedAt: Instant = Instant.now(),
+    ) = RaiderFixtures.createRaider(
         id = id,
+        characterId = characterId,
         guildId = guildId,
-        characterName = characterName,
+        name = name,
         realm = realm,
+        region = region,
         characterClass = characterClass,
         role = role,
         rank = rank,
         status = status,
         joinDate = joinDate,
         wowauditId = wowauditId,
+        blizzardId = blizzardId,
+        accountId = accountId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
     )
 
     // endregion
@@ -54,7 +70,7 @@ class RaiderTest : UnitTest() {
                 createRaider(
                     id = RaiderId(42L),
                     guildId = GuildId("edge-rush"),
-                    characterName = "Thrall",
+                    name = "Thrall",
                     realm = "Draenor",
                     characterClass = CharacterClass.SHAMAN,
                     role = Role.DPS,
@@ -67,7 +83,7 @@ class RaiderTest : UnitTest() {
             // Assert
             raider.id shouldBe RaiderId(42L)
             raider.guildId shouldBe GuildId("edge-rush")
-            raider.characterName shouldBe "Thrall"
+            raider.name shouldBe "Thrall"
             raider.realm shouldBe "Draenor"
             raider.characterClass shouldBe CharacterClass.SHAMAN
             raider.role shouldBe Role.DPS
@@ -98,7 +114,7 @@ class RaiderTest : UnitTest() {
             // Arrange, Act & Assert
             val exception =
                 shouldThrow<IllegalArgumentException> {
-                    createRaider(characterName = "")
+                    createRaider(name = "")
                 }
             exception.message shouldBe "Character name cannot be blank"
         }
@@ -108,7 +124,7 @@ class RaiderTest : UnitTest() {
             // Arrange, Act & Assert
             val exception =
                 shouldThrow<IllegalArgumentException> {
-                    createRaider(characterName = "   ")
+                    createRaider(name = "   ")
                 }
             exception.message shouldBe "Character name cannot be blank"
         }
@@ -136,8 +152,9 @@ class RaiderTest : UnitTest() {
         @Test
         fun `should be immutable data class`() {
             // Arrange
-            val raider1 = createRaider(id = RaiderId(1L), characterName = "Test")
-            val raider2 = createRaider(id = RaiderId(1L), characterName = "Test")
+            val fixedTime = Instant.parse("2024-01-15T10:30:00Z")
+            val raider1 = createRaider(id = RaiderId(1L), name = "Test", createdAt = fixedTime, updatedAt = fixedTime)
+            val raider2 = createRaider(id = RaiderId(1L), name = "Test", createdAt = fixedTime, updatedAt = fixedTime)
 
             // Assert
             raider1 shouldBe raider2
@@ -200,7 +217,7 @@ class RaiderTest : UnitTest() {
             // Arrange
             val raider =
                 createRaider(
-                    characterName = "Illidan",
+                    name = "Illidan",
                     realm = "Black Temple",
                 )
 
@@ -216,7 +233,7 @@ class RaiderTest : UnitTest() {
             // Arrange
             val raider =
                 createRaider(
-                    characterName = "Sylvanas",
+                    name = "Sylvanas",
                     realm = "Silvermoon",
                 )
 
@@ -232,7 +249,7 @@ class RaiderTest : UnitTest() {
             // Arrange
             val raider =
                 createRaider(
-                    characterName = "Kael'thas",
+                    name = "Kael'thas",
                     realm = "Quel'Thalas",
                 )
 
@@ -247,12 +264,12 @@ class RaiderTest : UnitTest() {
     @Nested
     inner class CharacterClassTests {
         @Test
-        fun `should have all 13 character classes`() {
+        fun `should have all 14 character classes including UNKNOWN`() {
             // Act
             val classes = CharacterClass.entries
 
-            // Assert
-            classes.size shouldBe 13
+            // Assert - 13 standard classes + UNKNOWN
+            classes.size shouldBe 14
         }
 
         @Test
@@ -289,19 +306,16 @@ class RaiderTest : UnitTest() {
         }
 
         @Test
-        fun `should throw exception for unknown character class`() {
+        fun `should return UNKNOWN for unrecognized character class`() {
             // Arrange, Act & Assert
-            shouldThrow<NoSuchElementException> {
-                CharacterClass.fromString("Unknown")
-            }
+            CharacterClass.fromString("Unknown") shouldBe CharacterClass.UNKNOWN
+            CharacterClass.fromString("InvalidClass") shouldBe CharacterClass.UNKNOWN
         }
 
         @Test
-        fun `should throw exception for empty string`() {
+        fun `should return UNKNOWN for empty string`() {
             // Arrange, Act & Assert
-            shouldThrow<NoSuchElementException> {
-                CharacterClass.fromString("")
-            }
+            CharacterClass.fromString("") shouldBe CharacterClass.UNKNOWN
         }
     }
 
@@ -400,7 +414,7 @@ class RaiderTest : UnitTest() {
             // Assert
             activeRaider.status shouldBe RaiderStatus.ACTIVE
             benchedRaider.status shouldBe RaiderStatus.BENCHED
-            benchedRaider.characterName shouldBe activeRaider.characterName
+            benchedRaider.name shouldBe activeRaider.name
         }
 
         @Test

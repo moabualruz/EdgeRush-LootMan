@@ -14,5 +14,6 @@ data class LootAwardWishDataEntity(
     val specName: String?,
     @Column("spec_icon")
     val specIcon: String?,
+    @Column("value")
     val value: Int?,
 )

@@ -7,13 +7,36 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.testcontainers.DockerClientFactory
 
 /**
- * JUnit 5 condition that checks if Docker is available.
+ * JUnit 5 condition that checks if Docker is available for Testcontainers.
  *
  * Tests annotated with @EnabledIfDockerAvailable will be skipped
  * when Docker is not available, instead of failing with an error.
+ *
+ * KNOWN ISSUE: Docker Desktop 4.55+ on Windows has a bug where its credential
+ * helper proxy returns invalid info responses (Status 400 with empty fields),
+ * which breaks Testcontainers' Docker detection. Tests will be skipped on
+ * affected systems. Workarounds:
+ *   - Run tests in WSL2 where Docker works natively
+ *   - Use an external PostgreSQL via docker-compose instead of Testcontainers
+ *   - Downgrade Docker Desktop to a version before 4.55.0
+ *   - Wait for Docker Desktop to fix this bug
+ *
+ * See: https://java.testcontainers.org/on_failure.html
  */
 class DockerAvailableCondition : ExecutionCondition {
+    companion object {
+        /**
+         * Set to true to force run Docker-dependent tests even when Docker detection fails.
+         * Useful for debugging or when you know Docker is available but detection is broken.
+         */
+        var forceEnabled: Boolean = System.getProperty("testcontainers.force.enabled", "false").toBoolean()
+    }
+
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult {
+        if (forceEnabled) {
+            return ConditionEvaluationResult.enabled("Docker tests force-enabled via system property")
+        }
+
         return try {
             if (DockerClientFactory.instance().isDockerAvailable) {
                 ConditionEvaluationResult.enabled("Docker is available")

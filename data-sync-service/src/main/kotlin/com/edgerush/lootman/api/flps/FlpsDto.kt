@@ -143,10 +143,10 @@ data class LeaderboardResponse(
 data class LeaderboardEntry(
     val rank: Int,
     val raiderId: Long,
-    val raiderName: String,
+    val characterName: String,
     val characterClass: String,
     val role: String,
-    val flpsScore: Double,
+    val flps: Double,
     val eligible: Boolean,
 )
 

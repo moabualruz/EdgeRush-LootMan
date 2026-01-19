@@ -1,9 +1,10 @@
 package com.edgerush.datasync.security
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.api.auth.JwtProperties
+import com.edgerush.lootman.api.auth.OAuth2Properties
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -28,14 +29,30 @@ import java.util.*
  * - Edge cases
  */
 class JwtServiceTest : UnitTest() {
-    private val defaultProperties =
-        JwtProperties(
-            secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-            expirationMs = 3600000, // 1 hour
-            issuer = "test-issuer",
-        )
+    // Use Base64-encoded secret key (at least 256 bits = 32 bytes)
+    private val testSecretBase64 = Base64.getEncoder().encodeToString(
+        "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes".toByteArray()
+    )
 
-    private val jwtService = JwtService(defaultProperties)
+    private val defaultJwtProperties = JwtProperties(
+        secret = testSecretBase64,
+        accessTokenValidityMinutes = 60,
+        refreshTokenValidityDays = 90,
+        issuer = "test-issuer",
+    )
+
+    private val defaultOAuth2Properties = OAuth2Properties(
+        jwt = defaultJwtProperties,
+    )
+
+    private val defaultKeyProvider = JwtKeyProvider(defaultOAuth2Properties)
+    private val jwtService = JwtService(defaultKeyProvider, defaultOAuth2Properties)
+
+    private fun createServiceWithProperties(jwtProperties: JwtProperties): JwtService {
+        val oauth2Props = OAuth2Properties(jwt = jwtProperties)
+        val keyProvider = JwtKeyProvider(oauth2Props)
+        return JwtService(keyProvider, oauth2Props)
+    }
 
     @Nested
     inner class `generateToken` {
@@ -328,13 +345,16 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for token with wrong signature`() {
             // Arrange - create a token with a different secret
-            val differentProperties =
+            val differentSecretBase64 = Base64.getEncoder().encodeToString(
+                "different-secret-key-must-be-at-least-256-bits-long-for-security".toByteArray()
+            )
+            val differentService = createServiceWithProperties(
                 JwtProperties(
-                    secret = "different-secret-key-must-be-at-least-256-bits-long-for-security",
-                    expirationMs = 3600000,
+                    secret = differentSecretBase64,
+                    accessTokenValidityMinutes = 60,
                     issuer = "test-issuer",
                 )
-            val differentService = JwtService(differentProperties)
+            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -352,14 +372,14 @@ class JwtServiceTest : UnitTest() {
 
         @Test
         fun `should return false for expired token`() {
-            // Arrange - create service with very short expiration
-            val shortExpirationProperties =
+            // Arrange - create service with very short expiration (0 minutes = immediate)
+            val shortExpirationService = createServiceWithProperties(
                 JwtProperties(
-                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = 1, // 1 millisecond
+                    secret = testSecretBase64,
+                    accessTokenValidityMinutes = 0,
                     issuer = "test-issuer",
                 )
-            val shortExpirationService = JwtService(shortExpirationProperties)
+            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -446,13 +466,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should throw exception for expired token`() {
             // Arrange - create service with very short expiration
-            val shortExpirationProperties =
+            val shortExpirationService = createServiceWithProperties(
                 JwtProperties(
-                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = 1, // 1 millisecond
+                    secret = testSecretBase64,
+                    accessTokenValidityMinutes = 0,
                     issuer = "test-issuer",
                 )
-            val shortExpirationService = JwtService(shortExpirationProperties)
+            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -554,16 +574,16 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should use subject as username when username claim is missing`() {
             // Arrange - manually create a token without username claim
-            val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
+            val expirationMs = defaultJwtProperties.accessTokenValidityMinutes * 60 * 1000
             val token =
                 Jwts.builder()
                     .subject("user-123")
                     .claim("roles", listOf("GUILD_ADMIN"))
                     .claim("guildIds", listOf("guild-1"))
-                    .issuer(defaultProperties.issuer)
+                    .issuer(defaultJwtProperties.issuer)
                     .issuedAt(Date())
-                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                    .signWith(secretKey)
+                    .expiration(Date(System.currentTimeMillis() + expirationMs))
+                    .signWith(defaultKeyProvider.secretKey)
                     .compact()
 
             // Act
@@ -576,16 +596,16 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle missing roles claim as empty list`() {
             // Arrange - manually create a token without roles claim
-            val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
+            val expirationMs = defaultJwtProperties.accessTokenValidityMinutes * 60 * 1000
             val token =
                 Jwts.builder()
                     .subject("user-123")
                     .claim("username", "testuser")
                     .claim("guildIds", listOf("guild-1"))
-                    .issuer(defaultProperties.issuer)
+                    .issuer(defaultJwtProperties.issuer)
                     .issuedAt(Date())
-                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                    .signWith(secretKey)
+                    .expiration(Date(System.currentTimeMillis() + expirationMs))
+                    .signWith(defaultKeyProvider.secretKey)
                     .compact()
 
             // Act
@@ -598,16 +618,16 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should handle missing guildIds claim as empty list`() {
             // Arrange - manually create a token without guildIds claim
-            val secretKey = Keys.hmacShaKeyFor(defaultProperties.secret.toByteArray())
+            val expirationMs = defaultJwtProperties.accessTokenValidityMinutes * 60 * 1000
             val token =
                 Jwts.builder()
                     .subject("user-123")
                     .claim("username", "testuser")
                     .claim("roles", listOf("GUILD_ADMIN"))
-                    .issuer(defaultProperties.issuer)
+                    .issuer(defaultJwtProperties.issuer)
                     .issuedAt(Date())
-                    .expiration(Date(System.currentTimeMillis() + defaultProperties.expirationMs))
-                    .signWith(secretKey)
+                    .expiration(Date(System.currentTimeMillis() + expirationMs))
+                    .signWith(defaultKeyProvider.secretKey)
                     .compact()
 
             // Act
@@ -634,25 +654,25 @@ class JwtServiceTest : UnitTest() {
             val properties = JwtProperties()
 
             // Assert
-            properties.component1().shouldNotBeEmpty() // secret
-            (properties.component2() > 0).shouldBeTrue() // expirationMs
-            properties.component3().shouldNotBeEmpty() // issuer
+            (properties.accessTokenValidityMinutes > 0).shouldBeTrue()
+            properties.issuer.shouldNotBeEmpty()
         }
 
         @Test
         fun `should allow configuration of all properties via constructor`() {
             // Arrange & Act
-            val properties =
-                JwtProperties(
-                    secret = "custom-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = 7200000,
-                    issuer = "custom-issuer",
-                )
+            val properties = JwtProperties(
+                secret = "custom-secret",
+                accessTokenValidityMinutes = 120,
+                refreshTokenValidityDays = 30,
+                issuer = "custom-issuer",
+            )
 
             // Assert
-            properties.component1() shouldBe "custom-secret-key-must-be-at-least-256-bits-long-for-security-purposes"
-            properties.component2() shouldBe 7200000
-            properties.component3() shouldBe "custom-issuer"
+            properties.secret shouldBe "custom-secret"
+            properties.accessTokenValidityMinutes shouldBe 120
+            properties.refreshTokenValidityDays shouldBe 30
+            properties.issuer shouldBe "custom-issuer"
         }
 
         @Test
@@ -661,24 +681,23 @@ class JwtServiceTest : UnitTest() {
             val original = JwtProperties()
 
             // Act
-            val copied =
-                original.copy(
-                    secret = "new-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = 1800000,
-                    issuer = "new-issuer",
-                )
+            val copied = original.copy(
+                secret = "new-secret",
+                accessTokenValidityMinutes = 30,
+                issuer = "new-issuer",
+            )
 
             // Assert
-            copied.component1() shouldBe "new-secret-key-must-be-at-least-256-bits-long-for-security-purposes"
-            copied.component2() shouldBe 1800000
-            copied.component3() shouldBe "new-issuer"
+            copied.secret shouldBe "new-secret"
+            copied.accessTokenValidityMinutes shouldBe 30
+            copied.issuer shouldBe "new-issuer"
         }
 
         @Test
         fun `should allow setting secret via setter for Spring property binding`() {
             // Arrange
             val properties = JwtProperties()
-            val newSecret = "new-secret-key-set-via-setter-must-be-at-least-256-bits-long"
+            val newSecret = "new-secret-key-set-via-setter"
 
             // Act
             properties.secret = newSecret
@@ -688,16 +707,16 @@ class JwtServiceTest : UnitTest() {
         }
 
         @Test
-        fun `should allow setting expirationMs via setter for Spring property binding`() {
+        fun `should allow setting accessTokenValidityMinutes via setter for Spring property binding`() {
             // Arrange
             val properties = JwtProperties()
-            val newExpiration = 1800000L
+            val newValidity = 30L
 
             // Act
-            properties.expirationMs = newExpiration
+            properties.accessTokenValidityMinutes = newValidity
 
             // Assert
-            properties.expirationMs shouldBe newExpiration
+            properties.accessTokenValidityMinutes shouldBe newValidity
         }
 
         @Test
@@ -719,13 +738,13 @@ class JwtServiceTest : UnitTest() {
             val properties = JwtProperties()
 
             // Act - simulate Spring property binding
-            properties.secret = "completely-new-secret-must-be-at-least-256-bits-long-for-security"
-            properties.expirationMs = 43200000L // 12 hours
+            properties.secret = "completely-new-secret"
+            properties.accessTokenValidityMinutes = 120
             properties.issuer = "completely-new-issuer"
 
             // Assert
-            properties.secret shouldBe "completely-new-secret-must-be-at-least-256-bits-long-for-security"
-            properties.expirationMs shouldBe 43200000L
+            properties.secret shouldBe "completely-new-secret"
+            properties.accessTokenValidityMinutes shouldBe 120
             properties.issuer shouldBe "completely-new-issuer"
         }
     }
@@ -797,13 +816,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should work with custom issuer`() {
             // Arrange
-            val customProperties =
+            val customService = createServiceWithProperties(
                 JwtProperties(
-                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = 3600000,
+                    secret = testSecretBase64,
+                    accessTokenValidityMinutes = 60,
                     issuer = "custom-application-issuer",
                 )
-            val customService = JwtService(customProperties)
+            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -822,14 +841,14 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should work with different expiration times`() {
             // Arrange
-            val sevenDaysInMs = 86400000L * 7 // 7 days (use Long to avoid overflow)
-            val longExpirationProperties =
+            val sevenDaysInMinutes = 7 * 24 * 60L // 7 days in minutes
+            val longExpirationService = createServiceWithProperties(
                 JwtProperties(
-                    secret = "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes",
-                    expirationMs = sevenDaysInMs,
+                    secret = testSecretBase64,
+                    accessTokenValidityMinutes = sevenDaysInMinutes,
                     issuer = "test-issuer",
                 )
-            val longExpirationService = JwtService(longExpirationProperties)
+            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",

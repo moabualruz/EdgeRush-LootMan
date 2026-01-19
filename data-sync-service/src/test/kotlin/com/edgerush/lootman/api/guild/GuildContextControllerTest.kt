@@ -100,9 +100,9 @@ class GuildContextControllerTest : UnitTest() {
 
             // Then
             result.statusCode shouldBe HttpStatus.OK
-            result.body?.get(0)?.permissions shouldHaveSize 2
-            result.body?.get(0)?.permissions shouldContain "SETTINGS_ACCESS"
-            result.body?.get(0)?.permissions shouldContain "LOOT_MANAGEMENT"
+            result.body?.get(0)?.permissions?.shouldHaveSize(2)
+            result.body?.get(0)?.permissions?.shouldContain("SETTINGS_ACCESS")
+            result.body?.get(0)?.permissions?.shouldContain("LOOT_MANAGEMENT")
         }
 
         @Test
@@ -246,7 +246,7 @@ class GuildContextControllerTest : UnitTest() {
             result.statusCode shouldBe HttpStatus.OK
             result.body?.guildId shouldBe "switched-guild"
             result.body?.guildName shouldBe "Switched Guild"
-            result.body?.permissions shouldContain "SETTINGS_ACCESS"
+            result.body?.permissions?.shouldContain("SETTINGS_ACCESS")
         }
     }
 
@@ -286,7 +286,7 @@ class GuildContextControllerTest : UnitTest() {
             response?.characterMappingId shouldBe 1L
             response?.raiderId shouldBe 10L
             response?.rank shouldBe "Guild Master"
-            response?.permissions shouldHaveSize 3
+            response?.permissions?.shouldHaveSize(3)
             response?.isActive shouldBe true
         }
 
@@ -313,7 +313,7 @@ class GuildContextControllerTest : UnitTest() {
             val result = controller.getUserGuilds(testAuth)
 
             // Then
-            result.body?.first()?.permissions shouldHaveSize 0
+            result.body?.first()?.permissions?.shouldHaveSize(0)
         }
     }
 

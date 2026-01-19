@@ -121,3 +121,37 @@ data class SimulationStatusResponse(
     val pendingSimulations: Int,
     val endpoints: Map<String, String>,
 )
+
+/**
+ * Status response for a raider's simulation.
+ * Matches frontend SimulationStatus interface.
+ */
+data class RaiderSimulationStatusResponse(
+    val raiderId: Long,
+    val status: String, // IDLE, QUEUED, RUNNING, COMPLETED, FAILED
+    val progress: Double? = null,
+    val lastRunAt: Instant? = null,
+    val nextScheduledAt: Instant? = null,
+    val error: String? = null,
+    val source: String? = null, // LOCAL, RAIDBOTS
+) {
+    companion object {
+        fun idle(raiderId: Long): RaiderSimulationStatusResponse {
+            return RaiderSimulationStatusResponse(
+                raiderId = raiderId,
+                status = "IDLE",
+            )
+        }
+
+        fun from(raiderId: Long, request: SimulationRequest): RaiderSimulationStatusResponse {
+            return RaiderSimulationStatusResponse(
+                raiderId = raiderId,
+                status = request.status.name,
+                progress = null, // Progress tracking not implemented yet
+                lastRunAt = request.completedAt,
+                error = request.errorMessage,
+                source = request.source,
+            )
+        }
+    }
+}

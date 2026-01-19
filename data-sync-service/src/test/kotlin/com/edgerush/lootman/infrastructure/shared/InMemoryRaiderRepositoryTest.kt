@@ -1,6 +1,7 @@
 package com.edgerush.lootman.infrastructure.shared
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -646,17 +647,16 @@ class InMemoryRaiderRepositoryTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider =
-        Raider(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = id,
+        guildId = guildId,
+        name = characterName,
+        realm = realm,
+        characterClass = characterClass,
+        role = role,
+        rank = rank,
+        status = status,
+        joinDate = joinDate,
+        wowauditId = wowauditId,
+    )
 }

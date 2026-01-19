@@ -64,8 +64,8 @@ class FlpsConfigPreviewService(
             raiderDataList.map { raiderData ->
                 // Calculate component scores (these don't change with config)
                 val acs = componentCalculator.calculateACS(raiderData.attendance)
-                val mas = componentCalculator.calculateMAS()
-                val eps = componentCalculator.calculateEPS(raiderData.gear)
+                val mas = componentCalculator.calculateMAS(raiderData.performanceData)
+                val eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation)
                 val uv = componentCalculator.calculateUV(raiderData.wishlist, exampleItemId)
                 val tb = componentCalculator.calculateTierBonus(raiderData.gear)
                 val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)

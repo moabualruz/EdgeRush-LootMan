@@ -6,6 +6,7 @@ package com.edgerush.lootman.domain.flps.model
  * MAS measures a raider's mechanical skill through death rates and avoidable damage.
  * Normalized value between 0.0 and 1.0.
  */
+@ConsistentCopyVisibility
 data class MechanicalAdherenceScore private constructor(val value: Double) {
     init {
         require(value in 0.0..1.0) {

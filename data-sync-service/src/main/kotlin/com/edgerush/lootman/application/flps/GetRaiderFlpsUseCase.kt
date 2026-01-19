@@ -35,8 +35,8 @@ class GetRaiderFlpsUseCase(
 
             // Calculate all component scores
             val acs = componentCalculator.calculateACS(raiderData.attendance)
-            val mas = componentCalculator.calculateMAS()
-            val eps = componentCalculator.calculateEPS(raiderData.gear)
+            val mas = componentCalculator.calculateMAS(raiderData.performanceData)
+            val eps = componentCalculator.calculateEPS(raiderData.gear, raiderData.preparation)
             val uv = componentCalculator.calculateUV(raiderData.wishlist, query.itemId)
             val tb = componentCalculator.calculateTierBonus(raiderData.gear)
             val rm = componentCalculator.calculateRoleMultiplier(raiderData.raider.role)

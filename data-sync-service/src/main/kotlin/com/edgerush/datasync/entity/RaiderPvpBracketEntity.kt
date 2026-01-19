@@ -10,7 +10,9 @@ data class RaiderPvpBracketEntity(
     val id: Long? = null,
     @Column("raider_id")
     val raiderId: Long,
+    @Column("bracket")
     val bracket: String,
+    @Column("rating")
     val rating: Int?,
     @Column("season_played")
     val seasonPlayed: Int?,

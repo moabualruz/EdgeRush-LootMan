@@ -2,91 +2,115 @@ package com.edgerush.lootman.infrastructure.activity
 
 import com.edgerush.datasync.entity.HistoricalActivityEntity
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.infrastructure.springdata.HistoricalActivityEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import java.sql.ResultSet
-import java.sql.Timestamp
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.Optional
 
 /**
  * Unit tests for JdbcHistoricalActivityRepository.
+ *
+ * These tests mock the Spring Data repository to verify delegation behavior.
  */
 class JdbcHistoricalActivityRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: HistoricalActivityEntitySpringRepository
     private lateinit var repository: JdbcHistoricalActivityRepository
 
     private val now = OffsetDateTime.now(ZoneOffset.UTC)
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcHistoricalActivityRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcHistoricalActivityRepository(springRepository)
     }
 
     @Nested
     inner class FindByIdTests {
         @Test
         fun `should return activity when found`() {
+            // Given
             val id = 1L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<HistoricalActivityEntity>>(), eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<HistoricalActivityEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id), 0))
-            }
+            val entity = createEntity(id = id)
+            every { springRepository.findById(id) } returns Optional.of(entity)
+
+            // When
             val result = repository.findById(id)
+
+            // Then
             result shouldNotBe null
             result?.id shouldBe id
+            verify { springRepository.findById(id) }
         }
 
         @Test
         fun `should return null when activity not found`() {
+            // Given
             val id = 999L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<HistoricalActivityEntity>>(), eq(id),
-                )
-            } returns emptyList()
-            repository.findById(id) shouldBe null
+            every { springRepository.findById(id) } returns Optional.empty()
+
+            // When
+            val result = repository.findById(id)
+
+            // Then
+            result shouldBe null
+            verify { springRepository.findById(id) }
         }
 
         @Test
         fun `should handle null optional fields`() {
+            // Given
             val id = 1L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<HistoricalActivityEntity>>(), eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<HistoricalActivityEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id, characterId = null, periodId = null, teamId = null, seasonId = null), 0))
-            }
+            val entity = createEntity(
+                id = id,
+                characterId = null,
+                periodId = null,
+                teamId = null,
+                seasonId = null,
+            )
+            every { springRepository.findById(id) } returns Optional.of(entity)
+
+            // When
             val result = repository.findById(id)
+
+            // Then
             result shouldNotBe null
             result?.characterId shouldBe null
             result?.teamId shouldBe null
+            verify { springRepository.findById(id) }
+        }
+    }
+
+    @Nested
+    inner class FindAllTests {
+        @Test
+        fun `should return paginated activities`() {
+            // Given
+            val offset = 10L
+            val limit = 5
+            val entities = listOf(
+                createEntity(1L),
+                createEntity(2L),
+            )
+            val page = PageImpl(entities)
+
+            every { springRepository.findAll(any<Pageable>()) } returns page
+
+            // When
+            val result = repository.findAll(offset, limit)
+
+            // Then
+            result.size shouldBe 2
+            verify { springRepository.findAll(any<Pageable>()) }
         }
     }
 
@@ -94,20 +118,38 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
     inner class FindByCharacterIdTests {
         @Test
         fun `should return activities for character`() {
+            // Given
             val characterId = 100L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("character_id = ?")
-                    },
-                    any<RowMapper<HistoricalActivityEntity>>(), eq(characterId), any<Int>(), any<Long>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<HistoricalActivityEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(1L, characterId = characterId), 0), rowMapper.mapRow(mockResultSet(2L, characterId = characterId), 1))
-            }
+            val entities = listOf(
+                createEntity(1L, characterId = characterId),
+                createEntity(2L, characterId = characterId),
+            )
+            val page = PageImpl(entities)
+
+            every { springRepository.findByCharacterId(characterId, any<Pageable>()) } returns page
+
+            // When
             val result = repository.findByCharacterId(characterId, 0L, 10)
+
+            // Then
             result.size shouldBe 2
+            verify { springRepository.findByCharacterId(characterId, any<Pageable>()) }
+        }
+
+        @Test
+        fun `should return empty list when character has no activities`() {
+            // Given
+            val characterId = 999L
+            val page = PageImpl(emptyList<HistoricalActivityEntity>())
+
+            every { springRepository.findByCharacterId(characterId, any<Pageable>()) } returns page
+
+            // When
+            val result = repository.findByCharacterId(characterId, 0L, 10)
+
+            // Then
+            result shouldBe emptyList()
+            verify { springRepository.findByCharacterId(characterId, any<Pageable>()) }
         }
     }
 
@@ -115,44 +157,144 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
     inner class FindByTeamIdTests {
         @Test
         fun `should return activities for team`() {
+            // Given
             val teamId = 100L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("team_id = ?")
-                    },
-                    any<RowMapper<HistoricalActivityEntity>>(), eq(teamId), any<Int>(), any<Long>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<HistoricalActivityEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(1L, teamId = teamId), 0))
-            }
+            val entities = listOf(
+                createEntity(1L, teamId = teamId),
+            )
+            val page = PageImpl(entities)
+
+            every { springRepository.findByTeamId(teamId, any<Pageable>()) } returns page
+
+            // When
             val result = repository.findByTeamId(teamId, 0L, 10)
+
+            // Then
             result.size shouldBe 1
+            verify { springRepository.findByTeamId(teamId, any<Pageable>()) }
+        }
+
+        @Test
+        fun `should return empty list when team has no activities`() {
+            // Given
+            val teamId = 999L
+            val page = PageImpl(emptyList<HistoricalActivityEntity>())
+
+            every { springRepository.findByTeamId(teamId, any<Pageable>()) } returns page
+
+            // When
+            val result = repository.findByTeamId(teamId, 0L, 10)
+
+            // Then
+            result shouldBe emptyList()
+            verify { springRepository.findByTeamId(teamId, any<Pageable>()) }
+        }
+    }
+
+    @Nested
+    inner class CountTests {
+        @Test
+        fun `should return total count`() {
+            // Given
+            every { springRepository.count() } returns 42L
+
+            // When
+            val result = repository.count()
+
+            // Then
+            result shouldBe 42L
+            verify { springRepository.count() }
+        }
+
+        @Test
+        fun `should return count by character id`() {
+            // Given
+            val characterId = 100L
+            every { springRepository.countByCharacterId(characterId) } returns 5L
+
+            // When
+            val result = repository.countByCharacterId(characterId)
+
+            // Then
+            result shouldBe 5L
+            verify { springRepository.countByCharacterId(characterId) }
+        }
+
+        @Test
+        fun `should return count by team id`() {
+            // Given
+            val teamId = 100L
+            every { springRepository.countByTeamId(teamId) } returns 3L
+
+            // When
+            val result = repository.countByTeamId(teamId)
+
+            // Then
+            result shouldBe 3L
+            verify { springRepository.countByTeamId(teamId) }
+        }
+    }
+
+    @Nested
+    inner class ExistsByIdTests {
+        @Test
+        fun `should return true when activity exists`() {
+            // Given
+            val id = 1L
+            every { springRepository.existsById(id) } returns true
+
+            // When
+            val result = repository.existsById(id)
+
+            // Then
+            result shouldBe true
+            verify { springRepository.existsById(id) }
+        }
+
+        @Test
+        fun `should return false when activity does not exist`() {
+            // Given
+            val id = 999L
+            every { springRepository.existsById(id) } returns false
+
+            // When
+            val result = repository.existsById(id)
+
+            // Then
+            result shouldBe false
+            verify { springRepository.existsById(id) }
         }
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert new activity when id is null`() {
+        fun `should save new entity and return saved result`() {
+            // Given
             val entity = createEntity(id = null)
-            val generatedId = 1L
-            every { jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>()) } answers {
-                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId))
-                1
-            }
+            val savedEntity = createEntity(id = 1L)
+            every { springRepository.save(entity) } returns savedEntity
+
+            // When
             val result = repository.save(entity)
-            result.id shouldBe generatedId
+
+            // Then
+            result.id shouldBe 1L
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should update existing activity when id is not null`() {
+        fun `should update existing activity`() {
+            // Given
             val entity = createEntity(id = 1L)
-            val sqlSlot = slot<String>()
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
-            repository.save(entity)
-            sqlSlot.captured.contains("UPDATE") shouldBe true
+            every { springRepository.save(entity) } returns entity
+
+            // When
+            val result = repository.save(entity)
+
+            // Then
+            result shouldBe entity
+            verify { springRepository.save(entity) }
         }
     }
 
@@ -160,45 +302,18 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
     inner class DeleteTests {
         @Test
         fun `should delete activity by id`() {
+            // Given
             val id = 1L
-            every { jdbcTemplate.update(match<String> { it.contains("DELETE") }, eq(id)) } returns 1
+
+            // When
             repository.delete(id)
-            verify { jdbcTemplate.update(match { it.contains("DELETE") }, id) }
+
+            // Then
+            verify { springRepository.deleteById(id) }
         }
     }
 
-    private fun mockResultSet(
-        id: Long,
-        characterId: Long? = 100L,
-        periodId: Long? = 5L,
-        teamId: Long? = 1L,
-        seasonId: Long? = 1L,
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("id") } returns id
-        every { rs.getLong("character_id") } returns (characterId ?: 0L)
-        every { rs.getLong("period_id") } returns (periodId ?: 0L)
-        every { rs.getLong("team_id") } returns (teamId ?: 0L)
-        every { rs.getLong("season_id") } returns (seasonId ?: 0L)
-        every { rs.getString("character_name") } returns "TestChar"
-        every { rs.getString("character_realm") } returns "Illidan"
-        every { rs.getString("data_json") } returns "{}"
-        var wasNullCount = 0
-        every { rs.wasNull() } answers {
-            val isNull =
-                when (wasNullCount) {
-                    0 -> characterId == null
-                    1 -> periodId == null
-                    2 -> teamId == null
-                    3 -> seasonId == null
-                    else -> false
-                }
-            wasNullCount++
-            isNull
-        }
-        every { rs.getTimestamp("synced_at") } returns Timestamp.from(now.toInstant())
-        return rs
-    }
+    // Helper methods
 
     private fun createEntity(
         id: Long? = 1L,
@@ -210,5 +325,15 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
         seasonId: Long? = 1L,
         dataJson: String = "{}",
         syncedAt: OffsetDateTime = now,
-    ) = HistoricalActivityEntity(id, characterId, characterName, characterRealm, periodId, teamId, seasonId, dataJson, syncedAt)
+    ) = HistoricalActivityEntity(
+        id,
+        characterId,
+        characterName,
+        characterRealm,
+        periodId,
+        teamId,
+        seasonId,
+        dataJson,
+        syncedAt,
+    )
 }

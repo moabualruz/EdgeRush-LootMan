@@ -76,7 +76,14 @@ export interface LeaderboardEntry {
 export interface LeaderboardResponse {
   guildId: string
   entries: LeaderboardEntry[]
-  totalRaiders: number
+  total: number
+  limit: number
+  offset: number
+  filters: {
+    role: string | null
+    characterClass: string | null
+    eligible: boolean | null
+  }
 }
 
 // Loot types

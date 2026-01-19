@@ -13,6 +13,7 @@ import com.edgerush.lootman.application.raider.ListRaidersUseCase
 import com.edgerush.lootman.application.raider.PaginatedRaiders
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -72,6 +73,7 @@ class RaiderControllerTest : UnitTest() {
             val request =
                 CreateRaiderRequest(
                     id = 1L,
+                    characterId = 1001L,
                     guildId = "test-guild",
                     characterName = "Testchar",
                     realm = "TestRealm",
@@ -105,6 +107,7 @@ class RaiderControllerTest : UnitTest() {
             val request =
                 CreateRaiderRequest(
                     id = 42L,
+                    characterId = 1002L,
                     guildId = "my-guild",
                     characterName = "MyChar",
                     realm = "MyRealm",
@@ -144,6 +147,7 @@ class RaiderControllerTest : UnitTest() {
             val request =
                 CreateRaiderRequest(
                     id = 1L,
+                    characterId = 1003L,
                     guildId = "test-guild",
                     characterName = "",
                     realm = "TestRealm",
@@ -514,19 +518,18 @@ class RaiderControllerTest : UnitTest() {
         fun `should correctly map all raider fields to response`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val raider =
-                Raider(
-                    id = RaiderId(123L),
-                    guildId = GuildId("test-guild"),
-                    characterName = "CompleteChar",
-                    realm = "CompleteRealm",
-                    characterClass = CharacterClass.PALADIN,
-                    role = Role.TANK,
-                    rank = "Guild Master",
-                    status = RaiderStatus.ACTIVE,
-                    joinDate = joinDate,
-                    wowauditId = 9876L,
-                )
+            val raider = RaiderFixtures.createRaider(
+                id = RaiderId(123L),
+                guildId = GuildId("test-guild"),
+                name = "CompleteChar",
+                realm = "CompleteRealm",
+                characterClass = CharacterClass.PALADIN,
+                role = Role.TANK,
+                rank = "Guild Master",
+                status = RaiderStatus.ACTIVE,
+                joinDate = joinDate,
+                wowauditId = 9876L,
+            )
 
             every { getRaiderUseCase.execute(any()) } returns Result.success(raider)
 
@@ -578,17 +581,16 @@ class RaiderControllerTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider =
-        Raider(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = id,
+        guildId = guildId,
+        name = characterName,
+        realm = realm,
+        characterClass = characterClass,
+        role = role,
+        rank = rank,
+        status = status,
+        joinDate = joinDate,
+        wowauditId = wowauditId,
+    )
 }

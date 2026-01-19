@@ -14,6 +14,7 @@ import {
   fetchGuildSyncConfig,
   updateGuildSyncConfig,
   triggerBnetSync,
+  triggerWowauditSync,
   type GuildSyncConfig,
 } from '@/api/guildSync'
 import type { GuildPermission, PermissionTypeInfo } from '@/types'
@@ -55,6 +56,7 @@ const bnetGuildNameSlug = ref('')
 const bnetRegion = ref('eu')
 const syncSaving = ref(false)
 const bnetSyncing = ref(false)
+const wowauditSyncing = ref(false)
 const syncMessage = ref<{ type: 'success' | 'error'; text: string } | null>(null)
 
 // Populate form when sync config loads
@@ -154,6 +156,26 @@ async function handleBnetSync() {
   }
 }
 
+async function handleWowauditSync() {
+  wowauditSyncing.value = true
+  syncMessage.value = null
+  try {
+    const result = await triggerWowauditSync(guildId.value)
+    if (result.success) {
+      syncMessage.value = { type: 'success', text: result.message }
+      // Refresh the guild context to pick up new raiders
+      guildContextStore.fetchGuilds()
+    } else {
+      syncMessage.value = { type: 'error', text: result.message }
+    }
+    refetchSyncConfig()
+  } catch (error) {
+    syncMessage.value = { type: 'error', text: 'Failed to trigger WoWAudit sync. Please try again.' }
+  } finally {
+    wowauditSyncing.value = false
+  }
+}
+
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return 'Never'
   return new Date(dateStr).toLocaleString()
@@ -210,11 +232,13 @@ function getPermissionDescription(type: string): string {
         <div
           v-if="syncMessage"
           :class="[
-            'p-4 rounded-lg',
-            syncMessage.type === 'success' ? 'bg-green-900/30 border border-green-700 text-green-300' : 'bg-red-900/30 border border-red-700 text-red-300'
+            'alert',
+            syncMessage.type === 'success' ? 'alert-info border-green-500/50 bg-green-500/10 text-green-200' : 'alert-error'
           ]"
         >
-          {{ syncMessage.text }}
+          <svg v-if="syncMessage.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="alert-description">{{ syncMessage.text }}</div>
         </div>
 
         <!-- Loading state -->
@@ -363,6 +387,16 @@ function getPermissionDescription(type: string): string {
                     <p class="text-red-400 text-xs">{{ syncConfig.lastSyncError }}</p>
                   </div>
                 </div>
+              </div>
+
+              <div class="flex justify-end gap-4">
+                <button
+                  @click="handleWowauditSync"
+                  class="btn-secondary"
+                  :disabled="wowauditSyncing || !wowauditGuildUri || !syncConfig?.wowauditApiKeyConfigured"
+                >
+                  {{ wowauditSyncing ? 'Syncing...' : 'Sync Now' }}
+                </button>
               </div>
             </div>
           </div>

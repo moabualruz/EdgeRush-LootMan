@@ -7,10 +7,13 @@ import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
 import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
 import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
+import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
+import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
 import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -190,19 +193,18 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
         id: Long = 1L,
         guildId: String = "test-guild",
         name: String = "TestRaider",
-    ): Raider =
-        Raider(
-            id = RaiderId(id),
-            guildId = GuildId(guildId),
-            characterName = name,
-            realm = "TestRealm",
-            characterClass = CharacterClass.WARRIOR,
-            role = Role.DPS,
-            rank = "Raider",
-            status = RaiderStatus.ACTIVE,
-            joinDate = LocalDateTime.now(),
-            wowauditId = id,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = RaiderId(id),
+        guildId = GuildId(guildId),
+        name = name,
+        realm = "TestRealm",
+        characterClass = CharacterClass.WARRIOR,
+        role = Role.DPS,
+        rank = "Raider",
+        status = RaiderStatus.ACTIVE,
+        joinDate = LocalDateTime.now(),
+        wowauditId = id,
+    )
 
     private fun createTestRaiderData(raider: Raider): RaiderFlpsData =
         RaiderFlpsData(
@@ -212,13 +214,14 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
             wishlist = null,
             gear = null,
             activeBans = emptyList(),
+            performanceData = RaiderPerformanceData.empty(raider.id, raider.characterName, raider.realm),
+            preparation = RaiderPreparationData.empty(raider.id),
         )
 
-    @Suppress("DEPRECATION")
     private fun setupComponentCalculatorMocks() {
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
-        every { componentCalculator.calculateMAS() } returns MechanicalAdherenceScore.of(0.8)
-        every { componentCalculator.calculateEPS(any()) } returns ExternalPreparationScore.of(0.7)
+        every { componentCalculator.calculateMAS(any()) } returns MechanicalAdherenceScore.of(0.8)
+        every { componentCalculator.calculateEPS(any(), any()) } returns ExternalPreparationScore.of(0.7)
         every { componentCalculator.calculateUV(any(), any()) } returns UpgradeValue.of(0.6)
         every { componentCalculator.calculateTierBonus(any()) } returns TierBonus.of(0.5)
         every { componentCalculator.calculateRoleMultiplier(any()) } returns RoleMultiplier.of(1.0)

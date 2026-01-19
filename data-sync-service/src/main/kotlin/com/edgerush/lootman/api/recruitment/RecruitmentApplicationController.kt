@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.scheduler.Schedulers
 import java.time.Instant
 
 /**
@@ -236,7 +237,9 @@ class RecruitmentApplicationController(
         @RequestParam name: String,
     ): ResponseEntity<CharacterLookupResponse> {
         return try {
-            val profile = raiderIOClient.fetchCharacterProfile(region, realm, name).block()
+            val profile = raiderIOClient.fetchCharacterProfile(region, realm, name)
+                .subscribeOn(Schedulers.boundedElastic())
+                .block()
             if (profile != null) {
                 ResponseEntity.ok(profile.toLookupResponse())
             } else {

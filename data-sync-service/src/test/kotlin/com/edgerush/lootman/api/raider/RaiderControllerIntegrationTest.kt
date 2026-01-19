@@ -38,6 +38,7 @@ class RaiderControllerIntegrationTest : IntegrationTest() {
         val request =
             CreateRaiderRequest(
                 id = id,
+                characterId = id + 10000L,
                 guildId = guildId,
                 characterName = characterName,
                 realm = realm,

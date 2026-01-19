@@ -1,5 +1,7 @@
 package com.edgerush.lootman.application.raider
 
+import com.edgerush.lootman.domain.shared.AccountId
+import com.edgerush.lootman.domain.shared.CharacterId
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -8,6 +10,7 @@ import com.edgerush.lootman.domain.shared.model.RaiderStatus
 import com.edgerush.lootman.domain.shared.model.Role
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDateTime
 
 /**
@@ -19,13 +22,20 @@ class CreateRaiderUseCase(
 ) {
     fun execute(command: CreateRaiderCommand): Result<Raider> =
         runCatching {
+            val now = Instant.now()
             val raider =
                 Raider(
                     id = RaiderId(command.id),
-                    guildId = GuildId(command.guildId),
-                    characterName = command.characterName,
+                    characterId = CharacterId(command.characterId),
+                    name = command.characterName,
                     realm = command.realm,
+                    region = command.region,
                     characterClass = CharacterClass.valueOf(command.characterClass.uppercase()),
+                    blizzardId = command.blizzardId,
+                    accountId = command.accountId?.let { AccountId(it) },
+                    createdAt = now,
+                    updatedAt = now,
+                    guildId = GuildId(command.guildId),
                     role = Role.valueOf(command.role.uppercase()),
                     rank = command.rank,
                     status = RaiderStatus.valueOf(command.status.uppercase()),
@@ -51,7 +61,7 @@ class UpdateRaiderUseCase(
 
             val updatedRaider =
                 existingRaider.copy(
-                    characterName = command.characterName ?: existingRaider.characterName,
+                    name = command.characterName ?: existingRaider.name,
                     realm = command.realm ?: existingRaider.realm,
                     characterClass =
                         command.characterClass?.let { CharacterClass.valueOf(it.uppercase()) }
@@ -61,6 +71,7 @@ class UpdateRaiderUseCase(
                     status =
                         command.status?.let { RaiderStatus.valueOf(it.uppercase()) }
                             ?: existingRaider.status,
+                    updatedAt = Instant.now(),
                 )
             raiderRepository.save(updatedRaider)
         }
@@ -129,15 +140,19 @@ data class PaginatedRaiders(
 
 data class CreateRaiderCommand(
     val id: Long,
+    val characterId: Long,
     val guildId: String,
     val characterName: String,
     val realm: String,
+    val region: String = "eu",
     val characterClass: String,
     val role: String,
     val rank: String? = null,
     val status: String = "ACTIVE",
     val joinDate: LocalDateTime? = null,
     val wowauditId: Long? = null,
+    val blizzardId: Long? = null,
+    val accountId: Long? = null,
 )
 
 data class UpdateRaiderCommand(

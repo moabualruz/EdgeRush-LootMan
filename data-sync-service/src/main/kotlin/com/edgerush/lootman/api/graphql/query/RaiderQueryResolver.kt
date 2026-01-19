@@ -89,6 +89,6 @@ private fun Raider.toGraphQLType(): RaiderType =
         role = this.role,
         rank = this.rank,
         status = this.status,
-        fullName = this.getFullName(),
+        fullName = this.displayName,
         isEligibleForLoot = this.isEligibleForLoot(),
     )

@@ -1,6 +1,7 @@
 package com.edgerush.lootman.application.raider
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -47,6 +48,7 @@ class RaiderUseCasesTest : UnitTest() {
             val command =
                 CreateRaiderCommand(
                     id = 1L,
+                    characterId = 1001L,
                     guildId = "test-guild",
                     characterName = "TestChar",
                     realm = "Area52",
@@ -83,6 +85,7 @@ class RaiderUseCasesTest : UnitTest() {
             val command =
                 CreateRaiderCommand(
                     id = 1L,
+                    characterId = 1002L,
                     guildId = "test-guild",
                     characterName = "",
                     realm = "Area52",
@@ -107,6 +110,7 @@ class RaiderUseCasesTest : UnitTest() {
             val command =
                 CreateRaiderCommand(
                     id = 1L,
+                    characterId = 1003L,
                     guildId = "test-guild",
                     characterName = "TestChar",
                     realm = "Area52",
@@ -129,6 +133,7 @@ class RaiderUseCasesTest : UnitTest() {
             val command =
                 CreateRaiderCommand(
                     id = 2L,
+                    characterId = 1004L,
                     guildId = "test-guild",
                     characterName = "AltChar",
                     realm = "Illidan",
@@ -660,17 +665,16 @@ class RaiderUseCasesTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider =
-        Raider(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = id,
+        guildId = guildId,
+        name = characterName,
+        realm = realm,
+        characterClass = characterClass,
+        role = role,
+        rank = rank,
+        status = status,
+        joinDate = joinDate,
+        wowauditId = wowauditId,
+    )
 }

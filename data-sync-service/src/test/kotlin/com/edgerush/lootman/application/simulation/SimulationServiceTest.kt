@@ -8,6 +8,8 @@ import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
+import com.edgerush.lootman.infrastructure.external.raidbots.RaidbotsConfig
+import com.edgerush.lootman.infrastructure.external.raidbots.RaidbotsService
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -26,6 +28,8 @@ import java.time.Instant
 class SimulationServiceTest : UnitTest() {
     private lateinit var simulationRepository: SimulationRepository
     private lateinit var profileGenerator: ProfileGeneratorService
+    private lateinit var raidbotsService: RaidbotsService
+    private lateinit var raidbotsConfig: RaidbotsConfig
     private lateinit var simulationExecutor: SimulationExecutor
     private lateinit var service: SimulationService
 
@@ -33,8 +37,10 @@ class SimulationServiceTest : UnitTest() {
     fun setUp() {
         simulationRepository = mockk(relaxed = true)
         profileGenerator = mockk()
+        raidbotsService = mockk()
+        raidbotsConfig = RaidbotsConfig(enabled = false) // Disable Raidbots for local executor tests
         simulationExecutor = mockk()
-        service = SimulationService(simulationRepository, profileGenerator, simulationExecutor)
+        service = SimulationService(simulationRepository, profileGenerator, raidbotsService, raidbotsConfig, simulationExecutor)
     }
 
     private fun createProfile(): SimulationProfile {

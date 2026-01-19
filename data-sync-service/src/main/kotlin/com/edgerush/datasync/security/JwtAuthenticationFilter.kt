@@ -18,15 +18,7 @@ class JwtAuthenticationFilter(
         exchange: ServerWebExchange,
         chain: WebFilterChain,
     ): Mono<Void> {
-        // Admin mode: bypass authentication
-        if (adminModeConfig.isEnabled()) {
-            val adminUser = AuthenticatedUser.adminModeUser()
-            val authentication = createAuthentication(adminUser)
-            return chain.filter(exchange)
-                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
-        }
-
-        // Extract token from Authorization header
+        // First, try to extract and validate a real JWT token
         val token = extractToken(exchange)
 
         if (token != null && jwtService.validateToken(token)) {
@@ -37,10 +29,19 @@ class JwtAuthenticationFilter(
                 return chain.filter(exchange)
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
             } catch (e: Exception) {
-                // Invalid token, continue without authentication
+                // Invalid token, fall through to admin mode or no auth
             }
         }
 
+        // No valid token - if admin mode is enabled, use admin user as fallback
+        if (adminModeConfig.isEnabled()) {
+            val adminUser = AuthenticatedUser.adminModeUser()
+            val authentication = createAuthentication(adminUser)
+            return chain.filter(exchange)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+        }
+
+        // No token and no admin mode - continue without authentication
         return chain.filter(exchange)
     }
 

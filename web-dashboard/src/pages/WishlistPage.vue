@@ -4,8 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { wishlistApi, type SimulationStatus } from '@/api/wishlist'
 import type { WishlistItem } from '@/types'
 import { formatRelativeTime } from '@/utils/date'
+import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 const queryClient = useQueryClient()
 
@@ -18,8 +22,9 @@ const filterSlot = ref<string>('all')
 
 // Wishlist data query
 const { data: wishlistData, isLoading: wishlistLoading, error: wishlistError } = useQuery({
-  queryKey: ['myWishlist', GUILD_ID],
-  queryFn: () => wishlistApi.getMyWishlist(GUILD_ID),
+  queryKey: ['myWishlist', guildId],
+  queryFn: () => wishlistApi.getMyWishlist(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Track simulation polling state separately to avoid circular reference
@@ -27,9 +32,9 @@ const shouldPollSimulation = ref(false)
 
 // Simulation status query - polls when running
 const { data: simStatus, isLoading: simStatusLoading } = useQuery({
-  queryKey: ['simulationStatus', GUILD_ID, wishlistData.value?.raiderId],
-  queryFn: () => wishlistApi.getSimulationStatus(GUILD_ID, wishlistData.value!.raiderId),
-  enabled: computed(() => !!wishlistData.value?.raiderId),
+  queryKey: ['simulationStatus', guildId, wishlistData.value?.raiderId],
+  queryFn: () => wishlistApi.getSimulationStatus(guildId.value!, wishlistData.value!.raiderId),
+  enabled: computed(() => !!guildId.value && !!wishlistData.value?.raiderId),
   refetchInterval: computed(() => shouldPollSimulation.value ? 3000 : false),
 })
 
@@ -40,9 +45,9 @@ watch(() => simStatus.value?.status, (status) => {
 
 // Trigger simulation mutation
 const triggerSimMutation = useMutation({
-  mutationFn: () => wishlistApi.triggerSimulation(GUILD_ID, wishlistData.value!.raiderId),
+  mutationFn: () => wishlistApi.triggerSimulation(guildId.value!, wishlistData.value!.raiderId),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['simulationStatus', GUILD_ID] })
+    queryClient.invalidateQueries({ queryKey: ['simulationStatus', guildId.value] })
   },
 })
 
@@ -158,8 +163,12 @@ function getSimulationStatusLabel(status: SimulationStatus['status']): string {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="wishlistError" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load wishlist data. Please try again.</p>
+    <div v-else-if="wishlistError" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Wishlist</h5>
+        <div class="alert-description">Failed to load wishlist data. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Content -->

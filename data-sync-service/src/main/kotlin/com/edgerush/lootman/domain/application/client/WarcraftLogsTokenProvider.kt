@@ -7,6 +7,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.scheduler.Schedulers
 import java.time.Instant
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -72,6 +73,7 @@ class OAuth2WarcraftLogsTokenProvider(
                 )
                 .retrieve()
                 .bodyToMono(TokenResponse::class.java)
+                .subscribeOn(Schedulers.boundedElastic())
                 .block()
                 ?: throw WarcraftLogsAuthException("Failed to obtain access token")
 

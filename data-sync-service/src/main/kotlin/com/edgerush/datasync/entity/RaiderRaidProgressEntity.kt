@@ -10,7 +10,9 @@ data class RaiderRaidProgressEntity(
     val id: Long? = null,
     @Column("raider_id")
     val raiderId: Long,
+    @Column("raid")
     val raid: String,
+    @Column("difficulty")
     val difficulty: String,
     @Column("bosses_defeated")
     val bossesDefeated: Int?,

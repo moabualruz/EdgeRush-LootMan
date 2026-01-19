@@ -6,8 +6,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.reactive.function.client.WebClient
-import java.time.Duration
 import java.time.Instant
 import com.edgerush.lootman.api.auth.OAuth2Properties
 
@@ -22,9 +20,6 @@ class BlizzardDataService(
     private val clientSecret get() = properties.battlenet.clientSecret
     private val region get() = properties.battlenet.region
 
-    private val webClient = WebClient.builder()
-        .codecs { it.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) } // 16MB buffer
-        .build()
     private var accessToken: String? = null
     private var tokenExpiry: Instant = Instant.MIN
 
@@ -36,23 +31,39 @@ class BlizzardDataService(
         return if (region == "cn") "https://www.battlenet.com.cn/oauth/token" else "https://$region.battle.net/oauth/token"
     }
 
+    /**
+     * Check if Blizzard API credentials are configured.
+     */
+    fun isConfigured(): Boolean = properties.battlenet.isConfigured()
+
     @Synchronized
     private fun getAccessToken(): String {
+        if (!isConfigured()) {
+            throw IllegalStateException("Blizzard API credentials not configured. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET environment variables.")
+        }
+
         if (accessToken != null && Instant.now().isBefore(tokenExpiry)) {
             return accessToken!!
         }
 
-        // Fetch new client credentials token
-        val response = webClient.post()
-            .uri(getAuthUrl())
-            .headers { it.setBasicAuth(clientId, clientSecret) }
-            .bodyValue("grant_type=client_credentials")
-            .retrieve()
-            .bodyToMono(TokenResponse::class.java)
-            .block(Duration.ofSeconds(30)) ?: throw IllegalStateException("Failed to retrieve Battle.net access token")
+        // Fetch new client credentials token using RestTemplate (avoids WebClient.block() issues)
+        val headers = HttpHeaders().apply {
+            setBasicAuth(clientId, clientSecret)
+            contentType = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
+        }
 
-        accessToken = response.access_token
-        tokenExpiry = Instant.now().plusSeconds(response.expires_in - 60) // Buffer
+        val response = restTemplate.exchange(
+            getAuthUrl(),
+            HttpMethod.POST,
+            HttpEntity("grant_type=client_credentials", headers),
+            TokenResponse::class.java
+        )
+
+        val tokenResponse = response.body
+            ?: throw IllegalStateException("Failed to retrieve Battle.net access token")
+
+        accessToken = tokenResponse.access_token
+        tokenExpiry = Instant.now().plusSeconds(tokenResponse.expires_in - 60) // Buffer
         return accessToken!!
     }
 
@@ -101,36 +112,61 @@ class BlizzardDataService(
         // Hardcoding current expansion raid tier ID (e.g., Nerub-ar Palace) logic or fetching 'current tier'
         // For now, let's fetch instances from the Journal API
         // https://us.api.blizzard.com/data/wow/journal-instance/index?namespace=static-us
-        
+
         val url = "${getBaseUrl()}/data/wow/journal-instance/index?namespace=static-$region&locale=en_US"
-        
-        return webClient.get()
-            .uri(url)
-            .header("Authorization", "Bearer ${getAccessToken()}")
-            .retrieve()
-            .bodyToMono(JournalInstanceIndexResponse::class.java)
-            .block()
-            ?.instances
-            ?.map { 
-                 BlizzardRaid(it.id, it.name) 
+        logger.info("Fetching raids from: $url")
+
+        try {
+            val headers = HttpHeaders().apply {
+                setBearerAuth(getAccessToken())
+            }
+
+            val response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity<Any>(headers),
+                JournalInstanceIndexResponse::class.java
+            )
+
+            val raids = response.body?.instances?.map {
+                BlizzardRaid(it.id, it.name)
             } ?: emptyList()
+            logger.info("Fetched ${raids.size} raids")
+            return raids
+        } catch (e: Exception) {
+            logger.error("Failed to fetch raids: ${e.message}", e)
+            return emptyList()
+        }
     }
     
     fun getRaidMaps(instanceId: Int): List<BlizzardMap> {
-         // 1. Get Instance Details to find description/background if needed
-         // 2. We actually need encounters to get maps, or journal-instance/{id} which usually lists maps/encounters
-         
-         val url = "${getBaseUrl()}/data/wow/journal-instance/$instanceId?namespace=static-$region&locale=en_US"
-         val instance = webClient.get()
-            .uri(url)
-            .header("Authorization", "Bearer ${getAccessToken()}")
-            .retrieve()
-            .bodyToMono(JournalInstanceDetailResponse::class.java)
-            .block()
+        // 1. Get Instance Details to find description/background if needed
+        // 2. We actually need encounters to get maps, or journal-instance/{id} which usually lists maps/encounters
 
-         return instance?.maps?.map { 
-             BlizzardMap(it.id, it.name, it.description)
-         } ?: emptyList()
+        val url = "${getBaseUrl()}/data/wow/journal-instance/$instanceId?namespace=static-$region&locale=en_US"
+        logger.info("Fetching raid maps for instance $instanceId from: $url")
+
+        try {
+            val headers = HttpHeaders().apply {
+                setBearerAuth(getAccessToken())
+            }
+
+            val response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity<Any>(headers),
+                JournalInstanceDetailResponse::class.java
+            )
+
+            val maps = response.body?.maps?.map {
+                BlizzardMap(it.id, it.name, it.description)
+            } ?: emptyList()
+            logger.info("Fetched ${maps.size} maps for instance $instanceId")
+            return maps
+        } catch (e: Exception) {
+            logger.error("Failed to fetch raid maps for instance $instanceId: ${e.message}", e)
+            return emptyList()
+        }
     }
     
     fun getMap(mapId: Int): BlizzardMapDetails? {
@@ -372,9 +408,14 @@ data class BlizzardProfileCharacter(
     val level: Int,
     val playable_class: BlizzardKeyName,
     val playable_race: BlizzardKeyName,
-    val faction: BlizzardKeyName
+    val faction: BlizzardKeyName,
+    val guild: BlizzardCharacterGuild? = null  // Guild info if available
 )
-data class BlizzardRealm(val name: String)
+data class BlizzardRealm(val name: String, val slug: String? = null)
+data class BlizzardCharacterGuild(
+    val name: String,
+    val realm: BlizzardRealm
+)
 data class BlizzardKeyName(val name: String)
 
 data class BlizzardRaid(val id: Int, val name: String)
@@ -429,8 +470,8 @@ data class BlizzardGuildRef(
 )
 data class BlizzardRealmRef(
     val id: Int,
-    val name: String,
-    val slug: String
+    val name: String? = null,
+    val slug: String? = null
 )
 data class BlizzardGuildMember(
     val character: BlizzardGuildCharacter,

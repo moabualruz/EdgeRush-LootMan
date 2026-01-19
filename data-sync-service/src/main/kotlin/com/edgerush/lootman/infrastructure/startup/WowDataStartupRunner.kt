@@ -1,5 +1,6 @@
 package com.edgerush.lootman.infrastructure.startup
 
+import com.edgerush.datasync.config.SyncProperties
 import com.edgerush.lootman.application.wow.WowDataSyncService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
@@ -10,16 +11,25 @@ import org.springframework.stereotype.Component
 /**
  * Application runner that syncs WoW classes and specializations on startup.
  * Runs early (Order 10) to ensure data is available for other components.
+ *
+ * Controlled by sync.run-on-startup property (default: false).
+ * Set SYNC_RUN_ON_STARTUP=true in environment to enable.
  */
 @Component
 @Order(10)
 class WowDataStartupRunner(
-    private val wowDataSyncService: WowDataSyncService
+    private val wowDataSyncService: WowDataSyncService,
+    private val syncProperties: SyncProperties,
 ) : ApplicationRunner {
 
     private val logger = LoggerFactory.getLogger(WowDataStartupRunner::class.java)
 
     override fun run(args: ApplicationArguments?) {
+        if (!syncProperties.runOnStartup) {
+            logger.info("WoW data sync on startup is disabled (sync.run-on-startup=false)")
+            return
+        }
+
         logger.info("Starting WoW data sync on application startup...")
 
         try {

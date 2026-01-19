@@ -57,7 +57,10 @@ describe('LeaderboardPage', () => {
   const mockLeaderboardData: LeaderboardResponse = {
     guildId: 'test-guild',
     entries: mockEntries,
-    totalRaiders: 4,
+    total: 4,
+    limit: 50,
+    offset: 0,
+    filters: { role: null, characterClass: null, eligible: null },
   }
 
   const mockUser: User = {
@@ -214,7 +217,10 @@ describe('LeaderboardPage', () => {
     vi.mocked(flpsApi.getLeaderboard).mockResolvedValue({
       guildId: 'test-guild',
       entries: [],
-      totalRaiders: 0,
+      total: 0,
+      limit: 50,
+      offset: 0,
+      filters: { role: null, characterClass: null, eligible: null },
     })
 
     const wrapper = mountComponent()

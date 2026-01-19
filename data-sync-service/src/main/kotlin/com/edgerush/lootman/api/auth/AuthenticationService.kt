@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.auth
 
+import com.edgerush.datasync.security.JwtKeyProvider
+import com.edgerush.lootman.application.guild.UserLinkageRefreshService
 import com.edgerush.lootman.domain.auth.model.User
 import com.edgerush.lootman.domain.auth.model.UserCharacterMapping
 import com.edgerush.lootman.domain.auth.model.UserId
@@ -8,6 +10,7 @@ import com.edgerush.lootman.domain.auth.model.UserRole
 import com.edgerush.lootman.domain.auth.repository.RefreshTokenRepository
 import com.edgerush.lootman.domain.auth.repository.UserCharacterMappingRepository
 import com.edgerush.lootman.domain.auth.repository.UserRepository
+import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
 import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import com.edgerush.lootman.domain.shared.InvalidRefreshTokenException
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -16,7 +19,6 @@ import com.edgerush.lootman.domain.shared.UserNotFoundException
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -25,7 +27,6 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
-import javax.crypto.SecretKey
 
 /**
  * Service for handling user authentication and JWT token management.
@@ -41,20 +42,13 @@ class AuthenticationService(
     private val userCharacterRepository: com.edgerush.lootman.domain.auth.repository.UserCharacterRepository,
     private val raiderRepository: RaiderRepository,
     private val userCharacterMappingRepository: UserCharacterMappingRepository,
+    private val guildConfigurationRepository: GuildConfigurationRepository,
+    private val userLinkageRefreshService: UserLinkageRefreshService,
+    private val jwtKeyProvider: JwtKeyProvider,
 ) {
     private val logger = LoggerFactory.getLogger(AuthenticationService::class.java)
     private val secureRandom = SecureRandom()
     private val passwordEncoder = BCryptPasswordEncoder()
-
-    private val jwtKey: SecretKey by lazy {
-        val secret =
-            properties.jwt.secret.ifBlank {
-                // Generate a random key if not configured (for development)
-                logger.warn("JWT secret not configured, using random key. Sessions will not persist across restarts.")
-                Base64.getEncoder().encodeToString(ByteArray(64).also { secureRandom.nextBytes(it) })
-            }
-        Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
-    }
 
     // ============= Discord Authentication =============
 
@@ -298,7 +292,19 @@ class AuthenticationService(
     private fun syncBattlenetCharacters(user: User, accessToken: String) {
         try {
             val characters = blizzardDataService.getAccountCharacters(accessToken)
+
+            // Build a map of tracked guilds for quick lookup (by guild name + realm slug)
+            val trackedGuilds = guildConfigurationRepository.findAll(offset = 0, limit = 100)
+                .filter { it.syncEnabled }
+                .associateBy { "${it.guildName.lowercase()}-${it.bnetRealmSlug?.lowercase()}" }
+
             val userCharacters = characters.map { char ->
+                // Check if character's guild is one we track
+                val guildKey = char.guild?.let {
+                    "${it.name.lowercase()}-${it.realm.name.lowercase()}"
+                }
+                val trackedGuild = guildKey?.let { trackedGuilds[it] }
+
                 com.edgerush.lootman.domain.auth.model.UserCharacter(
                     userId = user.id!!,
                     name = char.name,
@@ -307,15 +313,21 @@ class AuthenticationService(
                     level = char.level,
                     race = char.playable_race.name,
                     faction = char.faction.name,
-                    blizzardId = char.id
+                    blizzardId = char.id,
+                    guildName = char.guild?.name,
+                    guildRealm = char.guild?.realm?.name,
+                    guildId = trackedGuild?.guildId  // Link to our tracked guild if it matches
                 )
-            }.filter { it.level >= 70 } // Only sync max/near-max level chars to reduce noise, assuming TWW level cap is 80, 70 is decent start
+            }.filter { it.level >= 70 } // Only sync max/near-max level chars to reduce noise
 
             userCharacterRepository.saveAll(userCharacters)
             logger.info("Synced ${userCharacters.size} characters for user ${user.id!!.value}")
 
-            // Auto-link characters to raiders in guild roster
-            autoLinkCharactersToRaiders(user.id!!, userCharacters)
+            // Use the linkage refresh service to create raiders and link characters
+            // This handles creating raiders from Battle.net characters if they don't exist
+            val refreshResult = userLinkageRefreshService.refreshUserLinkages(user.id!!)
+            logger.info("Linkage refresh for user ${user.id!!.value}: created=${refreshResult.newLinksCreated}, orphaned=${refreshResult.orphanedMappingsRemoved}")
+
         } catch (e: Exception) {
             logger.error("Failed to sync Battle.net characters for user ${user.id?.value}", e)
             // Swallow exception to not block login/linking
@@ -445,16 +457,33 @@ class AuthenticationService(
         val now = Instant.now()
         val expiry = now.plusSeconds(properties.jwt.accessTokenValidityMinutes * 60)
 
+        // Get all guild IDs from user's character mappings
+        val guildIds = getUserGuildIds(user.id!!)
+
         return Jwts.builder()
             .subject(user.id!!.value.toString())
             .claim("username", user.username)
             .claim("role", user.role.name)
-            .claim("guildId", user.guildId?.value)
+            .claim("guildIds", guildIds)
             .issuer(properties.jwt.issuer)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiry))
-            .signWith(jwtKey)
+            .signWith(jwtKeyProvider.secretKey)
             .compact()
+    }
+
+    /**
+     * Gets all unique guild IDs that the user has access to via their character mappings.
+     */
+    private fun getUserGuildIds(userId: UserId): List<String> {
+        val mappings = userCharacterMappingRepository.findByUserId(userId)
+        return mappings
+            .mapNotNull { mapping ->
+                mapping.raiderId?.let { raiderId ->
+                    raiderRepository.findById(raiderId)?.guildId?.value
+                }
+            }
+            .distinct()
     }
 
     private fun generateRefreshToken(user: User): String {
@@ -477,7 +506,7 @@ class AuthenticationService(
 
     private fun parseToken(token: String): Claims {
         return Jwts.parser()
-            .verifyWith(jwtKey)
+            .verifyWith(jwtKeyProvider.secretKey)
             .requireIssuer(properties.jwt.issuer)
             .build()
             .parseSignedClaims(token)

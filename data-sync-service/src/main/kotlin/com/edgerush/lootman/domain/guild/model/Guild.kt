@@ -63,6 +63,11 @@ data class GuildSettings(
     val benchmarkMode: BenchmarkMode = BenchmarkMode.THEORETICAL,
     val customBenchmarkRms: Double? = null,
     val customBenchmarkIpi: Double? = null,
+    /**
+     * Configuration for how attendance is aggregated.
+     * Defaults to per-character within the guild.
+     */
+    val attendanceAggregation: AttendanceAggregationConfig = AttendanceAggregationConfig.DEFAULT,
 ) {
     companion object {
         fun default(): GuildSettings = GuildSettings()

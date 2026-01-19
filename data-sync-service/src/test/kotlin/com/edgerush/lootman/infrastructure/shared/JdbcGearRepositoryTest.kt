@@ -46,7 +46,7 @@ class JdbcGearRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("gear_set = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
                     eq("EQUIPPED"),
@@ -74,7 +74,7 @@ class JdbcGearRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("gear_set = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
                     eq("EQUIPPED"),
@@ -98,7 +98,7 @@ class JdbcGearRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("gear_set = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
                     eq("EQUIPPED"),
@@ -125,7 +125,7 @@ class JdbcGearRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("gearSet = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("gear_set = ?") },
                     any<RowMapper<GearItem>>(),
                     eq(raiderId.value),
                     eq("BEST"),
@@ -423,9 +423,9 @@ class JdbcGearRepositoryTest : UnitTest() {
     ): ResultSet {
         val rs = mockk<ResultSet>()
         every { rs.getString("slot") } returns slot
-        every { rs.getLong("itemId") } returns itemId
+        every { rs.getLong("item_id") } returns itemId
         every { rs.getString("name") } returns name
-        every { rs.getInt("itemLevel") } returns itemLevel
+        every { rs.getInt("item_level") } returns itemLevel
         every { rs.getInt("quality") } returns quality
         every { rs.getString("enchant") } returns enchant
         every { rs.getInt("sockets") } returns sockets

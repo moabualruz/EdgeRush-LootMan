@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.raider
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -31,6 +32,7 @@ class RaiderDtoTest : UnitTest() {
             val request =
                 CreateRaiderRequest(
                     id = 1L,
+                    characterId = 1001L,
                     guildId = "test-guild",
                     characterName = "Testchar",
                     realm = "TestRealm",
@@ -58,6 +60,7 @@ class RaiderDtoTest : UnitTest() {
             val request =
                 CreateRaiderRequest(
                     id = 1L,
+                    characterId = 1002L,
                     guildId = "test-guild",
                     characterName = "Testchar",
                     realm = "TestRealm",
@@ -125,19 +128,18 @@ class RaiderDtoTest : UnitTest() {
         fun `should map Raider to RaiderResponse correctly`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val raider =
-                Raider(
-                    id = RaiderId(123L),
-                    guildId = GuildId("test-guild"),
-                    characterName = "Testchar",
-                    realm = "TestRealm",
-                    characterClass = CharacterClass.WARRIOR,
-                    role = Role.DPS,
-                    rank = "Raider",
-                    status = RaiderStatus.ACTIVE,
-                    joinDate = joinDate,
-                    wowauditId = 9876L,
-                )
+            val raider = RaiderFixtures.createRaider(
+                id = RaiderId(123L),
+                guildId = GuildId("test-guild"),
+                name = "Testchar",
+                realm = "TestRealm",
+                characterClass = CharacterClass.WARRIOR,
+                role = Role.DPS,
+                rank = "Raider",
+                status = RaiderStatus.ACTIVE,
+                joinDate = joinDate,
+                wowauditId = 9876L,
+            )
 
             // When
             val response = RaiderResponse.from(raider)
@@ -267,17 +269,16 @@ class RaiderDtoTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider =
-        Raider(
-            id = id,
-            guildId = guildId,
-            characterName = characterName,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = rank,
-            status = status,
-            joinDate = joinDate,
-            wowauditId = wowauditId,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = id,
+        guildId = guildId,
+        name = characterName,
+        realm = realm,
+        characterClass = characterClass,
+        role = role,
+        rank = rank,
+        status = status,
+        joinDate = joinDate,
+        wowauditId = wowauditId,
+    )
 }

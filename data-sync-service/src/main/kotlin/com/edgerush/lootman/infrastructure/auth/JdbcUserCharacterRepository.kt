@@ -1,107 +1,88 @@
 package com.edgerush.lootman.infrastructure.auth
 
+import com.edgerush.datasync.entity.UserCharacterEntity
 import com.edgerush.lootman.domain.auth.model.UserCharacter
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.repository.UserCharacterRepository
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
+import com.edgerush.lootman.infrastructure.springdata.UserCharacterEntitySpringRepository
 import org.springframework.stereotype.Repository
-import java.sql.ResultSet
-import java.sql.Timestamp
 
 @Repository
 class JdbcUserCharacterRepository(
-    private val jdbcTemplate: JdbcTemplate
+    private val springRepository: UserCharacterEntitySpringRepository,
 ) : UserCharacterRepository {
 
-    private val rowMapper = RowMapper { rs: ResultSet, _ ->
-        UserCharacter(
-            id = rs.getLong("id"),
-            userId = UserId(rs.getLong("user_id")),
-            name = rs.getString("character_name"),
-            realm = rs.getString("realm"),
-            className = rs.getString("class_name") ?: "Unknown",
-            classId = rs.getInt("class_id").takeUnless { rs.wasNull() },
-            specId = rs.getInt("spec_id").takeUnless { rs.wasNull() },
-            level = rs.getInt("level"),
-            race = rs.getString("playable_race"),
-            faction = rs.getString("faction"),
-            blizzardId = rs.getLong("blizzard_id").takeUnless { rs.wasNull() },
-            lastSyncedAt = rs.getTimestamp("last_synced_at").toInstant()
-        )
-    }
-
     override fun save(character: UserCharacter): UserCharacter {
-        return if (character.id == null) {
-            insert(character)
-        } else {
-            update(character)
-        }
+        val entity = character.toEntity()
+        val savedEntity = springRepository.save(entity)
+        return savedEntity.toDomain()
     }
 
     override fun saveAll(characters: List<UserCharacter>): List<UserCharacter> {
         if (characters.isEmpty()) return emptyList()
-        deleteAllByUserId(characters.first().userId) // Simple sync strategy: wipe and replace
-        return characters.map { insert(it) }
+
+        val userId = characters.first().userId
+
+        // Get existing characters by (name, realm) for upsert matching
+        val existing = findAllByUserId(userId)
+            .associateBy { "${it.name.lowercase()}-${it.realm.lowercase()}" }
+
+        return characters.map { char ->
+            val key = "${char.name.lowercase()}-${char.realm.lowercase()}"
+            val existingChar = existing[key]
+            if (existingChar != null) {
+                // Update existing character, preserving its ID
+                save(char.copy(id = existingChar.id))
+            } else {
+                // Insert new character
+                save(char)
+            }
+        }
     }
 
-    private fun insert(character: UserCharacter): UserCharacter {
-        val sql = """
-            INSERT INTO user_characters (
-                user_id, character_name, realm, class_name, class_id, spec_id, level,
-                playable_race, faction, blizzard_id, last_synced_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id
-        """
-        val id = jdbcTemplate.queryForObject(
-            sql,
-            Long::class.java,
-            character.userId.value,
-            character.name,
-            character.realm,
-            character.className,
-            character.classId,
-            character.specId,
-            character.level,
-            character.race,
-            character.faction,
-            character.blizzardId,
-            Timestamp.from(character.lastSyncedAt)
-        )
-        return character.copy(id = id)
-    }
-
-    private fun update(character: UserCharacter): UserCharacter {
-        val sql = """
-            UPDATE user_characters SET
-                character_name = ?, realm = ?, class_name = ?, class_id = ?, spec_id = ?, level = ?,
-                playable_race = ?, faction = ?, blizzard_id = ?, last_synced_at = ?
-            WHERE id = ?
-        """
-        jdbcTemplate.update(
-            sql,
-            character.name,
-            character.realm,
-            character.className,
-            character.classId,
-            character.specId,
-            character.level,
-            character.race,
-            character.faction,
-            character.blizzardId,
-            Timestamp.from(character.lastSyncedAt),
-            character.id
-        )
-        return character
-    }
-
-    override fun findAllByUserId(userId: UserId): List<UserCharacter> {
-        val sql = "SELECT * FROM user_characters WHERE user_id = ? ORDER BY level DESC, character_name ASC"
-        return jdbcTemplate.query(sql, rowMapper, userId.value)
-    }
+    override fun findAllByUserId(userId: UserId): List<UserCharacter> =
+        springRepository.findByUserIdOrderByLevelDescCharacterNameAsc(userId.value)
+            .map { it.toDomain() }
 
     override fun deleteAllByUserId(userId: UserId) {
-        val sql = "DELETE FROM user_characters WHERE user_id = ?"
-        jdbcTemplate.update(sql, userId.value)
+        springRepository.deleteAllByUserId(userId.value)
     }
+
+    private fun UserCharacterEntity.toDomain(): UserCharacter =
+        UserCharacter(
+            id = id,
+            userId = UserId(userId),
+            name = characterName,
+            realm = realm,
+            className = className ?: "Unknown",
+            classId = classId,
+            specId = specId,
+            level = level,
+            race = playableRace,
+            faction = faction,
+            blizzardId = blizzardId,
+            guildName = guildName,
+            guildRealm = guildRealm,
+            guildId = guildId,
+            lastSyncedAt = lastSyncedAt,
+        )
+
+    private fun UserCharacter.toEntity(): UserCharacterEntity =
+        UserCharacterEntity(
+            id = id,
+            userId = userId.value,
+            characterName = name,
+            realm = realm,
+            className = className,
+            classId = classId,
+            specId = specId,
+            level = level,
+            playableRace = race,
+            faction = faction,
+            blizzardId = blizzardId,
+            guildName = guildName,
+            guildRealm = guildRealm,
+            guildId = guildId,
+            lastSyncedAt = lastSyncedAt,
+        )
 }

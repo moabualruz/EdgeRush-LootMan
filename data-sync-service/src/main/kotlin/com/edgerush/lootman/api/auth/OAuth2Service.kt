@@ -36,7 +36,7 @@ class OAuth2Service(
             throw OAuth2AuthenticationException("Discord", "Discord OAuth2 is not configured")
         }
 
-        return UriComponentsBuilder.fromHttpUrl(properties.discord.authorizationUrl)
+        return UriComponentsBuilder.fromUriString(properties.discord.authorizationUrl)
             .queryParam("client_id", properties.discord.clientId)
             .queryParam("redirect_uri", URLEncoder.encode(properties.discord.redirectUri, StandardCharsets.UTF_8))
             .queryParam("response_type", "code")
@@ -139,7 +139,7 @@ class OAuth2Service(
         // Battle.net requires state parameter - generate one if not provided
         val stateValue = state ?: java.util.UUID.randomUUID().toString()
 
-        return UriComponentsBuilder.fromHttpUrl(properties.battlenet.authorizationUrl)
+        return UriComponentsBuilder.fromUriString(properties.battlenet.authorizationUrl)
             .queryParam("client_id", properties.battlenet.clientId)
             .queryParam("redirect_uri", URLEncoder.encode(properties.battlenet.redirectUri, StandardCharsets.UTF_8))
             .queryParam("response_type", "code")

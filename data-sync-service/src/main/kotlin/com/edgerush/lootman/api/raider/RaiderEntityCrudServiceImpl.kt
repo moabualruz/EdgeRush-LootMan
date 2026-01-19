@@ -27,10 +27,21 @@ class RaiderEntityCrudServiceImpl(
     override fun create(request: CreateRaiderEntityRequest): RaiderEntityResponse {
         val entity =
             RaiderEntity(
-                characterName = request.characterName, realm = request.realm, region = request.region,
-                wowauditId = request.wowauditId, clazz = request.clazz, spec = request.spec, role = request.role,
-                rank = request.rank, status = request.status, note = request.note, blizzardId = request.blizzardId,
-                trackingSince = request.trackingSince, joinDate = request.joinDate, blizzardLastModified = null,
+                characterName = request.characterName,
+                realm = request.realm,
+                region = request.region,
+                guildId = request.guildId,
+                wowauditId = request.wowauditId,
+                clazz = request.clazz,
+                spec = request.spec,
+                role = request.role,
+                rank = request.rank,
+                status = request.status,
+                note = request.note,
+                blizzardId = request.blizzardId,
+                trackingSince = request.trackingSince,
+                joinDate = request.joinDate,
+                blizzardLastModified = null,
                 lastSync = OffsetDateTime.now(),
             )
         return RaiderEntityResponse.from(repository.save(entity))
@@ -43,6 +54,7 @@ class RaiderEntityCrudServiceImpl(
         val existing = repository.findById(id) ?: throw NoSuchElementException("Raider not found with id: $id")
         val updated =
             existing.copy(
+                guildId = request.guildId ?: existing.guildId,
                 spec = request.spec ?: existing.spec,
                 role = request.role ?: existing.role,
                 rank = request.rank ?: existing.rank,

@@ -36,7 +36,17 @@ interface RaiderEntityRepository {
 
     fun findByCharacterNameAndRealm(characterName: String, realm: String): RaiderEntity?
 
+    /**
+     * Case-insensitive lookup that handles realm name variations.
+     * Matches both slug format (twisting-nether) and display format (Twisting Nether).
+     */
+    fun findByCharacterNameAndRealmNormalized(characterName: String, realm: String): RaiderEntity?
+
     fun findByBlizzardId(blizzardId: Long): RaiderEntity?
+
+    fun findByWowauditId(wowauditId: Long): RaiderEntity?
+
+    fun findByWowauditIds(wowauditIds: List<Long>): List<RaiderEntity>
 
     fun findByGuildId(guildId: String, offset: Long, limit: Int): List<RaiderEntity>
 

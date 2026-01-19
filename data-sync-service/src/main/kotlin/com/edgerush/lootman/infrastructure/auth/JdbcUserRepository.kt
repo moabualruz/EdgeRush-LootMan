@@ -1,220 +1,104 @@
 package com.edgerush.lootman.infrastructure.auth
 
+import com.edgerush.datasync.entity.UserEntity
 import com.edgerush.lootman.domain.auth.model.User
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.model.UserRole
 import com.edgerush.lootman.domain.auth.repository.UserRepository
 import com.edgerush.lootman.domain.shared.GuildId
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
+import com.edgerush.lootman.infrastructure.springdata.UserEntitySpringRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
-import java.sql.Statement
-import java.sql.Timestamp
 
 /**
  * JDBC implementation of UserRepository.
  *
- * Persists users to the users table.
+ * Persists users to the users table using Spring Data JDBC.
  */
 @Repository
 class JdbcUserRepository(
-    private val jdbcTemplate: JdbcTemplate,
+    private val springRepository: UserEntitySpringRepository,
 ) : UserRepository {
-    override fun findById(id: UserId): User? {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE id = ?
-            """.trimIndent()
+    override fun findById(id: UserId): User? =
+        springRepository.findById(id.value).orElse(null)?.toDomain()
 
-        return jdbcTemplate.query(sql, rowMapper, id.value).firstOrNull()
-    }
+    override fun findByDiscordId(discordId: String): User? =
+        springRepository.findByDiscordId(discordId)?.toDomain()
 
-    override fun findByDiscordId(discordId: String): User? {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE discord_id = ?
-            """.trimIndent()
+    override fun findByBattlenetId(battlenetId: String): User? =
+        springRepository.findByBattlenetId(battlenetId)?.toDomain()
 
-        return jdbcTemplate.query(sql, rowMapper, discordId).firstOrNull()
-    }
+    override fun findByGuildId(guildId: GuildId): List<User> =
+        springRepository.findByGuildId(guildId.value).map { it.toDomain() }
 
-    override fun findByBattlenetId(battlenetId: String): User? {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE battlenet_id = ?
-            """.trimIndent()
+    override fun findByUsername(username: String): User? =
+        springRepository.findByUsernameIgnoreCase(username)?.toDomain()
 
-        return jdbcTemplate.query(sql, rowMapper, battlenetId).firstOrNull()
-    }
+    override fun findByEmail(email: String): User? =
+        springRepository.findByEmailIgnoreCase(email)?.toDomain()
 
-    override fun findByGuildId(guildId: GuildId): List<User> {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE guild_id = ?
-            ORDER BY username ASC
-            """.trimIndent()
+    override fun existsByUsername(username: String): Boolean =
+        springRepository.existsByUsernameIgnoreCase(username)
 
-        return jdbcTemplate.query(sql, rowMapper, guildId.value)
-    }
-
-    override fun findByUsername(username: String): User? {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE LOWER(username) = LOWER(?)
-            """.trimIndent()
-
-        return jdbcTemplate.query(sql, rowMapper, username).firstOrNull()
-    }
-
-    override fun findByEmail(email: String): User? {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            WHERE LOWER(email) = LOWER(?)
-            """.trimIndent()
-
-        return jdbcTemplate.query(sql, rowMapper, email).firstOrNull()
-    }
-
-    override fun existsByUsername(username: String): Boolean {
-        val sql = "SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER(?)"
-        val count = jdbcTemplate.queryForObject(sql, Long::class.java, username)
-        return (count ?: 0) > 0
-    }
-
-    override fun existsByEmail(email: String): Boolean {
-        val sql = "SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?)"
-        val count = jdbcTemplate.queryForObject(sql, Long::class.java, email)
-        return (count ?: 0) > 0
-    }
+    override fun existsByEmail(email: String): Boolean =
+        springRepository.existsByEmailIgnoreCase(email)
 
     override fun save(user: User): User {
-        return if (user.id == null) {
-            insert(user)
-        } else {
-            update(user)
-        }
-    }
-
-    private fun insert(user: User): User {
-        val sql =
-            """
-            INSERT INTO users (discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-
-        val keyHolder = GeneratedKeyHolder()
-
-        jdbcTemplate.update({ connection ->
-            val ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-            ps.setString(1, user.discordId)
-            ps.setString(2, user.battlenetId)
-            ps.setString(3, user.username)
-            ps.setString(4, user.email)
-            ps.setString(5, user.passwordHash)
-            ps.setString(6, user.avatarUrl)
-            ps.setString(7, user.role.name)
-            ps.setString(8, user.guildId?.value)
-            ps.setTimestamp(9, Timestamp.from(user.createdAt))
-            ps.setTimestamp(10, user.lastLogin?.let { Timestamp.from(it) })
-            ps
-        }, keyHolder)
-
-        val generatedId =
-            keyHolder.keys?.get("id") as? Long
-                ?: throw IllegalStateException("Failed to retrieve generated ID for user")
-
-        return user.withId(UserId(generatedId))
-    }
-
-    private fun update(user: User): User {
-        val sql =
-            """
-            UPDATE users
-            SET discord_id = ?, battlenet_id = ?, username = ?, email = ?, password_hash = ?, avatar_url = ?, role = ?, guild_id = ?, last_login = ?
-            WHERE id = ?
-            """.trimIndent()
-
-        jdbcTemplate.update(
-            sql,
-            user.discordId,
-            user.battlenetId,
-            user.username,
-            user.email,
-            user.passwordHash,
-            user.avatarUrl,
-            user.role.name,
-            user.guildId?.value,
-            user.lastLogin?.let { Timestamp.from(it) },
-            user.id!!.value,
-        )
-
-        return user
+        val entity = user.toEntity()
+        val savedEntity = springRepository.save(entity)
+        return savedEntity.toDomain()
     }
 
     override fun deleteById(id: UserId) {
-        val sql = "DELETE FROM users WHERE id = ?"
-        jdbcTemplate.update(sql, id.value)
+        springRepository.deleteById(id.value)
     }
 
-    override fun existsByDiscordId(discordId: String): Boolean {
-        val sql = "SELECT COUNT(*) FROM users WHERE discord_id = ?"
-        val count = jdbcTemplate.queryForObject(sql, Long::class.java, discordId)
-        return (count ?: 0) > 0
+    override fun existsByDiscordId(discordId: String): Boolean =
+        springRepository.existsByDiscordId(discordId)
+
+    override fun existsByBattlenetId(battlenetId: String): Boolean =
+        springRepository.existsByBattlenetId(battlenetId)
+
+    override fun findAll(offset: Long, limit: Int): List<User> {
+        val pageRequest = PageRequest.of(
+            (offset / limit).toInt(),
+            limit,
+            Sort.by("id"),
+        )
+        return springRepository.findAll(pageRequest).content.map { it.toDomain() }
     }
 
-    override fun existsByBattlenetId(battlenetId: String): Boolean {
-        val sql = "SELECT COUNT(*) FROM users WHERE battlenet_id = ?"
-        val count = jdbcTemplate.queryForObject(sql, Long::class.java, battlenetId)
-        return (count ?: 0) > 0
-    }
+    override fun count(): Long =
+        springRepository.count()
 
-    override fun findAll(
-        offset: Long,
-        limit: Int,
-    ): List<User> {
-        val sql =
-            """
-            SELECT id, discord_id, battlenet_id, username, email, password_hash, avatar_url, role, guild_id, created_at, last_login
-            FROM users
-            ORDER BY id ASC
-            LIMIT ? OFFSET ?
-            """.trimIndent()
+    private fun UserEntity.toDomain(): User =
+        User(
+            id = id?.let { UserId(it) },
+            discordId = discordId,
+            battlenetId = battlenetId,
+            username = username,
+            email = email,
+            passwordHash = passwordHash,
+            avatarUrl = avatarUrl,
+            role = UserRole.fromString(role),
+            guildId = guildId?.let { GuildId(it) },
+            createdAt = createdAt,
+            lastLogin = lastLogin,
+        )
 
-        return jdbcTemplate.query(sql, rowMapper, limit, offset)
-    }
-
-    override fun count(): Long {
-        val sql = "SELECT COUNT(*) FROM users"
-        return jdbcTemplate.queryForObject(sql, Long::class.java) ?: 0
-    }
-
-    private val rowMapper =
-        RowMapper { rs, _ ->
-            User(
-                id = UserId(rs.getLong("id")),
-                discordId = rs.getString("discord_id"),
-                battlenetId = rs.getString("battlenet_id"),
-                username = rs.getString("username"),
-                email = rs.getString("email"),
-                passwordHash = rs.getString("password_hash"),
-                avatarUrl = rs.getString("avatar_url"),
-                role = UserRole.fromString(rs.getString("role")),
-                guildId = rs.getString("guild_id")?.let { GuildId(it) },
-                createdAt = rs.getTimestamp("created_at").toInstant(),
-                lastLogin = rs.getTimestamp("last_login")?.toInstant(),
-            )
-        }
+    private fun User.toEntity(): UserEntity =
+        UserEntity(
+            id = id?.value,
+            discordId = discordId,
+            battlenetId = battlenetId,
+            username = username,
+            email = email,
+            passwordHash = passwordHash,
+            avatarUrl = avatarUrl,
+            role = role.name,
+            guildId = guildId?.value,
+            createdAt = createdAt,
+            lastLogin = lastLogin,
+        )
 }

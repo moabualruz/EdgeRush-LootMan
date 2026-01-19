@@ -7,6 +7,7 @@ import com.edgerush.lootman.domain.application.client.WarcraftLogsParseResult
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 
 /**
  * Service for fetching character data from external APIs for recruitment applications.
@@ -40,6 +41,7 @@ class ApplicationDataFetchService(
         // Fetch RaiderIO data (required)
         val raiderIOProfile =
             raiderIOClient.fetchCharacterProfile(region, realm, name)
+                .subscribeOn(Schedulers.boundedElastic())
                 .block()
                 ?: throw CharacterNotFoundException("Character not found: $name-$realm-$region")
 
@@ -51,6 +53,7 @@ class ApplicationDataFetchService(
                         log.warn("Failed to fetch Warcraft Logs data for {}: {}", name, error.message)
                         Mono.empty()
                     }
+                    .subscribeOn(Schedulers.boundedElastic())
                     .block()
             } catch (e: Exception) {
                 log.warn("Exception fetching Warcraft Logs data for {}: {}", name, e.message)
@@ -80,7 +83,9 @@ class ApplicationDataFetchService(
         realm: String,
         name: String,
     ): RaiderIOCharacterProfile? {
-        return raiderIOClient.fetchCharacterProfile(region, realm, name).block()
+        return raiderIOClient.fetchCharacterProfile(region, realm, name)
+            .subscribeOn(Schedulers.boundedElastic())
+            .block()
     }
 
     /**
@@ -91,7 +96,9 @@ class ApplicationDataFetchService(
         realm: String,
         name: String,
     ): WarcraftLogsParseResult? {
-        return warcraftLogsClient.fetchCharacterParses(region, realm, name).block()
+        return warcraftLogsClient.fetchCharacterParses(region, realm, name)
+            .subscribeOn(Schedulers.boundedElastic())
+            .block()
     }
 }
 

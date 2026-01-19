@@ -12,17 +12,22 @@ data class RaiderGearItemEntity(
     val raiderId: Long,
     @Column("gear_set")
     val gearSet: String,
+    @Column("slot")
     val slot: String,
     @Column("item_id")
     val itemId: Long?,
     @Column("item_level")
     val itemLevel: Int?,
+    @Column("quality")
     val quality: Int?,
+    @Column("enchant")
     val enchant: String?,
     @Column("enchant_quality")
     val enchantQuality: Int?,
     @Column("upgrade_level")
     val upgradeLevel: Int?,
+    @Column("sockets")
     val sockets: Int?,
+    @Column("name")
     val name: String?,
 )

@@ -42,13 +42,15 @@ class CurrentUserService(
      */
     fun getCurrentUserPrimaryRaiderId(): Mono<RaiderId> {
         return getCurrentUser().flatMap { user ->
-            val userId = UserId(user.id.toLongOrNull() ?: -1L)
-
             // In admin mode, we can't get a raider ID (admin doesn't have one)
             if (user.isAdminMode) {
                 return@flatMap Mono.error(NoLinkedRaiderException(-1L))
             }
 
+            val userIdLong = user.id.toLongOrNull()
+                ?: return@flatMap Mono.error(IllegalArgumentException("Invalid user ID: ${user.id}"))
+
+            val userId = UserId(userIdLong)
             val primaryMapping =
                 userCharacterMappingService.getPrimaryCharacterForUser(userId)
                     ?: return@flatMap Mono.error(NoLinkedRaiderException(userId.value))
@@ -62,12 +64,15 @@ class CurrentUserService(
      * For use in non-reactive controllers.
      */
     fun getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser: AuthenticatedUser): RaiderId {
-        val userId = UserId(authenticatedUser.id.toLongOrNull() ?: -1L)
-
+        // In admin mode, we can't get a raider ID (admin doesn't have one)
         if (authenticatedUser.isAdminMode) {
             throw NoLinkedRaiderException(-1L)
         }
 
+        val userIdLong = authenticatedUser.id.toLongOrNull()
+            ?: throw IllegalArgumentException("Invalid user ID: ${authenticatedUser.id}")
+
+        val userId = UserId(userIdLong)
         val primaryMapping =
             userCharacterMappingService.getPrimaryCharacterForUser(userId)
                 ?: throw NoLinkedRaiderException(userId.value)

@@ -7,6 +7,7 @@ package com.edgerush.lootman.domain.flps.model
  * Values typically range from 1.0 (has tier) to 1.2 (needs tier).
  * Stored as normalized value between 0.0 and 2.0 to allow for multipliers.
  */
+@ConsistentCopyVisibility
 data class TierBonus private constructor(val value: Double) {
     init {
         require(value in 0.0..2.0) {

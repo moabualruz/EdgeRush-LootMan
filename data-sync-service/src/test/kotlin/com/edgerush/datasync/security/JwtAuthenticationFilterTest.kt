@@ -74,9 +74,12 @@ class JwtAuthenticationFilterTest : UnitTest() {
         }
 
         @Test
-        fun `should not extract token when admin mode is enabled`() {
+        fun `should fallback to admin user when token is invalid and admin mode is enabled`() {
             // Arrange
+            // The current implementation always tries to validate the token first,
+            // and only uses admin mode as a fallback if the token is invalid or missing
             every { adminModeConfig.isEnabled() } returns true
+            every { jwtService.validateToken("some-token") } returns false
 
             val request =
                 MockServerHttpRequest.get("/api/v1/test")
@@ -93,7 +96,8 @@ class JwtAuthenticationFilterTest : UnitTest() {
             StepVerifier.create(result)
                 .verifyComplete()
 
-            verify(exactly = 0) { jwtService.validateToken(any()) }
+            // Token is validated but user is not extracted since validation failed
+            verify(exactly = 1) { jwtService.validateToken("some-token") }
             verify(exactly = 0) { jwtService.extractUser(any()) }
         }
     }

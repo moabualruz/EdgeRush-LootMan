@@ -53,15 +53,19 @@ class RaiderController(
         val command =
             CreateRaiderCommand(
                 id = request.id,
+                characterId = request.characterId,
                 guildId = request.guildId,
                 characterName = request.characterName,
                 realm = request.realm,
+                region = request.region,
                 characterClass = request.characterClass,
                 role = request.role,
                 rank = request.rank,
                 status = request.status,
                 joinDate = request.joinDate,
                 wowauditId = request.wowauditId,
+                blizzardId = request.blizzardId,
+                accountId = request.accountId,
             )
 
         return createRaiderUseCase.execute(command)

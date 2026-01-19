@@ -7,6 +7,7 @@ import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
+import com.edgerush.lootman.application.raider.GetRaiderUseCase
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -21,13 +22,15 @@ import java.time.Instant
 class SimulationControllerTest : UnitTest() {
     private lateinit var simulationService: SimulationService
     private lateinit var simulationRepository: SimulationRepository
+    private lateinit var getRaiderUseCase: GetRaiderUseCase
     private lateinit var controller: SimulationController
 
     @BeforeEach
     fun setUp() {
         simulationService = mockk()
         simulationRepository = mockk()
-        controller = SimulationController(simulationService, simulationRepository)
+        getRaiderUseCase = mockk()
+        controller = SimulationController(simulationService, simulationRepository, getRaiderUseCase)
     }
 
     private fun createTestProfile(

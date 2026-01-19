@@ -16,6 +16,7 @@ data class RecruitmentCommentEntity(
     @Column("author_id")
     val authorId: Long,
 
+    @Column("text")
     val text: String,
 
     @Column("created_at")

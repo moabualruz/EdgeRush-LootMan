@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.graphql.dataloader
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -127,17 +128,16 @@ class RaiderDataLoaderTest : UnitTest() {
         id: Long = 1L,
         guildId: String = "test-guild",
         name: String = "TestRaider",
-    ): Raider =
-        Raider(
-            id = RaiderId(id),
-            guildId = GuildId(guildId),
-            characterName = name,
-            realm = "TestRealm",
-            characterClass = CharacterClass.WARRIOR,
-            role = Role.DPS,
-            rank = "Raider",
-            status = RaiderStatus.ACTIVE,
-            joinDate = LocalDateTime.now(),
-            wowauditId = id,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = RaiderId(id),
+        guildId = GuildId(guildId),
+        name = name,
+        realm = "TestRealm",
+        characterClass = CharacterClass.WARRIOR,
+        role = Role.DPS,
+        rank = "Raider",
+        status = RaiderStatus.ACTIVE,
+        joinDate = LocalDateTime.now(),
+        wowauditId = id,
+    )
 }

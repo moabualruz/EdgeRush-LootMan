@@ -1,7 +1,11 @@
 package com.edgerush.lootman.application.guild
 
 import com.edgerush.datasync.entity.RaiderEntity
+import com.edgerush.lootman.domain.guild.model.GuildPermission
+import com.edgerush.lootman.domain.guild.model.GuildPermissionType
+import com.edgerush.lootman.domain.guild.repository.GuildPermissionRepository
 import com.edgerush.lootman.domain.raider.repository.RaiderEntityRepository
+import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.infrastructure.external.blizzard.BlizzardDataService
 import com.edgerush.lootman.infrastructure.external.blizzard.BlizzardGuildMember
 import org.slf4j.LoggerFactory
@@ -16,6 +20,7 @@ import java.time.OffsetDateTime
 class GuildRosterSyncService(
     private val blizzardDataService: BlizzardDataService,
     private val raiderEntityRepository: RaiderEntityRepository,
+    private val guildPermissionRepository: GuildPermissionRepository,
 ) {
     private val logger = LoggerFactory.getLogger(GuildRosterSyncService::class.java)
 
@@ -66,7 +71,68 @@ class GuildRosterSyncService(
         }
 
         logger.info("Guild roster sync completed: created=$created, updated=$updated, skipped=$skipped")
+
+        // Auto-create default permissions for officer ranks if they don't exist
+        ensureDefaultPermissions(guildId)
+
         return GuildRosterSyncResult(created, updated, skipped)
+    }
+
+    /**
+     * Ensures default permissions exist for common ranks.
+     * This is called after each sync to ensure permissions are always available.
+     *
+     * Note: "Main" and "Raider" are WoWAudit ranks that regular raiders have.
+     * Without permissions defined for these ranks, users cannot access guild data.
+     */
+    private fun ensureDefaultPermissions(guildId: String) {
+        // Officer ranks get full permissions
+        val officerRanks = listOf("Guild Master", "Officer", "Veteran")
+        // Raider ranks get view permissions only
+        val raiderRanks = listOf("Main", "Raider", "Member", "Initiate")
+        val permissionTypes = listOf(
+            GuildPermissionType.SETTINGS_ACCESS,
+            GuildPermissionType.LOOT_MANAGEMENT,
+            GuildPermissionType.MEMBER_MANAGEMENT,
+            GuildPermissionType.VIEW_ALL_SCORES,
+        )
+
+        var created = 0
+        // Grant full permissions to officer ranks
+        for (rank in officerRanks) {
+            for (permissionType in permissionTypes) {
+                try {
+                    val permission = GuildPermission.create(
+                        guildId = GuildId(guildId),
+                        rankName = rank,
+                        permissionType = permissionType,
+                    )
+                    guildPermissionRepository.save(permission)
+                    created++
+                } catch (e: Exception) {
+                    // Permission already exists (unique constraint), ignore
+                }
+            }
+        }
+
+        // Grant view-only permission to regular raider ranks
+        for (rank in raiderRanks) {
+            try {
+                val permission = GuildPermission.create(
+                    guildId = GuildId(guildId),
+                    rankName = rank,
+                    permissionType = GuildPermissionType.VIEW_ALL_SCORES,
+                )
+                guildPermissionRepository.save(permission)
+                created++
+            } catch (e: Exception) {
+                // Permission already exists (unique constraint), ignore
+            }
+        }
+
+        if (created > 0) {
+            logger.info("Created $created default permissions for guild $guildId")
+        }
     }
 
     private fun upsertRaider(
@@ -76,14 +142,15 @@ class GuildRosterSyncService(
         classNames: Map<Int, String>,
     ): UpsertResult {
         val character = member.character
-        val realmName = character.realm.name
+        // Handle nullable realm name - use slug as fallback, or "Unknown" if both are null
+        val realmName = character.realm.name ?: character.realm.slug ?: "Unknown"
 
         // First try to find by blizzardId
         var existing = raiderEntityRepository.findByBlizzardId(character.id)
 
-        // If not found by blizzardId, try by name+realm
+        // If not found by blizzardId, try by name+realm (normalized to handle slug vs display name differences)
         if (existing == null) {
-            existing = raiderEntityRepository.findByCharacterNameAndRealm(character.name, realmName)
+            existing = raiderEntityRepository.findByCharacterNameAndRealmNormalized(character.name, realmName)
         }
 
         val className = classNames[character.playable_class.id] ?: "Unknown"

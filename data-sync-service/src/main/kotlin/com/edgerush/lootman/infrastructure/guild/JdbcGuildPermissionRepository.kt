@@ -104,6 +104,38 @@ class JdbcGuildPermissionRepository(
         return jdbcTemplate.queryForList(sql, String::class.java, guildId.value)
     }
 
+    override fun findByGuildIdAndRankNames(
+        guildRanks: List<Pair<GuildId, String>>
+    ): Map<Pair<String, String>, List<GuildPermissionType>> {
+        if (guildRanks.isEmpty()) return emptyMap()
+
+        // Build a WHERE clause with OR conditions for each (guild_id, rank_name) pair
+        val conditions = guildRanks.joinToString(" OR ") { "(guild_id = ? AND rank_name = ?)" }
+        val sql = """
+            SELECT guild_id, rank_name, permission_type
+            FROM guild_permissions
+            WHERE $conditions
+            ORDER BY guild_id, rank_name, permission_type
+        """.trimIndent()
+
+        // Flatten the pairs into a list of parameters
+        val params = guildRanks.flatMap { listOf(it.first.value, it.second) }.toTypedArray()
+
+        val results = jdbcTemplate.query(sql, { rs, _ ->
+            Triple(
+                rs.getString("guild_id"),
+                rs.getString("rank_name"),
+                GuildPermissionType.valueOf(rs.getString("permission_type"))
+            )
+        }, *params)
+
+        // Group by (guildId, rankName)
+        return results.groupBy(
+            keySelector = { Pair(it.first, it.second) },
+            valueTransform = { it.third }
+        )
+    }
+
     private fun insert(permission: GuildPermission): GuildPermission {
         val sql =
             """

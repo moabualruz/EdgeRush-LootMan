@@ -10,6 +10,8 @@ data class RaiderWarcraftLogEntity(
     val id: Long? = null,
     @Column("raider_id")
     val raiderId: Long,
+    @Column("difficulty")
     val difficulty: String,
+    @Column("score")
     val score: Int?,
 )

@@ -66,6 +66,7 @@ services:
         VITE_WS_URL: ${VITE_WS_URL:-}
         VITE_DISCORD_CLIENT_ID: ${VITE_DISCORD_CLIENT_ID:-}
         VITE_BATTLENET_CLIENT_ID: ${VITE_BATTLENET_CLIENT_ID:-}
+        VITE_GUILD_ID: ${VITE_GUILD_ID:-dod}
     container_name: edgerush-web-dashboard
     restart: unless-stopped
     depends_on:

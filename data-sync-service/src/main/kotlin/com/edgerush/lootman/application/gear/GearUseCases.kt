@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 
 /**
  * Use case for retrieving a raider's current gear.
+ * Returns an empty gear set if none exists for the raider.
  */
 @Service
 class GetCurrentGearUseCase(
@@ -20,7 +21,7 @@ class GetCurrentGearUseCase(
     fun execute(query: GetCurrentGearQuery): Result<GearSet> =
         runCatching {
             gearRepository.findCurrentGear(RaiderId(query.raiderId))
-                ?: throw NoSuchElementException("Gear not found for raider: ${query.raiderId}")
+                ?: GearSet(items = emptyMap(), gearSetType = GearSetType.EQUIPPED)
         }
 }
 

@@ -2,34 +2,32 @@ package com.edgerush.lootman.infrastructure.application
 
 import com.edgerush.datasync.entity.ApplicationQuestionFileEntity
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.infrastructure.springdata.ApplicationQuestionFileEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import java.sql.ResultSet
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import java.util.Optional
 
 /**
  * Unit tests for JdbcApplicationQuestionFileRepository.
  *
- * These tests mock the JdbcTemplate to verify SQL queries and mappings.
- * The repository operates on the application_question_files table.
+ * These tests mock the Spring Data repository to verify delegation behavior.
  */
 class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: ApplicationQuestionFileEntitySpringRepository
     private lateinit var repository: JdbcApplicationQuestionFileRepository
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcApplicationQuestionFileRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcApplicationQuestionFileRepository(springRepository)
     }
 
     @Nested
@@ -38,17 +36,8 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
         fun `should return application question file when found`() {
             // Given
             val fileId = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(fileId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationQuestionFileEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(fileId, 100L), 0))
-            }
+            val entity = createApplicationQuestionFileEntity(id = fileId)
+            every { springRepository.findById(fileId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(fileId)
@@ -57,52 +46,36 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             result shouldNotBe null
             result?.id shouldBe fileId
             result?.applicationId shouldBe 100L
+            verify { springRepository.findById(fileId) }
         }
 
         @Test
         fun `should return null when application question file not found`() {
             // Given
             val fileId = 999L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(fileId),
-                )
-            } returns emptyList()
+            every { springRepository.findById(fileId) } returns Optional.empty()
 
             // When
             val result = repository.findById(fileId)
 
             // Then
             result shouldBe null
+            verify { springRepository.findById(fileId) }
         }
 
         @Test
-        fun `should map all database fields to entity`() {
+        fun `should map all entity fields correctly`() {
             // Given
             val fileId = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(fileId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationQuestionFileEntity>>()
-                val rs =
-                    mockResultSet(
-                        id = fileId,
-                        applicationId = 100L,
-                        questionPosition = 1,
-                        question = "Upload your logs",
-                        originalFilename = "raid_logs.txt",
-                        url = "https://example.com/files/raid_logs.txt",
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
+            val entity = createApplicationQuestionFileEntity(
+                id = fileId,
+                applicationId = 100L,
+                questionPosition = 1,
+                question = "Upload your logs",
+                originalFilename = "raid_logs.txt",
+                url = "https://example.com/files/raid_logs.txt",
+            )
+            every { springRepository.findById(fileId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(fileId)
@@ -115,32 +88,22 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             result?.question shouldBe "Upload your logs"
             result?.originalFilename shouldBe "raid_logs.txt"
             result?.url shouldBe "https://example.com/files/raid_logs.txt"
+            verify { springRepository.findById(fileId) }
         }
 
         @Test
         fun `should handle null optional fields`() {
             // Given
             val fileId = 1L
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(fileId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationQuestionFileEntity>>()
-                val rs =
-                    mockResultSet(
-                        id = fileId,
-                        applicationId = 100L,
-                        questionPosition = null,
-                        question = null,
-                        originalFilename = null,
-                        url = null,
-                    )
-                listOf(rowMapper.mapRow(rs, 0))
-            }
+            val entity = createApplicationQuestionFileEntity(
+                id = fileId,
+                applicationId = 100L,
+                questionPosition = null,
+                question = null,
+                originalFilename = null,
+                url = null,
+            )
+            every { springRepository.findById(fileId) } returns Optional.of(entity)
 
             // When
             val result = repository.findById(fileId)
@@ -152,6 +115,7 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             result?.question shouldBe null
             result?.originalFilename shouldBe null
             result?.url shouldBe null
+            verify { springRepository.findById(fileId) }
         }
     }
 
@@ -162,46 +126,34 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
+            val entities = listOf(
+                createApplicationQuestionFileEntity(1L, 100L),
+                createApplicationQuestionFileEntity(2L, 100L),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("LIMIT") && it.contains("OFFSET") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(limit),
-                    eq(offset),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationQuestionFileEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, 100L), 0),
-                    rowMapper.mapRow(mockResultSet(2L, 100L), 1),
-                )
-            }
+            every { springRepository.findAll(any<Pageable>()) } returns page
 
             // When
             val result = repository.findAll(offset, limit)
 
             // Then
             result.size shouldBe 2
+            verify { springRepository.findAll(any<Pageable>()) }
         }
 
         @Test
         fun `should return empty list when no application question files`() {
             // Given
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("LIMIT") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } returns emptyList()
+            val page = PageImpl(emptyList<ApplicationQuestionFileEntity>())
+            every { springRepository.findAll(any<Pageable>()) } returns page
 
             // When
             val result = repository.findAll(0L, 10)
 
             // Then
             result shouldBe emptyList()
+            verify { springRepository.findAll(any<Pageable>()) }
         }
     }
 
@@ -211,22 +163,13 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
         fun `should return files for application`() {
             // Given
             val applicationId = 100L
+            val entities = listOf(
+                createApplicationQuestionFileEntity(1L, applicationId, questionPosition = 1),
+                createApplicationQuestionFileEntity(2L, applicationId, questionPosition = 2),
+            )
+            val page = PageImpl(entities)
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(applicationId),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<ApplicationQuestionFileEntity>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, applicationId, questionPosition = 1), 0),
-                    rowMapper.mapRow(mockResultSet(2L, applicationId, questionPosition = 2), 1),
-                )
-            }
+            every { springRepository.findByApplicationId(applicationId, any<Pageable>()) } returns page
 
             // When
             val result = repository.findByApplicationId(applicationId, 0L, 10)
@@ -234,28 +177,23 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             // Then
             result.size shouldBe 2
             result.all { it.applicationId == applicationId } shouldBe true
+            verify { springRepository.findByApplicationId(applicationId, any<Pageable>()) }
         }
 
         @Test
         fun `should return empty list when application has no files`() {
             // Given
             val applicationId = 999L
+            val page = PageImpl(emptyList<ApplicationQuestionFileEntity>())
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("application_id = ?") },
-                    any<RowMapper<ApplicationQuestionFileEntity>>(),
-                    eq(applicationId),
-                    any<Int>(),
-                    any<Long>(),
-                )
-            } returns emptyList()
+            every { springRepository.findByApplicationId(applicationId, any<Pageable>()) } returns page
 
             // When
             val result = repository.findByApplicationId(applicationId, 0L, 10)
 
             // Then
             result shouldBe emptyList()
+            verify { springRepository.findByApplicationId(applicationId, any<Pageable>()) }
         }
     }
 
@@ -264,55 +202,28 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
         @Test
         fun `should return total count`() {
             // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("application_question_files") },
-                    Long::class.java,
-                )
-            } returns 42L
+            every { springRepository.count() } returns 42L
 
             // When
             val result = repository.count()
 
             // Then
             result shouldBe 42L
-        }
-
-        @Test
-        fun `should handle null count result`() {
-            // Given
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") },
-                    Long::class.java,
-                )
-            } returns null
-
-            // When
-            val result = repository.count()
-
-            // Then
-            result shouldBe 0L
+            verify { springRepository.count() }
         }
 
         @Test
         fun `should return count by application id`() {
             // Given
             val applicationId = 100L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("application_id = ?") },
-                    Long::class.java,
-                    eq(applicationId),
-                )
-            } returns 3L
+            every { springRepository.countByApplicationId(applicationId) } returns 3L
 
             // When
             val result = repository.countByApplicationId(applicationId)
 
             // Then
             result shouldBe 3L
+            verify { springRepository.countByApplicationId(applicationId) }
         }
     }
 
@@ -322,108 +233,61 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
         fun `should return true when application question file exists`() {
             // Given
             val fileId = 1L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(fileId),
-                )
-            } returns 1
+            every { springRepository.existsById(fileId) } returns true
 
             // When
             val result = repository.existsById(fileId)
 
             // Then
             result shouldBe true
+            verify { springRepository.existsById(fileId) }
         }
 
         @Test
         fun `should return false when application question file does not exist`() {
             // Given
             val fileId = 999L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(fileId),
-                )
-            } returns 0
+            every { springRepository.existsById(fileId) } returns false
 
             // When
             val result = repository.existsById(fileId)
 
             // Then
             result shouldBe false
-        }
-
-        @Test
-        fun `should handle null count result as false`() {
-            // Given
-            val fileId = 1L
-
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> { it.contains("COUNT(*)") && it.contains("id = ?") },
-                    Int::class.java,
-                    eq(fileId),
-                )
-            } returns null
-
-            // When
-            val result = repository.existsById(fileId)
-
-            // Then
-            result shouldBe false
+            verify { springRepository.existsById(fileId) }
         }
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert new application question file when id is null`() {
+        fun `should save entity and return saved result`() {
             // Given
             val entity = createApplicationQuestionFileEntity(id = null)
-            val generatedId = 1L
-
-            every {
-                jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>())
-            } answers {
-                val keyHolder = secondArg<GeneratedKeyHolder>()
-                keyHolder.keyList.add(mapOf("id" to generatedId))
-                1
-            }
+            val savedEntity = createApplicationQuestionFileEntity(id = 1L)
+            every { springRepository.save(entity) } returns savedEntity
 
             // When
             val result = repository.save(entity)
 
             // Then
-            result.id shouldBe generatedId
+            result.id shouldBe 1L
             result.applicationId shouldBe entity.applicationId
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should update existing application question file when id is not null`() {
+        fun `should update existing application question file`() {
             // Given
             val entity = createApplicationQuestionFileEntity(id = 1L)
-            val sqlSlot = slot<String>()
-
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
+            every { springRepository.save(entity) } returns entity
 
             // When
             val result = repository.save(entity)
 
             // Then
             result shouldBe entity
-            sqlSlot.captured.contains("UPDATE") shouldBe true
-
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("UPDATE") },
-                    *anyVararg(),
-                )
-            }
+            verify { springRepository.save(entity) }
         }
     }
 
@@ -434,46 +298,15 @@ class JdbcApplicationQuestionFileRepositoryTest : UnitTest() {
             // Given
             val fileId = 1L
 
-            every {
-                jdbcTemplate.update(
-                    match<String> { it.contains("DELETE") },
-                    eq(fileId),
-                )
-            } returns 1
-
             // When
             repository.delete(fileId)
 
             // Then
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("DELETE") && it.contains("id = ?") },
-                    fileId,
-                )
-            }
+            verify { springRepository.deleteById(fileId) }
         }
     }
 
     // Helper methods
-
-    private fun mockResultSet(
-        id: Long,
-        applicationId: Long,
-        questionPosition: Int? = 1,
-        question: String? = "Upload file",
-        originalFilename: String? = "test_file.txt",
-        url: String? = "https://example.com/files/test.txt",
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("id") } returns id
-        every { rs.getLong("application_id") } returns applicationId
-        every { rs.getInt("question_position") } returns (questionPosition ?: 0)
-        every { rs.wasNull() } returns (questionPosition == null)
-        every { rs.getString("question") } returns question
-        every { rs.getString("original_filename") } returns originalFilename
-        every { rs.getString("url") } returns url
-        return rs
-    }
 
     private fun createApplicationQuestionFileEntity(
         id: Long? = 1L,

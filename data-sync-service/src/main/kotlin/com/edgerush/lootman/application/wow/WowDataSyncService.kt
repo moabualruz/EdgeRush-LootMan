@@ -22,11 +22,28 @@ class WowDataSyncService(
     private val logger = LoggerFactory.getLogger(WowDataSyncService::class.java)
 
     /**
+     * Check if Blizzard API is configured.
+     */
+    fun isBlizzardApiConfigured(): Boolean = blizzardDataService.isConfigured()
+
+    /**
      * Syncs all playable classes and their specializations from Blizzard API.
      * This should be called on application startup and periodically (e.g., daily).
      */
     fun syncAllClassesAndSpecs(): SyncResult {
         logger.info("Starting WoW classes and specializations sync from Blizzard API")
+
+        // Check if Blizzard API credentials are configured
+        if (!isBlizzardApiConfigured()) {
+            logger.warn("Blizzard API credentials not configured, skipping WoW data sync. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET to enable.")
+            return SyncResult(
+                classesAdded = 0,
+                classesUpdated = 0,
+                specsAdded = 0,
+                specsUpdated = 0,
+                errors = listOf("Blizzard API credentials not configured")
+            )
+        }
 
         var classesAdded = 0
         var classesUpdated = 0

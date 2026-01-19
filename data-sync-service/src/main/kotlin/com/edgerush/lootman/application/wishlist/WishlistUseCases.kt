@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 
 /**
  * Use case for retrieving a raider's wishlist.
+ * Returns an empty wishlist if none exists for the raider.
  */
 @Service
 class GetWishlistUseCase(
@@ -16,8 +17,9 @@ class GetWishlistUseCase(
 ) {
     fun execute(query: GetWishlistQuery): Result<Wishlist> =
         runCatching {
-            wishlistRepository.findByRaiderId(RaiderId(query.raiderId))
-                ?: throw NoSuchElementException("Wishlist not found for raider: ${query.raiderId}")
+            val raiderId = RaiderId(query.raiderId)
+            wishlistRepository.findByRaiderId(raiderId)
+                ?: Wishlist(raiderId = raiderId, items = emptyList())
         }
 }
 

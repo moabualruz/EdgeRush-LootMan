@@ -3,6 +3,7 @@ package com.edgerush.lootman.api.raid
 import com.edgerush.datasync.entity.RaidEntity
 import com.edgerush.lootman.api.common.PageRequest
 import com.edgerush.lootman.api.common.PagedResponse
+import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
 import com.edgerush.lootman.domain.raids.repository.RaidRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -16,6 +17,7 @@ import java.time.OffsetDateTime
 @Service
 class RaidCrudServiceImpl(
     private val raidRepository: RaidRepository,
+    private val guildConfigurationRepository: GuildConfigurationRepository,
 ) : RaidCrudService {
     override fun findAll(pageRequest: PageRequest): PagedResponse<RaidResponse> {
         val raids = raidRepository.findAll(pageRequest.offset, pageRequest.size)
@@ -131,14 +133,29 @@ class RaidCrudServiceImpl(
     override fun countByTeam(teamId: Long): Long = raidRepository.countByTeamId(teamId)
 
     override fun findUpcomingByGuild(
-        guildId: Long,
+        guildId: String,
         limit: Int,
-    ): List<RaidResponse> = raidRepository.findUpcomingByGuildId(guildId, limit).map { RaidResponse.from(it) }
+    ): List<RaidResponse> {
+        val numericGuildId = resolveGuildId(guildId)
+        return raidRepository.findUpcomingByGuildId(numericGuildId, limit).map { RaidResponse.from(it) }
+    }
 
     override fun findPastByGuild(
-        guildId: Long,
+        guildId: String,
         limit: Int,
-    ): List<RaidResponse> = raidRepository.findPastByGuildId(guildId, limit).map { RaidResponse.from(it) }
+    ): List<RaidResponse> {
+        val numericGuildId = resolveGuildId(guildId)
+        return raidRepository.findPastByGuildId(numericGuildId, limit).map { RaidResponse.from(it) }
+    }
+
+    /**
+     * Resolves a string guild ID (e.g., "dod") to the numeric ID from guild_configurations.
+     */
+    private fun resolveGuildId(guildId: String): Long {
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw NoSuchElementException("Guild not found with id: $guildId")
+        return config.id?.toLong() ?: throw IllegalStateException("Guild configuration has no ID: $guildId")
+    }
 
     private fun generateRaidId(): Long {
         // Generate a unique ID based on current timestamp

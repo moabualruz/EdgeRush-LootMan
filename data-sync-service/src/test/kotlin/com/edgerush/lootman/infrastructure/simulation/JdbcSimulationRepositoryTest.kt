@@ -494,6 +494,8 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             every { rs.getTimestamp("submitted_at") } returns Timestamp.from(now)
             every { rs.getTimestamp("completed_at") } returns Timestamp.from(now)
             every { rs.getString("error_message") } returns errorMessage
+            every { rs.getString("external_id") } returns null
+            every { rs.getString("source") } returns "LOCAL"
 
             return rs
         }
@@ -696,6 +698,8 @@ class JdbcSimulationRepositoryTest : UnitTest() {
             every { rs.getTimestamp("submitted_at") } returns Timestamp.from(now)
             every { rs.getTimestamp("completed_at") } returns null // NULL completed_at
             every { rs.getString("error_message") } returns errorMessage
+            every { rs.getString("external_id") } returns null
+            every { rs.getString("source") } returns "LOCAL"
 
             return rs
         }

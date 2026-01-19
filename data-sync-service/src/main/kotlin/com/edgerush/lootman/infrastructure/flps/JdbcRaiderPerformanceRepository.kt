@@ -44,7 +44,7 @@ class JdbcRaiderPerformanceRepository(
                 MAX(wlr.end_time) as period_end
             FROM raiders r
             JOIN warcraft_logs_performance wlp
-                ON LOWER(r.characterName) = LOWER(wlp.character_name)
+                ON LOWER(r.character_name) = LOWER(wlp.character_name)
                 AND LOWER(r.realm) = LOWER(wlp.character_realm)
             JOIN warcraft_logs_fights wlf ON wlp.fight_id = wlf.id
             JOIN warcraft_logs_reports wlr ON wlf.report_id = wlr.id
@@ -90,7 +90,7 @@ class JdbcRaiderPerformanceRepository(
             JOIN warcraft_logs_fights wlf ON wlp.fight_id = wlf.id
             JOIN warcraft_logs_reports wlr ON wlf.report_id = wlr.id
             LEFT JOIN raiders r
-                ON LOWER(r.characterName) = LOWER(wlp.character_name)
+                ON LOWER(r.character_name) = LOWER(wlp.character_name)
                 AND LOWER(r.realm) = LOWER(wlp.character_realm)
             WHERE wlp.character_name = ?
                 AND wlp.character_realm = ?
@@ -134,7 +134,7 @@ class JdbcRaiderPerformanceRepository(
             JOIN warcraft_logs_fights wlf ON wlp.fight_id = wlf.id
             JOIN warcraft_logs_reports wlr ON wlf.report_id = wlr.id
             LEFT JOIN raiders r
-                ON LOWER(r.characterName) = LOWER(wlp.character_name)
+                ON LOWER(r.character_name) = LOWER(wlp.character_name)
                 AND LOWER(r.realm) = LOWER(wlp.character_realm)
             WHERE wlr.guild_id = ?
                 AND wlr.start_time >= ?

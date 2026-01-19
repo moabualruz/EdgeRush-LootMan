@@ -1,8 +1,11 @@
 package com.edgerush.lootman.api.graphql.scalar
 
 import com.expediagroup.graphql.generator.hooks.SchemaGeneratorHooks
+import graphql.GraphQLContext
+import graphql.execution.CoercedVariables
 import graphql.language.IntValue
 import graphql.language.StringValue
+import graphql.language.Value
 import graphql.schema.Coercing
 import graphql.schema.CoercingParseLiteralException
 import graphql.schema.CoercingParseValueException
@@ -10,11 +13,11 @@ import graphql.schema.CoercingSerializeException
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
 import org.springframework.stereotype.Component
-import java.math.BigInteger
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
+import java.util.Locale
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -71,7 +74,11 @@ val LongScalar: GraphQLScalarType =
  * Coercing implementation for Instant scalar.
  */
 class InstantScalarCoercing : Coercing<Instant, String> {
-    override fun serialize(dataFetcherResult: Any): String {
+    override fun serialize(
+        dataFetcherResult: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): String {
         return when (dataFetcherResult) {
             is Instant -> dataFetcherResult.toString()
             else -> throw CoercingSerializeException(
@@ -80,7 +87,11 @@ class InstantScalarCoercing : Coercing<Instant, String> {
         }
     }
 
-    override fun parseValue(input: Any): Instant {
+    override fun parseValue(
+        input: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): Instant {
         return when (input) {
             is String ->
                 try {
@@ -94,7 +105,12 @@ class InstantScalarCoercing : Coercing<Instant, String> {
         }
     }
 
-    override fun parseLiteral(input: Any): Instant {
+    override fun parseLiteral(
+        input: Value<*>,
+        variables: CoercedVariables,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): Instant {
         return when (input) {
             is StringValue ->
                 try {
@@ -113,7 +129,11 @@ class InstantScalarCoercing : Coercing<Instant, String> {
  * Coercing implementation for LocalDate scalar.
  */
 class LocalDateScalarCoercing : Coercing<LocalDate, String> {
-    override fun serialize(dataFetcherResult: Any): String {
+    override fun serialize(
+        dataFetcherResult: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): String {
         return when (dataFetcherResult) {
             is LocalDate -> dataFetcherResult.toString()
             else -> throw CoercingSerializeException(
@@ -122,7 +142,11 @@ class LocalDateScalarCoercing : Coercing<LocalDate, String> {
         }
     }
 
-    override fun parseValue(input: Any): LocalDate {
+    override fun parseValue(
+        input: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): LocalDate {
         return when (input) {
             is String ->
                 try {
@@ -136,7 +160,12 @@ class LocalDateScalarCoercing : Coercing<LocalDate, String> {
         }
     }
 
-    override fun parseLiteral(input: Any): LocalDate {
+    override fun parseLiteral(
+        input: Value<*>,
+        variables: CoercedVariables,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): LocalDate {
         return when (input) {
             is StringValue ->
                 try {
@@ -155,7 +184,11 @@ class LocalDateScalarCoercing : Coercing<LocalDate, String> {
  * Coercing implementation for LocalDateTime scalar.
  */
 class LocalDateTimeScalarCoercing : Coercing<LocalDateTime, String> {
-    override fun serialize(dataFetcherResult: Any): String {
+    override fun serialize(
+        dataFetcherResult: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): String {
         return when (dataFetcherResult) {
             is LocalDateTime -> dataFetcherResult.toString()
             else -> throw CoercingSerializeException(
@@ -164,7 +197,11 @@ class LocalDateTimeScalarCoercing : Coercing<LocalDateTime, String> {
         }
     }
 
-    override fun parseValue(input: Any): LocalDateTime {
+    override fun parseValue(
+        input: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): LocalDateTime {
         return when (input) {
             is String ->
                 try {
@@ -178,7 +215,12 @@ class LocalDateTimeScalarCoercing : Coercing<LocalDateTime, String> {
         }
     }
 
-    override fun parseLiteral(input: Any): LocalDateTime {
+    override fun parseLiteral(
+        input: Value<*>,
+        variables: CoercedVariables,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): LocalDateTime {
         return when (input) {
             is StringValue ->
                 try {
@@ -197,7 +239,11 @@ class LocalDateTimeScalarCoercing : Coercing<LocalDateTime, String> {
  * Coercing implementation for Long scalar.
  */
 class LongScalarCoercing : Coercing<Long, String> {
-    override fun serialize(dataFetcherResult: Any): String {
+    override fun serialize(
+        dataFetcherResult: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): String {
         return when (dataFetcherResult) {
             is Long -> dataFetcherResult.toString()
             is Int -> dataFetcherResult.toLong().toString()
@@ -207,7 +253,11 @@ class LongScalarCoercing : Coercing<Long, String> {
         }
     }
 
-    override fun parseValue(input: Any): Long {
+    override fun parseValue(
+        input: Any,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): Long {
         return when (input) {
             is Long -> input
             is Int -> input.toLong()
@@ -223,7 +273,12 @@ class LongScalarCoercing : Coercing<Long, String> {
         }
     }
 
-    override fun parseLiteral(input: Any): Long {
+    override fun parseLiteral(
+        input: Value<*>,
+        variables: CoercedVariables,
+        graphQLContext: GraphQLContext,
+        locale: Locale,
+    ): Long {
         return when (input) {
             is IntValue -> input.value.toLong()
             is StringValue ->

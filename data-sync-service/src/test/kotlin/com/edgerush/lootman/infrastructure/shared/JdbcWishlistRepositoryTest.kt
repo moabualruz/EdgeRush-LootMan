@@ -42,7 +42,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("raiderId = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("raider_id = ?") },
                     any<RowMapper<WishlistItem>>(),
                     eq(raiderId.value),
                 )
@@ -68,7 +68,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
 
             every {
                 jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("raiderId = ?") },
+                    match<String> { it.contains("SELECT") && it.contains("raider_id = ?") },
                     any<RowMapper<WishlistItem>>(),
                     eq(raiderId.value),
                 )
@@ -314,7 +314,7 @@ class JdbcWishlistRepositoryTest : UnitTest() {
             // Then
             verify {
                 jdbcTemplate.update(
-                    match { it.contains("DELETE FROM") && it.contains("raiderId = ?") },
+                    match { it.contains("DELETE FROM") && it.contains("raider_id = ?") },
                     raiderId.value,
                 )
             }
@@ -355,11 +355,11 @@ class JdbcWishlistRepositoryTest : UnitTest() {
         specName: String? = null,
     ): ResultSet {
         val rs = mockk<ResultSet>()
-        every { rs.getLong("itemId") } returns itemId
-        every { rs.getString("itemName") } returns itemName
+        every { rs.getLong("item_id") } returns itemId
+        every { rs.getString("item_name") } returns itemName
         every { rs.getInt("priority") } returns priority
-        every { rs.getDouble("upgradePercentage") } returns upgradePercentage
-        every { rs.getString("specName") } returns specName
+        every { rs.getDouble("upgrade_percentage") } returns upgradePercentage
+        every { rs.getString("spec_name") } returns specName
         return rs
     }
 

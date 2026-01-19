@@ -10,6 +10,7 @@ data class RaiderTrackItemEntity(
     val id: Long? = null,
     @Column("raider_id")
     val raiderId: Long,
+    @Column("tier")
     val tier: String,
     @Column("item_count")
     val itemCount: Int?,

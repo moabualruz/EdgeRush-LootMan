@@ -1,5 +1,7 @@
 package com.edgerush.lootman.api.common
 
+import com.edgerush.lootman.api.auth.GuildAccessDeniedException
+import com.edgerush.lootman.api.auth.NoLinkedRaiderException
 import com.edgerush.lootman.domain.shared.GuildNotFoundException
 import com.edgerush.lootman.domain.shared.ItemNotFoundException
 import com.edgerush.lootman.domain.shared.LootBanActiveException
@@ -99,6 +101,41 @@ class GlobalExceptionHandler {
                     status = HttpStatus.UNAUTHORIZED.value(),
                     error = "Unauthorized",
                     message = ex.message ?: "Invalid credentials",
+                ),
+            )
+    }
+
+    /**
+     * Handle NoLinkedRaiderException as 400 Bad Request.
+     * This occurs when trying to access user-specific data but no raider is linked.
+     */
+    @ExceptionHandler(NoLinkedRaiderException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleNoLinkedRaiderException(ex: NoLinkedRaiderException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.BAD_REQUEST.value(),
+                    error = "Bad Request",
+                    message = ex.message ?: "No character linked. Please link a character first.",
+                ),
+            )
+    }
+
+    /**
+     * Handle GuildAccessDeniedException as 403 Forbidden.
+     */
+    @ExceptionHandler(GuildAccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleGuildAccessDeniedException(ex: GuildAccessDeniedException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.FORBIDDEN.value(),
+                    error = "Forbidden",
+                    message = ex.message ?: "You do not have access to this guild",
                 ),
             )
     }

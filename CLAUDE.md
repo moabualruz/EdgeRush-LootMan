@@ -4,6 +4,38 @@ A progression-first guild operations platform for World of Warcraft that automat
 
 ---
 
+## ⚠️ CRITICAL: Claude Code Rules (READ FIRST)
+
+**These rules are NON-NEGOTIABLE. Claude MUST follow them:**
+
+### 1. TDD Is Mandatory
+
+- **NEVER write production code without a failing test first**
+- Write the test → See it fail → Write minimal code → See it pass → Refactor
+- If you're about to write code, STOP and ask: "Where's the test?"
+
+### 2. Local Development Only (No Docker for App)
+
+- **Backend**: Run with `./gradlew :data-sync-service:bootRun`
+- **Frontend**: Run with `cd web-dashboard && npm run dev`
+- **Database ONLY**: Use Docker for PostgreSQL: `docker-compose up -d postgres`
+- **NEVER use docker-compose up for full stack** - it's slow and hides errors
+
+### 3. Verify Before Claiming Done
+
+- After ANY code change: run `./gradlew test` or specific tests
+- After schema changes: restart backend and check logs for errors
+- After API changes: test with curl or frontend
+
+### 4. DDD Layer Rules
+
+- **Domain layer has ZERO external dependencies** (no Spring, no DB, no HTTP)
+- **Application layer orchestrates** domain objects, handles transactions
+- **Infrastructure implements** domain interfaces (repositories, clients)
+- **API layer only does** request/response mapping
+
+---
+
 ## Core Philosophy
 
 - **Data-driven fairness** - Loot decisions backed by objective metrics, not politics
@@ -14,7 +46,7 @@ A progression-first guild operations platform for World of Warcraft that automat
 
 ---
 
-## Seven Principles (Non-Negotiable)
+## Eight Principles (Non-Negotiable)
 
 1. **No mock data in production** - All calculations use real synced data
 2. **Guild-specific configuration** - Every guild can tune weights and thresholds
@@ -23,6 +55,7 @@ A progression-first guild operations platform for World of Warcraft that automat
 5. **Graceful degradation** - System works even when external APIs fail
 6. **Single source of truth** - One authoritative document per topic
 7. **Human approval for loot** - No automated distribution without confirmation
+8. **Local dev, Docker DB only** - Fast iteration with immediate feedback
 
 ---
 
@@ -299,6 +332,34 @@ data-sync-service/
 
 ## Database Standards
 
+### Source of Truth
+
+**Flyway migrations are the ONLY source of truth for database schema.**
+
+- All schema is defined in `db/migration/postgres/V0001__init.sql`
+- Entity classes MUST match the migration schema exactly
+- When adding columns: update migration FIRST, then update entity
+
+### Column Naming Convention
+
+**ALL columns use snake_case.** Spring Data JDBC's default NamingStrategy automatically converts:
+
+- `characterName` → `character_name`
+- `guildId` → `guild_id`
+
+**@Column annotation rules:**
+
+```kotlin
+// UNNECESSARY - default naming handles it:
+@Column("character_name") val characterName: String  // ❌ Redundant
+
+// CORRECT - omit @Column, let default naming work:
+val characterName: String  // ✅ Maps to character_name automatically
+
+// NECESSARY - only when column name differs from convention:
+@Column("character_class") val clazz: String  // ✅ Needed for reserved words
+```
+
 ### Spring Data JDBC Required
 
 All database operations MUST use Spring Data repositories. Raw JDBC is PROHIBITED except for Flyway migrations.
@@ -315,6 +376,32 @@ class JdbcCharacterRepository(private val jdbcTemplate: JdbcTemplate) {
     fun findByGuildId(guildId: String) = jdbcTemplate.query(...)  // NO!
 }
 ```
+
+### Key Tables Reference
+
+| Table                    | Purpose                                | Key Columns                                    |
+|--------------------------|----------------------------------------|------------------------------------------------|
+| `characters`             | WoW character identity (authoritative) | id, name, realm, region, character_class       |
+| `raiders`                | Guild roster members                   | id, character_id, guild_id, role, status       |
+| `guild_configurations`   | Guild settings & sync config           | id, guild_id, sync_enabled, timezone           |
+| `loot_awards`            | Loot distribution records              | id, raider_id, item_id, awarded_at             |
+| `attendance_stats`       | Raid attendance data                   | id, character_id, team_id, attended_percentage |
+| `flps_default_modifiers` | Default FLPS weights                   | category, modifier_key, value                  |
+| `flps_guild_modifiers`   | Per-guild FLPS overrides               | guild_id, category, modifier_key, value        |
+| `wow_classes`            | WoW class definitions                  | id (Blizzard ID), name, slug, color            |
+| `wow_specializations`    | WoW spec definitions                   | id (Blizzard ID), class_id, name, role         |
+| `simulation_profiles`    | SimC character profiles                | id, guild_id, character_name, profile_content  |
+| `users`                  | User accounts                          | id, username, role, guild_id                   |
+
+### Entity-Table Mapping Checklist
+
+When creating/modifying entities:
+
+1. Check V0001__init.sql for exact column names
+2. ✅ Use camelCase in Kotlin (auto-converts to snake_case)
+3. ✅ Only add @Column when column name differs from convention
+4. ✅ Verify @Table annotation matches table name
+5. ✅ Run integration tests to validate mapping
 
 ### Migration Naming
 ```
@@ -470,24 +557,65 @@ flps:
 
 ## Quick Commands
 
+### Local Development (PREFERRED)
+
+```bash
+# 1. Start ONLY the database (Docker)
+docker-compose up -d postgres
+
+# 2. Run backend locally (faster, better error visibility)
+./gradlew :data-sync-service:bootRun
+
+# 3. Run frontend locally (in separate terminal)
+cd web-dashboard && npm run dev
+```
+
+### Testing
+
 ```bash
 # Run all tests
 ./gradlew test
 
-# Run with coverage
-./gradlew test jacocoTestReport
-
-# Start local environment
-docker-compose up -d
-
 # Run specific test class
 ./gradlew test --tests "*.FlpsCalculatorTest"
 
+# Run schema validation tests (after migration changes)
+./gradlew test --tests "*SchemaValidationTest"
+
+# Run with coverage
+./gradlew test jacocoTestReport
+```
+
+### Verification
+
+```bash
+# Check backend health
+curl http://localhost:8080/actuator/health
+
+# Check database connection
+docker-compose exec postgres psql -U edgerush -d edgerush -c "\dt"
+
+# View backend logs (if running via docker)
+docker-compose logs -f data-sync
+```
+
+### Code Quality
+
+```bash
 # Check code quality
 ./gradlew ktlintCheck detekt
 
 # Generate API docs
 ./gradlew generateOpenApiDocs
+```
+
+### Database Reset (When Needed)
+
+```bash
+# Full reset - removes all data
+docker-compose down -v
+docker-compose up -d postgres
+# Then restart backend to apply migrations
 ```
 
 ---

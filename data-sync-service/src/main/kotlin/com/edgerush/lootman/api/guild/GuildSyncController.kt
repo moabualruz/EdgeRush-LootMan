@@ -1,29 +1,44 @@
 package com.edgerush.lootman.api.guild
 
+import com.edgerush.datasync.security.AuthenticatedUser
+import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.application.guild.GuildRosterSyncResult
 import com.edgerush.lootman.application.guild.GuildRosterSyncService
+import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
+import com.edgerush.lootman.application.guild.WoWAuditHistoricalDataSyncService
+import com.edgerush.lootman.application.guild.WoWAuditLootHistorySyncService
+import com.edgerush.lootman.application.guild.WoWAuditRosterSyncService
+import com.edgerush.lootman.application.guild.WoWAuditSyncResult
+import com.edgerush.lootman.application.guild.WoWAuditWishlistSyncService
+import com.edgerush.lootman.domain.auth.model.UserId
+import com.edgerush.lootman.domain.guild.model.GuildPermissionType
 import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
+import com.edgerush.lootman.domain.shared.GuildId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
+import reactor.core.publisher.Mono
 import java.time.OffsetDateTime
 
 /**
  * REST controller for guild sync operations.
  *
  * Provides endpoints to configure and trigger Battle.net and WoWAudit sync per guild.
- * Access should be restricted to users with SETTINGS_ACCESS permission on the guild.
+ * Access is restricted to users with SETTINGS_ACCESS permission on the guild.
  */
 @RestController
 @RequestMapping("/api/v1/guilds/{guildId}/sync")
@@ -31,6 +46,12 @@ import java.time.OffsetDateTime
 class GuildSyncController(
     private val guildConfigurationRepository: GuildConfigurationRepository,
     private val guildRosterSyncService: GuildRosterSyncService,
+    private val wowAuditRosterSyncService: WoWAuditRosterSyncService,
+    private val wowAuditAttendanceSyncService: WoWAuditAttendanceSyncService,
+    private val wowAuditLootHistorySyncService: WoWAuditLootHistorySyncService,
+    private val wowAuditWishlistSyncService: WoWAuditWishlistSyncService,
+    private val wowAuditHistoricalDataSyncService: WoWAuditHistoricalDataSyncService,
+    private val guildContextService: GuildContextService,
 ) {
     private val logger = LoggerFactory.getLogger(GuildSyncController::class.java)
 
@@ -39,7 +60,10 @@ class GuildSyncController(
     fun getSyncConfig(
         @Parameter(description = "Guild ID")
         @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
     ): GuildSyncConfigResponse {
+        requireSettingsAccess(user, guildId)
+
         val config = guildConfigurationRepository.findByGuildId(guildId)
             ?: throw GuildNotFoundException(guildId)
 
@@ -71,7 +95,10 @@ class GuildSyncController(
         @Parameter(description = "Guild ID")
         @PathVariable guildId: String,
         @Valid @RequestBody request: UpdateGuildSyncConfigRequest,
+        @AuthenticationPrincipal user: AuthenticatedUser,
     ): GuildSyncConfigResponse {
+        requireSettingsAccess(user, guildId)
+
         val existing = guildConfigurationRepository.findByGuildId(guildId)
             ?: throw GuildNotFoundException(guildId)
 
@@ -114,7 +141,10 @@ class GuildSyncController(
     fun triggerBnetSync(
         @Parameter(description = "Guild ID")
         @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
     ): ResponseEntity<GuildSyncTriggerResponse> {
+        requireSettingsAccess(user, guildId)
+
         val config = guildConfigurationRepository.findByGuildId(guildId)
             ?: throw GuildNotFoundException(guildId)
 
@@ -196,6 +226,421 @@ class GuildSyncController(
             )
         }
     }
+
+    @PostMapping("/wowaudit/trigger")
+    @Operation(summary = "Trigger WoWAudit guild roster sync")
+    fun triggerWowauditSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        if (config.wowauditGuildUri.isNullOrBlank()) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit guild URI must be configured before syncing",
+                    )
+                )
+            )
+        }
+
+        // Update status to IN_PROGRESS
+        guildConfigurationRepository.save(
+            config.copy(
+                lastSyncStatus = "IN_PROGRESS",
+                lastSyncError = null,
+                updatedAt = OffsetDateTime.now(),
+            )
+        )
+
+        return wowAuditRosterSyncService.syncRoster(guildId)
+            .map { result ->
+                if (result.success) {
+                    logger.info("WoWAudit sync completed for guild $guildId: $result")
+                    ResponseEntity.ok(
+                        WoWAuditSyncTriggerResponse(
+                            success = true,
+                            message = "Synced ${result.total} raiders (created: ${result.created}, updated: ${result.updated}, skipped: ${result.skipped})",
+                            result = result,
+                        )
+                    )
+                } else {
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync completed with errors: ${result.error}",
+                            result = result,
+                        )
+                    )
+                }
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit sync failed for guild $guildId", e)
+
+                // Update status to FAILED
+                guildConfigurationRepository.save(
+                    config.copy(
+                        lastSyncStatus = "FAILED",
+                        lastSyncError = e.message ?: "Unknown error",
+                        updatedAt = OffsetDateTime.now(),
+                    )
+                )
+
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    @PostMapping("/wowaudit/attendance/trigger")
+    @Operation(summary = "Trigger WoWAudit attendance sync")
+    fun triggerWowauditAttendanceSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        return wowAuditAttendanceSyncService.syncAttendance(guildId)
+            .map { result ->
+                if (result.success) {
+                    logger.info("WoWAudit attendance sync completed for guild $guildId: $result")
+                    ResponseEntity.ok(
+                        WoWAuditSyncTriggerResponse(
+                            success = true,
+                            message = "Synced ${result.total} attendance records (created: ${result.created}, skipped: ${result.skipped})",
+                            result = result,
+                        )
+                    )
+                } else {
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync completed with errors: ${result.error}",
+                            result = result,
+                        )
+                    )
+                }
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit attendance sync failed for guild $guildId", e)
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    @PostMapping("/wowaudit/loot/trigger")
+    @Operation(summary = "Trigger WoWAudit loot history sync")
+    fun triggerWowauditLootSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @Parameter(description = "Season ID for loot history")
+        @RequestParam seasonId: Long,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        return wowAuditLootHistorySyncService.syncLootHistory(guildId, seasonId)
+            .map { result ->
+                if (result.success) {
+                    logger.info("WoWAudit loot history sync completed for guild $guildId, season $seasonId: $result")
+                    ResponseEntity.ok(
+                        WoWAuditSyncTriggerResponse(
+                            success = true,
+                            message = "Synced ${result.total} loot awards (created: ${result.created}, skipped: ${result.skipped})",
+                            result = result,
+                        )
+                    )
+                } else {
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync completed with errors: ${result.error}",
+                            result = result,
+                        )
+                    )
+                }
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit loot history sync failed for guild $guildId", e)
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    @PostMapping("/wowaudit/wishlist/trigger")
+    @Operation(summary = "Trigger WoWAudit wishlist sync")
+    fun triggerWowauditWishlistSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        return wowAuditWishlistSyncService.syncWishlists(guildId)
+            .map { result ->
+                if (result.success) {
+                    logger.info("WoWAudit wishlist sync completed for guild $guildId: $result")
+                    ResponseEntity.ok(
+                        WoWAuditSyncTriggerResponse(
+                            success = true,
+                            message = "Synced ${result.total} wishlists (created: ${result.created}, skipped: ${result.skipped})",
+                            result = result,
+                        )
+                    )
+                } else {
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync completed with errors: ${result.error}",
+                            result = result,
+                        )
+                    )
+                }
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit wishlist sync failed for guild $guildId", e)
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    @PostMapping("/wowaudit/historical/trigger")
+    @Operation(summary = "Trigger WoWAudit historical data sync (gear/statistics)")
+    fun triggerWowauditHistoricalSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @Parameter(description = "Period ID for historical data")
+        @RequestParam periodId: Long,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        return wowAuditHistoricalDataSyncService.syncHistoricalData(guildId, periodId)
+            .map { result ->
+                if (result.success) {
+                    logger.info("WoWAudit historical data sync completed for guild $guildId, period $periodId: $result")
+                    ResponseEntity.ok(
+                        WoWAuditSyncTriggerResponse(
+                            success = true,
+                            message = "Synced ${result.total} characters (updated: ${result.updated}, skipped: ${result.skipped})",
+                            result = result,
+                        )
+                    )
+                } else {
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync completed with errors: ${result.error}",
+                            result = result,
+                        )
+                    )
+                }
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit historical data sync failed for guild $guildId", e)
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    @PostMapping("/wowaudit/all/trigger")
+    @Operation(summary = "Trigger all WoWAudit syncs (roster, attendance, wishlist)")
+    fun triggerWowauditAllSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditAllSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+
+        val config = guildConfigurationRepository.findByGuildId(guildId)
+            ?: throw GuildNotFoundException(guildId)
+
+        if (!config.syncEnabled) {
+            return Mono.just(
+                ResponseEntity.badRequest().body(
+                    WoWAuditAllSyncTriggerResponse(
+                        success = false,
+                        message = "WoWAudit sync is disabled for this guild",
+                    )
+                )
+            )
+        }
+
+        // Run all syncs in sequence
+        return wowAuditRosterSyncService.syncRoster(guildId)
+            .flatMap { rosterResult ->
+                wowAuditAttendanceSyncService.syncAttendance(guildId)
+                    .map { attendanceResult -> Pair(rosterResult, attendanceResult) }
+            }
+            .flatMap { (rosterResult, attendanceResult) ->
+                wowAuditWishlistSyncService.syncWishlists(guildId)
+                    .map { wishlistResult -> Triple(rosterResult, attendanceResult, wishlistResult) }
+            }
+            .map { (rosterResult, attendanceResult, wishlistResult) ->
+                val allSuccess = rosterResult.success && attendanceResult.success && wishlistResult.success
+                logger.info(
+                    "WoWAudit all sync completed for guild $guildId: roster=$rosterResult, attendance=$attendanceResult, wishlist=$wishlistResult"
+                )
+                ResponseEntity.ok(
+                    WoWAuditAllSyncTriggerResponse(
+                        success = allSuccess,
+                        message = if (allSuccess) "All syncs completed successfully" else "Some syncs completed with errors",
+                        rosterResult = rosterResult,
+                        attendanceResult = attendanceResult,
+                        wishlistResult = wishlistResult,
+                    )
+                )
+            }
+            .onErrorResume { e ->
+                logger.error("WoWAudit all sync failed for guild $guildId", e)
+                Mono.just(
+                    ResponseEntity.internalServerError().body(
+                        WoWAuditAllSyncTriggerResponse(
+                            success = false,
+                            message = "Sync failed: ${e.message}",
+                        )
+                    )
+                )
+            }
+    }
+
+    /**
+     * Verifies that the user has SETTINGS_ACCESS permission for the specified guild.
+     * Throws ResponseStatusException with 403 FORBIDDEN if the user lacks permission.
+     *
+     * Permission is based on the user's character rank in the guild.
+     * System admins bypass this check.
+     */
+    private fun requireSettingsAccess(user: AuthenticatedUser, guildId: String) {
+        // System admins can always access
+        if (user.isSystemAdmin()) {
+            return
+        }
+
+        val userIdLong = user.id.toLongOrNull()
+            ?: throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid user authentication"
+            )
+
+        val userId = UserId(userIdLong)
+        val hasPermission = guildContextService.hasGuildPermission(
+            userId,
+            GuildId(guildId),
+            GuildPermissionType.SETTINGS_ACCESS
+        )
+
+        if (!hasPermission) {
+            logger.warn("User ${user.id} denied SETTINGS_ACCESS for guild $guildId")
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "You do not have permission to access guild settings. Only guild officers can modify sync configuration."
+            )
+        }
+    }
 }
 
 // DTOs
@@ -235,6 +680,20 @@ data class GuildSyncTriggerResponse(
     val success: Boolean,
     val message: String,
     val result: GuildRosterSyncResult? = null,
+)
+
+data class WoWAuditSyncTriggerResponse(
+    val success: Boolean,
+    val message: String,
+    val result: WoWAuditSyncResult? = null,
+)
+
+data class WoWAuditAllSyncTriggerResponse(
+    val success: Boolean,
+    val message: String,
+    val rosterResult: WoWAuditSyncResult? = null,
+    val attendanceResult: WoWAuditSyncResult? = null,
+    val wishlistResult: WoWAuditSyncResult? = null,
 )
 
 class GuildNotFoundException(guildId: String) : RuntimeException("Guild not found: $guildId")

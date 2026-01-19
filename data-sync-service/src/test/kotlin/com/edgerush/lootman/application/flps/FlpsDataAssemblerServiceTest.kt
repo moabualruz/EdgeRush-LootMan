@@ -11,6 +11,7 @@ import com.edgerush.lootman.domain.loot.model.LootBanId
 import com.edgerush.lootman.domain.loot.model.LootTier
 import com.edgerush.lootman.domain.loot.repository.LootAwardRepository
 import com.edgerush.lootman.domain.loot.repository.LootBanRepository
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -25,9 +26,13 @@ import com.edgerush.lootman.domain.shared.model.RaiderStatus
 import com.edgerush.lootman.domain.shared.model.Role
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import com.edgerush.lootman.domain.shared.model.WishlistItem
+import com.edgerush.lootman.domain.flps.repository.RaiderPerformanceRepository
+import com.edgerush.lootman.domain.raider.repository.RaiderCrestCountRepository
+import com.edgerush.lootman.domain.raider.repository.RaiderVaultSlotRepository
 import com.edgerush.lootman.domain.shared.repository.GearRepository
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import com.edgerush.lootman.domain.shared.repository.WishlistRepository
+import com.edgerush.lootman.domain.statistics.repository.RaiderStatisticsRepository
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -53,6 +58,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
     private val wishlistRepository = mockk<WishlistRepository>()
     private val gearRepository = mockk<GearRepository>()
     private val lootBanRepository = mockk<LootBanRepository>()
+    private val raiderPerformanceRepository = mockk<RaiderPerformanceRepository>()
+    private val raiderStatisticsRepository = mockk<RaiderStatisticsRepository>()
+    private val raiderVaultSlotRepository = mockk<RaiderVaultSlotRepository>()
+    private val raiderCrestCountRepository = mockk<RaiderCrestCountRepository>()
 
     private val service =
         FlpsDataAssemblerService(
@@ -62,6 +71,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
             wishlistRepository = wishlistRepository,
             gearRepository = gearRepository,
             lootBanRepository = lootBanRepository,
+            raiderPerformanceRepository = raiderPerformanceRepository,
+            raiderStatisticsRepository = raiderStatisticsRepository,
+            raiderVaultSlotRepository = raiderVaultSlotRepository,
+            raiderCrestCountRepository = raiderCrestCountRepository,
         )
 
     @Test
@@ -91,6 +104,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
         every { gearRepository.findCurrentGear(raider2.id) } returns null
         every { lootBanRepository.findActiveByRaiderId(raider1.id, guildId) } returns emptyList()
         every { lootBanRepository.findActiveByRaiderId(raider2.id, guildId) } returns ban2
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(any(), any(), any(), any()) } returns null
+        every { raiderStatisticsRepository.findByRaiderId(any()) } returns null
+        every { raiderVaultSlotRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
+        every { raiderCrestCountRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
 
         // Act
         val result = service.assembleFlpsData(guildId)
@@ -149,6 +166,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
         every { wishlistRepository.findByRaiderId(raider.id) } returns null
         every { gearRepository.findCurrentGear(raider.id) } returns null
         every { lootBanRepository.findActiveByRaiderId(raider.id, guildId) } returns emptyList()
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(any(), any(), any(), any()) } returns null
+        every { raiderStatisticsRepository.findByRaiderId(any()) } returns null
+        every { raiderVaultSlotRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
+        every { raiderCrestCountRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
 
         // Act
         val result = service.assembleFlpsData(guildId, customLookbackDays)
@@ -182,6 +203,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
         every { wishlistRepository.findByRaiderId(raider.id) } returns null
         every { gearRepository.findCurrentGear(raider.id) } returns null
         every { lootBanRepository.findActiveByRaiderId(raider.id, guildId) } returns emptyList()
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(any(), any(), any(), any()) } returns null
+        every { raiderStatisticsRepository.findByRaiderId(any()) } returns null
+        every { raiderVaultSlotRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
+        every { raiderCrestCountRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
 
         // Act
         val result = service.assembleFlpsData(guildId)
@@ -219,6 +244,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
         every { wishlistRepository.findByRaiderId(raider.id) } returns wishlist
         every { gearRepository.findCurrentGear(raider.id) } returns gear
         every { lootBanRepository.findActiveByRaiderId(raider.id, guildId) } returns bans
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(any(), any(), any(), any()) } returns null
+        every { raiderStatisticsRepository.findByRaiderId(any()) } returns null
+        every { raiderVaultSlotRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
+        every { raiderCrestCountRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
 
         // Act
         val result = service.assembleFlpsData(guildId)
@@ -246,6 +275,10 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
         every { wishlistRepository.findByRaiderId(raider.id) } returns null
         every { gearRepository.findCurrentGear(raider.id) } returns null
         every { lootBanRepository.findActiveByRaiderId(raider.id, guildId) } returns emptyList()
+        every { raiderPerformanceRepository.findByRaiderAndPeriod(any(), any(), any(), any()) } returns null
+        every { raiderStatisticsRepository.findByRaiderId(any()) } returns null
+        every { raiderVaultSlotRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
+        every { raiderCrestCountRepository.findByRaiderId(any(), any(), any()) } returns emptyList()
 
         // Act
         val result = service.assembleFlpsData(guildId)
@@ -266,19 +299,18 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
     private fun createRaider(
         raiderId: RaiderId,
         guildId: GuildId,
-    ): Raider =
-        Raider(
-            id = raiderId,
-            guildId = guildId,
-            characterName = "TestCharacter${raiderId.value}",
-            realm = "TestRealm",
-            characterClass = CharacterClass.WARRIOR,
-            role = Role.DPS,
-            rank = "Raider",
-            status = RaiderStatus.ACTIVE,
-            joinDate = LocalDateTime.now().minusMonths(6),
-            wowauditId = 12345L + raiderId.value,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = raiderId,
+        guildId = guildId,
+        name = "TestCharacter${raiderId.value}",
+        realm = "TestRealm",
+        characterClass = CharacterClass.WARRIOR,
+        role = Role.DPS,
+        rank = "Raider",
+        status = RaiderStatus.ACTIVE,
+        joinDate = LocalDateTime.now().minusMonths(6),
+        wowauditId = 12345L + raiderId.value,
+    )
 
     private fun createAttendanceRecord(
         raiderId: RaiderId,

@@ -7,7 +7,6 @@ import java.time.Instant
  *
  * Tracks the state of a simulation from submission through completion or failure.
  */
-@ConsistentCopyVisibility
 data class SimulationRequest(
     val id: Long? = null,
     val profile: SimulationProfile,

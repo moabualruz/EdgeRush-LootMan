@@ -6,6 +6,7 @@ package com.edgerush.lootman.domain.flps.model
  * EPS measures a raider's preparation through vault slots, crest usage, and heroic clears.
  * Normalized value between 0.0 and 1.0.
  */
+@ConsistentCopyVisibility
 data class ExternalPreparationScore private constructor(val value: Double) {
     init {
         require(value in 0.0..1.0) {

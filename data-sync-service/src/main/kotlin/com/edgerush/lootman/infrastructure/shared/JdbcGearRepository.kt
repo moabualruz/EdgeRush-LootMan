@@ -16,14 +16,14 @@ import org.springframework.stereotype.Repository
  * JDBC implementation of GearRepository.
  *
  * Persists GearSet aggregates to the raider_gear_items table.
- * Column names follow the JPA naming conventions from V0019 migration.
+ * Uses snake_case column names as per V0045 migration.
  *
  * Database column mappings:
- * - raiderId -> raider_id (Long)
- * - gearSet -> gear set type (String)
+ * - raider_id -> raider ID (Long)
+ * - gear_set -> gear set type (String)
  * - slot -> equipment slot (String)
- * - itemId -> item_id (Long)
- * - itemLevel -> item level (Int)
+ * - item_id -> item ID (Long)
+ * - item_level -> item level (Int)
  * - quality -> item quality (Int)
  * - enchant -> enchant text (String?)
  * - sockets -> socket count (Int)
@@ -43,9 +43,9 @@ class JdbcGearRepository(
     ): GearSet? {
         val sql =
             """
-            SELECT slot, itemId, name, itemLevel, quality, enchant, sockets
+            SELECT slot, item_id, name, item_level, quality, enchant, sockets
             FROM raider_gear_items
-            WHERE raiderId = ? AND gearSet = ?
+            WHERE raider_id = ? AND gear_set = ?
             """.trimIndent()
 
         val items = jdbcTemplate.query(sql, gearItemRowMapper, raiderId.value, gearSetType.name)
@@ -63,14 +63,14 @@ class JdbcGearRepository(
         gearSet: GearSet,
     ): GearSet {
         // Delete existing gear items for this raider and gear set type
-        val deleteSql = "DELETE FROM raider_gear_items WHERE raiderId = ? AND gearSet = ?"
+        val deleteSql = "DELETE FROM raider_gear_items WHERE raider_id = ? AND gear_set = ?"
         jdbcTemplate.update(deleteSql, raiderId.value, gearSet.gearSetType.name)
 
         // Insert new gear items
         val insertSql =
             """
             INSERT INTO raider_gear_items (
-                raiderId, gearSet, slot, itemId, itemLevel, quality, enchant, sockets, name
+                raider_id, gear_set, slot, item_id, item_level, quality, enchant, sockets, name
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
@@ -101,9 +101,9 @@ class JdbcGearRepository(
             val quality = ItemQuality.fromInt(qualityInt) ?: ItemQuality.EPIC
 
             GearItem(
-                itemId = ItemId(rs.getLong("itemId")),
+                itemId = ItemId(rs.getLong("item_id")),
                 name = rs.getString("name") ?: "Unknown Item",
-                itemLevel = rs.getInt("itemLevel"),
+                itemLevel = rs.getInt("item_level"),
                 quality = quality,
                 slot = slot,
                 isTierPiece = false, // Not stored in DB, would need additional logic

@@ -5,6 +5,7 @@ import com.edgerush.lootman.application.raider.GetRaiderQuery
 import com.edgerush.lootman.application.raider.GetRaiderUseCase
 import com.edgerush.lootman.application.raider.ListRaidersByGuildQuery
 import com.edgerush.lootman.application.raider.ListRaidersUseCase
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -194,17 +195,16 @@ class RaiderQueryResolverTest : UnitTest() {
         characterClass: CharacterClass = CharacterClass.WARRIOR,
         role: Role = Role.DPS,
         status: RaiderStatus = RaiderStatus.ACTIVE,
-    ): Raider =
-        Raider(
-            id = RaiderId(id),
-            guildId = GuildId(guildId),
-            characterName = name,
-            realm = realm,
-            characterClass = characterClass,
-            role = role,
-            rank = "Raider",
-            status = status,
-            joinDate = LocalDateTime.now(),
-            wowauditId = id,
-        )
+    ): Raider = RaiderFixtures.createRaider(
+        id = RaiderId(id),
+        guildId = GuildId(guildId),
+        name = name,
+        realm = realm,
+        characterClass = characterClass,
+        role = role,
+        rank = "Raider",
+        status = status,
+        joinDate = LocalDateTime.now(),
+        wowauditId = id,
+    )
 }

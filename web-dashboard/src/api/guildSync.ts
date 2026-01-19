@@ -68,3 +68,11 @@ export const triggerBnetSync = async (guildId: string): Promise<GuildSyncTrigger
   const response = await api.post<GuildSyncTriggerResponse>(`/v1/guilds/${guildId}/sync/bnet/trigger`)
   return response.data
 }
+
+/**
+ * Trigger WoWAudit guild roster sync.
+ */
+export const triggerWowauditSync = async (guildId: string): Promise<GuildSyncTriggerResponse> => {
+  const response = await api.post<GuildSyncTriggerResponse>(`/v1/guilds/${guildId}/sync/wowaudit/trigger`)
+  return response.data
+}

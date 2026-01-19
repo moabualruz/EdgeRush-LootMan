@@ -1,32 +1,29 @@
 package com.edgerush.lootman.infrastructure.audit
 
+import com.edgerush.datasync.entity.AuditLogEntity
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.domain.audit.model.AuditLog
 import com.edgerush.lootman.domain.audit.model.AuditLogId
 import com.edgerush.lootman.domain.audit.model.AuditOperation
+import com.edgerush.lootman.infrastructure.springdata.AuditLogEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import java.sql.ResultSet
-import java.sql.Timestamp
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 /**
  * Unit tests for JdbcAuditLogRepository.
  *
- * These tests mock the JdbcTemplate to verify SQL queries and mappings.
+ * These tests mock the Spring Data repository to verify domain/entity mappings.
  * The repository operates on the audit_logs table.
  */
 class JdbcAuditLogRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: AuditLogEntitySpringRepository
     private lateinit var repository: JdbcAuditLogRepository
 
     private val now = Instant.now()
@@ -35,38 +32,34 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcAuditLogRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcAuditLogRepository(springRepository)
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert audit log entry`() {
+        fun `should save audit log entry and return domain model`() {
             // Given
             val auditLog = createAuditLog(id = null)
-            val sqlSlot = slot<String>()
+            val savedEntity = createAuditLogEntity(id = 1L)
 
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
+            every { springRepository.save(any()) } returns savedEntity
 
             // When
             val result = repository.save(auditLog)
 
             // Then
-            result shouldBe auditLog
-            sqlSlot.captured.contains("INSERT INTO") shouldBe true
-            sqlSlot.captured.contains("audit_logs") shouldBe true
+            result.id?.value shouldBe 1L
+            result.operation shouldBe auditLog.operation
+            result.entityType shouldBe auditLog.entityType
+            result.entityId shouldBe auditLog.entityId
 
-            verify {
-                jdbcTemplate.update(
-                    match { it.contains("INSERT INTO") && it.contains("audit_logs") },
-                    *anyVararg(),
-                )
-            }
+            verify { springRepository.save(any()) }
         }
 
         @Test
-        fun `should insert with all required fields`() {
+        fun `should map all required fields to entity`() {
             // Given
             val auditLog =
                 createAuditLog(
@@ -79,24 +72,43 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     isAdminMode = true,
                     requestId = "req-789",
                 )
+            val savedEntity =
+                createAuditLogEntity(
+                    id = 1L,
+                    operation = "CREATE",
+                    entityType = "Guild",
+                    entityId = "guild-123",
+                    userId = "user-456",
+                    username = "testuser",
+                    isAdminMode = true,
+                    requestId = "req-789",
+                )
 
-            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+            every { springRepository.save(any()) } returns savedEntity
 
             // When
-            repository.save(auditLog)
+            val result = repository.save(auditLog)
 
             // Then
+            result.operation shouldBe AuditOperation.CREATE
+            result.entityType shouldBe "Guild"
+            result.entityId shouldBe "guild-123"
+            result.userId shouldBe "user-456"
+            result.username shouldBe "testuser"
+            result.isAdminMode shouldBe true
+            result.requestId shouldBe "req-789"
+
             verify {
-                jdbcTemplate.update(
-                    any<String>(),
-                    any<Timestamp>(), // timestamp
-                    eq("CREATE"), // operation
-                    eq("Guild"), // entity_type
-                    eq("guild-123"), // entity_id
-                    eq("user-456"), // user_id
-                    eq("testuser"), // username
-                    eq(true), // is_admin_mode
-                    eq("req-789"), // request_id
+                springRepository.save(
+                    match {
+                        it.operation == "CREATE" &&
+                            it.entityType == "Guild" &&
+                            it.entityId == "guild-123" &&
+                            it.userId == "user-456" &&
+                            it.username == "testuser" &&
+                            it.isAdminMode == true &&
+                            it.requestId == "req-789"
+                    },
                 )
             }
         }
@@ -109,25 +121,18 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
                     id = null,
                     requestId = null,
                 )
+            val savedEntity = createAuditLogEntity(id = 1L, requestId = null)
 
-            every { jdbcTemplate.update(any<String>(), *anyVararg()) } returns 1
+            every { springRepository.save(any()) } returns savedEntity
 
             // When
-            repository.save(auditLog)
+            val result = repository.save(auditLog)
 
             // Then
+            result.requestId shouldBe null
+
             verify {
-                jdbcTemplate.update(
-                    any<String>(),
-                    any<Timestamp>(),
-                    any<String>(),
-                    any<String>(),
-                    any<String>(),
-                    any<String>(),
-                    any<String>(),
-                    any<Boolean>(),
-                    isNull(), // request_id should be null
-                )
+                springRepository.save(match { it.requestId == null })
             }
         }
     }
@@ -139,25 +144,15 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             // Given
             val entityType = "Guild"
             val entityId = "guild-123"
+            val entities =
+                listOf(
+                    createAuditLogEntity(id = 1L, entityType = entityType, entityId = entityId),
+                    createAuditLogEntity(id = 2L, entityType = entityType, entityId = entityId),
+                )
 
             every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") &&
-                            it.contains("entity_type = ?") &&
-                            it.contains("entity_id = ?")
-                    },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, entityType = entityType, entityId = entityId), 0),
-                    rowMapper.mapRow(mockResultSet(2L, entityType = entityType, entityId = entityId), 1),
-                )
-            }
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns entities
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -175,12 +170,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             val entityId = "non-existent"
 
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
             } returns emptyList()
 
             // When
@@ -197,20 +187,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         fun `should find audit logs by user id`() {
             // Given
             val userId = "user-123"
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("user_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(userId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
+            val entities =
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, userId = userId), 0),
-                    rowMapper.mapRow(mockResultSet(2L, userId = userId), 1),
+                    createAuditLogEntity(id = 1L, userId = userId),
+                    createAuditLogEntity(id = 2L, userId = userId),
                 )
-            }
+
+            every { springRepository.findByUserIdOrderByTimestampDesc(userId) } returns entities
 
             // When
             val result = repository.findByUserId(userId)
@@ -225,13 +208,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             // Given
             val userId = "unknown-user"
 
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("user_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(userId),
-                )
-            } returns emptyList()
+            every { springRepository.findByUserIdOrderByTimestampDesc(userId) } returns emptyList()
 
             // When
             val result = repository.findByUserId(userId)
@@ -248,25 +225,15 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             // Given
             val from = oneDayAgo
             val to = now
+            val entities =
+                listOf(
+                    createAuditLogEntity(id = 1L, timestamp = oneHourAgo),
+                    createAuditLogEntity(id = 2L, timestamp = now.minus(30, ChronoUnit.MINUTES)),
+                )
 
             every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") &&
-                            it.contains("timestamp >= ?") &&
-                            it.contains("timestamp <= ?")
-                    },
-                    any<RowMapper<AuditLog>>(),
-                    any<Timestamp>(),
-                    any<Timestamp>(),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, timestamp = oneHourAgo), 0),
-                    rowMapper.mapRow(mockResultSet(2L, timestamp = now.minus(30, ChronoUnit.MINUTES)), 1),
-                )
-            }
+                springRepository.findByTimestampBetweenOrderByTimestampDesc(from, to)
+            } returns entities
 
             // When
             val result = repository.findByTimeRange(from, to)
@@ -282,12 +249,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             val to = oneDayAgo.minus(1, ChronoUnit.DAYS)
 
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("timestamp >= ?") && it.contains("timestamp <= ?") },
-                    any<RowMapper<AuditLog>>(),
-                    any<Timestamp>(),
-                    any<Timestamp>(),
-                )
+                springRepository.findByTimestampBetweenOrderByTimestampDesc(from, to)
             } returns emptyList()
 
             // When
@@ -304,20 +266,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         fun `should find audit logs by operation type`() {
             // Given
             val operation = AuditOperation.CREATE
-
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("SELECT") && it.contains("operation = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(operation.name),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
+            val entities =
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, operation = operation), 0),
-                    rowMapper.mapRow(mockResultSet(2L, operation = operation), 1),
+                    createAuditLogEntity(id = 1L, operation = operation.name),
+                    createAuditLogEntity(id = 2L, operation = operation.name),
                 )
-            }
+
+            every { springRepository.findByOperationOrderByTimestampDesc(operation.name) } returns entities
 
             // When
             val result = repository.findByOperation(operation)
@@ -329,13 +284,13 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
     }
 
     @Nested
-    inner class RowMapperTests {
+    inner class DomainEntityMappingTests {
         @Test
-        fun `should map all database fields to domain model`() {
+        fun `should map all entity fields to domain model`() {
             // Given
             val id = 123L
             val timestamp = Instant.parse("2024-06-01T12:00:00Z")
-            val operation = AuditOperation.UPDATE
+            val operation = "UPDATE"
             val entityType = "LootAward"
             val entityId = "award-456"
             val userId = "user-789"
@@ -343,32 +298,22 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             val isAdminMode = true
             val requestId = "req-abc"
 
+            val entity =
+                createAuditLogEntity(
+                    id = id,
+                    timestamp = timestamp,
+                    operation = operation,
+                    entityType = entityType,
+                    entityId = entityId,
+                    userId = userId,
+                    username = username,
+                    isAdminMode = isAdminMode,
+                    requestId = requestId,
+                )
+
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(
-                        mockResultSet(
-                            id = id,
-                            timestamp = timestamp,
-                            operation = operation,
-                            entityType = entityType,
-                            entityId = entityId,
-                            userId = userId,
-                            username = username,
-                            isAdminMode = isAdminMode,
-                            requestId = requestId,
-                        ),
-                        0,
-                    ),
-                )
-            }
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns listOf(entity)
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -378,7 +323,7 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             val auditLog = result.first()
             auditLog.id?.value shouldBe id
             auditLog.timestamp shouldBe timestamp
-            auditLog.operation shouldBe operation
+            auditLog.operation shouldBe AuditOperation.UPDATE
             auditLog.entityType shouldBe entityType
             auditLog.entityId shouldBe entityId
             auditLog.userId shouldBe userId
@@ -388,24 +333,15 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
         }
 
         @Test
-        fun `should handle null requestId from database`() {
+        fun `should handle null requestId from entity`() {
             // Given
             val entityType = "Guild"
             val entityId = "guild-123"
+            val entity = createAuditLogEntity(id = 1L, requestId = null)
 
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, requestId = null), 0),
-                )
-            }
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns listOf(entity)
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -417,25 +353,19 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
         @Test
         fun `should map all operation types correctly`() {
-            // Given - Test different AuditOperation enum values
+            // Given
             val entityType = "LootAward"
             val entityId = "award-123"
 
-            // Test UPDATE operation
-            every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
+            val entities =
                 listOf(
-                    rowMapper.mapRow(mockResultSet(1L, operation = AuditOperation.UPDATE), 0),
-                    rowMapper.mapRow(mockResultSet(2L, operation = AuditOperation.DELETE), 0),
+                    createAuditLogEntity(id = 1L, operation = "UPDATE"),
+                    createAuditLogEntity(id = 2L, operation = "DELETE"),
                 )
-            }
+
+            every {
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns entities
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -451,20 +381,11 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             // Given
             val entityType = "Guild"
             val entityId = "guild-admin"
+            val entity = createAuditLogEntity(id = 1L, isAdminMode = true)
 
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = true), 0),
-                )
-            }
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns listOf(entity)
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -479,20 +400,11 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
             // Given
             val entityType = "Guild"
             val entityId = "guild-user"
+            val entity = createAuditLogEntity(id = 1L, isAdminMode = false)
 
             every {
-                jdbcTemplate.query(
-                    match<String> { it.contains("entity_type = ?") && it.contains("entity_id = ?") },
-                    any<RowMapper<AuditLog>>(),
-                    eq(entityType),
-                    eq(entityId),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<AuditLog>>()
-                listOf(
-                    rowMapper.mapRow(mockResultSet(1L, isAdminMode = false), 0),
-                )
-            }
+                springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
+            } returns listOf(entity)
 
             // When
             val result = repository.findByEntity(entityType, entityId)
@@ -505,29 +417,28 @@ class JdbcAuditLogRepositoryTest : UnitTest() {
 
     // Helper methods
 
-    private fun mockResultSet(
-        id: Long,
+    private fun createAuditLogEntity(
+        id: Long? = 1L,
         timestamp: Instant = now,
-        operation: AuditOperation = AuditOperation.CREATE,
+        operation: String = "CREATE",
         entityType: String = "Guild",
         entityId: String = "guild-123",
         userId: String = "user-456",
         username: String = "testuser",
         isAdminMode: Boolean = false,
         requestId: String? = "req-789",
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("id") } returns id
-        every { rs.getTimestamp("timestamp") } returns Timestamp.from(timestamp)
-        every { rs.getString("operation") } returns operation.name
-        every { rs.getString("entity_type") } returns entityType
-        every { rs.getString("entity_id") } returns entityId
-        every { rs.getString("user_id") } returns userId
-        every { rs.getString("username") } returns username
-        every { rs.getBoolean("is_admin_mode") } returns isAdminMode
-        every { rs.getString("request_id") } returns requestId
-        return rs
-    }
+    ): AuditLogEntity =
+        AuditLogEntity(
+            id = id,
+            timestamp = timestamp,
+            operation = operation,
+            entityType = entityType,
+            entityId = entityId,
+            userId = userId,
+            username = username,
+            isAdminMode = isAdminMode,
+            requestId = requestId,
+        )
 
     private fun createAuditLog(
         id: AuditLogId? = AuditLogId(1L),

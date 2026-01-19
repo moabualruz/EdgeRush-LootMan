@@ -48,24 +48,24 @@ interface RaidCrudService : CrudService<Long, CreateRaidRequest, UpdateRaidReque
     /**
      * Find upcoming raids for a guild.
      *
-     * @param guildId The guild identifier
+     * @param guildId The guild identifier (string slug, e.g., "dod")
      * @param limit Maximum number of raids to return
      * @return List of upcoming raids ordered by date ascending
      */
     fun findUpcomingByGuild(
-        guildId: Long,
+        guildId: String,
         limit: Int,
     ): List<RaidResponse>
 
     /**
      * Find past raids for a guild.
      *
-     * @param guildId The guild identifier
+     * @param guildId The guild identifier (string slug, e.g., "dod")
      * @param limit Maximum number of raids to return
      * @return List of past raids ordered by date descending
      */
     fun findPastByGuild(
-        guildId: Long,
+        guildId: String,
         limit: Int,
     ): List<RaidResponse>
 }

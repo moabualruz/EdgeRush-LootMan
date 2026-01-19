@@ -127,7 +127,19 @@
       "Bash(npm run test:e2e:*)",
       "Bash(npx playwright show-trace:*)",
       "Bash(winpty docker exec edgerush-web-dashboard ls -la //usr/share/nginx/html/)",
-      "Bash(openssl rand:*)"
+      "Bash(openssl rand:*)",
+      "Bash(git stash:*)",
+      "Bash(Select-String -Pattern \"FAILED|MockKException|AssertionError\")",
+      "Bash(../gradlew compileKotlin:*)",
+      "Bash(f:/work/dod/looter/gradlew.bat:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(wsl --list:*)",
+      "Bash(wsl -d Ubuntu -- docker info:*)",
+      "Bash(wsl -d Ubuntu -- bash -c \"cd /mnt/f/work/dod/looter && ./gradlew :data-sync-service:test --tests '*IntegrationTest' --rerun-tasks 2>&1\":*)",
+      "Bash(wsl:*)",
+      "Bash(TEST_DB_URL=\"jdbc:postgresql://localhost:5433/lootman_test\" TEST_DB_USERNAME=\"test\" TEST_DB_PASSWORD=\"test\" cmd //c:*)",
+      "Bash(git checkout:*)",
+      "Bash(docker restart:*)"
     ]
   }
 }

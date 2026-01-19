@@ -3,13 +3,15 @@ import { ref, computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { adminApi } from '@/api/admin'
+import { useAuthStore } from '@/stores/auth'
 import { useGuildContextStore } from '@/stores/guildContext'
 import ConfigEditor from '@/components/admin/ConfigEditor.vue'
 import BehavioralActionsPanel from '@/components/admin/BehavioralActionsPanel.vue'
 import LootBansPanel from '@/components/admin/LootBansPanel.vue'
 
+const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
-const guildId = computed(() => guildContextStore.currentGuildId || import.meta.env.VITE_GUILD_ID || 'default')
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 const activeTab = ref<'config' | 'actions' | 'bans'>('config')
 
@@ -44,10 +46,13 @@ const tabs = [
     </div>
 
     <!-- Tab content -->
-    <div>
+    <div v-if="guildId">
       <ConfigEditor v-if="activeTab === 'config'" :guild-id="guildId" />
       <BehavioralActionsPanel v-else-if="activeTab === 'actions'" :guild-id="guildId" />
       <LootBansPanel v-else-if="activeTab === 'bans'" :guild-id="guildId" />
+    </div>
+    <div v-else class="text-center py-8 text-muted-foreground">
+      Please select a guild to view admin settings.
     </div>
   </div>
 </template>

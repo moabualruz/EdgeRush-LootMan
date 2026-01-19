@@ -1,5 +1,6 @@
 package com.edgerush.lootman.infrastructure.shared
 
+import com.edgerush.lootman.domain.shared.CharacterId
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
+import java.time.Instant
 import java.time.LocalDateTime
 
 /**
@@ -18,8 +20,7 @@ import java.time.LocalDateTime
  *
  * Persists Raider aggregates to the raiders table.
  *
- * Note: This implementation assumes the raiders table has a guild_id column.
- * The column uses JPA naming conventions (camelCase) as per V0019 migration.
+ * Note: This implementation uses snake_case column names as per V0045 migration.
  */
 @Repository
 class JdbcRaiderRepository(
@@ -28,8 +29,9 @@ class JdbcRaiderRepository(
     override fun findById(id: RaiderId): Raider? {
         val sql =
             """
-            SELECT id, guild_id, "characterName", realm, "characterClass", role,
-                   rank, status, "joinDate", "wowauditId"
+            SELECT id, guild_id, character_name, realm, region, character_class, role,
+                   rank, status, join_date, wowaudit_id, blizzard_id, character_id,
+                   tracking_since as created_at, last_sync as updated_at
             FROM raiders
             WHERE id = ?
             """.trimIndent()
@@ -41,11 +43,12 @@ class JdbcRaiderRepository(
     override fun findByGuildId(guildId: GuildId): List<Raider> {
         val sql =
             """
-            SELECT id, guild_id, "characterName", realm, "characterClass", role,
-                   rank, status, "joinDate", "wowauditId"
+            SELECT id, guild_id, character_name, realm, region, character_class, role,
+                   rank, status, join_date, wowaudit_id, blizzard_id, character_id,
+                   tracking_since as created_at, last_sync as updated_at
             FROM raiders
             WHERE guild_id = ?
-            ORDER BY "characterName"
+            ORDER BY character_name
             """.trimIndent()
 
         return jdbcTemplate.query(sql, raiderRowMapper, guildId.value)
@@ -58,11 +61,12 @@ class JdbcRaiderRepository(
     ): List<Raider> {
         val sql =
             """
-            SELECT id, guild_id, "characterName", realm, "characterClass", role,
-                   rank, status, "joinDate", "wowauditId"
+            SELECT id, guild_id, character_name, realm, region, character_class, role,
+                   rank, status, join_date, wowaudit_id, blizzard_id, character_id,
+                   tracking_since as created_at, last_sync as updated_at
             FROM raiders
             WHERE guild_id = ?
-            ORDER BY "characterName"
+            ORDER BY character_name
             LIMIT ? OFFSET ?
             """.trimIndent()
 
@@ -80,10 +84,11 @@ class JdbcRaiderRepository(
     ): Raider? {
         val sql =
             """
-            SELECT id, guild_id, "characterName", realm, "characterClass", role,
-                   rank, status, "joinDate", "wowauditId"
+            SELECT id, guild_id, character_name, realm, region, character_class, role,
+                   rank, status, join_date, wowaudit_id, blizzard_id, character_id,
+                   tracking_since as created_at, last_sync as updated_at
             FROM raiders
-            WHERE "characterName" = ? AND realm = ?
+            WHERE character_name = ? AND realm = ?
             """.trimIndent()
 
         val results = jdbcTemplate.query(sql, raiderRowMapper, characterName, realm)
@@ -113,8 +118,9 @@ class JdbcRaiderRepository(
         val placeholders = ids.joinToString(", ") { "?" }
         val sql =
             """
-            SELECT id, guild_id, "characterName", realm, "characterClass", role,
-                   rank, status, "joinDate", "wowauditId"
+            SELECT id, guild_id, character_name, realm, region, character_class, role,
+                   rank, status, join_date, wowaudit_id, blizzard_id, character_id,
+                   tracking_since as created_at, last_sync as updated_at
             FROM raiders
             WHERE id IN ($placeholders)
             """.trimIndent()
@@ -132,8 +138,8 @@ class JdbcRaiderRepository(
         val sql =
             """
             INSERT INTO raiders (
-                guild_id, "characterName", realm, "characterClass", role,
-                rank, status, "joinDate", "wowauditId"
+                guild_id, character_name, realm, character_class, role,
+                rank, status, join_date, wowaudit_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
@@ -156,14 +162,14 @@ class JdbcRaiderRepository(
             """
             UPDATE raiders SET
                 guild_id = ?,
-                "characterName" = ?,
+                character_name = ?,
                 realm = ?,
-                "characterClass" = ?,
+                character_class = ?,
                 role = ?,
                 rank = ?,
                 status = ?,
-                "joinDate" = ?,
-                "wowauditId" = ?
+                join_date = ?,
+                wowaudit_id = ?
             WHERE id = ?
             """.trimIndent()
 
@@ -184,13 +190,13 @@ class JdbcRaiderRepository(
 
     private val raiderRowMapper =
         RowMapper { rs, _ ->
-            val wowauditIdValue = rs.getLong("wowauditId")
+            val wowauditIdValue = rs.getLong("wowaudit_id")
             val wowauditId = if (rs.wasNull()) null else wowauditIdValue
 
-            val joinDateTimestamp = rs.getTimestamp("joinDate")
+            val joinDateTimestamp = rs.getTimestamp("join_date")
             val joinDate: LocalDateTime? = joinDateTimestamp?.toLocalDateTime()
 
-            val classStr = rs.getString("characterClass") ?: "WARRIOR"
+            val classStr = rs.getString("character_class") ?: "WARRIOR"
             val characterClass =
                 try {
                     CharacterClass.valueOf(classStr.uppercase().replace(" ", "_"))
@@ -211,12 +217,33 @@ class JdbcRaiderRepository(
 
             val guildIdStr = rs.getString("guild_id") ?: "default"
 
+            // Read new WoWCharacter fields (with fallbacks for backward compatibility)
+            val characterIdValue = rs.getLong("character_id")
+            val characterId = if (rs.wasNull()) rs.getLong("id") else characterIdValue
+
+            val region = rs.getString("region") ?: "eu"
+
+            val blizzardIdValue = rs.getLong("blizzard_id")
+            val blizzardId = if (rs.wasNull() || blizzardIdValue <= 0) null else blizzardIdValue
+
+            val createdAtTimestamp = rs.getTimestamp("created_at")
+            val createdAt = createdAtTimestamp?.toInstant() ?: Instant.now()
+
+            val updatedAtTimestamp = rs.getTimestamp("updated_at")
+            val updatedAt = updatedAtTimestamp?.toInstant() ?: Instant.now()
+
             Raider(
                 id = RaiderId(rs.getLong("id")),
-                guildId = GuildId(guildIdStr),
-                characterName = rs.getString("characterName"),
+                characterId = CharacterId(characterId),
+                name = rs.getString("character_name"),
                 realm = rs.getString("realm"),
+                region = region,
                 characterClass = characterClass,
+                blizzardId = blizzardId,
+                accountId = null,
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+                guildId = GuildId(guildIdStr),
                 role = role,
                 rank = rs.getString("rank"),
                 status = status,

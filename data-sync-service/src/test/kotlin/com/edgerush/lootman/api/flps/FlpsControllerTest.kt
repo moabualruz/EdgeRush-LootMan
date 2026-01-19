@@ -16,6 +16,8 @@ import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
 import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
 import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
 import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
+import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
+import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue
@@ -120,6 +122,7 @@ class FlpsControllerTest : UnitTest() {
         val raider = mockk<Raider>()
         every { raider.id } returns RaiderId(1L)
         every { raider.characterName } returns "TestRaider"
+        every { raider.realm } returns "TestRealm"
         every { raider.role } returns Role.DPS
 
         val raiderData =
@@ -130,6 +133,8 @@ class FlpsControllerTest : UnitTest() {
                 wishlist = null,
                 gear = null,
                 activeBans = emptyList(),
+                performanceData = RaiderPerformanceData.empty(raider.id, raider.characterName, raider.realm),
+                preparation = RaiderPreparationData.empty(raider.id),
             )
 
         val calculation = createFlpsCalculationResult(guildId, 1L, 0.85)
@@ -141,8 +146,8 @@ class FlpsControllerTest : UnitTest() {
 
         every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns listOf(raiderData)
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
-        every { componentCalculator.calculateMAS() } returns MechanicalAdherenceScore.of(0.8)
-        every { componentCalculator.calculateEPS(any()) } returns ExternalPreparationScore.of(0.7)
+        every { componentCalculator.calculateMAS(any()) } returns MechanicalAdherenceScore.of(0.8)
+        every { componentCalculator.calculateEPS(any(), any()) } returns ExternalPreparationScore.of(0.7)
         every { componentCalculator.calculateUV(any(), any()) } returns UpgradeValue.of(0.6)
         every { componentCalculator.calculateTierBonus(any()) } returns TierBonus.of(1.1)
         every { componentCalculator.calculateRoleMultiplier(any()) } returns RoleMultiplier.of(1.0)
@@ -209,6 +214,7 @@ class FlpsControllerTest : UnitTest() {
         val raider = mockk<Raider>()
         every { raider.id } returns RaiderId(123L)
         every { raider.characterName } returns "TestRaider"
+        every { raider.realm } returns "TestRealm"
         every { raider.role } returns Role.DPS
 
         val raiderData =
@@ -219,14 +225,16 @@ class FlpsControllerTest : UnitTest() {
                 wishlist = null,
                 gear = null,
                 activeBans = emptyList(),
+                performanceData = RaiderPerformanceData.empty(raider.id, raider.characterName, raider.realm),
+                preparation = RaiderPreparationData.empty(raider.id),
             )
 
         val calculationResult = createFlpsCalculationResult(guildId, 123L, 0.75)
 
         every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns listOf(raiderData)
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
-        every { componentCalculator.calculateMAS() } returns MechanicalAdherenceScore.of(0.8)
-        every { componentCalculator.calculateEPS(any()) } returns ExternalPreparationScore.of(0.7)
+        every { componentCalculator.calculateMAS(any()) } returns MechanicalAdherenceScore.of(0.8)
+        every { componentCalculator.calculateEPS(any(), any()) } returns ExternalPreparationScore.of(0.7)
         every { componentCalculator.calculateUV(any(), any()) } returns UpgradeValue.of(0.6)
         every { componentCalculator.calculateTierBonus(any()) } returns TierBonus.of(1.1)
         every { componentCalculator.calculateRoleMultiplier(any()) } returns RoleMultiplier.of(1.0)
@@ -255,11 +263,13 @@ class FlpsControllerTest : UnitTest() {
         val raider1 = mockk<Raider>()
         every { raider1.id } returns RaiderId(1L)
         every { raider1.characterName } returns "LowScoreRaider"
+        every { raider1.realm } returns "TestRealm"
         every { raider1.role } returns Role.DPS
 
         val raider2 = mockk<Raider>()
         every { raider2.id } returns RaiderId(2L)
         every { raider2.characterName } returns "HighScoreRaider"
+        every { raider2.realm } returns "TestRealm"
         every { raider2.role } returns Role.TANK
 
         val raiderData1 =
@@ -270,6 +280,8 @@ class FlpsControllerTest : UnitTest() {
                 wishlist = null,
                 gear = null,
                 activeBans = emptyList(),
+                performanceData = RaiderPerformanceData.empty(raider1.id, raider1.characterName, raider1.realm),
+                preparation = RaiderPreparationData.empty(raider1.id),
             )
 
         val raiderData2 =
@@ -280,6 +292,8 @@ class FlpsControllerTest : UnitTest() {
                 wishlist = null,
                 gear = null,
                 activeBans = emptyList(),
+                performanceData = RaiderPerformanceData.empty(raider2.id, raider2.characterName, raider2.realm),
+                preparation = RaiderPreparationData.empty(raider2.id),
             )
 
         val lowResult = createFlpsCalculationResult(guildId, 1L, 0.50)
@@ -287,8 +301,8 @@ class FlpsControllerTest : UnitTest() {
 
         every { flpsDataAssembler.assembleFlpsData(GuildId(guildId)) } returns listOf(raiderData1, raiderData2)
         every { componentCalculator.calculateACS(any()) } returns AttendanceCommitmentScore.of(0.9)
-        every { componentCalculator.calculateMAS() } returns MechanicalAdherenceScore.of(0.8)
-        every { componentCalculator.calculateEPS(any()) } returns ExternalPreparationScore.of(0.7)
+        every { componentCalculator.calculateMAS(any()) } returns MechanicalAdherenceScore.of(0.8)
+        every { componentCalculator.calculateEPS(any(), any()) } returns ExternalPreparationScore.of(0.7)
         every { componentCalculator.calculateUV(any(), any()) } returns UpgradeValue.of(0.6)
         every { componentCalculator.calculateTierBonus(any()) } returns TierBonus.of(1.1)
         every { componentCalculator.calculateRoleMultiplier(any()) } returns RoleMultiplier.of(1.0)

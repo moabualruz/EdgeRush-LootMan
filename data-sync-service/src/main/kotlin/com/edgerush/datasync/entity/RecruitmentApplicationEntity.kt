@@ -20,6 +20,7 @@ data class RecruitmentApplicationEntity(
     @Column("discord_id")
     val discordId: String,
 
+    @Column("email")
     val email: String,
 
     // Character Data
@@ -45,8 +46,11 @@ data class RecruitmentApplicationEntity(
     val bestParseAverage: Double?,
 
     // User Input
+    @Column("age")
     val age: Int,
+    @Column("location")
     val location: String,
+    @Column("timezone")
     val timezone: String,
 
     @Column("raid_days_available")
@@ -62,6 +66,7 @@ data class RecruitmentApplicationEntity(
     val whyThisGuild: String,
 
     // Status
+    @Column("status")
     val status: String,
 
     @Column("reviewed_by")

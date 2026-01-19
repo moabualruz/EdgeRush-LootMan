@@ -8,6 +8,7 @@ package com.edgerush.lootman.domain.flps.model
  *
  * Normalized value between 0.0 and 1.0.
  */
+@ConsistentCopyVisibility
 data class RecencyDecayFactor private constructor(val value: Double) {
     init {
         require(value in 0.0..1.0) {

@@ -4,29 +4,35 @@ import { useQuery } from '@tanstack/vue-query'
 import { performanceApi } from '@/api/performance'
 import { flpsApi } from '@/api/flps'
 import { formatDate, formatRelativeTime } from '@/utils/date'
+import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import SkeletonTable from '@/components/SkeletonTable.vue'
 import { LineChart, ProgressBar, DonutChart } from '@/components/charts'
 
-const GUILD_ID = import.meta.env.VITE_GUILD_ID || 'default'
+const authStore = useAuthStore()
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 // Performance data query
 const { data: performanceData, isLoading: perfLoading, error: perfError } = useQuery({
-  queryKey: ['myPerformance', GUILD_ID],
-  queryFn: () => performanceApi.getMyPerformance(GUILD_ID),
+  queryKey: ['myPerformance', guildId],
+  queryFn: () => performanceApi.getMyPerformance(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // FLPS data for MAS breakdown
 const { data: flpsData, isLoading: flpsLoading } = useQuery({
-  queryKey: ['myFlps', GUILD_ID],
-  queryFn: () => flpsApi.getMyFlps(GUILD_ID),
+  queryKey: ['myFlps', guildId],
+  queryFn: () => flpsApi.getMyFlps(guildId.value!),
+  enabled: computed(() => !!guildId.value),
 })
 
 // Warcraft Logs reports (when we have raiderId)
 const { data: wclReports, isLoading: wclLoading } = useQuery({
-  queryKey: ['wclReports', GUILD_ID, flpsData.value?.raiderId],
-  queryFn: () => performanceApi.getWarcraftLogsReports(GUILD_ID, flpsData.value!.raiderId, 20),
-  enabled: computed(() => !!flpsData.value?.raiderId),
+  queryKey: ['wclReports', guildId, flpsData.value?.raiderId],
+  queryFn: () => performanceApi.getWarcraftLogsReports(guildId.value!, flpsData.value!.raiderId, 20),
+  enabled: computed(() => !!guildId.value && !!flpsData.value?.raiderId),
 })
 
 // Performance trend for LineChart component
@@ -111,8 +117,12 @@ function getMasColor(mas: number): string {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="perfError" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load performance data. Please try again.</p>
+    <div v-else-if="perfError" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Performance</h5>
+        <div class="alert-description">Failed to load performance data. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Content -->

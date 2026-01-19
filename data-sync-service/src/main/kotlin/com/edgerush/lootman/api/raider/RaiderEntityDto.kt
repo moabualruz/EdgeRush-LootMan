@@ -11,6 +11,7 @@ data class CreateRaiderEntityRequest(
     val realm: String,
     @field:NotBlank(message = "Region is required")
     val region: String,
+    val guildId: String? = null,
     val wowauditId: Long? = null,
     @field:NotBlank(message = "Class is required")
     val clazz: String,
@@ -27,6 +28,7 @@ data class CreateRaiderEntityRequest(
 )
 
 data class UpdateRaiderEntityRequest(
+    val guildId: String? = null,
     val spec: String? = null,
     val role: String? = null,
     val rank: String? = null,
@@ -39,6 +41,7 @@ data class RaiderEntityResponse(
     val characterName: String,
     val realm: String,
     val region: String,
+    val guildId: String?,
     val wowauditId: Long?,
     val clazz: String,
     val spec: String,
@@ -59,6 +62,7 @@ data class RaiderEntityResponse(
                 characterName = entity.characterName,
                 realm = entity.realm,
                 region = entity.region,
+                guildId = entity.guildId,
                 wowauditId = entity.wowauditId,
                 clazz = entity.clazz,
                 spec = entity.spec,

@@ -10,12 +10,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/LoginPage.vue'),
     meta: { requiresAuth: false },
   },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: () => import('@/pages/ProfilePage.vue'),
-    meta: { requiresAuth: true },
-  },
+
   {
     path: '/auth/:provider/callback',
     name: 'oauth-callback',
@@ -36,6 +31,11 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         redirect: '/dashboard',
+      },
+      {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/pages/ProfilePage.vue'),
       },
       {
         path: 'dashboard',

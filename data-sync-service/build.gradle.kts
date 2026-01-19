@@ -58,9 +58,9 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 
     // Testcontainers for database integration tests
-    testImplementation("org.testcontainers:testcontainers:1.19.3")
-    testImplementation("org.testcontainers:postgresql:1.19.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("org.testcontainers:testcontainers:1.20.4")
+    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
 
     // Kotest for better assertions
     testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
@@ -75,6 +75,18 @@ tasks.withType<Test> {
     useJUnitPlatform()
     ignoreFailures = true // Allow coverage report generation even with test failures
     finalizedBy(tasks.jacocoTestReport)
+
+    // Pass testcontainers.force.enabled system property to test JVM
+    systemProperty("testcontainers.force.enabled", System.getProperty("testcontainers.force.enabled", "false"))
+
+    // Pass external database configuration for integration tests (workaround for Docker Desktop bug)
+    // Usage: ./gradlew test -PTEST_DB_URL=jdbc:postgresql://localhost:5433/lootman_test
+    listOf("TEST_DB_URL", "TEST_DB_USERNAME", "TEST_DB_PASSWORD").forEach { envVar ->
+        val value = System.getenv(envVar) ?: project.findProperty(envVar)?.toString()
+        if (value != null) {
+            environment(envVar, value)
+        }
+    }
 }
 
 // JaCoCo configuration for code coverage

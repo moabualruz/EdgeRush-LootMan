@@ -2,84 +2,94 @@ package com.edgerush.lootman.infrastructure.statistics
 
 import com.edgerush.datasync.entity.RaiderStatisticsEntity
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.infrastructure.springdata.RaiderStatisticsEntitySpringRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import java.sql.ResultSet
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import java.util.Optional
 
 /**
  * Unit tests for JdbcRaiderStatisticsRepository.
+ *
+ * These tests mock the Spring Data repository to verify delegation behavior.
  */
 class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
-    private lateinit var jdbcTemplate: JdbcTemplate
+    private lateinit var springRepository: RaiderStatisticsEntitySpringRepository
     private lateinit var repository: JdbcRaiderStatisticsRepository
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate = mockk(relaxed = true)
-        repository = JdbcRaiderStatisticsRepository(jdbcTemplate)
+        springRepository = mockk(relaxed = true)
+        repository = JdbcRaiderStatisticsRepository(springRepository)
     }
 
     @Nested
     inner class FindByIdTests {
         @Test
         fun `should return statistics when found`() {
+            // Given
             val id = 1L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<RaiderStatisticsEntity>>(), eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderStatisticsEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id, 100L), 0))
-            }
+            val entity = createStatisticsEntity(id = id)
+            every { springRepository.findById(id) } returns Optional.of(entity)
+
+            // When
             val result = repository.findById(id)
+
+            // Then
             result shouldNotBe null
             result?.id shouldBe id
+            result?.raiderId shouldBe 100L
+            verify { springRepository.findById(id) }
         }
 
         @Test
         fun `should return null when statistics not found`() {
+            // Given
             val id = 999L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<RaiderStatisticsEntity>>(), eq(id),
-                )
-            } returns emptyList()
-            repository.findById(id) shouldBe null
+            every { springRepository.findById(id) } returns Optional.empty()
+
+            // When
+            val result = repository.findById(id)
+
+            // Then
+            result shouldBe null
+            verify { springRepository.findById(id) }
         }
 
         @Test
-        fun `should map all database fields to entity`() {
+        fun `should map all entity fields correctly`() {
+            // Given
             val id = 1L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<RaiderStatisticsEntity>>(), eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderStatisticsEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id, 100L, mythicPlusScore = 2500.5, weeklyHighestMplus = 20, seasonHighestMplus = 22, worldQuestsTotal = 1000, worldQuestsThisWeek = 50, collectiblesMounts = 300, collectiblesToys = 150, collectiblesUniquePets = 200, collectiblesLevel25Pets = 50, honorLevel = 100), 0))
-            }
+            val entity = createStatisticsEntity(
+                id = id,
+                raiderId = 100L,
+                mythicPlusScore = 2500.5,
+                weeklyHighestMplus = 20,
+                seasonHighestMplus = 22,
+                worldQuestsTotal = 1000,
+                worldQuestsThisWeek = 50,
+                collectiblesMounts = 300,
+                collectiblesToys = 150,
+                collectiblesUniquePets = 200,
+                collectiblesLevel25Pets = 50,
+                honorLevel = 100,
+            )
+            every { springRepository.findById(id) } returns Optional.of(entity)
+
+            // When
             val result = repository.findById(id)
+
+            // Then
             result shouldNotBe null
+            result?.id shouldBe id
+            result?.raiderId shouldBe 100L
             result?.mythicPlusScore shouldBe 2500.5
             result?.weeklyHighestMplus shouldBe 20
             result?.seasonHighestMplus shouldBe 22
@@ -90,27 +100,69 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
             result?.collectiblesUniquePets shouldBe 200
             result?.collectiblesLevel25Pets shouldBe 50
             result?.honorLevel shouldBe 100
+            verify { springRepository.findById(id) }
         }
 
         @Test
         fun `should handle null optional fields`() {
+            // Given
             val id = 1L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("SELECT") && it.contains("id = ?")
-                    },
-                    any<RowMapper<RaiderStatisticsEntity>>(), eq(id),
-                )
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderStatisticsEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(id, 100L, mythicPlusScore = null, weeklyHighestMplus = null, seasonHighestMplus = null, worldQuestsTotal = null, worldQuestsThisWeek = null, collectiblesMounts = null, collectiblesToys = null, collectiblesUniquePets = null, collectiblesLevel25Pets = null, honorLevel = null), 0))
-            }
+            val entity = createStatisticsEntity(
+                id = id,
+                raiderId = 100L,
+                mythicPlusScore = null,
+                weeklyHighestMplus = null,
+                seasonHighestMplus = null,
+                worldQuestsTotal = null,
+                worldQuestsThisWeek = null,
+                collectiblesMounts = null,
+                collectiblesToys = null,
+                collectiblesUniquePets = null,
+                collectiblesLevel25Pets = null,
+                honorLevel = null,
+            )
+            every { springRepository.findById(id) } returns Optional.of(entity)
+
+            // When
             val result = repository.findById(id)
+
+            // Then
             result shouldNotBe null
             result?.mythicPlusScore shouldBe null
             result?.weeklyHighestMplus shouldBe null
+            result?.seasonHighestMplus shouldBe null
+            result?.worldQuestsTotal shouldBe null
+            result?.worldQuestsThisWeek shouldBe null
+            result?.collectiblesMounts shouldBe null
+            result?.collectiblesToys shouldBe null
+            result?.collectiblesUniquePets shouldBe null
+            result?.collectiblesLevel25Pets shouldBe null
             result?.honorLevel shouldBe null
+            verify { springRepository.findById(id) }
+        }
+    }
+
+    @Nested
+    inner class FindAllTests {
+        @Test
+        fun `should return paginated statistics`() {
+            // Given
+            val offset = 10L
+            val limit = 5
+            val entities = listOf(
+                createStatisticsEntity(1L, 100L),
+                createStatisticsEntity(2L, 101L),
+            )
+            val page = PageImpl(entities)
+
+            every { springRepository.findAll(any<Pageable>()) } returns page
+
+            // When
+            val result = repository.findAll(offset, limit)
+
+            // Then
+            result.size shouldBe 2
+            verify { springRepository.findAll(any<Pageable>()) }
         }
     }
 
@@ -118,61 +170,32 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
     inner class FindByRaiderIdTests {
         @Test
         fun `should return statistics for raider`() {
+            // Given
             val raiderId = 100L
-            every {
-                jdbcTemplate.query(match<String> { it.contains("raider_id = ?") }, any<RowMapper<RaiderStatisticsEntity>>(), eq(raiderId))
-            } answers {
-                val rowMapper = secondArg<RowMapper<RaiderStatisticsEntity>>()
-                listOf(rowMapper.mapRow(mockResultSet(1L, raiderId), 0))
-            }
+            val entity = createStatisticsEntity(1L, raiderId)
+            every { springRepository.findByRaiderId(raiderId) } returns entity
+
+            // When
             val result = repository.findByRaiderId(raiderId)
+
+            // Then
             result shouldNotBe null
             result?.raiderId shouldBe raiderId
+            verify { springRepository.findByRaiderId(raiderId) }
         }
 
         @Test
         fun `should return null when raider has no statistics`() {
+            // Given
             val raiderId = 999L
-            every {
-                jdbcTemplate.query(
-                    match<String> {
-                        it.contains("raider_id = ?")
-                    },
-                    any<RowMapper<RaiderStatisticsEntity>>(), eq(raiderId),
-                )
-            } returns emptyList()
-            repository.findByRaiderId(raiderId) shouldBe null
-        }
-    }
+            every { springRepository.findByRaiderId(raiderId) } returns null
 
-    @Nested
-    inner class ExistsByRaiderIdTests {
-        @Test
-        fun `should return true when statistics exist for raider`() {
-            val raiderId = 100L
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> {
-                        it.contains("COUNT(*)") && it.contains("raider_id = ?")
-                    },
-                    Int::class.java, eq(raiderId),
-                )
-            } returns 1
-            repository.existsByRaiderId(raiderId) shouldBe true
-        }
+            // When
+            val result = repository.findByRaiderId(raiderId)
 
-        @Test
-        fun `should return false when statistics do not exist for raider`() {
-            val raiderId = 999L
-            every {
-                jdbcTemplate.queryForObject(
-                    match<String> {
-                        it.contains("COUNT(*)") && it.contains("raider_id = ?")
-                    },
-                    Int::class.java, eq(raiderId),
-                )
-            } returns 0
-            repository.existsByRaiderId(raiderId) shouldBe false
+            // Then
+            result shouldBe null
+            verify { springRepository.findByRaiderId(raiderId) }
         }
     }
 
@@ -180,40 +203,110 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
     inner class CountTests {
         @Test
         fun `should return total count`() {
-            every {
-                jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") && it.contains("raider_statistics") }, Long::class.java)
-            } returns 42L
-            repository.count() shouldBe 42L
+            // Given
+            every { springRepository.count() } returns 42L
+
+            // When
+            val result = repository.count()
+
+            // Then
+            result shouldBe 42L
+            verify { springRepository.count() }
+        }
+    }
+
+    @Nested
+    inner class ExistsByIdTests {
+        @Test
+        fun `should return true when statistics exists`() {
+            // Given
+            val id = 1L
+            every { springRepository.existsById(id) } returns true
+
+            // When
+            val result = repository.existsById(id)
+
+            // Then
+            result shouldBe true
+            verify { springRepository.existsById(id) }
         }
 
         @Test
-        fun `should handle null count result`() {
-            every { jdbcTemplate.queryForObject(match<String> { it.contains("COUNT(*)") }, Long::class.java) } returns null
-            repository.count() shouldBe 0L
+        fun `should return false when statistics does not exist`() {
+            // Given
+            val id = 999L
+            every { springRepository.existsById(id) } returns false
+
+            // When
+            val result = repository.existsById(id)
+
+            // Then
+            result shouldBe false
+            verify { springRepository.existsById(id) }
+        }
+    }
+
+    @Nested
+    inner class ExistsByRaiderIdTests {
+        @Test
+        fun `should return true when statistics exist for raider`() {
+            // Given
+            val raiderId = 100L
+            every { springRepository.existsByRaiderId(raiderId) } returns true
+
+            // When
+            val result = repository.existsByRaiderId(raiderId)
+
+            // Then
+            result shouldBe true
+            verify { springRepository.existsByRaiderId(raiderId) }
+        }
+
+        @Test
+        fun `should return false when statistics do not exist for raider`() {
+            // Given
+            val raiderId = 999L
+            every { springRepository.existsByRaiderId(raiderId) } returns false
+
+            // When
+            val result = repository.existsByRaiderId(raiderId)
+
+            // Then
+            result shouldBe false
+            verify { springRepository.existsByRaiderId(raiderId) }
         }
     }
 
     @Nested
     inner class SaveTests {
         @Test
-        fun `should insert new statistics when id is null`() {
-            val entity = createEntity(id = null)
-            val generatedId = 1L
-            every { jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>()) } answers {
-                secondArg<GeneratedKeyHolder>().keyList.add(mapOf("id" to generatedId))
-                1
-            }
+        fun `should save entity and return saved result`() {
+            // Given
+            val entity = createStatisticsEntity(id = null)
+            val savedEntity = createStatisticsEntity(id = 1L)
+            every { springRepository.save(entity) } returns savedEntity
+
+            // When
             val result = repository.save(entity)
-            result.id shouldBe generatedId
+
+            // Then
+            result.id shouldBe 1L
+            result.raiderId shouldBe entity.raiderId
+            verify { springRepository.save(entity) }
         }
 
         @Test
-        fun `should update existing statistics when id is not null`() {
-            val entity = createEntity(id = 1L)
-            val sqlSlot = slot<String>()
-            every { jdbcTemplate.update(capture(sqlSlot), *anyVararg()) } returns 1
-            repository.save(entity)
-            sqlSlot.captured.contains("UPDATE") shouldBe true
+        fun `should update existing statistics`() {
+            // Given
+            val entity = createStatisticsEntity(id = 1L)
+            every { springRepository.save(entity) } returns entity
+
+            // When
+            val result = repository.save(entity)
+
+            // Then
+            result shouldBe entity
+            verify { springRepository.save(entity) }
         }
     }
 
@@ -221,63 +314,20 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
     inner class DeleteTests {
         @Test
         fun `should delete statistics by id`() {
+            // Given
             val id = 1L
-            every { jdbcTemplate.update(match<String> { it.contains("DELETE") }, eq(id)) } returns 1
+
+            // When
             repository.delete(id)
-            verify { jdbcTemplate.update(match { it.contains("DELETE") }, id) }
+
+            // Then
+            verify { springRepository.deleteById(id) }
         }
     }
 
-    private fun mockResultSet(
-        id: Long,
-        raiderId: Long,
-        mythicPlusScore: Double? = 2500.0,
-        weeklyHighestMplus: Int? = 20,
-        seasonHighestMplus: Int? = 22,
-        worldQuestsTotal: Int? = 1000,
-        worldQuestsThisWeek: Int? = 50,
-        collectiblesMounts: Int? = 300,
-        collectiblesToys: Int? = 150,
-        collectiblesUniquePets: Int? = 200,
-        collectiblesLevel25Pets: Int? = 50,
-        honorLevel: Int? = 100,
-    ): ResultSet {
-        val rs = mockk<ResultSet>()
-        every { rs.getLong("id") } returns id
-        every { rs.getLong("raider_id") } returns raiderId
-        every { rs.getDouble("mythic_plus_score") } returns (mythicPlusScore ?: 0.0)
-        every { rs.getInt("weekly_highest_mplus") } returns (weeklyHighestMplus ?: 0)
-        every { rs.getInt("season_highest_mplus") } returns (seasonHighestMplus ?: 0)
-        every { rs.getInt("world_quests_total") } returns (worldQuestsTotal ?: 0)
-        every { rs.getInt("world_quests_this_week") } returns (worldQuestsThisWeek ?: 0)
-        every { rs.getInt("collectibles_mounts") } returns (collectiblesMounts ?: 0)
-        every { rs.getInt("collectibles_toys") } returns (collectiblesToys ?: 0)
-        every { rs.getInt("collectibles_unique_pets") } returns (collectiblesUniquePets ?: 0)
-        every { rs.getInt("collectibles_level_25_pets") } returns (collectiblesLevel25Pets ?: 0)
-        every { rs.getInt("honor_level") } returns (honorLevel ?: 0)
-        var wasNullCount = 0
-        every { rs.wasNull() } answers {
-            val isNull =
-                when (wasNullCount) {
-                    0 -> mythicPlusScore == null
-                    1 -> weeklyHighestMplus == null
-                    2 -> seasonHighestMplus == null
-                    3 -> worldQuestsTotal == null
-                    4 -> worldQuestsThisWeek == null
-                    5 -> collectiblesMounts == null
-                    6 -> collectiblesToys == null
-                    7 -> collectiblesUniquePets == null
-                    8 -> collectiblesLevel25Pets == null
-                    9 -> honorLevel == null
-                    else -> false
-                }
-            wasNullCount++
-            isNull
-        }
-        return rs
-    }
+    // Helper methods
 
-    private fun createEntity(
+    private fun createStatisticsEntity(
         id: Long? = 1L,
         raiderId: Long = 100L,
         mythicPlusScore: Double? = 2500.0,
@@ -290,6 +340,19 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
         collectiblesUniquePets: Int? = 200,
         collectiblesLevel25Pets: Int? = 50,
         honorLevel: Int? = 100,
-    ) =
-        RaiderStatisticsEntity(id, raiderId, mythicPlusScore, weeklyHighestMplus, seasonHighestMplus, worldQuestsTotal, worldQuestsThisWeek, collectiblesMounts, collectiblesToys, collectiblesUniquePets, collectiblesLevel25Pets, honorLevel)
+    ): RaiderStatisticsEntity =
+        RaiderStatisticsEntity(
+            id = id,
+            raiderId = raiderId,
+            mythicPlusScore = mythicPlusScore,
+            weeklyHighestMplus = weeklyHighestMplus,
+            seasonHighestMplus = seasonHighestMplus,
+            worldQuestsTotal = worldQuestsTotal,
+            worldQuestsThisWeek = worldQuestsThisWeek,
+            collectiblesMounts = collectiblesMounts,
+            collectiblesToys = collectiblesToys,
+            collectiblesUniquePets = collectiblesUniquePets,
+            collectiblesLevel25Pets = collectiblesLevel25Pets,
+            honorLevel = honorLevel,
+        )
 }

@@ -3,6 +3,7 @@ import { computed, toRef } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { lootApi } from '@/api/loot'
 import { useAuthStore } from '@/stores/auth'
+import { useGuildContextStore } from '@/stores/guildContext'
 import { formatDate, formatRelativeTime } from '@/utils/date'
 import { useWowhead } from '@/composables/useWowhead'
 import WowheadItem from '@/components/WowheadItem.vue'
@@ -10,7 +11,8 @@ import SkeletonCard from '@/components/SkeletonCard.vue'
 import { DonutChart, BarChart } from '@/components/charts'
 
 const authStore = useAuthStore()
-const guildId = computed(() => authStore.user?.guildId)
+const guildContextStore = useGuildContextStore()
+const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 const { data, isLoading, error } = useQuery({
   queryKey: ['myLootHistory', guildId, 50],
@@ -74,16 +76,21 @@ const averageFlps = computed(() => {
     </div>
 
     <!-- No Guild state -->
-    <div v-else-if="!guildId" class="card bg-blue-900/20 border-blue-700">
-       <h2 class="text-lg font-semibold text-blue-400 mb-2">No Guild Found</h2>
-       <p class="text-blue-300">
-         You are not currently a member of any guild.
-       </p>
+    <div v-else-if="!guildId" class="alert alert-info">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div>
+        <h5 class="alert-title">No Guild Found</h5>
+        <div class="alert-description">You are not currently a member of any guild. Please join one to view loot history.</div>
+      </div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load loot history. Please try again.</p>
+    <div v-else-if="error" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Loot History</h5>
+        <div class="alert-description">Failed to load loot history. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Content -->

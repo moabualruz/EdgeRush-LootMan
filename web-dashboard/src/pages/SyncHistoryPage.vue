@@ -183,8 +183,12 @@ function formatDuration(startedAt: string, completedAt: string | null): string {
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="card bg-red-900/20 border-red-700">
-      <p class="text-red-400">Failed to load sync history. Please try again.</p>
+    <div v-else-if="error" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h5 class="alert-title">Error Loading Sync History</h5>
+        <div class="alert-description">Failed to load sync history. Please try again later.</div>
+      </div>
     </div>
 
     <!-- Empty state -->

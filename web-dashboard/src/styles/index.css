@@ -47,6 +47,27 @@
   .text-glow {
     text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
   }
+
+  /* Alert Component Styles */
+  .alert {
+    @apply glass rounded-lg p-4 border-l-4 flex items-start gap-3 shadow-lg transition-all duration-300;
+  }
+  
+  .alert-error {
+    @apply border-l-red-500 bg-red-950/20 text-red-200 border-y border-r border-red-500/20;
+  }
+  
+  .alert-info {
+    @apply border-l-blue-500 bg-blue-950/20 text-blue-200 border-y border-r border-blue-500/20;
+  }
+
+  .alert-title {
+    @apply font-semibold tracking-tight text-foreground mb-1 block;
+  }
+
+  .alert-description {
+    @apply text-sm opacity-90;
+  }
 }
 
 @layer base {
