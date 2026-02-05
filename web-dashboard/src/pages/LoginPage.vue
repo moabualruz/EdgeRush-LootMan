@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
@@ -177,6 +177,14 @@ async function loginWithBattlenet() {
                 class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
                 required
               />
+              <div v-if="mode === 'login'" class="mt-2 text-right">
+                <RouterLink 
+                  to="/forgot-password" 
+                  class="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Forgot Password?
+                </RouterLink>
+              </div>
             </div>
 
             <!-- Confirm Password (register only) -->

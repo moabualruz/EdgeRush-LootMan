@@ -1,7 +1,7 @@
 # Gap Tracker
 
 > **Last Updated:** 2026-02-05  
-> **Progress:** 10/12 Complete
+> **Progress:** 12/12 Complete ✅
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Count |
 |--------|-------|
-| ⬜ TODO | 2 |
+| ⬜ TODO | 0 |
 | 🔄 IN PROGRESS | 0 |
-| ✅ DONE | 10 |
+| ✅ DONE | 12 |
 
 ---
 
@@ -56,8 +56,8 @@
 
 | ID | Gap | Status | Started | Completed | Notes |
 |----|-----|--------|---------|-----------|-------|
-| GAP-011 | Forgot Password flow | ⬜ TODO | - | - | |
-| GAP-012 | Vue ErrorBoundary | ⬜ TODO | - | - | |
+| GAP-011 | Forgot Password flow | ✅ DONE | 2026-02-05 | 2026-02-05 | TDD: 15 tests (auth API + 2 pages) |
+| GAP-012 | Vue ErrorBoundary | ✅ DONE | 2026-02-05 | 2026-02-05 | TDD: 5 tests, integrated in App.vue |
 
 ---
 
@@ -65,6 +65,8 @@
 
 | Date | Gap ID | Action | Details |
 |------|--------|--------|---------|
+| 2026-02-05 | GAP-012 | Complete | ErrorBoundary.vue component, integrated in App.vue. 5 tests. |
+| 2026-02-05 | GAP-011 | Complete | auth.ts API, ForgotPasswordPage, ResetPasswordPage, routes, LoginPage link. 15 tests. |
 | 2026-02-05 | GAP-010 | Complete | RaiderEditForm.vue, updateRaider API, integrated into RaiderDetailModal. 7 tests. |
 | 2026-02-05 | GAP-009 | Complete | RaiderDetailModal.vue component, LeaderboardPage click handler. 12 tests. |
 | 2026-02-05 | GAP-007 | Complete | SyncLogViewer.vue component, click handler in SyncHistoryPage. 5 tests. |
@@ -77,10 +79,9 @@
 
 ---
 
-## Next Up
+## 🎉 All Gaps Complete!
 
-**Recommended next gap to work on:** `GAP-011` (Forgot Password flow)  
-**Reason:** Start Phase 6 (Polish)
+**All 12 gaps have been successfully remediated.** The web-dashboard is now feature-complete.
 
 ---
 
