@@ -169,3 +169,12 @@ flps:
     max-attendance-bonus: 1.0       # Maximum attendance score cap
     min-mechanical-score: 0.0       # Minimum mechanical adherence score
     max-preparation-score: 1.0      # Maximum preparation score cap
+
+# HTTP Client Configuration (WebClient/RestTemplate)
+http-clients:
+  connect-timeout-ms: 5000    # Connection timeout in milliseconds
+  read-timeout-ms: 10000      # Read timeout in milliseconds
+  write-timeout-ms: 10000     # Write timeout in milliseconds
+  max-retries: 3              # Max retry attempts for 5xx errors
+  retry-backoff-ms: 500       # Initial backoff between retries
+

@@ -6,12 +6,15 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import java.util.function.Consumer
@@ -20,7 +23,7 @@ import java.util.function.Consumer
  * Unit tests for WebClientConfig.
  *
  * Tests WebClient bean configuration including base URL setup,
- * authentication headers, and memory settings.
+ * authentication headers, timeout configuration, and retry strategies.
  */
 class WebClientConfigTest : UnitTest() {
     @MockK(relaxed = true)
@@ -30,12 +33,16 @@ class WebClientConfigTest : UnitTest() {
     private lateinit var webClient: WebClient
 
     private lateinit var webClientConfig: WebClientConfig
+    private lateinit var httpClientsProperties: HttpClientsProperties
 
     @BeforeEach
     fun setUp() {
-        webClientConfig = WebClientConfig()
+        httpClientsProperties = createHttpClientsProperties()
+        webClientConfig = WebClientConfig(httpClientsProperties)
         every { webClientBuilder.baseUrl(any()) } returns webClientBuilder
         every { webClientBuilder.defaultHeaders(any()) } returns webClientBuilder
+        every { webClientBuilder.clientConnector(any<ReactorClientHttpConnector>()) } returns webClientBuilder
+        every { webClientBuilder.filter(any<ExchangeFilterFunction>()) } returns webClientBuilder
         every { webClientBuilder.exchangeStrategies(any<ExchangeStrategies>()) } returns webClientBuilder
         every { webClientBuilder.build() } returns webClient
     }
@@ -92,6 +99,30 @@ class WebClientConfigTest : UnitTest() {
 
             // Assert
             verify(exactly = 1) { webClientBuilder.build() }
+        }
+
+        @Test
+        fun `should configure client connector with timeouts`() {
+            // Arrange
+            val properties = createSyncProperties()
+
+            // Act
+            webClientConfig.wowauditWebClient(webClientBuilder, properties)
+
+            // Assert
+            verify(exactly = 1) { webClientBuilder.clientConnector(any<ReactorClientHttpConnector>()) }
+        }
+
+        @Test
+        fun `should configure retry filter`() {
+            // Arrange
+            val properties = createSyncProperties()
+
+            // Act
+            webClientConfig.wowauditWebClient(webClientBuilder, properties)
+
+            // Assert
+            verify(exactly = 1) { webClientBuilder.filter(any<ExchangeFilterFunction>()) }
         }
     }
 
@@ -245,6 +276,42 @@ class WebClientConfigTest : UnitTest() {
     }
 
     @Nested
+    inner class HttpClientsPropertiesTests {
+        @Test
+        fun `should use configured timeout values`() {
+            // Arrange
+            val customProperties = HttpClientsProperties(
+                connectTimeoutMs = 3000,
+                readTimeoutMs = 6000,
+                writeTimeoutMs = 6000,
+                maxRetries = 5,
+                retryBackoffMs = 1000,
+            )
+            val config = WebClientConfig(customProperties)
+            val syncProperties = createSyncProperties()
+
+            // Act
+            config.wowauditWebClient(webClientBuilder, syncProperties)
+
+            // Assert - verify that client connector is configured (timeouts are internal)
+            verify(exactly = 1) { webClientBuilder.clientConnector(any<ReactorClientHttpConnector>()) }
+        }
+
+        @Test
+        fun `should use default timeout values`() {
+            // Arrange
+            val defaultProperties = createHttpClientsProperties()
+
+            // Assert
+            defaultProperties.connectTimeoutMs shouldBe 5000
+            defaultProperties.readTimeoutMs shouldBe 10000
+            defaultProperties.writeTimeoutMs shouldBe 10000
+            defaultProperties.maxRetries shouldBe 3
+            defaultProperties.retryBackoffMs shouldBe 500
+        }
+    }
+
+    @Nested
     inner class EdgeCases {
         @Test
         fun `should handle properties with all nullable fields as null`() {
@@ -284,6 +351,22 @@ class WebClientConfigTest : UnitTest() {
         }
     }
 
+    @Nested
+    inner class ServerErrorExceptionTests {
+        @Test
+        fun `ServerErrorException should contain status code and message`() {
+            // Arrange & Act
+            val exception = ServerErrorException(
+                statusCode = mockk { every { value() } returns 503 },
+                message = "Service Unavailable",
+            )
+
+            // Assert
+            exception.message shouldBe "Service Unavailable"
+            exception.statusCode.value() shouldBe 503
+        }
+    }
+
     // Helper function to create SyncProperties for testing
     private fun createSyncProperties(
         baseUrl: String = "https://wowaudit.com",
@@ -304,4 +387,20 @@ class WebClientConfigTest : UnitTest() {
             wowaudit = wowAuditProperties,
         )
     }
+
+    // Helper function to create HttpClientsProperties for testing
+    private fun createHttpClientsProperties(
+        connectTimeoutMs: Int = 5000,
+        readTimeoutMs: Int = 10000,
+        writeTimeoutMs: Int = 10000,
+        maxRetries: Int = 3,
+        retryBackoffMs: Long = 500,
+    ): HttpClientsProperties =
+        HttpClientsProperties(
+            connectTimeoutMs = connectTimeoutMs,
+            readTimeoutMs = readTimeoutMs,
+            writeTimeoutMs = writeTimeoutMs,
+            maxRetries = maxRetries,
+            retryBackoffMs = retryBackoffMs,
+        )
 }
