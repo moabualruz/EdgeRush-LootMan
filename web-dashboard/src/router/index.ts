@@ -105,6 +105,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/GearPage.vue'),
       },
       {
+        path: 'droptimizer',
+        name: 'droptimizer',
+        component: () => import('@/pages/DroptimizerPage.vue'),
+      },
+      {
         path: 'admin',
         name: 'admin',
         component: () => import('@/pages/AdminPage.vue'),
