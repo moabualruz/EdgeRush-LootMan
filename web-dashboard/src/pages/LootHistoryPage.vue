@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { lootApi } from '@/api/loot'
 import { useAuthStore } from '@/stores/auth'
@@ -10,6 +10,7 @@ import WowheadItem from '@/components/WowheadItem.vue'
 import ItemHoverPreview from '@/components/ItemHoverPreview.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import { DonutChart, BarChart } from '@/components/charts'
+import AwardLootModal from '@/components/loot/AwardLootModal.vue'
 
 const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
@@ -26,6 +27,9 @@ const dataRef = toRef(() => data.value)
 useWowhead({}, [dataRef])
 
 const formatScore = (score: number) => score.toFixed(3)
+
+// Award modal state
+const isAwardModalOpen = ref(false)
 
 // RDF status breakdown for donut chart
 const rdfBreakdown = computed(() => {
@@ -64,7 +68,19 @@ const averageFlps = computed(() => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">Loot History</h1>
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Loot History</h1>
+      <button
+        class="btn-primary"
+        @click="isAwardModalOpen = true"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Award Loot
+      </button>
+    </div>
 
     <!-- Loading state with skeletons -->
     <div v-if="isLoading && guildId" class="space-y-6">
@@ -185,5 +201,11 @@ const averageFlps = computed(() => {
         </div>
       </template>
     </div>
+
+    <!-- Award Loot Modal -->
+    <AwardLootModal
+      :is-open="isAwardModalOpen"
+      @close="isAwardModalOpen = false"
+    />
   </div>
 </template>

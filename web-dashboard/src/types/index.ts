@@ -105,6 +105,26 @@ export interface LootHistoryResponse {
   awards: LootAward[]
 }
 
+export interface AwardLootRequest {
+  raiderId: number
+  itemId: number
+  itemName: string
+  raidId?: number
+  notes?: string
+}
+
+export interface UpdateLootRequest {
+  itemName?: string
+  notes?: string
+}
+
+export interface WowItem {
+  id: number
+  name: string
+  iconUrl?: string
+  quality: 'POOR' | 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY'
+}
+
 // Wishlist types
 export interface WishlistItem {
   itemId: number

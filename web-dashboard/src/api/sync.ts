@@ -17,6 +17,12 @@ export interface PagedSyncRunResponse {
   totalPages: number
 }
 
+export interface SyncLog {
+  timestamp: string
+  level: 'INFO' | 'WARN' | 'ERROR'
+  message: string
+}
+
 export const syncApi = {
   async getSyncRuns(page = 0, size = 20): Promise<PagedSyncRunResponse> {
     const response = await api.get<PagedSyncRunResponse>('/api/sync-runs', {
@@ -48,4 +54,15 @@ export const syncApi = {
     const response = await api.get<{ count: number }>(`/api/sync-runs/source/${source}/count`)
     return response.data
   },
+
+  async triggerSync(source: 'WoWAudit' | 'WarcraftLogs'): Promise<SyncRun> {
+    const response = await api.post<SyncRun>(`/api/sync/trigger/${source}`)
+    return response.data
+  },
+
+  async getSyncLogs(syncRunId: number): Promise<SyncLog[]> {
+    const response = await api.get<SyncLog[]>(`/api/sync-runs/${syncRunId}/logs`)
+    return response.data
+  },
 }
+
