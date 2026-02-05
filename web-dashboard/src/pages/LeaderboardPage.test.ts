@@ -11,6 +11,7 @@ import type { LeaderboardResponse, LeaderboardEntry, User } from '@/types'
 vi.mock('@/api/flps', () => ({
   flpsApi: {
     getLeaderboard: vi.fn(),
+    getFlpsReport: vi.fn(),
   },
 }))
 
@@ -91,6 +92,11 @@ describe('LeaderboardPage', () => {
     vi.clearAllMocks()
     setActivePinia(createPinia())
     vi.mocked(flpsApi.getLeaderboard).mockResolvedValue(mockLeaderboardData)
+    vi.mocked(flpsApi.getFlpsReport).mockResolvedValue({
+      guildId: 'test-guild',
+      raiders: [],
+      generatedAt: new Date().toISOString(),
+    })
   })
 
   it('should render page title "FLPS Leaderboard"', async () => {
@@ -116,7 +122,7 @@ describe('LeaderboardPage', () => {
     await flushPromises()
 
     // Check that API was called with default params (no role filter)
-    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('default', undefined, 50)
+    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('dod', undefined, 50)
   })
 
   it('should filter by role when selecting Tank', async () => {
@@ -127,7 +133,7 @@ describe('LeaderboardPage', () => {
     await select.setValue('TANK')
     await flushPromises()
 
-    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('default', 'TANK', 50)
+    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('dod', 'TANK', 50)
   })
 
   it('should filter by role when selecting Healer', async () => {
@@ -138,7 +144,7 @@ describe('LeaderboardPage', () => {
     await select.setValue('HEALER')
     await flushPromises()
 
-    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('default', 'HEALER', 50)
+    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('dod', 'HEALER', 50)
   })
 
   it('should filter by role when selecting DPS', async () => {
@@ -149,7 +155,7 @@ describe('LeaderboardPage', () => {
     await select.setValue('DPS')
     await flushPromises()
 
-    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('default', 'DPS', 50)
+    expect(flpsApi.getLeaderboard).toHaveBeenCalledWith('dod', 'DPS', 50)
   })
 
   it('should highlight current user row', async () => {

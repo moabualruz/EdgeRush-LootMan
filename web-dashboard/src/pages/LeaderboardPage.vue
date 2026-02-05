@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/vue-query'
 import { flpsApi } from '@/api/flps'
 import { useAuthStore } from '@/stores/auth'
 import { useGuildContextStore } from '@/stores/guildContext'
-import type { Role } from '@/types'
+import type { Role, FlpsScore, LeaderboardEntry } from '@/types'
 import { getClassColor } from '@/utils/classColors'
+import RaiderDetailModal from '@/components/RaiderDetailModal.vue'
 
 const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
@@ -19,10 +20,35 @@ const { data, isLoading, error } = useQuery({
   enabled: computed(() => !!guildId.value),
 })
 
+// Fetch full FLPS report to get score breakdowns
+const { data: flpsReport } = useQuery({
+  queryKey: ['flpsReport', guildId],
+  queryFn: () => flpsApi.getFlpsReport(guildId.value!),
+  enabled: computed(() => !!guildId.value),
+})
+
 const formatScore = (score: number) => score.toFixed(3)
 
 const isCurrentUser = (characterName: string) => {
   return authStore.user?.linkedCharacters.some((c) => c.characterName === characterName)
+}
+
+// Modal state
+const isModalOpen = ref(false)
+const selectedRaider = ref<FlpsScore | null>(null)
+
+function openRaiderDetail(entry: LeaderboardEntry) {
+  // Find the full FlpsScore from the report
+  const fullScore = flpsReport.value?.raiders.find(r => r.raiderId === entry.raiderId)
+  if (fullScore) {
+    selectedRaider.value = fullScore
+    isModalOpen.value = true
+  }
+}
+
+function closeModal() {
+  isModalOpen.value = false
+  selectedRaider.value = null
 }
 </script>
 
@@ -89,7 +115,8 @@ const isCurrentUser = (characterName: string) => {
           <tr
             v-for="entry in data.entries"
             :key="entry.raiderId"
-            class="hover:bg-gray-700/30 transition-colors"
+            class="hover:bg-gray-700/30 transition-colors cursor-pointer"
+            @click="openRaiderDetail(entry)"
           >
             <td class="px-4 py-3">
               <span class="font-semibold">
@@ -120,5 +147,12 @@ const isCurrentUser = (characterName: string) => {
         No raiders found for the selected filter.
       </div>
     </div>
+
+    <!-- Raider Detail Modal -->
+    <RaiderDetailModal
+      :is-open="isModalOpen"
+      :raider="selectedRaider"
+      @close="closeModal"
+    />
   </div>
 </template>

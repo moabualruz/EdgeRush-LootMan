@@ -1,7 +1,7 @@
 # Gap Tracker
 
 > **Last Updated:** 2026-02-05  
-> **Progress:** 8/12 Complete
+> **Progress:** 9/12 Complete
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Count |
 |--------|-------|
-| ⬜ TODO | 4 |
+| ⬜ TODO | 3 |
 | 🔄 IN PROGRESS | 0 |
-| ✅ DONE | 8 |
+| ✅ DONE | 9 |
 
 ---
 
@@ -49,7 +49,7 @@
 
 | ID | Gap | Status | Started | Completed | Notes |
 |----|-----|--------|---------|-----------|-------|
-| GAP-009 | RaiderDetail modal | ⬜ TODO | - | - | |
+| GAP-009 | RaiderDetail modal | ✅ DONE | 2026-02-05 | 2026-02-05 | Click raider row → modal with FLPS breakdown. 12 tests. |
 | GAP-010 | Edit Rank/Status forms | ⬜ TODO | - | - | Admin only |
 
 ### Phase 6: Polish
@@ -65,6 +65,7 @@
 
 | Date | Gap ID | Action | Details |
 |------|--------|--------|---------|
+| 2026-02-05 | GAP-009 | Complete | RaiderDetailModal.vue component, LeaderboardPage click handler. 12 tests. |
 | 2026-02-05 | GAP-007 | Complete | SyncLogViewer.vue component, click handler in SyncHistoryPage. 5 tests. |
 | 2026-02-05 | GAP-006 | Complete | useSyncTrigger.ts composable, Sync WoWAudit/WarcraftLogs buttons in SyncHistoryPage. 3 tests. |
 | 2026-02-05 | GAP-004 | Complete | Added sorting (Date/Item/FLPS) and pagination (10/page) to LootHistoryPage |
@@ -77,8 +78,8 @@
 
 ## Next Up
 
-**Recommended next gap to work on:** `GAP-009` (RaiderDetail modal)  
-**Reason:** Start Phase 5 (Raider Management)
+**Recommended next gap to work on:** `GAP-010` (Edit Rank/Status forms)  
+**Reason:** Complete Phase 5 (Raider Management)
 
 ---
 
