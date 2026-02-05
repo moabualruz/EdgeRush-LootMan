@@ -12,9 +12,9 @@ vi.mock('@/api/sync', () => ({
 
 vi.mock('@tanstack/vue-query', () => ({
   useQuery: vi.fn(({ queryFn, enabled }) => {
-    const data = ref(null)
+    const data = ref<unknown>(null)
     const isLoading = ref(false)
-    const error = ref(null)
+    const error = ref<Error | null>(null)
 
     if (enabled?.value) {
       isLoading.value = true

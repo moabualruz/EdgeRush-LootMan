@@ -1,0 +1,22 @@
+
+> lootman-dashboard@1.0.0 build
+> vue-tsc -b && vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 24 modules transformed.
+x Build failed in 1.01s
+error during build:
+[vite:vue] [plugin vite:vue] src/pages/LootHistoryPage.vue (284:9): Element is missing end tag.
+file: F:/work/dod/looter/web-dashboard/src/pages/LootHistoryPage.vue:284:9
+SyntaxError: [plugin vite:vue] src/pages/LootHistoryPage.vue (284:9): Element is missing end tag.
+    at createCompilerError (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:1374:17)
+    at emitError (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:2980:5)
+    at Object.onclosetag (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:2377:13)
+    at Tokenizer.stateInClosingTagName (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:799:16)
+    at Tokenizer.parse (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:1157:16)
+    at Object.baseParse (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-core\dist\compiler-core.cjs.prod.js:3012:13)
+    at Object.parse (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-dom\dist\compiler-dom.cjs.prod.js:665:23)
+    at Object.parse$1 [as parse] (F:\work\dod\looter\web-dashboard\node_modules\@vue\compiler-sfc\dist\compiler-sfc.cjs.js:1824:24)
+    at createDescriptor (file:///F:/work/dod/looter/web-dashboard/node_modules/@vitejs/plugin-vue/dist/index.mjs:71:43)
+    at transformMain (file:///F:/work/dod/looter/web-dashboard/node_modules/@vitejs/plugin-vue/dist/index.mjs:2421:34)

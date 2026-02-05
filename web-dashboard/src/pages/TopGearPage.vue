@@ -36,8 +36,8 @@ const {
   isLoading: gearLoading,
 } = useQuery({
   queryKey: ['character-gear', selectedCharacter, selectedRealm],
-  queryFn: () => gearApi.getCharacterGear(selectedCharacter.value, selectedRealm.value),
-  enabled: computed(() => !!selectedCharacter.value && !!selectedRealm.value),
+  queryFn: () => gearApi.getMyGear(authStore.currentGuildId!),
+  enabled: computed(() => !!authStore.currentGuildId && !!selectedCharacter.value),
 })
 
 // Calculate optimal gear mutation
@@ -45,7 +45,7 @@ const calculateMutation = useMutation({
   mutationFn: async () => {
     isCalculating.value = true
     // Submit simulation with bag items included
-    return simulationApi.submitSimulation(authStore.currentGuildId, selectedCharacter.value, {
+    return simulationApi.submitSimulation(authStore.currentGuildId!, selectedCharacter.value, {
       characterRealm: selectedRealm.value,
       characterClass: 'Warrior',
       characterSpec: 'Arms',
@@ -85,11 +85,11 @@ const slots = [
 
 // Tier set tracking
 const tierPieces = computed(() => {
-  if (!gearData.value?.equipped) return { count: 0, bonus2pc: false, bonus4pc: false }
+  if (!gearData.value?.items) return { count: 0, bonus2pc: false, bonus4pc: false }
   
-  const tierSlots = ['head', 'shoulder', 'chest', 'hands', 'legs']
-  const equippedTier = gearData.value.equipped.filter(
-    (item: any) => tierSlots.includes(item.slot) && item.isTierPiece
+  const tierSlots = ['HEAD', 'SHOULDER', 'CHEST', 'HANDS', 'LEGS']
+  const equippedTier = gearData.value.items.filter(
+    (item) => tierSlots.includes(item.slot) && item.isTierPiece
   )
   
   return {
@@ -251,14 +251,14 @@ const characters = [
         <div v-if="gearLoading" class="animate-pulse space-y-3">
           <div v-for="i in 8" :key="i" class="h-12 bg-gray-700 rounded"></div>
         </div>
-        <div v-else-if="gearData?.equipped" class="space-y-2">
+        <div v-else-if="gearData?.items" class="space-y-2">
           <div
-            v-for="item in gearData.equipped"
+            v-for="item in gearData.items"
             :key="item.slot"
             class="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg"
           >
             <div>
-              <span class="text-sm text-gray-400 capitalize">{{ item.slot }}</span>
+              <span class="text-sm text-gray-400 capitalize">{{ item.slot.toLowerCase() }}</span>
               <p class="text-white font-medium">{{ item.itemName }}</p>
             </div>
             <span :class="['font-mono font-bold', getItemLevelClass(item.itemLevel)]">

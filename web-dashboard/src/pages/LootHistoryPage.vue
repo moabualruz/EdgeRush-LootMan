@@ -417,6 +417,7 @@ const averageFlps = computed(() => {
             </div>
           </div>
         </template>
+        </div>
       </template>
     </div>
 

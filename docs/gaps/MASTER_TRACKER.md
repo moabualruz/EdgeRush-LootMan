@@ -47,8 +47,8 @@ Reference: `.agent/workflows/tdd-workflow.md`
 |--------|-------|----------------|------------|--------|
 | G-02 | Discord Bot | `discord-bot/src/**` | 16-24h | ✅ **VERIFIED** |
 | G-03 | Droptimizer UI | `web-dashboard/src/pages/`, `api/` | 8-12h | ✅ **VERIFIED** |
-| G-05 | Desktop Client | `desktop-client/src-tauri/**` | 12-16h | ⬜ TODO |
-| G-06 | WoW Addon | `wow-addon/Modules/**` | 8-12h | ⬜ TODO |
+| G-05 | Desktop Client | `desktop-client/src-tauri/**` | 12-16h | ✅ **VERIFIED** |
+| G-06 | WoW Addon | `wow-addon/Modules/**` | 8-12h | ✅ **VERIFIED** |
 
 
 ---
@@ -80,5 +80,9 @@ A gap is marked ✅ DONE when:
 | 2026-02-05 | - | Initial audit complete | Identified 4 major gaps |
 | 2026-02-05 | G-02 | **VERIFIED COMPLETE** | Full impl found: 15 Kotlin files, 6 tests |
 | 2026-02-05 | G-03 | **IMPLEMENTED** | DroptimizerPage, TopGearPage, routes added |
+| 2026-02-05 | G-05 | **VERIFIED COMPLETE** | Full Tauri impl: 8 Rust files, 4 Vue components |
+| 2026-02-05 | G-06 | **VERIFIED COMPLETE** | Full Lua impl: 15 files, 166KB (FLPS+LootCouncil+GearSync) |
+
+
 
 

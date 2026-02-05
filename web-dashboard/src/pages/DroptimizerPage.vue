@@ -56,17 +56,17 @@ const {
   queryKey: ['simulation-results', authStore.currentGuildId, selectedCharacter, selectedRealm],
   queryFn: () =>
     simulationApi.getSimulationResults(
-      authStore.currentGuildId,
+      authStore.currentGuildId!,
       selectedCharacter.value,
       selectedRealm.value
     ),
-  enabled: computed(() => !!selectedCharacter.value && !!selectedRealm.value),
+  enabled: computed(() => !!authStore.currentGuildId && !!selectedCharacter.value && !!selectedRealm.value),
 })
 
 // Submit simulation mutation
 const submitMutation = useMutation({
   mutationFn: () =>
-    simulationApi.submitSimulation(authStore.currentGuildId, selectedCharacter.value, {
+    simulationApi.submitSimulation(authStore.currentGuildId!, selectedCharacter.value, {
       characterRealm: selectedRealm.value,
       characterClass: 'Warrior', // TODO: Get from character data
       characterSpec: 'Arms',

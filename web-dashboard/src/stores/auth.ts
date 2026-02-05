@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'ADMIN' || user.value?.role === 'OFFICER')
   const guildId = computed(() => user.value?.guildId)
+  const currentGuildId = guildId // Alias for backward compatibility
 
   async function fetchUser() {
     if (!token.value) return
@@ -115,6 +116,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isAdmin,
     guildId,
+    currentGuildId,
     fetchUser,
     setTokens,
     logout,
