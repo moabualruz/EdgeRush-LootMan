@@ -28,6 +28,11 @@ class WebClientConfig(
     private val httpClientsProperties: HttpClientsProperties,
 ) {
     @Bean
+    fun restTemplate(): org.springframework.web.client.RestTemplate {
+        return org.springframework.web.client.RestTemplate()
+    }
+
+    @Bean
     fun wowauditWebClient(
         builder: WebClient.Builder,
         syncProperties: SyncProperties,

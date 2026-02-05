@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -94,8 +94,17 @@ async function loginWithBattlenet() {
     console.error('Battle.net OAuth error:', e)
     error.value = e.response?.data?.message || e.message || 'Battle.net login is not configured'
     isLoading.value = false
+    isLoading.value = false
   }
 }
+
+watch(() => authStore.isAuthenticated, (newVal) => {
+  if (newVal) {
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/dashboard'
+    localStorage.removeItem('redirectAfterLogin')
+    router.push(redirectPath)
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -142,11 +151,13 @@ async function loginWithBattlenet() {
           <!-- Login/Register Form -->
           <form @submit.prevent="handleSubmit" class="space-y-5">
             <!-- Username -->
+            <!-- Username -->
             <div class="group">
-              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
+              <label for="username" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
                 {{ mode === 'login' ? 'Identity' : 'Username' }}
               </label>
               <input
+                id="username"
                 v-model="username"
                 type="text"
                 :placeholder="mode === 'login' ? 'Username or Email' : 'Choose a username'"
@@ -157,8 +168,9 @@ async function loginWithBattlenet() {
 
             <!-- Email (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Email Address</label>
+              <label for="email" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Email Address</label>
               <input
+                id="email"
                 v-model="email"
                 type="email"
                 placeholder="name@example.com"
@@ -169,8 +181,9 @@ async function loginWithBattlenet() {
 
             <!-- Password -->
             <div class="group">
-              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Password</label>
+              <label for="password" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Password</label>
               <input
+                id="password"
                 v-model="password"
                 type="password"
                 placeholder="••••••••"
@@ -189,8 +202,9 @@ async function loginWithBattlenet() {
 
             <!-- Confirm Password (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Confirm Password</label>
+              <label for="confirmPassword" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Confirm Password</label>
               <input
+                id="confirmPassword"
                 v-model="confirmPassword"
                 type="password"
                 placeholder="••••••••"

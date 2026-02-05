@@ -69,14 +69,18 @@ api.interceptors.response.use(
     
     // If 401 and retry failed or no refresh token -> logout
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      // Store intended destination for post-login redirect
-      const currentPath = window.location.pathname + window.location.search
-      if (currentPath !== '/login') {
-        localStorage.setItem('redirectAfterLogin', currentPath)
+      // Don't global logout if the 401 came from the login endpoint itself
+      // This allows the login form to show "Invalid Credentials" instead of reloading
+      if (!originalRequest.url?.includes('/auth/login')) {
+         localStorage.removeItem('token')
+         localStorage.removeItem('refreshToken')
+         // Store intended destination for post-login redirect
+         const currentPath = window.location.pathname + window.location.search
+         if (currentPath !== '/login') {
+           localStorage.setItem('redirectAfterLogin', currentPath)
+         }
+         window.location.href = '/login'
       }
-      window.location.href = '/login'
     }
     
     return Promise.reject(error)

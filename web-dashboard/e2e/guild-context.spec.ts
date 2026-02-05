@@ -100,7 +100,7 @@ async function navigateToGuildSettings(page: any) {
 // Returns the mockGuilds for use in tests that need to reference them
 async function authenticateViaOAuth(page: any, mockUser: any, mockGuilds: any) {
   // Mock the OAuth callback endpoint
-  await page.route('**/api/v1/auth/discord/callback', async (route: any) => {
+  await page.route('**/v1/auth/discord/callback', async (route: any) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -113,7 +113,7 @@ async function authenticateViaOAuth(page: any, mockUser: any, mockGuilds: any) {
   });
 
   // Mock auth/me endpoint - this MUST return 200 for all future navigations too
-  await page.route('**/api/v1/auth/me', async (route: any) => {
+  await page.route('**/v1/auth/me', async (route: any) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -122,7 +122,7 @@ async function authenticateViaOAuth(page: any, mockUser: any, mockGuilds: any) {
   });
 
   // Mock user guilds endpoint
-  await page.route('**/api/v1/user/guilds', async (route: any) => {
+  await page.route('**/v1/user/guilds', async (route: any) => {
     if (!route.request().url().includes('/active')) {
       await route.fulfill({
         status: 200,
@@ -135,7 +135,7 @@ async function authenticateViaOAuth(page: any, mockUser: any, mockGuilds: any) {
   });
 
   // Mock active guild context endpoint
-  await page.route('**/api/v1/user/guilds/active', async (route: any) => {
+  await page.route('**/v1/user/guilds/active', async (route: any) => {
     if (route.request().method() === 'GET') {
       const activeGuild = mockGuilds.find((g: any) => g.isActive) || mockGuilds[0];
       await route.fulfill({
@@ -160,6 +160,11 @@ async function authenticateViaOAuth(page: any, mockUser: any, mockGuilds: any) {
 
   // Wait for redirect to dashboard
   await expect(page).toHaveURL(/dashboard/, { timeout: 10000 });
+
+  // Wait for initial data fetches to complete to avoid Skeleton UI causing element detachments
+  // This is crucial because MainCharacter text might flicker during loading
+  await page.waitForLoadState('networkidle').catch(() => {}); // Catch timeout if network never idles (unlikely but safe)
+  await page.waitForTimeout(500); // Extra stability buffer
 }
 
 test.describe('Guild Context', () => {
@@ -218,7 +223,7 @@ test.describe('Guild Context', () => {
         const altOption = page.getByText('AltCharacter').first();
         if (await altOption.isVisible({ timeout: 2000 }).catch(() => false)) {
           // Set up response listener before click
-          const responsePromise = page.waitForResponse('**/api/v1/user/guilds/active', { timeout: 5000 }).catch(() => null);
+          const responsePromise = page.waitForResponse('**/v1/user/guilds/active', { timeout: 5000 }).catch(() => null);
           await altOption.click();
           await responsePromise;
 
@@ -406,7 +411,7 @@ test.describe('Guild Settings Page', () => {
 
   // Helper to set up route mocks for guild settings page
   async function setupGuildSettingsRoutes(page: any) {
-    await page.route('**/api/v1/guilds/*/permissions', async (route: any) => {
+    await page.route('**/v1/guilds/*/permissions', async (route: any) => {
       if (route.request().method() === 'GET') {
         await route.fulfill({
           status: 200,
@@ -429,14 +434,14 @@ test.describe('Guild Settings Page', () => {
       }
     });
 
-    await page.route('**/api/v1/guilds/*/permissions/*', async (route: any) => {
+    await page.route('**/v1/guilds/*/permissions/*', async (route: any) => {
       await route.fulfill({
         status: 204,
         body: '',
       });
     });
 
-    await page.route('**/api/v1/guilds/*/permissions/types', async (route: any) => {
+    await page.route('**/v1/guilds/*/permissions/types', async (route: any) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -535,7 +540,7 @@ test.describe('Guild Settings Page', () => {
       await rankInput.fill('Raider');
       await page.getByRole('combobox').selectOption('VIEW_ALL_SCORES');
       await page.getByRole('button', { name: /add permission/i }).click();
-      await page.waitForResponse('**/api/v1/guilds/*/permissions');
+      await page.waitForResponse('**/v1/guilds/*/permissions');
     }
 
     await page.screenshot({ path: 'test-results/permission-added.png', fullPage: true });
@@ -597,7 +602,7 @@ test.describe('Guild Settings Page', () => {
     const removeBtn = page.locator('button:has-text("Remove")').first();
     if (await removeBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       // Set up response interception before clicking
-      const responsePromise = page.waitForResponse('**/api/v1/guilds/*/permissions/*', { timeout: 5000 }).catch(() => null);
+      const responsePromise = page.waitForResponse('**/v1/guilds/*/permissions/*', { timeout: 5000 }).catch(() => null);
       await removeBtn.click();
       await responsePromise;
     }

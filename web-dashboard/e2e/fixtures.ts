@@ -25,9 +25,9 @@ export const mockResponses = {
         realm: 'Illidan',
         class: 'WARRIOR',
         spec: 'Protection',
-        score: 0.95,
-        rms: 0.4,
-        ipi: 0.35,
+        flps: 0.95,
+        rms: { value: 0.4, acs: 0.9, mas: 0.8, eps: 1.0 },
+        ipi: { value: 0.35, uv: 0.2, tierBonus: 0.1, roleMultiplier: 1.1 },
         rdf: 0.2,
       },
       {
@@ -36,9 +36,9 @@ export const mockResponses = {
         realm: 'Illidan',
         class: 'PRIEST',
         spec: 'Holy',
-        score: 0.88,
-        rms: 0.35,
-        ipi: 0.33,
+        flps: 0.88,
+        rms: { value: 0.35, acs: 0.85, mas: 0.8, eps: 1.0 },
+        ipi: { value: 0.33, uv: 0.2, tierBonus: 0.1, roleMultiplier: 1.1 },
         rdf: 0.2,
       },
       {
@@ -47,9 +47,9 @@ export const mockResponses = {
         realm: 'Illidan',
         class: 'MAGE',
         spec: 'Fire',
-        score: 0.82,
-        rms: 0.32,
-        ipi: 0.3,
+        flps: 0.82,
+        rms: { value: 0.32, acs: 0.8, mas: 0.8, eps: 1.0 },
+        ipi: { value: 0.3, uv: 0.2, tierBonus: 0.1, roleMultiplier: 1.1 },
         rdf: 0.2,
       },
     ],
@@ -59,10 +59,22 @@ export const mockResponses = {
   characterFlps: {
     characterName: 'TopRaider',
     realm: 'Illidan',
-    score: 0.95,
-    rms: 0.4,
-    ipi: 0.35,
+    flps: 0.95,
+    rms: {
+      value: 0.4,
+      acs: 0.95,
+      mas: 0.8,
+      eps: 1.0
+    },
+    ipi: {
+      value: 0.35,
+      uv: 0.2,
+      tierBonus: 0.1,
+      roleMultiplier: 1.1
+    },
     rdf: 0.2,
+    characterClass: 'WARRIOR',
+    eligible: true,
     rank: 1,
     totalRaiders: 25,
     breakdown: {
@@ -85,27 +97,31 @@ export const mockResponses = {
   },
 
   lootHistory: {
-    items: [
+    awards: [
       {
-        id: '1',
+        id: 1,
         itemId: 12345,
         itemName: 'Heroic Sword',
-        itemLevel: 500,
-        awardedTo: 'TopRaider',
+        raiderId: 1,
+        characterName: 'TopRaider',
         awardedAt: new Date().toISOString(),
-        encounter: 'Raid Boss 1',
-        reason: 'Best in Slot',
+        flpsAtAward: 0.95,
+        rdfExpired: false,
+        rdfExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        notes: 'Best in Slot'
       },
       {
-        id: '2',
+        id: 2,
         itemId: 12346,
         itemName: 'Epic Helm',
-        itemLevel: 495,
-        awardedTo: 'SecondPlace',
+        raiderId: 2,
+        characterName: 'SecondPlace',
         awardedAt: new Date(Date.now() - 86400000).toISOString(),
-        encounter: 'Raid Boss 2',
-        reason: 'Major Upgrade',
-      },
+        flpsAtAward: 0.88,
+        rdfExpired: true,
+        rdfExpiresAt: new Date(Date.now() - 1000).toISOString(),
+        notes: 'Major Upgrade'
+      }
     ],
     total: 50,
     page: 1,
@@ -143,7 +159,7 @@ export const test = base.extend<{
   authenticatedPage: async ({ page }, use) => {
     // Set auth token in localStorage
     await page.addInitScript(() => {
-      localStorage.setItem('auth_token', 'test-jwt-token');
+      localStorage.setItem('token', 'test-jwt-token');
       localStorage.setItem('guild_id', 'test-guild');
     });
 

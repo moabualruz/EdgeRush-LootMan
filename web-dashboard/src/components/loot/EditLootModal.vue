@@ -64,10 +64,15 @@ function handleClose() {
       />
 
       <!-- Modal -->
-      <div class="relative bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        class="relative bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6"
+      >
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold">Edit Loot Award</h2>
+          <h2 id="modal-title" class="text-xl font-bold">Edit Loot Award</h2>
           <button
             type="button"
             class="text-gray-400 hover:text-white transition-colors"

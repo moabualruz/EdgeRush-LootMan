@@ -229,7 +229,7 @@ function handleMouseUp() {
         />
 
         <!-- Grid Overlay -->
-        <g v-if="showGrid" class="grid-overlay" data-testid="grid-overlay">
+        <g v-if="showGrid" class="grid-overlay" data-testid="grid-overlay" pointer-events="none">
           <!-- Vertical grid lines -->
           <line
             v-for="(x, i) in gridLines.vertical"

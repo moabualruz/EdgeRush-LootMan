@@ -8,14 +8,86 @@ import { test, expect, mockResponses } from './fixtures';
 
 test.describe('Navigation', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => console.log(`BROWSER: ${msg.text()}`));
+    
     // Set up authenticated state
     await page.addInitScript(() => {
-      localStorage.setItem('auth_token', 'test-jwt-token');
+      localStorage.setItem('token', 'test-jwt-token');
       localStorage.setItem('guild_id', 'test-guild');
+    });
+
+    // Mock specific list endpoints first
+    await page.route('**/api/guilds/', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+    
+    await page.route('**/api/users/characters', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    });
+
+    // Mock user for consistent state
+    await page.route('**/v1/auth/me', async (route) => {
+       await route.fulfill({
+         status: 200,
+         contentType: 'application/json',
+         body: JSON.stringify({
+           id: 'nav-user-1',
+           username: 'NavUser',
+           role: 'MEMBER',
+           guildId: 'test-guild'
+         })
+       });
+    });
+
+    // Mock Dashboard Dependencies with correct URLs
+    await page.route('**/v1/flps/guilds/*/me', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockResponses.characterFlps) });
+    });
+    await page.route('**/v1/flps/guilds/*/leaderboard*', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockResponses.leaderboard) });
+    });
+    await page.route('**/v1/loot/guilds/*/me/history*', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockResponses.lootHistory) });
+    });
+    await page.route('**/v1/raids/guilds/*/upcoming*', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockResponses.raids) });
     });
 
     // Mock common APIs
     await page.route('**/api/**', async (route) => {
+      const type = route.request().resourceType();
+      const url = route.request().url();
+      
+      // Prevent intercepting source files (e.g. src/api/client.ts)
+      if (url.includes('/src/') || !['fetch', 'xhr'].includes(type)) {
+        await route.continue();
+        return;
+      }
+      
+      // If it's the specific routes above, they should have been handled if registered before?
+      // Actually Playwright matches in order of handlers?
+      // "Once a handler is set up ... it will handle all requests matching the url."
+      // If multiple handlers match, the one registered *last* (most recently) overrides?
+      // "Routes can be overridden by calling page.route again."
+      // So if generic is registered LAST, it might override.
+      // But here we are in the same beforeEach.
+      // Let's use a conditional inside the handler or rely on specific paths not matching generic? 
+      // **/api/** matches everything.
+      // So we should register generic FIRST, then specific? No, specific overrides generic.
+      // In Mock Service Worker, specifically overrides. In Playwright, "handlers are called in reverse order of registration" (Last one wins).
+      // So I should put specific mocks AFTER the generic one?
+      // Let's safe-guard by using `fallback` or just return object.
+      // But easier: Just mock the specific ones explicitly in the generic handler OR register specific ones AFTER.
+      // Let's try registering specific ones AFTER the generic one involves deleting the generic one? No.
+      
+      // WAIT. If I register generic first, then specific later (in test), the specific one wins.
+      // But here they are in the same block.
+      
+      if (url.includes('/api/guilds/') || url.includes('/api/users/characters')) {
+         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+         return;
+      }
+      
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -27,19 +99,20 @@ test.describe('Navigation', () => {
   test.describe('Main Navigation', () => {
     test('should display main navigation menu', async ({ page }) => {
       await page.goto('/dashboard');
+      await page.waitForLoadState('networkidle');
 
-      // Check navigation links exist
-      await expect(page.getByRole('link', { name: /dashboard/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /leaderboard/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /history|loot/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /raids/i })).toBeVisible();
+      // Check navigation links exist using text matching which is more robust with icons
+      await expect(page.locator('a').filter({ hasText: /mission.*control/i })).toBeVisible();
+      await expect(page.locator('a').filter({ hasText: /leaderboard/i })).toBeVisible();
+      await expect(page.locator('a').filter({ hasText: /history|loot/i })).toBeVisible();
+      await expect(page.locator('a').filter({ hasText: /raid.*operations|raids/i })).toBeVisible();
     });
 
     test('should highlight active route', async ({ page }) => {
       await page.goto('/dashboard');
 
-      const dashboardLink = page.getByRole('link', { name: /dashboard/i });
-      await expect(dashboardLink).toHaveClass(/active|selected|current/);
+      const dashboardLink = page.getByRole('link', { name: /mission.*control|dashboard/i });
+      await expect(dashboardLink).toHaveClass(/active|bg-primary\/10/); // Updated for custom class
     });
 
     test('should navigate between pages', async ({ page }) => {
@@ -63,7 +136,7 @@ test.describe('Navigation', () => {
     test.beforeEach(async ({ page }) => {
       // Set up admin state
       await page.addInitScript(() => {
-        localStorage.setItem('auth_token', 'test-jwt-token');
+        localStorage.setItem('token', 'test-jwt-token');
         localStorage.setItem('guild_id', 'test-guild');
         localStorage.setItem(
           'user',

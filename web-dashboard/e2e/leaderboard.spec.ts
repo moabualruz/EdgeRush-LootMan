@@ -15,7 +15,7 @@ test.describe('FLPS Leaderboard', () => {
     });
 
     // Mock leaderboard API
-    await page.route('**/api/guilds/*/flps/leaderboard', async (route) => {
+    await page.route('**/v1/guilds/*/flps/leaderboard', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -65,7 +65,7 @@ test.describe('FLPS Leaderboard', () => {
 
   test('should navigate to character details on click', async ({ page }) => {
     // Mock character FLPS endpoint
-    await page.route('**/api/guilds/*/characters/*/flps', async (route) => {
+    await page.route('**/v1/guilds/*/characters/*/flps', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -83,7 +83,7 @@ test.describe('FLPS Leaderboard', () => {
   });
 
   test('should handle empty leaderboard', async ({ page }) => {
-    await page.route('**/api/guilds/*/flps/leaderboard', async (route) => {
+    await page.route('**/v1/guilds/*/flps/leaderboard', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -100,7 +100,7 @@ test.describe('FLPS Leaderboard', () => {
   });
 
   test('should handle API error gracefully', async ({ page }) => {
-    await page.route('**/api/guilds/*/flps/leaderboard', async (route) => {
+    await page.route('**/v1/guilds/*/flps/leaderboard', async (route) => {
       await route.fulfill({
         status: 500,
         contentType: 'application/json',
@@ -115,7 +115,7 @@ test.describe('FLPS Leaderboard', () => {
 
   test('should refresh data on button click', async ({ page }) => {
     let callCount = 0;
-    await page.route('**/api/guilds/*/flps/leaderboard', async (route) => {
+    await page.route('**/v1/guilds/*/flps/leaderboard', async (route) => {
       callCount++;
       await route.fulfill({
         status: 200,
