@@ -1,0 +1,25 @@
+> Task :data-sync-service:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :data-sync-service:compileKotlin UP-TO-DATE
+> Task :data-sync-service:compileJava NO-SOURCE
+> Task :data-sync-service:processResources UP-TO-DATE
+> Task :data-sync-service:classes UP-TO-DATE
+> Task :data-sync-service:jar UP-TO-DATE
+
+> Task :data-sync-service:compileTestKotlin FAILED
+e: file:///F:/work/dod/looter/data-sync-service/src/test/kotlin/com/edgerush/lootman/api/raid/RaidCrudServiceImplTest.kt:32:39 No value passed for parameter 'guildConfigurationRepository'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':data-sync-service:compileTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 8s
+4 actionable tasks: 1 executed, 3 up-to-date

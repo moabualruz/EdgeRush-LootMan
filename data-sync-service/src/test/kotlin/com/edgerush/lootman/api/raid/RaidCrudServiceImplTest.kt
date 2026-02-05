@@ -3,6 +3,7 @@ package com.edgerush.lootman.api.raid
 import com.edgerush.datasync.entity.RaidEntity
 import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.api.common.PageRequest
+import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
 import com.edgerush.lootman.domain.raids.repository.RaidRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -24,12 +25,14 @@ import java.time.OffsetDateTime
  */
 class RaidCrudServiceImplTest : UnitTest() {
     private lateinit var raidRepository: RaidRepository
+    private lateinit var guildConfigurationRepository: GuildConfigurationRepository
     private lateinit var service: RaidCrudServiceImpl
 
     @BeforeEach
     fun setup() {
         raidRepository = mockk()
-        service = RaidCrudServiceImpl(raidRepository)
+        guildConfigurationRepository = mockk()
+        service = RaidCrudServiceImpl(raidRepository, guildConfigurationRepository)
     }
 
     @Nested

@@ -49,3 +49,4 @@ target/
 # dist
 dist/
 **/dist
+test_*.txt
