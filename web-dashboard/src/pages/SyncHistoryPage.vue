@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { syncApi } from '@/api/sync'
 import { useSyncTrigger } from '@/composables/useSyncTrigger'
+import SyncLogViewer from '@/components/SyncLogViewer.vue'
 
 // Sync trigger mutations
 const triggerWoWAudit = useSyncTrigger('WoWAudit')
@@ -109,6 +110,20 @@ function formatDuration(startedAt: string, completedAt: string | null): string {
   if (durationMs < 1000) return `${durationMs}ms`
   if (durationMs < 60000) return `${(durationMs / 1000).toFixed(1)}s`
   return `${(durationMs / 60000).toFixed(1)}m`
+}
+
+// Log viewer state
+const selectedSyncRunId = ref<number | null>(null)
+const isLogViewerOpen = ref(false)
+
+function openLogViewer(syncRunId: number) {
+  selectedSyncRunId.value = syncRunId
+  isLogViewerOpen.value = true
+}
+
+function closeLogViewer() {
+  isLogViewerOpen.value = false
+  selectedSyncRunId.value = null
 }
 </script>
 
@@ -229,7 +244,8 @@ function formatDuration(startedAt: string, completedAt: string | null): string {
         <div
           v-for="run in syncRuns"
           :key="run.id"
-          class="card"
+          class="card cursor-pointer hover:bg-gray-800/50 transition-colors"
+          @click="openLogViewer(run.id)"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
@@ -306,5 +322,12 @@ function formatDuration(startedAt: string, completedAt: string | null): string {
         </div>
       </div>
     </div>
+
+    <!-- Log Viewer Modal -->
+    <SyncLogViewer
+      :is-open="isLogViewerOpen"
+      :sync-run-id="selectedSyncRunId"
+      @close="closeLogViewer"
+    />
   </div>
 </template>
