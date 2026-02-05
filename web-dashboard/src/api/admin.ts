@@ -54,4 +54,17 @@ export const adminApi = {
   async deleteLootBan(guildId: string, banId: number): Promise<void> {
     await api.delete(`/v1/admin/guilds/${guildId}/loot-bans/${banId}`)
   },
+
+  // Raider Management
+  async updateRaider(
+    guildId: string,
+    raiderId: number,
+    data: { rank?: string; isActive?: boolean }
+  ): Promise<{ raiderId: number; rank: string; isActive: boolean }> {
+    const response = await api.patch<{ raiderId: number; rank: string; isActive: boolean }>(
+      `/v1/admin/guilds/${guildId}/raiders/${raiderId}`,
+      data
+    )
+    return response.data
+  },
 }

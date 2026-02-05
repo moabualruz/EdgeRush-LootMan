@@ -1,7 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import RaiderDetailModal from './RaiderDetailModal.vue'
 import type { FlpsScore } from '@/types'
+
+// Mock the guildContext store
+vi.mock('@/stores/guildContext', () => ({
+  useGuildContextStore: vi.fn(() => ({
+    canManageMembers: false,
+  })),
+}))
 
 describe('RaiderDetailModal', () => {
   const mockRaider: FlpsScore = {
@@ -36,16 +44,25 @@ describe('RaiderDetailModal', () => {
     ineligibilityReasons: ['Attendance below 60%', 'Recent inactivity'],
   }
 
-  const mountComponent = (props: { isOpen: boolean; raider: FlpsScore | null }) => {
+  const mountComponent = (props: { isOpen: boolean; raider: FlpsScore | null; guildId?: string }) => {
     return mount(RaiderDetailModal, {
-      props,
+      props: {
+        ...props,
+        guildId: props.guildId ?? 'test-guild',
+      },
       global: {
         stubs: {
           Teleport: true,
+          RaiderEditForm: true,
         },
       },
     })
   }
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.clearAllMocks()
+  })
 
   it('should not render when isOpen is false', () => {
     const wrapper = mountComponent({ isOpen: false, raider: mockRaider })

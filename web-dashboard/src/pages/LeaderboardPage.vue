@@ -152,6 +152,7 @@ function closeModal() {
     <RaiderDetailModal
       :is-open="isModalOpen"
       :raider="selectedRaider"
+      :guild-id="guildId"
       @close="closeModal"
     />
   </div>

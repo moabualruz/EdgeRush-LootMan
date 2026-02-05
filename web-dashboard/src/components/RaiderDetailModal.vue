@@ -1,21 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { FlpsScore } from '@/types'
 import { getClassColor } from '@/utils/classColors'
+import { useGuildContextStore } from '@/stores/guildContext'
+import RaiderEditForm from '@/components/admin/RaiderEditForm.vue'
 
 const props = defineProps<{
   isOpen: boolean
   raider: FlpsScore | null
+  guildId: string
 }>()
 
 const emit = defineEmits<{
   close: []
 }>()
 
+const guildContextStore = useGuildContextStore()
+const showEditForm = ref(false)
+
+const canManageMembers = computed(() => guildContextStore.canManageMembers)
+
 const formatScore = (score: number) => score.toFixed(3)
 
 function handleClose() {
+  showEditForm.value = false
   emit('close')
+}
+
+function toggleEditForm() {
+  showEditForm.value = !showEditForm.value
 }
 
 const roleColorClass = computed(() => {
@@ -167,6 +180,32 @@ const roleColorClass = computed(() => {
             </ul>
           </template>
         </div>
+
+        <!-- Admin Edit Button -->
+        <div v-if="canManageMembers && !showEditForm" class="mt-4 pt-4 border-t border-gray-700">
+          <button
+            @click="toggleEditForm"
+            class="btn-secondary w-full flex items-center justify-center gap-2"
+            data-testid="edit-raider-button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit Raider
+          </button>
+        </div>
+
+        <!-- Admin Edit Form -->
+        <RaiderEditForm
+          v-if="canManageMembers && showEditForm"
+          :guild-id="guildId"
+          :raider-id="raider.raiderId"
+          :character-name="raider.characterName"
+          :current-rank="'Raider'"
+          :is-active="true"
+          @close="showEditForm = false"
+        />
       </div>
     </div>
   </Teleport>
