@@ -19,6 +19,12 @@ export interface PlanCanvasProps {
   selectedMarkerIndex?: number
   selectedShapeIndex?: number
   currentTool?: 'select' | 'pan' | 'marker' | 'shape'
+  /** Enable grid snapping for marker placement */
+  gridEnabled?: boolean
+  /** Grid size in percentage units (default: 5 = 5% of canvas) */
+  gridSize?: number
+  /** Show grid overlay lines */
+  showGrid?: boolean
 }
 
 const props = withDefaults(defineProps<PlanCanvasProps>(), {
@@ -28,6 +34,9 @@ const props = withDefaults(defineProps<PlanCanvasProps>(), {
   selectedMarkerIndex: -1,
   selectedShapeIndex: -1,
   currentTool: 'select',
+  gridEnabled: true,
+  gridSize: 5,
+  showGrid: true,
 })
 
 const emit = defineEmits<{
@@ -57,6 +66,32 @@ function toPercentX(pixel: number): number {
 function toPercentY(pixel: number): number {
   return (pixel / props.height) * 100
 }
+
+// Snap coordinate to nearest grid point
+function snapToGrid(value: number): number {
+  if (!props.gridEnabled || props.gridSize <= 0) return value
+  return Math.round(value / props.gridSize) * props.gridSize
+}
+
+// Generate grid lines for overlay
+const gridLines = computed(() => {
+  if (!props.showGrid || props.gridSize <= 0) return { horizontal: [], vertical: [] }
+  
+  const horizontal: number[] = []
+  const vertical: number[] = []
+  
+  // Generate horizontal lines (y coordinates)
+  for (let y = props.gridSize; y < 100; y += props.gridSize) {
+    horizontal.push(toPixelY(y))
+  }
+  
+  // Generate vertical lines (x coordinates)
+  for (let x = props.gridSize; x < 100; x += props.gridSize) {
+    vertical.push(toPixelX(x))
+  }
+  
+  return { horizontal, vertical }
+})
 
 // Container transform style
 const containerStyle = computed(() => ({
@@ -119,8 +154,13 @@ function getMarkerColor(type: MarkerType, customColor?: string): string {
 // Event handlers
 function handleBackgroundClick(event: MouseEvent) {
   const rect = (event.currentTarget as SVGElement).getBoundingClientRect()
-  const x = toPercentX(event.offsetX)
-  const y = toPercentY(event.offsetY)
+  let x = toPercentX(event.offsetX)
+  let y = toPercentY(event.offsetY)
+  
+  // Apply grid snapping
+  x = snapToGrid(x)
+  y = snapToGrid(y)
+  
   emit('canvas-click', { x, y })
 }
 
@@ -187,6 +227,34 @@ function handleMouseUp() {
           fill="#1a1a2e"
           @click="handleBackgroundClick"
         />
+
+        <!-- Grid Overlay -->
+        <g v-if="showGrid" class="grid-overlay" data-testid="grid-overlay">
+          <!-- Vertical grid lines -->
+          <line
+            v-for="(x, i) in gridLines.vertical"
+            :key="`grid-v-${i}`"
+            :x1="x"
+            :y1="0"
+            :x2="x"
+            :y2="height"
+            stroke="rgba(255, 255, 255, 0.08)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <!-- Horizontal grid lines -->
+          <line
+            v-for="(y, i) in gridLines.horizontal"
+            :key="`grid-h-${i}`"
+            :x1="0"
+            :y1="y"
+            :x2="width"
+            :y2="y"
+            stroke="rgba(255, 255, 255, 0.08)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+        </g>
 
         <!-- Background Image -->
         <image

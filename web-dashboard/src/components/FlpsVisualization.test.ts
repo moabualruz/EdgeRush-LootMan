@@ -14,6 +14,11 @@ vi.mock('@/components/charts', () => ({
     template: '<div class="mock-progress-bar"></div>',
     props: ['value', 'max', 'label', 'color', 'height'],
   },
+  DecayProjectionChart: {
+    name: 'DecayProjectionChart',
+    template: '<div class="mock-decay-chart" data-testid="decay-projection-chart"></div>',
+    props: ['currentFlps', 'rdfDecayRate', 'projectionWeeks', 'height'],
+  },
 }))
 
 describe('FlpsVisualization', () => {

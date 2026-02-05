@@ -7,7 +7,7 @@
  */
 import { computed } from 'vue'
 import type { RmsBreakdown, IpiBreakdown } from '@/types'
-import { DonutChart, ProgressBar } from '@/components/charts'
+import { DonutChart, ProgressBar, DecayProjectionChart } from '@/components/charts'
 
 const props = defineProps<{
   flps: number
@@ -201,6 +201,22 @@ const rmsTimesIpi = computed(() => props.rms.value * props.ipi.value)
           }}
         </p>
       </div>
+    </div>
+
+    <!-- Decay Projection Section -->
+    <div class="card mt-6">
+      <h3 class="text-sm font-semibold text-gray-400 uppercase mb-4">
+        4-Week Decay Projection (If Missing Attendance)
+      </h3>
+      <p class="text-xs text-gray-500 mb-4">
+        Shows how your FLPS score would decay if you miss all raids for the next 4 weeks.
+      </p>
+      <DecayProjectionChart
+        :current-flps="flps"
+        :rdf-decay-rate="0.85"
+        :projection-weeks="4"
+        :height="140"
+      />
     </div>
   </div>
 </template>

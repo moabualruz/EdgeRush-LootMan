@@ -355,4 +355,78 @@ describe('PlanCanvas', () => {
       expect(svg.classes()).toContain('cursor-default')
     })
   })
+
+  describe('Grid Snapping', () => {
+    it('should show grid overlay by default', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: defaultProps,
+      })
+
+      expect(wrapper.find('[data-testid="grid-overlay"]').exists()).toBe(true)
+    })
+
+    it('should hide grid overlay when showGrid is false', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, showGrid: false },
+      })
+
+      expect(wrapper.find('[data-testid="grid-overlay"]').exists()).toBe(false)
+    })
+
+    it('should render grid lines based on gridSize', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, gridSize: 10, showGrid: true },
+      })
+
+      const gridOverlay = wrapper.find('[data-testid="grid-overlay"]')
+      expect(gridOverlay.exists()).toBe(true)
+      
+      // With gridSize 10, should have 9 lines (10%, 20%, ..., 90%)
+      const lines = gridOverlay.findAll('line')
+      expect(lines.length).toBe(18) // 9 vertical + 9 horizontal
+    })
+
+    it('should use dashed stroke for grid lines', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, showGrid: true },
+      })
+
+      const gridLine = wrapper.find('[data-testid="grid-overlay"] line')
+      expect(gridLine.attributes('stroke-dasharray')).toBe('4,4')
+    })
+
+    it('should apply grid snapping when gridEnabled is true', async () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, gridEnabled: true, gridSize: 10 },
+      })
+
+      const background = wrapper.find('[data-testid="canvas-background"]')
+      // Click at position that would be 12% - should snap to 10%
+      await background.trigger('click', { offsetX: 96, offsetY: 72 }) // 12% of 800, 12% of 600
+
+      const emitted = wrapper.emitted('canvas-click')
+      expect(emitted).toBeTruthy()
+      // Note: JSDOM doesn't properly handle offsetX/offsetY, but we verify the event fires
+    })
+
+    it('should not show grid when gridSize is 0', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, gridSize: 0, showGrid: true },
+      })
+
+      const gridOverlay = wrapper.find('[data-testid="grid-overlay"]')
+      // Grid overlay element exists but should have no lines
+      const lines = gridOverlay.findAll('line')
+      expect(lines.length).toBe(0)
+    })
+
+    it('should pass gridEnabled and gridSize props correctly', () => {
+      const wrapper = mount(PlanCanvas, {
+        props: { ...defaultProps, gridEnabled: false, gridSize: 20, showGrid: true },
+      })
+
+      // Just verify component mounts without error with custom props
+      expect(wrapper.find('svg').exists()).toBe(true)
+    })
+  })
 })

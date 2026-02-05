@@ -7,6 +7,7 @@ import { useGuildContextStore } from '@/stores/guildContext'
 import { formatDate, formatRelativeTime } from '@/utils/date'
 import { useWowhead } from '@/composables/useWowhead'
 import WowheadItem from '@/components/WowheadItem.vue'
+import ItemHoverPreview from '@/components/ItemHoverPreview.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import { DonutChart, BarChart } from '@/components/charts'
 
@@ -152,11 +153,13 @@ const averageFlps = computed(() => {
               class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors"
             >
               <div class="flex-1">
-                <WowheadItem
-                  :item-id="award.itemId"
-                  :item-name="award.itemName"
-                  quality="epic"
-                />
+                <ItemHoverPreview :item-id="award.itemId" position="right">
+                  <WowheadItem
+                    :item-id="award.itemId"
+                    :item-name="award.itemName"
+                    quality="epic"
+                  />
+                </ItemHoverPreview>
                 <p class="text-sm text-gray-400 mt-1">
                   Awarded {{ formatDate(award.awardedAt) }} · FLPS: {{ formatScore(award.flpsAtAward) }}
                 </p>
