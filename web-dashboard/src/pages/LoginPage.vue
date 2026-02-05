@@ -47,7 +47,10 @@ async function handleSubmit() {
     } else {
       await authStore.register(username.value, email.value, password.value, role.value)
     }
-    router.push('/dashboard')
+    // Redirect to intended destination or dashboard
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/dashboard'
+    localStorage.removeItem('redirectAfterLogin')
+    router.push(redirectPath)
   } catch (e: any) {
     error.value = e.response?.data?.message || e.message || 'Authentication failed. Please try again.'
     console.error('Auth error:', e)

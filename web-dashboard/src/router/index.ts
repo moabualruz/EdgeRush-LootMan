@@ -145,6 +145,11 @@ router.beforeEach((to, _from, next) => {
   const guildContextStore = useGuildContextStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    // Store intended destination for post-login redirect
+    const intendedPath = to.fullPath
+    if (intendedPath !== '/login') {
+      localStorage.setItem('redirectAfterLogin', intendedPath)
+    }
     next('/login')
     return
   }

@@ -71,6 +71,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('refreshToken')
+      // Store intended destination for post-login redirect
+      const currentPath = window.location.pathname + window.location.search
+      if (currentPath !== '/login') {
+        localStorage.setItem('redirectAfterLogin', currentPath)
+      }
       window.location.href = '/login'
     }
     

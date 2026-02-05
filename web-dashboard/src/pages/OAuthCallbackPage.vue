@@ -54,8 +54,10 @@ onMounted(async () => {
       }
     }
 
-    // Redirect to dashboard on success
-    router.push('/dashboard')
+    // Redirect to intended destination or dashboard
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/dashboard'
+    localStorage.removeItem('redirectAfterLogin')
+    router.push(redirectPath)
   } catch (err: any) {
     console.error('OAuth callback error:', err)
     error.value = err.response?.data?.message || err.message || 'Authentication failed'
