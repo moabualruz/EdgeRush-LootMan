@@ -110,6 +110,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/DroptimizerPage.vue'),
       },
       {
+        path: 'top-gear',
+        name: 'top-gear',
+        component: () => import('@/pages/TopGearPage.vue'),
+      },
+      {
         path: 'admin',
         name: 'admin',
         component: () => import('@/pages/AdminPage.vue'),
