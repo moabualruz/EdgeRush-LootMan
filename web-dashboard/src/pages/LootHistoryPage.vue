@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
 import { useQuery } from '@tanstack/vue-query'
 import { lootApi } from '@/api/loot'
 import { useAuthStore } from '@/stores/auth'
@@ -35,6 +36,75 @@ const formatScore = (score: number) => score.toFixed(3)
 // Award modal state
 const isAwardModalOpen = ref(false)
 
+// Search state
+const searchQuery = ref('')
+const debouncedQuery = ref('')
+
+const updateDebouncedQuery = useDebounceFn((value: string) => {
+  debouncedQuery.value = value
+}, 300)
+
+watch(searchQuery, (val) => {
+  updateDebouncedQuery(val)
+})
+
+const filteredAwards = computed(() => {
+  if (!data.value?.awards) return []
+  if (!debouncedQuery.value.trim()) return data.value.awards
+  const q = debouncedQuery.value.toLowerCase()
+  return data.value.awards.filter(award =>
+    award.itemName.toLowerCase().includes(q) ||
+    award.characterName?.toLowerCase().includes(q)
+  )
+})
+
+// Sorting state
+type SortColumn = 'awardedAt' | 'itemName' | 'flpsAtAward'
+const sortColumn = ref<SortColumn>('awardedAt')
+const sortDir = ref<'asc' | 'desc'>('desc')
+
+function toggleSort(column: SortColumn) {
+  if (sortColumn.value === column) {
+    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDir.value = 'desc'
+  }
+  currentPage.value = 0 // Reset to first page on sort
+}
+
+const sortedAwards = computed(() => {
+  const awards = [...filteredAwards.value]
+  const col = sortColumn.value
+  const dir = sortDir.value === 'asc' ? 1 : -1
+  
+  return awards.sort((a, b) => {
+    if (col === 'itemName') {
+      return dir * a.itemName.localeCompare(b.itemName)
+    } else if (col === 'flpsAtAward') {
+      return dir * (a.flpsAtAward - b.flpsAtAward)
+    } else {
+      return dir * (new Date(a.awardedAt).getTime() - new Date(b.awardedAt).getTime())
+    }
+  })
+})
+
+// Pagination state
+const pageSize = 10
+const currentPage = ref(0)
+
+const totalPages = computed(() => Math.ceil(sortedAwards.value.length / pageSize))
+
+const paginatedAwards = computed(() => {
+  const start = currentPage.value * pageSize
+  return sortedAwards.value.slice(start, start + pageSize)
+})
+
+// Reset page when search changes
+watch(debouncedQuery, () => {
+  currentPage.value = 0
+})
+
 // Context menu state
 const contextMenu = ref<{
   isOpen: boolean
@@ -67,7 +137,7 @@ function closeContextMenu() {
 }
 
 function handleEdit(awardId: number) {
-  const award = data.value?.awards.find(a => a.id === awardId)
+  const award = filteredAwards.value.find(a => a.id === awardId) || data.value?.awards.find(a => a.id === awardId)
   if (award) {
     editingAward.value = award
     isEditModalOpen.value = true
@@ -212,11 +282,67 @@ const averageFlps = computed(() => {
 
         <!-- Loot items list -->
         <div class="card">
-          <h2 class="text-lg font-semibold mb-4">Recent Loot</h2>
-          <div class="space-y-4">
-            <div
-              v-for="award in data.awards"
-              :key="award.id"
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Recent Loot</h2>
+            <div class="relative">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search items..."
+                class="input pl-10 w-64"
+              />
+            </div>
+          </div>
+          
+          <!-- No results -->
+          <div v-if="filteredAwards.length === 0 && debouncedQuery" class="text-center py-6">
+            <p class="text-gray-400">No items found matching "{{ debouncedQuery }}"</p>
+          </div>
+          
+          <template v-else>
+            <!-- Sort Controls -->
+            <div class="flex items-center gap-4 mb-4 text-sm">
+              <span class="text-gray-400">Sort by:</span>
+              <button
+                @click="toggleSort('awardedAt')"
+                :class="['px-2 py-1 rounded', sortColumn === 'awardedAt' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+              >
+                Date {{ sortColumn === 'awardedAt' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
+              </button>
+              <button
+                @click="toggleSort('itemName')"
+                :class="['px-2 py-1 rounded', sortColumn === 'itemName' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+              >
+                Item {{ sortColumn === 'itemName' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
+              </button>
+              <button
+                @click="toggleSort('flpsAtAward')"
+                :class="['px-2 py-1 rounded', sortColumn === 'flpsAtAward' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+              >
+                FLPS {{ sortColumn === 'flpsAtAward' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
+              </button>
+            </div>
+            
+            <!-- Items List -->
+            <div class="space-y-4">
+              <div
+                v-for="award in paginatedAwards"
+                :key="award.id"
               class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors cursor-context-menu"
               @contextmenu="handleContextMenu($event, award)"
             >
@@ -250,7 +376,47 @@ const averageFlps = computed(() => {
               </div>
             </div>
           </div>
-        </div>
+          
+          <!-- Pagination -->
+          <div v-if="totalPages > 1" class="flex items-center justify-between mt-6 pt-4 border-t border-gray-700">
+            <span class="text-sm text-gray-400">
+              Showing {{ currentPage * pageSize + 1 }}-{{ Math.min((currentPage + 1) * pageSize, sortedAwards.length) }} of {{ sortedAwards.length }}
+            </span>
+            <div class="flex items-center gap-2">
+              <button
+                @click="currentPage = 0"
+                :disabled="currentPage === 0"
+                class="px-2 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+              >
+                First
+              </button>
+              <button
+                @click="currentPage--"
+                :disabled="currentPage === 0"
+                class="px-3 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+              >
+                ←
+              </button>
+              <span class="text-sm text-gray-300 px-2">
+                Page {{ currentPage + 1 }} of {{ totalPages }}
+              </span>
+              <button
+                @click="currentPage++"
+                :disabled="currentPage >= totalPages - 1"
+                class="px-3 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+              >
+                →
+              </button>
+              <button
+                @click="currentPage = totalPages - 1"
+                :disabled="currentPage >= totalPages - 1"
+                class="px-2 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+              >
+                Last
+              </button>
+            </div>
+          </div>
+        </template>
       </template>
     </div>
 
