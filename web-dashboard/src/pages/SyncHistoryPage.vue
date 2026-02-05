@@ -2,6 +2,11 @@
 import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { syncApi } from '@/api/sync'
+import { useSyncTrigger } from '@/composables/useSyncTrigger'
+
+// Sync trigger mutations
+const triggerWoWAudit = useSyncTrigger('WoWAudit')
+const triggerWarcraftLogs = useSyncTrigger('WarcraftLogs')
 
 const selectedSource = ref<string | null>(null)
 const selectedStatus = ref<string | null>(null)
@@ -116,7 +121,23 @@ function formatDuration(startedAt: string, completedAt: string | null): string {
           View data synchronization history from external sources
         </p>
       </div>
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <button
+          @click="triggerWoWAudit.mutate()"
+          :disabled="triggerWoWAudit.isPending.value"
+          class="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+        >
+          <span v-if="triggerWoWAudit.isPending.value" class="animate-spin mr-2">⟳</span>
+          Sync WoWAudit
+        </button>
+        <button
+          @click="triggerWarcraftLogs.mutate()"
+          :disabled="triggerWarcraftLogs.isPending.value"
+          class="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+        >
+          <span v-if="triggerWarcraftLogs.isPending.value" class="animate-spin mr-2">⟳</span>
+          Sync WarcraftLogs
+        </button>
         <button
           @click="refetch()"
           class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm"

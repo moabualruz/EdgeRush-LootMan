@@ -1,7 +1,7 @@
 # Gap Tracker
 
 > **Last Updated:** 2026-02-05  
-> **Progress:** 6/12 Complete
+> **Progress:** 7/12 Complete
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Count |
 |--------|-------|
-| ⬜ TODO | 6 |
+| ⬜ TODO | 5 |
 | 🔄 IN PROGRESS | 0 |
-| ✅ DONE | 6 |
+| ✅ DONE | 7 |
 
 ---
 
@@ -42,7 +42,7 @@
 
 | ID | Gap | Status | Started | Completed | Notes |
 |----|-----|--------|---------|-----------|-------|
-| GAP-006 | Sync Now button | ⬜ TODO | - | - | Requires GAP-008 |
+| GAP-006 | Sync Now button | ✅ DONE | 2026-02-05 | 2026-02-05 | useSyncTrigger composable + UI buttons |
 | GAP-007 | SyncLogViewer | ⬜ TODO | - | - | |
 
 ### Phase 5: Raider Management
@@ -65,6 +65,7 @@
 
 | Date | Gap ID | Action | Details |
 |------|--------|--------|---------|
+| 2026-02-05 | GAP-006 | Complete | useSyncTrigger.ts composable, Sync WoWAudit/WarcraftLogs buttons in SyncHistoryPage. 3 tests. |
 | 2026-02-05 | GAP-004 | Complete | Added sorting (Date/Item/FLPS) and pagination (10/page) to LootHistoryPage |
 | 2026-02-05 | GAP-002 | Complete | useLootEdit, useLootRevoke composables, LootContextMenu, EditLootModal, LootHistoryPage integration. 12 tests. |
 | 2026-02-05 | GAP-008 | Complete | Added triggerSync, getSyncLogs to sync.ts. 4 tests passing. |
@@ -75,8 +76,8 @@
 
 ## Next Up
 
-**Recommended next gap to work on:** `GAP-006` (Sync Now button)  
-**Reason:** Start sync operations (Phase 4)
+**Recommended next gap to work on:** `GAP-007` (SyncLogViewer)  
+**Reason:** Continue Phase 4 sync operations
 
 ---
 
