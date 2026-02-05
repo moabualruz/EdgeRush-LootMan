@@ -1,7 +1,7 @@
 # Gap Tracker
 
 > **Last Updated:** 2026-02-05  
-> **Progress:** 3/12 Complete
+> **Progress:** 4/12 Complete
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Status | Count |
 |--------|-------|
-| ⬜ TODO | 9 |
+| ⬜ TODO | 8 |
 | 🔄 IN PROGRESS | 0 |
-| ✅ DONE | 3 |
+| ✅ DONE | 4 |
 
 ---
 
@@ -29,7 +29,7 @@
 | ID | Gap | Status | Started | Completed | Notes |
 |----|-----|--------|---------|-----------|-------|
 | GAP-001 | LootConsole / Award Modal | ✅ DONE | 2026-02-05 | 2026-02-05 | useLootAward + AwardLootModal + ItemAutocomplete |
-| GAP-002 | Edit/Revoke context actions | ⬜ TODO | - | - | Requires GAP-005 |
+| GAP-002 | Edit/Revoke context actions | ✅ DONE | 2026-02-05 | 2026-02-05 | useLootEdit + useLootRevoke + LootContextMenu + EditLootModal |
 | GAP-003 | Search/Filter | ⬜ TODO | - | - | |
 
 ### Phase 3: Data Grid Enhancement
@@ -65,16 +65,17 @@
 
 | Date | Gap ID | Action | Details |
 |------|--------|--------|---------|
+| 2026-02-05 | GAP-002 | Complete | useLootEdit, useLootRevoke composables, LootContextMenu, EditLootModal, LootHistoryPage integration. 12 tests. |
 | 2026-02-05 | GAP-001 | Complete | useLootAward composable, ItemAutocomplete, AwardLootModal, LootHistoryPage integration |
 | 2026-02-05 | GAP-008 | Complete | Added triggerSync, getSyncLogs to sync.ts. 4 tests passing. |
 | 2026-02-05 | GAP-005 | Complete | Added awardLoot, updateLoot, revokeLoot, searchItems to loot.ts. 6 tests passing. |
-| 2026-02-05 | - | Audit | Initial gap analysis complete |
+| 2026-02-05 | - | Audit | Initial gap analysis complete | |
 
 ---
 
 ## Next Up
 
-**Recommended next gap to work on:** `GAP-002` (Edit/Revoke context actions)  
+**Recommended next gap to work on:** `GAP-003` (Search/Filter)  
 **Reason:** Complete core loot workflow (Phase 2)
 
 ---

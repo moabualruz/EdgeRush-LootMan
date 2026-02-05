@@ -6,11 +6,15 @@ import { useAuthStore } from '@/stores/auth'
 import { useGuildContextStore } from '@/stores/guildContext'
 import { formatDate, formatRelativeTime } from '@/utils/date'
 import { useWowhead } from '@/composables/useWowhead'
+import { useLootRevoke } from '@/composables/useLootRevoke'
 import WowheadItem from '@/components/WowheadItem.vue'
 import ItemHoverPreview from '@/components/ItemHoverPreview.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import { DonutChart, BarChart } from '@/components/charts'
 import AwardLootModal from '@/components/loot/AwardLootModal.vue'
+import LootContextMenu from '@/components/loot/LootContextMenu.vue'
+import EditLootModal from '@/components/loot/EditLootModal.vue'
+import type { LootAward } from '@/types'
 
 const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
@@ -30,6 +34,53 @@ const formatScore = (score: number) => score.toFixed(3)
 
 // Award modal state
 const isAwardModalOpen = ref(false)
+
+// Context menu state
+const contextMenu = ref<{
+  isOpen: boolean
+  position: { x: number; y: number }
+  award: LootAward | null
+}>({
+  isOpen: false,
+  position: { x: 0, y: 0 },
+  award: null,
+})
+
+// Edit modal state
+const isEditModalOpen = ref(false)
+const editingAward = ref<LootAward | null>(null)
+
+// Revoke mutation
+const revokeMutation = useLootRevoke(guildId)
+
+function handleContextMenu(event: MouseEvent, award: LootAward) {
+  event.preventDefault()
+  contextMenu.value = {
+    isOpen: true,
+    position: { x: event.clientX, y: event.clientY },
+    award,
+  }
+}
+
+function closeContextMenu() {
+  contextMenu.value.isOpen = false
+}
+
+function handleEdit(awardId: number) {
+  const award = data.value?.awards.find(a => a.id === awardId)
+  if (award) {
+    editingAward.value = award
+    isEditModalOpen.value = true
+  }
+  closeContextMenu()
+}
+
+async function handleRevoke(awardId: number) {
+  closeContextMenu()
+  if (confirm('Are you sure you want to revoke this loot award? This action cannot be undone.')) {
+    await revokeMutation.mutateAsync(awardId)
+  }
+}
 
 // RDF status breakdown for donut chart
 const rdfBreakdown = computed(() => {
@@ -166,7 +217,8 @@ const averageFlps = computed(() => {
             <div
               v-for="award in data.awards"
               :key="award.id"
-              class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors"
+              class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors cursor-context-menu"
+              @contextmenu="handleContextMenu($event, award)"
             >
               <div class="flex-1">
                 <ItemHoverPreview :item-id="award.itemId" position="right">
@@ -206,6 +258,24 @@ const averageFlps = computed(() => {
     <AwardLootModal
       :is-open="isAwardModalOpen"
       @close="isAwardModalOpen = false"
+    />
+
+    <!-- Context Menu -->
+    <LootContextMenu
+      :is-open="contextMenu.isOpen"
+      :position="contextMenu.position"
+      :award-id="contextMenu.award?.id ?? 0"
+      :item-name="contextMenu.award?.itemName ?? ''"
+      @edit="handleEdit"
+      @revoke="handleRevoke"
+      @close="closeContextMenu"
+    />
+
+    <!-- Edit Loot Modal -->
+    <EditLootModal
+      :is-open="isEditModalOpen"
+      :award="editingAward"
+      @close="isEditModalOpen = false"
     />
   </div>
 </template>

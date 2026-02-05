@@ -97,7 +97,9 @@ export interface LootAward {
   flpsAtAward: number
   rdfExpired: boolean
   rdfExpiresAt?: string
+  notes?: string
 }
+
 
 export interface LootHistoryResponse {
   raiderId: number
