@@ -114,7 +114,7 @@ class RaidPlanController(
             UpdateRaidPlanRequest(
                 name = request.name,
                 visibility = request.visibility,
-                steps = request.steps?.map { it.toDomain() }
+                steps = request.steps?.map { it.toDomain() },
             ),
         ).toResponse()
     }
@@ -287,6 +287,7 @@ fun PlanShape.toResponse(): PlanShapeResponse =
         color = color,
         strokeWidth = strokeWidth,
     )
+
 data class PlanStepApiRequest(
     val order: Int,
     val notes: String?,
@@ -298,7 +299,7 @@ data class PlanStepApiRequest(
             order = order,
             notes = notes,
             markers = markers.map { it.toDomain() },
-            shapes = shapes.map { it.toDomain() }
+            shapes = shapes.map { it.toDomain() },
         )
 }
 
@@ -309,8 +310,7 @@ data class PlanMarkerApiRequest(
     val label: String?,
     val color: String?,
 ) {
-    fun toDomain(): PlanMarker =
-        PlanMarker(type, x, y, label, color)
+    fun toDomain(): PlanMarker = PlanMarker(type, x, y, label, color)
 }
 
 data class PlanShapeApiRequest(
@@ -323,6 +323,5 @@ data class PlanShapeApiRequest(
     val color: String?,
     val strokeWidth: Int,
 ) {
-    fun toDomain(): PlanShape =
-        PlanShape(shapeType, x1, y1, x2, y2, radius, color, strokeWidth)
+    fun toDomain(): PlanShape = PlanShape(shapeType, x1, y1, x2, y2, radius, color, strokeWidth)
 }

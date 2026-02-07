@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface ApplicationQuestionFileEntitySpringRepository :
     CrudRepository<ApplicationQuestionFileEntity, Long>,
     PagingAndSortingRepository<ApplicationQuestionFileEntity, Long> {
-
-    fun findByApplicationId(applicationId: Long, pageable: Pageable): Page<ApplicationQuestionFileEntity>
+    fun findByApplicationId(
+        applicationId: Long,
+        pageable: Pageable,
+    ): Page<ApplicationQuestionFileEntity>
 
     fun countByApplicationId(applicationId: Long): Long
 
     fun findByApplicationId(applicationId: Long): List<ApplicationQuestionFileEntity>
 
-    fun findByApplicationIdAndQuestionPosition(applicationId: Long, questionPosition: Int): List<ApplicationQuestionFileEntity>
+    fun findByApplicationIdAndQuestionPosition(
+        applicationId: Long,
+        questionPosition: Int,
+    ): List<ApplicationQuestionFileEntity>
 
     fun deleteByApplicationId(applicationId: Long)
 }

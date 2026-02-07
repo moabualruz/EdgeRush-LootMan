@@ -4,7 +4,6 @@ import com.edgerush.lootman.application.guild.GuildContext
 import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.domain.auth.model.UserCharacterMappingId
 import com.edgerush.lootman.domain.auth.model.UserId
-import com.edgerush.lootman.domain.guild.model.GuildPermissionType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses

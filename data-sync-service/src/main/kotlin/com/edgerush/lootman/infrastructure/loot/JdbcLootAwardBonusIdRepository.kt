@@ -14,39 +14,42 @@ import org.springframework.stereotype.Repository
 class JdbcLootAwardBonusIdRepository(
     private val springRepository: LootAwardBonusIdEntitySpringRepository,
 ) : LootAwardBonusIdRepository {
+    override fun findById(id: Long): LootAwardBonusIdEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): LootAwardBonusIdEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<LootAwardBonusIdEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("id"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardBonusIdEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("id"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByLootAwardId(lootAwardId: Long, offset: Long, limit: Int): List<LootAwardBonusIdEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("id"),
-        )
+    override fun findByLootAwardId(
+        lootAwardId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<LootAwardBonusIdEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("id"),
+            )
         return springRepository.findByLootAwardId(lootAwardId, pageRequest).content
     }
 
-    override fun countByLootAwardId(lootAwardId: Long): Long =
-        springRepository.countByLootAwardId(lootAwardId)
+    override fun countByLootAwardId(lootAwardId: Long): Long = springRepository.countByLootAwardId(lootAwardId)
 
-    override fun save(entity: LootAwardBonusIdEntity): LootAwardBonusIdEntity =
-        springRepository.save(entity)
+    override fun save(entity: LootAwardBonusIdEntity): LootAwardBonusIdEntity = springRepository.save(entity)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

@@ -19,8 +19,10 @@ import java.time.OffsetDateTime
 interface RaidEntitySpringRepository :
     CrudRepository<RaidEntity, Long>,
     PagingAndSortingRepository<RaidEntity, Long> {
-
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<RaidEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<RaidEntity>
 
     fun countByTeamId(teamId: Long): Long
 
@@ -35,7 +37,7 @@ interface RaidEntitySpringRepository :
         SELECT * FROM raids
         WHERE team_id = :teamId AND start_time BETWEEN :startDate AND :endDate
         ORDER BY start_time DESC
-        """
+        """,
     )
     fun findByTeamIdAndDateRange(
         teamId: Long,
@@ -47,7 +49,7 @@ interface RaidEntitySpringRepository :
         """
         SELECT COUNT(*) FROM raids
         WHERE team_id = :teamId AND start_time BETWEEN :startDate AND :endDate
-        """
+        """,
     )
     fun countByTeamIdAndDateRange(
         teamId: Long,
@@ -60,7 +62,7 @@ interface RaidEntitySpringRepository :
         SELECT * FROM raids
         WHERE date >= :startDate AND date <= :endDate
         ORDER BY date DESC, raid_id DESC
-        """
+        """,
     )
     fun findByDateBetween(
         startDate: LocalDate,
@@ -71,7 +73,7 @@ interface RaidEntitySpringRepository :
         """
         SELECT COUNT(*) FROM raids
         WHERE date >= :startDate AND date <= :endDate
-        """
+        """,
     )
     fun countByDateBetween(
         startDate: LocalDate,
@@ -85,9 +87,12 @@ interface RaidEntitySpringRepository :
         WHERE tm.guild_id = :guildId AND r.date >= CURRENT_DATE
         ORDER BY r.date ASC, r.start_time ASC
         LIMIT :limit
-        """
+        """,
     )
-    fun findUpcomingByGuildId(guildId: Long, limit: Int): List<RaidEntity>
+    fun findUpcomingByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
     @Query(
         """
@@ -96,11 +101,17 @@ interface RaidEntitySpringRepository :
         WHERE tm.guild_id = :guildId AND r.date < CURRENT_DATE
         ORDER BY r.date DESC, r.start_time DESC
         LIMIT :limit
-        """
+        """,
     )
-    fun findPastByGuildId(guildId: Long, limit: Int): List<RaidEntity>
+    fun findPastByGuildId(
+        guildId: Long,
+        limit: Int,
+    ): List<RaidEntity>
 
-    fun findByInstance(instance: String, pageable: Pageable): Page<RaidEntity>
+    fun findByInstance(
+        instance: String,
+        pageable: Pageable,
+    ): Page<RaidEntity>
 
     fun countByInstance(instance: String): Long
 }

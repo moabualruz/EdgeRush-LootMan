@@ -25,11 +25,12 @@ class JwtKeyProvider(
      * The shared JWT secret key. Generated once at startup.
      */
     val secretKey: SecretKey by lazy {
-        val secret = oauth2Properties.jwt.secret.ifBlank {
-            // Generate a random key if not configured (for development)
-            logger.warn("JWT secret not configured, using random key. Sessions will not persist across restarts.")
-            Base64.getEncoder().encodeToString(ByteArray(64).also { secureRandom.nextBytes(it) })
-        }
+        val secret =
+            oauth2Properties.jwt.secret.ifBlank {
+                // Generate a random key if not configured (for development)
+                logger.warn("JWT secret not configured, using random key. Sessions will not persist across restarts.")
+                Base64.getEncoder().encodeToString(ByteArray(64).also { secureRandom.nextBytes(it) })
+            }
         Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
     }
 }

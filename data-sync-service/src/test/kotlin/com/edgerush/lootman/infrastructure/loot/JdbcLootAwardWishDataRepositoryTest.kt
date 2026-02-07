@@ -67,13 +67,14 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val id = 1L
-            val entity = createWishDataEntity(
-                id = id,
-                lootAwardId = 100L,
-                specName = "Frost",
-                specIcon = "spell_deathknight_frostpresence",
-                value = 5,
-            )
+            val entity =
+                createWishDataEntity(
+                    id = id,
+                    lootAwardId = 100L,
+                    specName = "Frost",
+                    specIcon = "spell_deathknight_frostpresence",
+                    value = 5,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -93,13 +94,14 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createWishDataEntity(
-                id = id,
-                lootAwardId = 100L,
-                specName = null,
-                specIcon = null,
-                value = null,
-            )
+            val entity =
+                createWishDataEntity(
+                    id = id,
+                    lootAwardId = 100L,
+                    specName = null,
+                    specIcon = null,
+                    value = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -121,10 +123,11 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createWishDataEntity(1L, 100L),
-                createWishDataEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createWishDataEntity(1L, 100L),
+                    createWishDataEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -144,10 +147,11 @@ class JdbcLootAwardWishDataRepositoryTest : UnitTest() {
         fun `should return wish data for loot award`() {
             // Given
             val lootAwardId = 100L
-            val entities = listOf(
-                createWishDataEntity(1L, lootAwardId, specName = "Frost"),
-                createWishDataEntity(2L, lootAwardId, specName = "Unholy"),
-            )
+            val entities =
+                listOf(
+                    createWishDataEntity(1L, lootAwardId, specName = "Frost"),
+                    createWishDataEntity(2L, lootAwardId, specName = "Unholy"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByLootAwardId(lootAwardId, any<Pageable>()) } returns page

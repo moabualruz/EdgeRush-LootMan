@@ -152,8 +152,9 @@ class RaidCrudServiceImpl(
      * Resolves a string guild ID (e.g., "dod") to the numeric ID from guild_configurations.
      */
     private fun resolveGuildId(guildId: String): Long {
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw NoSuchElementException("Guild not found with id: $guildId")
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw NoSuchElementException("Guild not found with id: $guildId")
         return config.id?.toLong() ?: throw IllegalStateException("Guild configuration has no ID: $guildId")
     }
 

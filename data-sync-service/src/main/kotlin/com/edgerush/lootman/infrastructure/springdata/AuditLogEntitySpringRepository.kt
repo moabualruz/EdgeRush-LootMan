@@ -10,9 +10,17 @@ import java.time.Instant
 interface AuditLogEntitySpringRepository :
     CrudRepository<AuditLogEntity, Long>,
     PagingAndSortingRepository<AuditLogEntity, Long> {
+    fun findByEntityTypeAndEntityIdOrderByTimestampDesc(
+        entityType: String,
+        entityId: String,
+    ): List<AuditLogEntity>
 
-    fun findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType: String, entityId: String): List<AuditLogEntity>
     fun findByUserIdOrderByTimestampDesc(userId: String): List<AuditLogEntity>
-    fun findByTimestampBetweenOrderByTimestampDesc(from: Instant, to: Instant): List<AuditLogEntity>
+
+    fun findByTimestampBetweenOrderByTimestampDesc(
+        from: Instant,
+        to: Instant,
+    ): List<AuditLogEntity>
+
     fun findByOperationOrderByTimestampDesc(operation: String): List<AuditLogEntity>
 }

@@ -30,11 +30,12 @@ class GuildPermissionTest : UnitTest() {
             val permissionType = GuildPermissionType.SETTINGS_ACCESS
 
             // When
-            val permission = GuildPermission(
-                guildId = guildId,
-                rankName = rankName,
-                permissionType = permissionType,
-            )
+            val permission =
+                GuildPermission(
+                    guildId = guildId,
+                    rankName = rankName,
+                    permissionType = permissionType,
+                )
 
             // Then
             permission.guildId shouldBe guildId
@@ -51,12 +52,13 @@ class GuildPermissionTest : UnitTest() {
             val guildId = GuildId("test-guild")
 
             // When
-            val permission = GuildPermission(
-                id = id,
-                guildId = guildId,
-                rankName = "Guild Master",
-                permissionType = GuildPermissionType.LOOT_MANAGEMENT,
-            )
+            val permission =
+                GuildPermission(
+                    id = id,
+                    guildId = guildId,
+                    rankName = "Guild Master",
+                    permissionType = GuildPermissionType.LOOT_MANAGEMENT,
+                )
 
             // Then
             permission.id shouldBe id
@@ -90,11 +92,12 @@ class GuildPermissionTest : UnitTest() {
         @Test
         fun `should accept rank names with leading or trailing whitespace`() {
             // Given - note: factory method trims, but direct constructor does not
-            val permission = GuildPermission(
-                guildId = GuildId("test-guild"),
-                rankName = "  Officer  ",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-            )
+            val permission =
+                GuildPermission(
+                    guildId = GuildId("test-guild"),
+                    rankName = "  Officer  ",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                )
 
             // Then - whitespace is preserved when using constructor directly
             permission.rankName shouldBe "  Officer  "
@@ -106,11 +109,12 @@ class GuildPermissionTest : UnitTest() {
         @Test
         fun `create should trim rank name`() {
             // When
-            val permission = GuildPermission.create(
-                guildId = GuildId("test-guild"),
-                rankName = "  Raider  ",
-                permissionType = GuildPermissionType.VIEW_ALL_SCORES,
-            )
+            val permission =
+                GuildPermission.create(
+                    guildId = GuildId("test-guild"),
+                    rankName = "  Raider  ",
+                    permissionType = GuildPermissionType.VIEW_ALL_SCORES,
+                )
 
             // Then
             permission.rankName shouldBe "Raider"
@@ -122,11 +126,12 @@ class GuildPermissionTest : UnitTest() {
             val before = Instant.now()
 
             // When
-            val permission = GuildPermission.create(
-                guildId = GuildId("test-guild"),
-                rankName = "Member",
-                permissionType = GuildPermissionType.MEMBER_MANAGEMENT,
-            )
+            val permission =
+                GuildPermission.create(
+                    guildId = GuildId("test-guild"),
+                    rankName = "Member",
+                    permissionType = GuildPermissionType.MEMBER_MANAGEMENT,
+                )
 
             val after = Instant.now()
 
@@ -138,11 +143,12 @@ class GuildPermissionTest : UnitTest() {
         @Test
         fun `create should set id to null`() {
             // When
-            val permission = GuildPermission.create(
-                guildId = GuildId("test-guild"),
-                rankName = "Member",
-                permissionType = GuildPermissionType.VIEW_ALL_SCORES,
-            )
+            val permission =
+                GuildPermission.create(
+                    guildId = GuildId("test-guild"),
+                    rankName = "Member",
+                    permissionType = GuildPermissionType.VIEW_ALL_SCORES,
+                )
 
             // Then
             permission.id shouldBe null
@@ -290,20 +296,22 @@ class GuildPermissionTest : UnitTest() {
 
         @Test
         fun `should have proper equals implementation`() {
-            val perm1 = GuildPermission(
-                id = GuildPermissionId(1L),
-                guildId = GuildId("test"),
-                rankName = "Officer",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-                createdAt = Instant.parse("2024-01-01T00:00:00Z"),
-            )
-            val perm2 = GuildPermission(
-                id = GuildPermissionId(1L),
-                guildId = GuildId("test"),
-                rankName = "Officer",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-                createdAt = Instant.parse("2024-01-01T00:00:00Z"),
-            )
+            val perm1 =
+                GuildPermission(
+                    id = GuildPermissionId(1L),
+                    guildId = GuildId("test"),
+                    rankName = "Officer",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                    createdAt = Instant.parse("2024-01-01T00:00:00Z"),
+                )
+            val perm2 =
+                GuildPermission(
+                    id = GuildPermissionId(1L),
+                    guildId = GuildId("test"),
+                    rankName = "Officer",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                    createdAt = Instant.parse("2024-01-01T00:00:00Z"),
+                )
             perm1 shouldBe perm2
         }
     }
@@ -315,11 +323,12 @@ class GuildPermissionTest : UnitTest() {
         rankName: String = "Officer",
         permissionType: GuildPermissionType = GuildPermissionType.SETTINGS_ACCESS,
         createdAt: Instant = Instant.now(),
-    ): GuildPermission = GuildPermission(
-        id = id,
-        guildId = guildId,
-        rankName = rankName,
-        permissionType = permissionType,
-        createdAt = createdAt,
-    )
+    ): GuildPermission =
+        GuildPermission(
+            id = id,
+            guildId = guildId,
+            rankName = rankName,
+            permissionType = permissionType,
+            createdAt = createdAt,
+        )
 }

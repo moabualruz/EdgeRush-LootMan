@@ -16,22 +16,33 @@ import org.springframework.stereotype.Repository
 interface RaidSignupEntitySpringRepository :
     CrudRepository<RaidSignupEntity, Long>,
     PagingAndSortingRepository<RaidSignupEntity, Long> {
-
-    fun findByRaidId(raidId: Long, pageable: Pageable): Page<RaidSignupEntity>
+    fun findByRaidId(
+        raidId: Long,
+        pageable: Pageable,
+    ): Page<RaidSignupEntity>
 
     fun countByRaidId(raidId: Long): Long
 
     fun findByRaidId(raidId: Long): List<RaidSignupEntity>
 
-    fun findByCharacterId(characterId: Long, pageable: Pageable): Page<RaidSignupEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        pageable: Pageable,
+    ): Page<RaidSignupEntity>
 
     fun countByCharacterId(characterId: Long): Long
 
-    fun findByRaidIdAndCharacterId(raidId: Long, characterId: Long): RaidSignupEntity?
+    fun findByRaidIdAndCharacterId(
+        raidId: Long,
+        characterId: Long,
+    ): RaidSignupEntity?
 
     fun deleteByRaidId(raidId: Long)
 
-    fun findByRaidIdAndSelectedTrue(raidId: Long, pageable: Pageable): Page<RaidSignupEntity>
+    fun findByRaidIdAndSelectedTrue(
+        raidId: Long,
+        pageable: Pageable,
+    ): Page<RaidSignupEntity>
 
     fun countByRaidIdAndSelectedTrue(raidId: Long): Long
 }

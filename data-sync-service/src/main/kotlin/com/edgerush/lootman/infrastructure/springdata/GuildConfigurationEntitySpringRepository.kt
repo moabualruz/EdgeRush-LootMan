@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository
 interface GuildConfigurationEntitySpringRepository :
     CrudRepository<GuildConfigurationEntity, Long>,
     PagingAndSortingRepository<GuildConfigurationEntity, Long> {
-
     fun findByGuildId(guildId: String): GuildConfigurationEntity?
 
     fun existsByGuildId(guildId: String): Boolean

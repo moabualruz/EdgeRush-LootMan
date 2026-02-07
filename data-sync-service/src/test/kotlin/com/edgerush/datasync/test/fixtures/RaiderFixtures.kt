@@ -82,29 +82,33 @@ object RaiderFixtures {
         accountId: AccountId? = null,
         createdAt: Instant = Instant.now(),
         updatedAt: Instant = Instant.now(),
-    ): Raider = createRaider(
-        id = id,
-        characterId = characterId,
-        guildId = guildId,
-        name = name,
-        realm = realm,
-        region = region,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId,
-        blizzardId = blizzardId,
-        accountId = accountId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-    )
+    ): Raider =
+        createRaider(
+            id = id,
+            characterId = characterId,
+            guildId = guildId,
+            name = name,
+            realm = realm,
+            region = region,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+            blizzardId = blizzardId,
+            accountId = accountId,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        )
 
     /**
      * Creates a list of test raiders with unique IDs and names.
      */
-    fun createRaiders(count: Int, guildId: GuildId = GuildId("guild-123")): List<Raider> {
+    fun createRaiders(
+        count: Int,
+        guildId: GuildId = GuildId("guild-123"),
+    ): List<Raider> {
         val names = listOf("Arthas", "Thrall", "Jaina", "Sylvanas", "Illidan", "Anduin", "Varian", "Tyrande")
         return (1..count).map { i ->
             createRaider(

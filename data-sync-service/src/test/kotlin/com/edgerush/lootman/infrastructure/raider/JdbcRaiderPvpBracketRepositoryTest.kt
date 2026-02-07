@@ -71,10 +71,11 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createPvpBracketEntity(1L, 100L),
-                createPvpBracketEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createPvpBracketEntity(1L, 100L),
+                    createPvpBracketEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -94,10 +95,11 @@ class JdbcRaiderPvpBracketRepositoryTest : UnitTest() {
         fun `should return pvp brackets for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createPvpBracketEntity(1L, raiderId, bracket = "2v2"),
-                createPvpBracketEntity(2L, raiderId, bracket = "3v3"),
-            )
+            val entities =
+                listOf(
+                    createPvpBracketEntity(1L, raiderId, bracket = "2v2"),
+                    createPvpBracketEntity(2L, raiderId, bracket = "3v3"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page

@@ -70,13 +70,14 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createEntity(
-                id = id,
-                teamId = null,
-                seasonId = null,
-                periodId = null,
-                currentPeriod = null,
-            )
+            val entity =
+                createEntity(
+                    id = id,
+                    teamId = null,
+                    seasonId = null,
+                    periodId = null,
+                    currentPeriod = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -99,10 +100,11 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createEntity(1L, 100L),
-                createEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, 100L),
+                    createEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -122,10 +124,11 @@ class JdbcPeriodSnapshotRepositoryTest : UnitTest() {
         fun `should return snapshots for team`() {
             // Given
             val teamId = 100L
-            val entities = listOf(
-                createEntity(1L, teamId = teamId),
-                createEntity(2L, teamId = teamId),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, teamId = teamId),
+                    createEntity(2L, teamId = teamId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByTeamId(teamId, any<Pageable>()) } returns page

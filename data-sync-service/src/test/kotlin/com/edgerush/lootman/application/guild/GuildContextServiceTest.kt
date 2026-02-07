@@ -53,13 +53,14 @@ class GuildContextServiceTest : UnitTest() {
         userPreferencesRepository = mockk()
         guildConfigurationRepository = mockk()
 
-        service = GuildContextService(
-            userCharacterMappingRepository,
-            raiderEntityRepository,
-            guildPermissionRepository,
-            userPreferencesRepository,
-            guildConfigurationRepository,
-        )
+        service =
+            GuildContextService(
+                userCharacterMappingRepository,
+                raiderEntityRepository,
+                guildPermissionRepository,
+                userPreferencesRepository,
+                guildConfigurationRepository,
+            )
     }
 
     @Nested
@@ -94,9 +95,10 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId(guildId) } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(GuildId(guildId), "Officer") } returns listOf(permission)
-            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns mapOf(
-                Pair(guildId, "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS)
-            )
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns
+                mapOf(
+                    Pair(guildId, "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS),
+                )
 
             // When
             val result = service.getUserGuilds(userId)
@@ -528,9 +530,10 @@ class GuildContextServiceTest : UnitTest() {
             every { raiderEntityRepository.findById(100L) } returns raider
             every { guildConfigurationRepository.findByGuildId("test-guild") } returns null
             every { guildPermissionRepository.findByGuildIdAndRankName(GuildId("test-guild"), "Officer") } returns listOf(permission)
-            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns mapOf(
-                Pair("test-guild", "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS)
-            )
+            every { guildPermissionRepository.findByGuildIdAndRankNames(any()) } returns
+                mapOf(
+                    Pair("test-guild", "Officer") to listOf(GuildPermissionType.SETTINGS_ACCESS),
+                )
 
             // When
             val result = service.hasActiveGuildPermission(userId, GuildPermissionType.SETTINGS_ACCESS)
@@ -558,45 +561,48 @@ class GuildContextServiceTest : UnitTest() {
         id: UserCharacterMappingId,
         userId: UserId,
         raiderId: RaiderId,
-    ): UserCharacterMapping = UserCharacterMapping(
-        id = id,
-        userId = userId,
-        raiderId = raiderId,
-    )
+    ): UserCharacterMapping =
+        UserCharacterMapping(
+            id = id,
+            userId = userId,
+            raiderId = raiderId,
+        )
 
     private fun createRaider(
         id: Long,
         guildId: String?,
         rank: String?,
         name: String = "TestCharacter",
-    ): RaiderEntity = RaiderEntity(
-        id = id,
-        characterName = name,
-        realm = "TestRealm",
-        region = "EU",
-        guildId = guildId,
-        wowauditId = null,
-        clazz = "WARRIOR",
-        spec = "Arms",
-        role = "DPS",
-        rank = rank,
-        status = "Active",
-        note = null,
-        blizzardId = null,
-        trackingSince = null,
-        joinDate = null,
-        blizzardLastModified = null,
-        lastSync = OffsetDateTime.now(),
-    )
+    ): RaiderEntity =
+        RaiderEntity(
+            id = id,
+            characterName = name,
+            realm = "TestRealm",
+            region = "EU",
+            guildId = guildId,
+            wowauditId = null,
+            clazz = "WARRIOR",
+            spec = "Arms",
+            role = "DPS",
+            rank = rank,
+            status = "Active",
+            note = null,
+            blizzardId = null,
+            trackingSince = null,
+            joinDate = null,
+            blizzardLastModified = null,
+            lastSync = OffsetDateTime.now(),
+        )
 
     private fun createPermission(
         guildId: String,
         rankName: String,
         permissionType: GuildPermissionType,
-    ): GuildPermission = GuildPermission(
-        id = GuildPermissionId(1L),
-        guildId = GuildId(guildId),
-        rankName = rankName,
-        permissionType = permissionType,
-    )
+    ): GuildPermission =
+        GuildPermission(
+            id = GuildPermissionId(1L),
+            guildId = GuildId(guildId),
+            rankName = rankName,
+            permissionType = permissionType,
+        )
 }

@@ -11,7 +11,7 @@ data class WowClass(
     val slug: String,
     val mediaUrl: String? = null,
     val powerType: String? = null,
-    val syncedAt: Instant = Instant.now()
+    val syncedAt: Instant = Instant.now(),
 )
 
 /**
@@ -24,7 +24,7 @@ data class WowSpecialization(
     val slug: String,
     val role: WowRole,
     val mediaUrl: String? = null,
-    val syncedAt: Instant = Instant.now()
+    val syncedAt: Instant = Instant.now(),
 )
 
 /**
@@ -33,7 +33,8 @@ data class WowSpecialization(
 enum class WowRole {
     TANK,
     HEALER,
-    DPS;
+    DPS,
+    ;
 
     companion object {
         fun fromString(value: String): WowRole {

@@ -13,7 +13,6 @@ import com.edgerush.lootman.domain.auth.repository.UserRepository
 import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
 import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import com.edgerush.lootman.domain.shared.InvalidRefreshTokenException
-import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.UserAlreadyExistsException
 import com.edgerush.lootman.domain.shared.UserNotFoundException
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
@@ -176,14 +175,14 @@ class AuthenticationService(
 
         // Link Battle.net account
         val updatedUser = userRepository.save(user.linkBattlenet(battlenetUser.sub))
-        
+
         // Sync characters
         syncBattlenetCharacters(updatedUser, authResult.accessToken)
 
         logger.info("Battle.net account linked for user ${userId.value}: ${battlenetUser.sub}")
         return UserProfileResponse.from(updatedUser)
     }
-    
+
     /**
      * Authenticates a user via Battle.net OAuth2 callback and syncs characters.
      */
@@ -288,37 +287,43 @@ class AuthenticationService(
         logger.info("Local user logged in: ${updatedUser.username} (id=${updatedUser.id?.value})")
         return generateTokens(updatedUser)
     }
-    
-    private fun syncBattlenetCharacters(user: User, accessToken: String) {
+
+    private fun syncBattlenetCharacters(
+        user: User,
+        accessToken: String,
+    ) {
         try {
             val characters = blizzardDataService.getAccountCharacters(accessToken)
 
             // Build a map of tracked guilds for quick lookup (by guild name + realm slug)
-            val trackedGuilds = guildConfigurationRepository.findAll(offset = 0, limit = 100)
-                .filter { it.syncEnabled }
-                .associateBy { "${it.guildName.lowercase()}-${it.bnetRealmSlug?.lowercase()}" }
+            val trackedGuilds =
+                guildConfigurationRepository.findAll(offset = 0, limit = 100)
+                    .filter { it.syncEnabled }
+                    .associateBy { "${it.guildName.lowercase()}-${it.bnetRealmSlug?.lowercase()}" }
 
-            val userCharacters = characters.map { char ->
-                // Check if character's guild is one we track
-                val guildKey = char.guild?.let {
-                    "${it.name.lowercase()}-${it.realm.name.lowercase()}"
-                }
-                val trackedGuild = guildKey?.let { trackedGuilds[it] }
+            val userCharacters =
+                characters.map { char ->
+                    // Check if character's guild is one we track
+                    val guildKey =
+                        char.guild?.let {
+                            "${it.name.lowercase()}-${it.realm.name.lowercase()}"
+                        }
+                    val trackedGuild = guildKey?.let { trackedGuilds[it] }
 
-                com.edgerush.lootman.domain.auth.model.UserCharacter(
-                    userId = user.id!!,
-                    name = char.name,
-                    realm = char.realm.name,
-                    className = char.playable_class.name,  // Store raw class name from Blizzard
-                    level = char.level,
-                    race = char.playable_race.name,
-                    faction = char.faction.name,
-                    blizzardId = char.id,
-                    guildName = char.guild?.name,
-                    guildRealm = char.guild?.realm?.name,
-                    guildId = trackedGuild?.guildId  // Link to our tracked guild if it matches
-                )
-            }.filter { it.level >= 70 } // Only sync max/near-max level chars to reduce noise
+                    com.edgerush.lootman.domain.auth.model.UserCharacter(
+                        userId = user.id!!,
+                        name = char.name,
+                        realm = char.realm.name,
+                        className = char.playable_class.name, // Store raw class name from Blizzard
+                        level = char.level,
+                        race = char.playable_race.name,
+                        faction = char.faction.name,
+                        blizzardId = char.id,
+                        guildName = char.guild?.name,
+                        guildRealm = char.guild?.realm?.name,
+                        guildId = trackedGuild?.guildId, // Link to our tracked guild if it matches
+                    )
+                }.filter { it.level >= 70 } // Only sync max/near-max level chars to reduce noise
 
             userCharacterRepository.saveAll(userCharacters)
             logger.info("Synced ${userCharacters.size} characters for user ${user.id!!.value}")
@@ -326,8 +331,9 @@ class AuthenticationService(
             // Use the linkage refresh service to create raiders and link characters
             // This handles creating raiders from Battle.net characters if they don't exist
             val refreshResult = userLinkageRefreshService.refreshUserLinkages(user.id!!)
-            logger.info("Linkage refresh for user ${user.id!!.value}: created=${refreshResult.newLinksCreated}, orphaned=${refreshResult.orphanedMappingsRemoved}")
-
+            logger.info(
+                "Linkage refresh for user ${user.id!!.value}: created=${refreshResult.newLinksCreated}, orphaned=${refreshResult.orphanedMappingsRemoved}",
+            )
         } catch (e: Exception) {
             logger.error("Failed to sync Battle.net characters for user ${user.id?.value}", e)
             // Swallow exception to not block login/linking
@@ -338,7 +344,10 @@ class AuthenticationService(
      * Automatically links user's Battle.net characters to matching raiders in guild rosters.
      * This allows the character selector dropdown to show all characters with their guild roles.
      */
-    private fun autoLinkCharactersToRaiders(userId: UserId, characters: List<com.edgerush.lootman.domain.auth.model.UserCharacter>) {
+    private fun autoLinkCharactersToRaiders(
+        userId: UserId,
+        characters: List<com.edgerush.lootman.domain.auth.model.UserCharacter>,
+    ) {
         var linkedCount = 0
         var skippedCount = 0
 
@@ -348,22 +357,25 @@ class AuthenticationService(
                 val raider = raiderRepository.findByCharacterNameAndRealm(character.name, character.realm)
 
                 if (raider != null) {
-                    val raiderId = raider.id  // Already a RaiderId
+                    val raiderId = raider.id // Already a RaiderId
 
                     // Check if already linked
                     if (!userCharacterMappingRepository.existsByUserIdAndRaiderId(userId, raiderId)) {
                         // Check if this is the first character for the user
                         val isPrimary = userCharacterMappingRepository.countByUserId(userId) == 0L
 
-                        val mapping = UserCharacterMapping.create(
-                            userId = userId,
-                            raiderId = raiderId,
-                            isPrimary = isPrimary
-                        )
+                        val mapping =
+                            UserCharacterMapping.create(
+                                userId = userId,
+                                raiderId = raiderId,
+                                isPrimary = isPrimary,
+                            )
 
                         userCharacterMappingRepository.save(mapping)
                         linkedCount++
-                        logger.info("Auto-linked character ${character.name}-${character.realm} to raider ${raider.id.value} (guild: ${raider.guildId.value}, rank: ${raider.rank})")
+                        logger.info(
+                            "Auto-linked character ${character.name}-${character.realm} to raider ${raider.id.value} (guild: ${raider.guildId.value}, rank: ${raider.rank})",
+                        )
                     } else {
                         skippedCount++
                     }

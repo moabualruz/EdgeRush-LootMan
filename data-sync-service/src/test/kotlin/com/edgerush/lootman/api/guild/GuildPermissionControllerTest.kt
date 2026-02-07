@@ -40,11 +40,12 @@ class GuildPermissionControllerTest : UnitTest() {
         guildPermissionRepository = mockk()
         guildContextService = mockk()
         userIdExtractor = mockk()
-        controller = GuildPermissionController(
-            guildPermissionRepository,
-            guildContextService,
-            userIdExtractor,
-        )
+        controller =
+            GuildPermissionController(
+                guildPermissionRepository,
+                guildContextService,
+                userIdExtractor,
+            )
 
         every { userIdExtractor.extractUserId(testAuth) } returns testUserId
     }
@@ -58,10 +59,11 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val permissions = listOf(
-                createPermission(1L, "Officer", GuildPermissionType.SETTINGS_ACCESS),
-                createPermission(2L, "Officer", GuildPermissionType.LOOT_MANAGEMENT),
-            )
+            val permissions =
+                listOf(
+                    createPermission(1L, "Officer", GuildPermissionType.SETTINGS_ACCESS),
+                    createPermission(2L, "Officer", GuildPermissionType.LOOT_MANAGEMENT),
+                )
             every { guildPermissionRepository.findByGuildId(GuildId(testGuildId)) } returns permissions
 
             // When
@@ -82,9 +84,10 @@ class GuildPermissionControllerTest : UnitTest() {
             } returns false
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.getPermissions(testGuildId, testAuth)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.getPermissions(testGuildId, testAuth)
+                }
             exception.statusCode shouldBe HttpStatus.FORBIDDEN
         }
 
@@ -136,9 +139,10 @@ class GuildPermissionControllerTest : UnitTest() {
             } returns false
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.getRanksWithPermissions(testGuildId, testAuth)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.getRanksWithPermissions(testGuildId, testAuth)
+                }
             exception.statusCode shouldBe HttpStatus.FORBIDDEN
         }
     }
@@ -152,10 +156,11 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val request = AddPermissionRequest(
-                rankName = "Raider",
-                permissionType = "VIEW_ALL_SCORES",
-            )
+            val request =
+                AddPermissionRequest(
+                    rankName = "Raider",
+                    permissionType = "VIEW_ALL_SCORES",
+                )
 
             val savedPermission = createPermission(1L, "Raider", GuildPermissionType.VIEW_ALL_SCORES)
             every { guildPermissionRepository.save(any()) } returns savedPermission
@@ -176,15 +181,17 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns false
 
-            val request = AddPermissionRequest(
-                rankName = "Raider",
-                permissionType = "VIEW_ALL_SCORES",
-            )
+            val request =
+                AddPermissionRequest(
+                    rankName = "Raider",
+                    permissionType = "VIEW_ALL_SCORES",
+                )
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.addPermission(testGuildId, testAuth, request)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.addPermission(testGuildId, testAuth, request)
+                }
             exception.statusCode shouldBe HttpStatus.FORBIDDEN
         }
 
@@ -195,15 +202,17 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val request = AddPermissionRequest(
-                rankName = "Raider",
-                permissionType = "INVALID_TYPE",
-            )
+            val request =
+                AddPermissionRequest(
+                    rankName = "Raider",
+                    permissionType = "INVALID_TYPE",
+                )
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.addPermission(testGuildId, testAuth, request)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.addPermission(testGuildId, testAuth, request)
+                }
             exception.statusCode shouldBe HttpStatus.BAD_REQUEST
             exception.reason shouldBe "Invalid permission type: INVALID_TYPE"
         }
@@ -215,10 +224,11 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val request = AddPermissionRequest(
-                rankName = "Officer",
-                permissionType = "LOOT_MANAGEMENT",
-            )
+            val request =
+                AddPermissionRequest(
+                    rankName = "Officer",
+                    permissionType = "LOOT_MANAGEMENT",
+                )
 
             val savedPermission = createPermission(1L, "Officer", GuildPermissionType.LOOT_MANAGEMENT)
             every { guildPermissionRepository.save(any()) } returns savedPermission
@@ -228,11 +238,13 @@ class GuildPermissionControllerTest : UnitTest() {
 
             // Then
             verify(exactly = 1) {
-                guildPermissionRepository.save(match { permission ->
-                    permission.guildId.value == testGuildId &&
-                        permission.rankName == "Officer" &&
-                        permission.permissionType == GuildPermissionType.LOOT_MANAGEMENT
-                })
+                guildPermissionRepository.save(
+                    match { permission ->
+                        permission.guildId.value == testGuildId &&
+                            permission.rankName == "Officer" &&
+                            permission.permissionType == GuildPermissionType.LOOT_MANAGEMENT
+                    },
+                )
             }
         }
     }
@@ -266,9 +278,10 @@ class GuildPermissionControllerTest : UnitTest() {
             } returns false
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.removePermission(testGuildId, 1L, testAuth)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.removePermission(testGuildId, 1L, testAuth)
+                }
             exception.statusCode shouldBe HttpStatus.FORBIDDEN
         }
 
@@ -281,9 +294,10 @@ class GuildPermissionControllerTest : UnitTest() {
             every { guildPermissionRepository.findById(GuildPermissionId(999L)) } returns null
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.removePermission(testGuildId, 999L, testAuth)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.removePermission(testGuildId, 999L, testAuth)
+                }
             exception.statusCode shouldBe HttpStatus.NOT_FOUND
         }
 
@@ -294,18 +308,20 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val permission = GuildPermission(
-                id = GuildPermissionId(1L),
-                guildId = GuildId("different-guild"),
-                rankName = "Officer",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-            )
+            val permission =
+                GuildPermission(
+                    id = GuildPermissionId(1L),
+                    guildId = GuildId("different-guild"),
+                    rankName = "Officer",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                )
             every { guildPermissionRepository.findById(GuildPermissionId(1L)) } returns permission
 
             // When & Then
-            val exception = shouldThrow<ResponseStatusException> {
-                controller.removePermission(testGuildId, 1L, testAuth)
-            }
+            val exception =
+                shouldThrow<ResponseStatusException> {
+                    controller.removePermission(testGuildId, 1L, testAuth)
+                }
             exception.statusCode shouldBe HttpStatus.NOT_FOUND
         }
     }
@@ -383,13 +399,14 @@ class GuildPermissionControllerTest : UnitTest() {
                 guildContextService.hasGuildPermission(testUserId, GuildId(testGuildId), GuildPermissionType.SETTINGS_ACCESS)
             } returns true
 
-            val permission = GuildPermission(
-                id = GuildPermissionId(42L),
-                guildId = GuildId(testGuildId),
-                rankName = "Guild Master",
-                permissionType = GuildPermissionType.LOOT_MANAGEMENT,
-                createdAt = Instant.parse("2024-01-15T10:30:00Z"),
-            )
+            val permission =
+                GuildPermission(
+                    id = GuildPermissionId(42L),
+                    guildId = GuildId(testGuildId),
+                    rankName = "Guild Master",
+                    permissionType = GuildPermissionType.LOOT_MANAGEMENT,
+                    createdAt = Instant.parse("2024-01-15T10:30:00Z"),
+                )
             every { guildPermissionRepository.findByGuildId(GuildId(testGuildId)) } returns listOf(permission)
 
             // When
@@ -411,11 +428,12 @@ class GuildPermissionControllerTest : UnitTest() {
         rankName: String,
         permissionType: GuildPermissionType,
         guildId: String = testGuildId,
-    ): GuildPermission = GuildPermission(
-        id = GuildPermissionId(id),
-        guildId = GuildId(guildId),
-        rankName = rankName,
-        permissionType = permissionType,
-        createdAt = Instant.now(),
-    )
+    ): GuildPermission =
+        GuildPermission(
+            id = GuildPermissionId(id),
+            guildId = GuildId(guildId),
+            rankName = rankName,
+            permissionType = permissionType,
+            createdAt = Instant.now(),
+        )
 }

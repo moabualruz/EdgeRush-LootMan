@@ -62,7 +62,5 @@ interface GuildPermissionRepository {
      *
      * This is more efficient than calling findByGuildIdAndRankName multiple times.
      */
-    fun findByGuildIdAndRankNames(
-        guildRanks: List<Pair<GuildId, String>>
-    ): Map<Pair<String, String>, List<GuildPermissionType>>
+    fun findByGuildIdAndRankNames(guildRanks: List<Pair<GuildId, String>>): Map<Pair<String, String>, List<GuildPermissionType>>
 }

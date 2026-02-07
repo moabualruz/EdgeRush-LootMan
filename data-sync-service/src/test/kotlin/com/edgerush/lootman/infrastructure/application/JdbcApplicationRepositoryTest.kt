@@ -72,24 +72,25 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Given
             val applicationId = 456L
             val appliedAt = OffsetDateTime.parse("2024-06-01T12:00:00Z")
-            val entity = createApplicationEntity(
-                applicationId = applicationId,
-                appliedAt = appliedAt,
-                status = "approved",
-                role = "Healer",
-                age = 25,
-                country = "US",
-                battletag = "Player#1234",
-                discordId = "discord123",
-                mainCharacterName = "TestChar",
-                mainCharacterRealm = "Illidan",
-                mainCharacterClass = "Priest",
-                mainCharacterRole = "Healer",
-                mainCharacterRace = "Human",
-                mainCharacterFaction = "Alliance",
-                mainCharacterLevel = 70,
-                mainCharacterRegion = "US",
-            )
+            val entity =
+                createApplicationEntity(
+                    applicationId = applicationId,
+                    appliedAt = appliedAt,
+                    status = "approved",
+                    role = "Healer",
+                    age = 25,
+                    country = "US",
+                    battletag = "Player#1234",
+                    discordId = "discord123",
+                    mainCharacterName = "TestChar",
+                    mainCharacterRealm = "Illidan",
+                    mainCharacterClass = "Priest",
+                    mainCharacterRole = "Healer",
+                    mainCharacterRace = "Human",
+                    mainCharacterFaction = "Alliance",
+                    mainCharacterLevel = 70,
+                    mainCharacterRegion = "US",
+                )
             every { springRepository.findById(applicationId) } returns Optional.of(entity)
 
             // When
@@ -119,24 +120,25 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val applicationId = 789L
-            val entity = createApplicationEntity(
-                applicationId = applicationId,
-                appliedAt = null,
-                status = null,
-                role = null,
-                age = null,
-                country = null,
-                battletag = null,
-                discordId = null,
-                mainCharacterName = null,
-                mainCharacterRealm = null,
-                mainCharacterClass = null,
-                mainCharacterRole = null,
-                mainCharacterRace = null,
-                mainCharacterFaction = null,
-                mainCharacterLevel = null,
-                mainCharacterRegion = null,
-            )
+            val entity =
+                createApplicationEntity(
+                    applicationId = applicationId,
+                    appliedAt = null,
+                    status = null,
+                    role = null,
+                    age = null,
+                    country = null,
+                    battletag = null,
+                    discordId = null,
+                    mainCharacterName = null,
+                    mainCharacterRealm = null,
+                    mainCharacterClass = null,
+                    mainCharacterRole = null,
+                    mainCharacterRace = null,
+                    mainCharacterFaction = null,
+                    mainCharacterLevel = null,
+                    mainCharacterRegion = null,
+                )
             every { springRepository.findById(applicationId) } returns Optional.of(entity)
 
             // When
@@ -160,10 +162,11 @@ class JdbcApplicationRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createApplicationEntity(1L),
-                createApplicationEntity(2L),
-            )
+            val entities =
+                listOf(
+                    createApplicationEntity(1L),
+                    createApplicationEntity(2L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -198,10 +201,11 @@ class JdbcApplicationRepositoryTest : UnitTest() {
         fun `should return applications with matching status`() {
             // Given
             val status = "pending"
-            val entities = listOf(
-                createApplicationEntity(1L, status = status),
-                createApplicationEntity(2L, status = status),
-            )
+            val entities =
+                listOf(
+                    createApplicationEntity(1L, status = status),
+                    createApplicationEntity(2L, status = status),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByStatus(status, any<Pageable>()) } returns page

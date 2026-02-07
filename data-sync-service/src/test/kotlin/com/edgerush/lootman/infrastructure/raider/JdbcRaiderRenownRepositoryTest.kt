@@ -71,10 +71,11 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createRenownEntity(1L, 100L),
-                createRenownEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createRenownEntity(1L, 100L),
+                    createRenownEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -94,10 +95,11 @@ class JdbcRaiderRenownRepositoryTest : UnitTest() {
         fun `should return renown for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createRenownEntity(1L, raiderId, faction = "The Assembly of the Deeps"),
-                createRenownEntity(2L, raiderId, faction = "Council of Dornogal"),
-            )
+            val entities =
+                listOf(
+                    createRenownEntity(1L, raiderId, faction = "The Assembly of the Deeps"),
+                    createRenownEntity(2L, raiderId, faction = "Council of Dornogal"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page

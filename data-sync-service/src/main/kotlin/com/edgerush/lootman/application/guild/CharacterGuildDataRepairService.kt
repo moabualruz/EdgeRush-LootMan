@@ -36,9 +36,10 @@ class CharacterGuildDataRepairService(
         logger.info("Starting character guild data repair for all users")
 
         // Build a map of tracked guilds for quick lookup
-        val trackedGuilds = guildConfigurationRepository.findAll(offset = 0, limit = 100)
-            .filter { it.syncEnabled }
-            .associateBy { it.guildId to "${it.guildName.lowercase()}-${it.bnetRealmSlug?.lowercase()}" }
+        val trackedGuilds =
+            guildConfigurationRepository.findAll(offset = 0, limit = 100)
+                .filter { it.syncEnabled }
+                .associateBy { it.guildId to "${it.guildName.lowercase()}-${it.bnetRealmSlug?.lowercase()}" }
 
         var usersProcessed = 0
         var charactersUpdated = 0
@@ -64,10 +65,11 @@ class CharacterGuildDataRepairService(
                         if (character.guildId != null) continue
 
                         // Try to find matching raider to get guild info
-                        val raider = raiderEntityRepository.findByCharacterNameAndRealm(
-                            character.name,
-                            character.realm
-                        )
+                        val raider =
+                            raiderEntityRepository.findByCharacterNameAndRealm(
+                                character.name,
+                                character.realm,
+                            )
 
                         if (raider != null && !raider.guildId.isNullOrBlank()) {
                             // Check if raider's guild is one we track
@@ -75,11 +77,12 @@ class CharacterGuildDataRepairService(
 
                             if (guildConfig != null) {
                                 // Update character with guild info from raider
-                                val updatedCharacter = character.copy(
-                                    guildName = guildConfig.guildName,
-                                    guildRealm = guildConfig.bnetRealmSlug,
-                                    guildId = raider.guildId
-                                )
+                                val updatedCharacter =
+                                    character.copy(
+                                        guildName = guildConfig.guildName,
+                                        guildRealm = guildConfig.bnetRealmSlug,
+                                        guildId = raider.guildId,
+                                    )
                                 userCharacterRepository.save(updatedCharacter)
                                 charactersUpdated++
                                 logger.debug("Updated guild info for ${character.name}-${character.realm}: guild=${raider.guildId}")
@@ -95,7 +98,6 @@ class CharacterGuildDataRepairService(
                     }
 
                     usersProcessed++
-
                 } catch (e: Exception) {
                     logger.error("Failed to repair data for user ${userId.value}: ${e.message}", e)
                     errors.add("User ${userId.value}: ${e.message}")
@@ -105,13 +107,14 @@ class CharacterGuildDataRepairService(
             offset += batchSize
         } while (users.size == batchSize)
 
-        val result = CharacterGuildRepairResult(
-            usersProcessed = usersProcessed,
-            charactersUpdated = charactersUpdated,
-            linkagesRefreshed = linkagesRefreshed,
-            totalNewLinksCreated = totalNewLinks,
-            errors = errors
-        )
+        val result =
+            CharacterGuildRepairResult(
+                usersProcessed = usersProcessed,
+                charactersUpdated = charactersUpdated,
+                linkagesRefreshed = linkagesRefreshed,
+                totalNewLinksCreated = totalNewLinks,
+                errors = errors,
+            )
 
         logger.info("Character guild data repair completed: $result")
         return result
@@ -135,26 +138,29 @@ class CharacterGuildDataRepairService(
             for (character in characters) {
                 try {
                     // Try to find matching raider to get guild info
-                    val raider = raiderEntityRepository.findByCharacterNameAndRealm(
-                        character.name,
-                        character.realm
-                    )
+                    val raider =
+                        raiderEntityRepository.findByCharacterNameAndRealm(
+                            character.name,
+                            character.realm,
+                        )
 
                     if (raider != null && !raider.guildId.isNullOrBlank()) {
                         val guildConfig = guildConfigurationRepository.findByGuildId(raider.guildId!!)
 
                         if (guildConfig != null) {
                             // Update character with guild info
-                            val needsUpdate = character.guildId != raider.guildId ||
-                                character.guildName != guildConfig.guildName ||
-                                character.guildRealm != guildConfig.bnetRealmSlug
+                            val needsUpdate =
+                                character.guildId != raider.guildId ||
+                                    character.guildName != guildConfig.guildName ||
+                                    character.guildRealm != guildConfig.bnetRealmSlug
 
                             if (needsUpdate) {
-                                val updatedCharacter = character.copy(
-                                    guildName = guildConfig.guildName,
-                                    guildRealm = guildConfig.bnetRealmSlug,
-                                    guildId = raider.guildId
-                                )
+                                val updatedCharacter =
+                                    character.copy(
+                                        guildName = guildConfig.guildName,
+                                        guildRealm = guildConfig.bnetRealmSlug,
+                                        guildId = raider.guildId,
+                                    )
                                 userCharacterRepository.save(updatedCharacter)
                                 charactersUpdated++
                                 logger.info("Updated guild info for ${character.name}-${character.realm}: guild=${raider.guildId}")
@@ -176,9 +182,8 @@ class CharacterGuildDataRepairService(
                 charactersUpdated = charactersUpdated,
                 newLinksCreated = refreshResult.newLinksCreated,
                 orphanedMappingsRemoved = refreshResult.orphanedMappingsRemoved,
-                errors = errors
+                errors = errors,
             )
-
         } catch (e: Exception) {
             logger.error("Failed to repair data for user ${userId.value}: ${e.message}", e)
             return UserCharacterGuildRepairResult(
@@ -187,7 +192,7 @@ class CharacterGuildDataRepairService(
                 charactersUpdated = 0,
                 newLinksCreated = 0,
                 orphanedMappingsRemoved = 0,
-                errors = listOf("Fatal error: ${e.message}")
+                errors = listOf("Fatal error: ${e.message}"),
             )
         }
     }
@@ -198,7 +203,7 @@ data class CharacterGuildRepairResult(
     val charactersUpdated: Int,
     val linkagesRefreshed: Int,
     val totalNewLinksCreated: Int,
-    val errors: List<String>
+    val errors: List<String>,
 ) {
     val success: Boolean get() = errors.isEmpty()
 }
@@ -209,7 +214,7 @@ data class UserCharacterGuildRepairResult(
     val charactersUpdated: Int,
     val newLinksCreated: Int,
     val orphanedMappingsRemoved: Int,
-    val errors: List<String>
+    val errors: List<String>,
 ) {
     val success: Boolean get() = errors.isEmpty()
 }

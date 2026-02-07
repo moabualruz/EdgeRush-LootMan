@@ -16,18 +16,31 @@ import org.springframework.stereotype.Repository
 interface PeriodSnapshotEntitySpringRepository :
     CrudRepository<PeriodSnapshotEntity, Long>,
     PagingAndSortingRepository<PeriodSnapshotEntity, Long> {
-
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<PeriodSnapshotEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<PeriodSnapshotEntity>
 
     fun countByTeamId(teamId: Long): Long
 
     fun findByTeamId(teamId: Long): List<PeriodSnapshotEntity>
 
-    fun findByTeamIdAndSeasonId(teamId: Long, seasonId: Long, pageable: Pageable): Page<PeriodSnapshotEntity>
+    fun findByTeamIdAndSeasonId(
+        teamId: Long,
+        seasonId: Long,
+        pageable: Pageable,
+    ): Page<PeriodSnapshotEntity>
 
-    fun countByTeamIdAndSeasonId(teamId: Long, seasonId: Long): Long
+    fun countByTeamIdAndSeasonId(
+        teamId: Long,
+        seasonId: Long,
+    ): Long
 
-    fun findByTeamIdAndSeasonIdAndPeriodId(teamId: Long, seasonId: Long, periodId: Long): PeriodSnapshotEntity?
+    fun findByTeamIdAndSeasonIdAndPeriodId(
+        teamId: Long,
+        seasonId: Long,
+        periodId: Long,
+    ): PeriodSnapshotEntity?
 
     fun findByCurrentPeriodTrue(): List<PeriodSnapshotEntity>
 }

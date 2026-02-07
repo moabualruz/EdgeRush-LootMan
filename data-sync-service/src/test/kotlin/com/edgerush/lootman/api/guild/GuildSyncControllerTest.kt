@@ -51,18 +51,19 @@ class GuildSyncControllerTest : UnitTest() {
         wowAuditHistoricalDataSyncService = mockk()
         warcraftLogsRosterSyncService = mockk()
         guildContextService = mockk()
-        
-        controller = GuildSyncController(
-            guildConfigurationRepository,
-            guildRosterSyncService,
-            wowAuditRosterSyncService,
-            wowAuditAttendanceSyncService,
-            wowAuditLootHistorySyncService,
-            wowAuditWishlistSyncService,
-            wowAuditHistoricalDataSyncService,
-            warcraftLogsRosterSyncService,
-            guildContextService
-        )
+
+        controller =
+            GuildSyncController(
+                guildConfigurationRepository,
+                guildRosterSyncService,
+                wowAuditRosterSyncService,
+                wowAuditAttendanceSyncService,
+                wowAuditLootHistorySyncService,
+                wowAuditWishlistSyncService,
+                wowAuditHistoricalDataSyncService,
+                warcraftLogsRosterSyncService,
+                guildContextService,
+            )
     }
 
     @Nested
@@ -72,14 +73,15 @@ class GuildSyncControllerTest : UnitTest() {
             // Given
             val guildId = "guild-1"
             val existing = createGuildConfiguration(guildId = guildId)
-            val request = UpdateGuildSyncConfigRequest(
-                wowauditGuildUri = "eu/twisting-nether/dod",
-                bnetRealmSlug = "twisting-nether",
-                bnetGuildNameSlug = "dod",
-                bnetRegion = "eu",
-                syncEnabled = true,
-                bnetSyncEnabled = true
-            )
+            val request =
+                UpdateGuildSyncConfigRequest(
+                    wowauditGuildUri = "eu/twisting-nether/dod",
+                    bnetRealmSlug = "twisting-nether",
+                    bnetGuildNameSlug = "dod",
+                    bnetRegion = "eu",
+                    syncEnabled = true,
+                    bnetSyncEnabled = true,
+                )
 
             val slot = slot<GuildConfigurationEntity>()
             every { guildConfigurationRepository.findByGuildId(guildId) } returns existing
@@ -98,19 +100,21 @@ class GuildSyncControllerTest : UnitTest() {
 
             verify { guildConfigurationRepository.save(any()) }
         }
-        
+
         @Test
         fun `should perform partial update`() {
             // Given
             val guildId = "guild-1"
-            val existing = createGuildConfiguration(
-                guildId = guildId,
-                bnetRegion = "us",
-                bnetRealmSlug = "existing-realm"
-            )
-            val request = UpdateGuildSyncConfigRequest(
-                bnetRegion = "eu"
-            )
+            val existing =
+                createGuildConfiguration(
+                    guildId = guildId,
+                    bnetRegion = "us",
+                    bnetRealmSlug = "existing-realm",
+                )
+            val request =
+                UpdateGuildSyncConfigRequest(
+                    bnetRegion = "eu",
+                )
 
             val slot = slot<GuildConfigurationEntity>()
             every { guildConfigurationRepository.findByGuildId(guildId) } returns existing
@@ -124,24 +128,25 @@ class GuildSyncControllerTest : UnitTest() {
             result.bnetRealmSlug shouldBe "existing-realm" // Should match existing
         }
     }
-    
+
     @Nested
     inner class TriggerBnetSyncTests {
         @Test
         fun `should trigger bnet sync when enabled and configured`() {
             // Given
             val guildId = "guild-1"
-            val config = createGuildConfiguration(
-                guildId = guildId,
-                bnetSyncEnabled = true,
-                bnetRealmSlug = "realm",
-                bnetGuildNameSlug = "guild",
-                bnetRegion = "eu"
-            )
-            
+            val config =
+                createGuildConfiguration(
+                    guildId = guildId,
+                    bnetSyncEnabled = true,
+                    bnetRealmSlug = "realm",
+                    bnetGuildNameSlug = "guild",
+                    bnetRegion = "eu",
+                )
+
             every { guildConfigurationRepository.findByGuildId(guildId) } returns config
             every { guildConfigurationRepository.save(any()) } returns config
-            every { guildRosterSyncService.syncGuildRoster(any(), any(), any(), any()) } returns 
+            every { guildRosterSyncService.syncGuildRoster(any(), any(), any(), any()) } returns
                 GuildRosterSyncResult(created = 5, updated = 5, skipped = 0)
 
             // When
@@ -152,24 +157,26 @@ class GuildSyncControllerTest : UnitTest() {
             verify { guildRosterSyncService.syncGuildRoster("realm", "guild", "eu", guildId) }
         }
     }
-    
+
     @Nested
     inner class TriggerWowauditSyncTests {
         @Test
         fun `should trigger wowaudit sync when enabled and configured`() {
             // Given
             val guildId = "guild-1"
-            val config = createGuildConfiguration(
-                guildId = guildId,
-                syncEnabled = true,
-                wowauditGuildUri = "uri"
-            )
-            
+            val config =
+                createGuildConfiguration(
+                    guildId = guildId,
+                    syncEnabled = true,
+                    wowauditGuildUri = "uri",
+                )
+
             every { guildConfigurationRepository.findByGuildId(guildId) } returns config
             every { guildConfigurationRepository.save(any()) } returns config
-            every { wowAuditRosterSyncService.syncRoster(guildId) } returns Mono.just(
-                WoWAuditSyncResult(created = 2, updated = 3, skipped = 0, error = null)
-            )
+            every { wowAuditRosterSyncService.syncRoster(guildId) } returns
+                Mono.just(
+                    WoWAuditSyncResult(created = 2, updated = 3, skipped = 0, error = null),
+                )
 
             // When
             val response = controller.triggerWowauditSync(guildId, user).block()
@@ -187,9 +194,9 @@ class GuildSyncControllerTest : UnitTest() {
             // Given
             val guildId = "guild-1"
             // Assuming config is present (controller assumes implicitly enabled if accessed or similar)
-            // Ideally we check if WarcraftLogs specific config exists, but current controller implementation 
+            // Ideally we check if WarcraftLogs specific config exists, but current controller implementation
             // doesn't block it based on a specific flag other than permission check.
-            
+
             // We need returns for findByGuildId only if the controller checks it.
             // GuildSyncController.triggerWarcraftLogsSync doesn't fetch config in the provided code snippet (Step 15),
             // it only calls requireSettingsAccess and then the service.
@@ -199,10 +206,11 @@ class GuildSyncControllerTest : UnitTest() {
             // So it doesn't need config repository mock for this specific method (unlike others).
             // But let's mock it just in case `requireSettingsAccess` or future changes need it.
             // Actually `requireSettingsAccess` currently is mocked/bypassed or needs guildContextService.
-            
-            every { warcraftLogsRosterSyncService.syncRoster(guildId) } returns Mono.just(
-                WarcraftLogsSyncResult(created = 0, updated = 3, skipped = 0, error = null)
-            )
+
+            every { warcraftLogsRosterSyncService.syncRoster(guildId) } returns
+                Mono.just(
+                    WarcraftLogsSyncResult(created = 0, updated = 3, skipped = 0, error = null),
+                )
 
             // When
             val response = controller.triggerWarcraftLogsSync(guildId, user).block()
@@ -243,6 +251,6 @@ class GuildSyncControllerTest : UnitTest() {
             bnetRegion = bnetRegion,
             bnetSyncEnabled = bnetSyncEnabled,
             createdAt = OffsetDateTime.now(),
-            updatedAt = OffsetDateTime.now()
+            updatedAt = OffsetDateTime.now(),
         )
 }

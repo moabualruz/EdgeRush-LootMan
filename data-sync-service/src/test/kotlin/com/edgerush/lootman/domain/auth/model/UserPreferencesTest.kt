@@ -27,11 +27,12 @@ class UserPreferencesTest : UnitTest() {
             val userId = UserId(1L)
 
             // When
-            val preferences = UserPreferences(
-                userId = userId,
-                activeCharacterMappingId = null,
-                lastGuildId = null,
-            )
+            val preferences =
+                UserPreferences(
+                    userId = userId,
+                    activeCharacterMappingId = null,
+                    lastGuildId = null,
+                )
 
             // Then
             preferences.userId shouldBe userId
@@ -49,11 +50,12 @@ class UserPreferencesTest : UnitTest() {
             val guildId = GuildId("test-guild")
 
             // When
-            val preferences = UserPreferences(
-                userId = userId,
-                activeCharacterMappingId = mappingId,
-                lastGuildId = guildId,
-            )
+            val preferences =
+                UserPreferences(
+                    userId = userId,
+                    activeCharacterMappingId = mappingId,
+                    lastGuildId = guildId,
+                )
 
             // Then
             preferences.activeCharacterMappingId shouldBe mappingId
@@ -67,12 +69,13 @@ class UserPreferencesTest : UnitTest() {
             val userId = UserId(1L)
 
             // When
-            val preferences = UserPreferences(
-                id = id,
-                userId = userId,
-                activeCharacterMappingId = null,
-                lastGuildId = null,
-            )
+            val preferences =
+                UserPreferences(
+                    id = id,
+                    userId = userId,
+                    activeCharacterMappingId = null,
+                    lastGuildId = null,
+                )
 
             // Then
             preferences.id shouldBe id
@@ -138,18 +141,20 @@ class UserPreferencesTest : UnitTest() {
         fun `should update timestamp when setting active character`() {
             // Given
             val pastTime = Instant.parse("2024-01-01T00:00:00Z")
-            val original = UserPreferences(
-                userId = UserId(1L),
-                activeCharacterMappingId = null,
-                lastGuildId = null,
-                updatedAt = pastTime,
-            )
+            val original =
+                UserPreferences(
+                    userId = UserId(1L),
+                    activeCharacterMappingId = null,
+                    lastGuildId = null,
+                    updatedAt = pastTime,
+                )
 
             // When
-            val updated = original.withActiveCharacter(
-                UserCharacterMappingId(42L),
-                GuildId("new-guild"),
-            )
+            val updated =
+                original.withActiveCharacter(
+                    UserCharacterMappingId(42L),
+                    GuildId("new-guild"),
+                )
 
             // Then
             updated.updatedAt.isAfter(pastTime) shouldBe true
@@ -158,11 +163,12 @@ class UserPreferencesTest : UnitTest() {
         @Test
         fun `should replace existing active character`() {
             // Given
-            val original = UserPreferences.create(
-                UserId(1L),
-                UserCharacterMappingId(1L),
-                GuildId("old-guild"),
-            )
+            val original =
+                UserPreferences.create(
+                    UserId(1L),
+                    UserCharacterMappingId(1L),
+                    GuildId("old-guild"),
+                )
             val newMappingId = UserCharacterMappingId(2L)
             val newGuildId = GuildId("new-guild")
 
@@ -180,11 +186,12 @@ class UserPreferencesTest : UnitTest() {
         @Test
         fun `should clear active character`() {
             // Given
-            val original = UserPreferences.create(
-                UserId(1L),
-                UserCharacterMappingId(42L),
-                GuildId("test-guild"),
-            )
+            val original =
+                UserPreferences.create(
+                    UserId(1L),
+                    UserCharacterMappingId(42L),
+                    GuildId("test-guild"),
+                )
 
             // When
             val cleared = original.clearActiveCharacter()
@@ -199,12 +206,13 @@ class UserPreferencesTest : UnitTest() {
         fun `should update timestamp when clearing active character`() {
             // Given
             val pastTime = Instant.parse("2024-01-01T00:00:00Z")
-            val original = UserPreferences(
-                userId = UserId(1L),
-                activeCharacterMappingId = UserCharacterMappingId(42L),
-                lastGuildId = GuildId("test-guild"),
-                updatedAt = pastTime,
-            )
+            val original =
+                UserPreferences(
+                    userId = UserId(1L),
+                    activeCharacterMappingId = UserCharacterMappingId(42L),
+                    lastGuildId = GuildId("test-guild"),
+                    updatedAt = pastTime,
+                )
 
             // When
             val cleared = original.clearActiveCharacter()
@@ -242,25 +250,28 @@ class UserPreferencesTest : UnitTest() {
 
         @Test
         fun `should throw exception for zero value`() {
-            val exception = shouldThrow<IllegalArgumentException> {
-                UserPreferencesId(0L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    UserPreferencesId(0L)
+                }
             exception.message shouldBe "UserPreferencesId must be positive, got 0"
         }
 
         @Test
         fun `should throw exception for negative value`() {
-            val exception = shouldThrow<IllegalArgumentException> {
-                UserPreferencesId(-1L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    UserPreferencesId(-1L)
+                }
             exception.message shouldBe "UserPreferencesId must be positive, got -1"
         }
 
         @Test
         fun `should throw exception for large negative value`() {
-            val exception = shouldThrow<IllegalArgumentException> {
-                UserPreferencesId(-100L)
-            }
+            val exception =
+                shouldThrow<IllegalArgumentException> {
+                    UserPreferencesId(-100L)
+                }
             exception.message shouldBe "UserPreferencesId must be positive, got -100"
         }
 
@@ -290,20 +301,22 @@ class UserPreferencesTest : UnitTest() {
         @Test
         fun `should have proper equals implementation`() {
             val timestamp = Instant.parse("2024-01-01T00:00:00Z")
-            val pref1 = UserPreferences(
-                id = UserPreferencesId(1L),
-                userId = UserId(1L),
-                activeCharacterMappingId = UserCharacterMappingId(42L),
-                lastGuildId = GuildId("test"),
-                updatedAt = timestamp,
-            )
-            val pref2 = UserPreferences(
-                id = UserPreferencesId(1L),
-                userId = UserId(1L),
-                activeCharacterMappingId = UserCharacterMappingId(42L),
-                lastGuildId = GuildId("test"),
-                updatedAt = timestamp,
-            )
+            val pref1 =
+                UserPreferences(
+                    id = UserPreferencesId(1L),
+                    userId = UserId(1L),
+                    activeCharacterMappingId = UserCharacterMappingId(42L),
+                    lastGuildId = GuildId("test"),
+                    updatedAt = timestamp,
+                )
+            val pref2 =
+                UserPreferences(
+                    id = UserPreferencesId(1L),
+                    userId = UserId(1L),
+                    activeCharacterMappingId = UserCharacterMappingId(42L),
+                    lastGuildId = GuildId("test"),
+                    updatedAt = timestamp,
+                )
             pref1 shouldBe pref2
         }
     }

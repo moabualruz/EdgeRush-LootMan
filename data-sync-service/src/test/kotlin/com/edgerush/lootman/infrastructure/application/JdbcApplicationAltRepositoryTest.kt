@@ -67,18 +67,19 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
         fun `should map all database fields to entity`() {
             // Given
             val altId = 1L
-            val entity = createApplicationAltEntity(
-                id = altId,
-                applicationId = 100L,
-                name = "AltCharacter",
-                realm = "Illidan",
-                region = "US",
-                clazz = "Warrior",
-                role = "Tank",
-                level = 70,
-                faction = "Alliance",
-                race = "Human",
-            )
+            val entity =
+                createApplicationAltEntity(
+                    id = altId,
+                    applicationId = 100L,
+                    name = "AltCharacter",
+                    realm = "Illidan",
+                    region = "US",
+                    clazz = "Warrior",
+                    role = "Tank",
+                    level = 70,
+                    faction = "Alliance",
+                    race = "Human",
+                )
             every { springRepository.findById(altId) } returns Optional.of(entity)
 
             // When
@@ -103,18 +104,19 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val altId = 1L
-            val entity = createApplicationAltEntity(
-                id = altId,
-                applicationId = 100L,
-                name = null,
-                realm = null,
-                region = null,
-                clazz = null,
-                role = null,
-                level = null,
-                faction = null,
-                race = null,
-            )
+            val entity =
+                createApplicationAltEntity(
+                    id = altId,
+                    applicationId = 100L,
+                    name = null,
+                    realm = null,
+                    region = null,
+                    clazz = null,
+                    role = null,
+                    level = null,
+                    faction = null,
+                    race = null,
+                )
             every { springRepository.findById(altId) } returns Optional.of(entity)
 
             // When
@@ -136,10 +138,11 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createApplicationAltEntity(1L, 100L),
-                createApplicationAltEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createApplicationAltEntity(1L, 100L),
+                    createApplicationAltEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -174,10 +177,11 @@ class JdbcApplicationAltRepositoryTest : UnitTest() {
         fun `should return alts for application`() {
             // Given
             val applicationId = 100L
-            val entities = listOf(
-                createApplicationAltEntity(1L, applicationId),
-                createApplicationAltEntity(2L, applicationId),
-            )
+            val entities =
+                listOf(
+                    createApplicationAltEntity(1L, applicationId),
+                    createApplicationAltEntity(2L, applicationId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByApplicationId(applicationId, any<Pageable>()) } returns page

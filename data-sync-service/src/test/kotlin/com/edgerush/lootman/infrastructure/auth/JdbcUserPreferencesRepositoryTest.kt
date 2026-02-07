@@ -196,11 +196,12 @@ class JdbcUserPreferencesRepositoryTest : UnitTest() {
         @Test
         fun `should insert new preferences`() {
             // Given
-            val preferences = UserPreferences.create(
-                userId = UserId(1L),
-                activeCharacterMappingId = UserCharacterMappingId(42L),
-                guildId = GuildId("test-guild"),
-            )
+            val preferences =
+                UserPreferences.create(
+                    userId = UserId(1L),
+                    activeCharacterMappingId = UserCharacterMappingId(42L),
+                    guildId = GuildId("test-guild"),
+                )
 
             every {
                 jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>())
@@ -222,12 +223,13 @@ class JdbcUserPreferencesRepositoryTest : UnitTest() {
         @Test
         fun `should update existing preferences`() {
             // Given
-            val preferences = UserPreferences(
-                id = UserPreferencesId(1L),
-                userId = UserId(1L),
-                activeCharacterMappingId = UserCharacterMappingId(42L),
-                lastGuildId = GuildId("test-guild"),
-            )
+            val preferences =
+                UserPreferences(
+                    id = UserPreferencesId(1L),
+                    userId = UserId(1L),
+                    activeCharacterMappingId = UserCharacterMappingId(42L),
+                    lastGuildId = GuildId("test-guild"),
+                )
 
             every {
                 jdbcTemplate.update(
@@ -258,12 +260,13 @@ class JdbcUserPreferencesRepositoryTest : UnitTest() {
         @Test
         fun `should update with null active character`() {
             // Given
-            val preferences = UserPreferences(
-                id = UserPreferencesId(1L),
-                userId = UserId(1L),
-                activeCharacterMappingId = null,
-                lastGuildId = null,
-            )
+            val preferences =
+                UserPreferences(
+                    id = UserPreferencesId(1L),
+                    userId = UserId(1L),
+                    activeCharacterMappingId = null,
+                    lastGuildId = null,
+                )
 
             every {
                 jdbcTemplate.update(
@@ -465,13 +468,14 @@ class JdbcUserPreferencesRepositoryTest : UnitTest() {
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<UserPreferences>>()
-                val rs = mockResultSet(
-                    id = 42L,
-                    userId = 1L,
-                    mappingId = 100L,
-                    guildId = "my-guild",
-                    updatedAt = now,
-                )
+                val rs =
+                    mockResultSet(
+                        id = 42L,
+                        userId = 1L,
+                        mappingId = 100L,
+                        guildId = "my-guild",
+                        updatedAt = now,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 

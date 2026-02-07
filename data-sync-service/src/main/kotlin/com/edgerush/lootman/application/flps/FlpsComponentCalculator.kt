@@ -294,8 +294,8 @@ class FlpsComponentCalculator(
      */
     fun calculateRoleMultiplier(role: Role): RoleMultiplier {
         return when (role) {
-            Role.DPS -> RoleMultiplier.dps()       // 1.0
-            Role.TANK -> RoleMultiplier.tank()     // 0.8
+            Role.DPS -> RoleMultiplier.dps() // 1.0
+            Role.TANK -> RoleMultiplier.tank() // 0.8
             Role.HEALER -> RoleMultiplier.healer() // 0.7
         }
     }

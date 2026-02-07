@@ -16,18 +16,30 @@ import org.springframework.stereotype.Repository
 interface FlpsGuildModifierEntitySpringRepository :
     CrudRepository<FlpsGuildModifierEntity, Long>,
     PagingAndSortingRepository<FlpsGuildModifierEntity, Long> {
-
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<FlpsGuildModifierEntity>
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<FlpsGuildModifierEntity>
 
     fun countByGuildId(guildId: String): Long
 
     fun findByGuildId(guildId: String): List<FlpsGuildModifierEntity>
 
-    fun findByGuildIdAndModifierKey(guildId: String, modifierKey: String): FlpsGuildModifierEntity?
+    fun findByGuildIdAndModifierKey(
+        guildId: String,
+        modifierKey: String,
+    ): FlpsGuildModifierEntity?
 
-    fun findByGuildIdAndCategory(guildId: String, category: String, pageable: Pageable): Page<FlpsGuildModifierEntity>
+    fun findByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+        pageable: Pageable,
+    ): Page<FlpsGuildModifierEntity>
 
-    fun countByGuildIdAndCategory(guildId: String, category: String): Long
+    fun countByGuildIdAndCategory(
+        guildId: String,
+        category: String,
+    ): Long
 
     fun deleteByGuildId(guildId: String)
 }

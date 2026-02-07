@@ -16,12 +16,17 @@ import org.springframework.stereotype.Repository
 interface SyncRunEntitySpringRepository :
     CrudRepository<SyncRunEntity, Long>,
     PagingAndSortingRepository<SyncRunEntity, Long> {
-
-    fun findBySource(source: String, pageable: Pageable): Page<SyncRunEntity>
+    fun findBySource(
+        source: String,
+        pageable: Pageable,
+    ): Page<SyncRunEntity>
 
     fun countBySource(source: String): Long
 
-    fun findByStatus(status: String, pageable: Pageable): Page<SyncRunEntity>
+    fun findByStatus(
+        status: String,
+        pageable: Pageable,
+    ): Page<SyncRunEntity>
 
     fun countByStatus(status: String): Long
 

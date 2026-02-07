@@ -67,14 +67,15 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val questionId = 1L
-            val entity = createApplicationQuestionEntity(
-                id = questionId,
-                applicationId = 100L,
-                position = 1,
-                question = "Why do you want to join?",
-                answer = "I love raiding!",
-                filesJson = "[\"file1.png\", \"file2.jpg\"]",
-            )
+            val entity =
+                createApplicationQuestionEntity(
+                    id = questionId,
+                    applicationId = 100L,
+                    position = 1,
+                    question = "Why do you want to join?",
+                    answer = "I love raiding!",
+                    filesJson = "[\"file1.png\", \"file2.jpg\"]",
+                )
             every { springRepository.findById(questionId) } returns Optional.of(entity)
 
             // When
@@ -95,14 +96,15 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val questionId = 1L
-            val entity = createApplicationQuestionEntity(
-                id = questionId,
-                applicationId = 100L,
-                position = null,
-                question = null,
-                answer = null,
-                filesJson = null,
-            )
+            val entity =
+                createApplicationQuestionEntity(
+                    id = questionId,
+                    applicationId = 100L,
+                    position = null,
+                    question = null,
+                    answer = null,
+                    filesJson = null,
+                )
             every { springRepository.findById(questionId) } returns Optional.of(entity)
 
             // When
@@ -126,10 +128,11 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createApplicationQuestionEntity(1L, 100L),
-                createApplicationQuestionEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createApplicationQuestionEntity(1L, 100L),
+                    createApplicationQuestionEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -163,10 +166,11 @@ class JdbcApplicationQuestionRepositoryTest : UnitTest() {
         fun `should return questions for application`() {
             // Given
             val applicationId = 100L
-            val entities = listOf(
-                createApplicationQuestionEntity(1L, applicationId, position = 1),
-                createApplicationQuestionEntity(2L, applicationId, position = 2),
-            )
+            val entities =
+                listOf(
+                    createApplicationQuestionEntity(1L, applicationId, position = 1),
+                    createApplicationQuestionEntity(2L, applicationId, position = 2),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByApplicationId(applicationId, any<Pageable>()) } returns page

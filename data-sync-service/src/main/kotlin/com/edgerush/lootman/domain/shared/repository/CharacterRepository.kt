@@ -37,7 +37,11 @@ interface CharacterRepository {
      * @param region The region (EU, US, etc.)
      * @return The character if found, null otherwise
      */
-    fun findByNameRealmRegion(name: String, realm: String, region: String): WoWCharacter?
+    fun findByNameRealmRegion(
+        name: String,
+        realm: String,
+        region: String,
+    ): WoWCharacter?
 
     /**
      * Finds all characters linked to an account.
@@ -55,7 +59,11 @@ interface CharacterRepository {
      * @param region The region (EU, US, etc.)
      * @return true if the character exists
      */
-    fun existsByNameRealmRegion(name: String, realm: String, region: String): Boolean
+    fun existsByNameRealmRegion(
+        name: String,
+        realm: String,
+        region: String,
+    ): Boolean
 
     /**
      * Gets or creates a character by their natural key.
@@ -88,7 +96,10 @@ interface CharacterRepository {
      * @param characterId The character to link
      * @param accountId The account to link to
      */
-    fun linkToAccount(characterId: CharacterId, accountId: AccountId)
+    fun linkToAccount(
+        characterId: CharacterId,
+        accountId: AccountId,
+    )
 
     /**
      * Links a character to their Blizzard ID.
@@ -96,5 +107,8 @@ interface CharacterRepository {
      * @param characterId The character to link
      * @param blizzardId The Blizzard ID from Battle.net API
      */
-    fun linkToBlizzard(characterId: CharacterId, blizzardId: Long)
+    fun linkToBlizzard(
+        characterId: CharacterId,
+        blizzardId: Long,
+    )
 }

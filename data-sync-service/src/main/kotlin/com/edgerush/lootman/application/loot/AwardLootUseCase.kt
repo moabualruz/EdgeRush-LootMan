@@ -37,6 +37,7 @@ class AwardLootUseCase(
     companion object {
         /** Default MAS threshold (0.5 = 50%). Configurable per guild in future. */
         const val DEFAULT_MAS_THRESHOLD = 0.5
+
         /** Performance data lookback period in days */
         const val PERFORMANCE_LOOKBACK_DAYS = 30L
     }
@@ -84,16 +85,20 @@ class AwardLootUseCase(
      *
      * @throws InsufficientPerformanceException if MAS is below threshold
      */
-    private fun validateMasThreshold(command: AwardLootCommand, now: Instant) {
+    private fun validateMasThreshold(
+        command: AwardLootCommand,
+        now: Instant,
+    ) {
         val periodStart = now.minus(PERFORMANCE_LOOKBACK_DAYS, ChronoUnit.DAYS)
         val periodEnd = now
 
-        val performanceData = raiderPerformanceRepository!!.findByRaiderAndPeriod(
-            raiderId = command.raiderId,
-            guildId = command.guildId,
-            startDate = periodStart,
-            endDate = periodEnd,
-        )
+        val performanceData =
+            raiderPerformanceRepository!!.findByRaiderAndPeriod(
+                raiderId = command.raiderId,
+                guildId = command.guildId,
+                startDate = periodStart,
+                endDate = periodEnd,
+            )
 
         // If no performance data exists, allow the award (new raiders get a pass)
         if (performanceData == null) {
@@ -126,4 +131,3 @@ data class AwardLootCommand(
     val tier: LootTier,
     val bypassMasCheck: Boolean = false,
 )
-

@@ -3,10 +3,10 @@ package com.edgerush.lootman.api.common
 import com.edgerush.lootman.api.auth.GuildAccessDeniedException
 import com.edgerush.lootman.api.auth.NoLinkedRaiderException
 import com.edgerush.lootman.domain.shared.GuildNotFoundException
+import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import com.edgerush.lootman.domain.shared.ItemNotFoundException
 import com.edgerush.lootman.domain.shared.LootBanActiveException
 import com.edgerush.lootman.domain.shared.RaiderNotFoundException
-import com.edgerush.lootman.domain.shared.InvalidCredentialsException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice

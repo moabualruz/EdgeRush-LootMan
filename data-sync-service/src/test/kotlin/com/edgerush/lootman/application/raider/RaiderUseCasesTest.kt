@@ -665,16 +665,17 @@ class RaiderUseCasesTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider = RaiderFixtures.createRaider(
-        id = id,
-        guildId = guildId,
-        name = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = id,
+            guildId = guildId,
+            name = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

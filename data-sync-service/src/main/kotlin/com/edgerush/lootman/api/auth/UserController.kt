@@ -33,16 +33,16 @@ class UserController(
     private val userLinkageRefreshService: UserLinkageRefreshService,
     private val characterGuildDataRepairService: CharacterGuildDataRepairService,
 ) {
-
     @GetMapping("/characters")
     @Operation(summary = "Get user characters", description = "Returns list of synced WoW characters")
     fun getCharacters(
         @Parameter(description = "JWT access token", required = true)
-        @RequestHeader("Authorization") authorization: String
+        @RequestHeader("Authorization") authorization: String,
     ): List<UserCharacter> {
         val token = authorization.substring(7)
-        val userId = authenticationService.validateToken(token)
-            ?: throw IllegalArgumentException("Invalid token")
+        val userId =
+            authenticationService.validateToken(token)
+                ?: throw IllegalArgumentException("Invalid token")
 
         return userCharacterRepository.findAllByUserId(userId)
     }
@@ -50,15 +50,16 @@ class UserController(
     @GetMapping("/linkage/validate")
     @Operation(
         summary = "Validate user linkages",
-        description = "Checks if user's character-raider-guild links are valid without making changes"
+        description = "Checks if user's character-raider-guild links are valid without making changes",
     )
     fun validateLinkages(
         @Parameter(description = "JWT access token", required = true)
-        @RequestHeader("Authorization") authorization: String
+        @RequestHeader("Authorization") authorization: String,
     ): ResponseEntity<UserLinkageValidationResult> {
         val token = authorization.substring(7)
-        val userId = authenticationService.validateToken(token)
-            ?: throw IllegalArgumentException("Invalid token")
+        val userId =
+            authenticationService.validateToken(token)
+                ?: throw IllegalArgumentException("Invalid token")
 
         val result = userLinkageRefreshService.validateUserLinkages(userId)
         return ResponseEntity.ok(result)
@@ -67,15 +68,16 @@ class UserController(
     @PostMapping("/linkage/refresh")
     @Operation(
         summary = "Refresh user linkages",
-        description = "Repairs user's character-raider-guild links: removes orphaned mappings, auto-links characters to raiders, fixes preferences"
+        description = "Repairs user's character-raider-guild links: removes orphaned mappings, auto-links characters to raiders, fixes preferences",
     )
     fun refreshLinkages(
         @Parameter(description = "JWT access token", required = true)
-        @RequestHeader("Authorization") authorization: String
+        @RequestHeader("Authorization") authorization: String,
     ): ResponseEntity<UserLinkageRefreshResult> {
         val token = authorization.substring(7)
-        val userId = authenticationService.validateToken(token)
-            ?: throw IllegalArgumentException("Invalid token")
+        val userId =
+            authenticationService.validateToken(token)
+                ?: throw IllegalArgumentException("Invalid token")
 
         val result = userLinkageRefreshService.refreshUserLinkages(userId)
         return ResponseEntity.ok(result)
@@ -86,11 +88,11 @@ class UserController(
     @GetMapping("/admin/{userId}/linkage/validate")
     @Operation(
         summary = "Admin: Validate user linkages by ID",
-        description = "Admin endpoint to check a specific user's character-raider-guild links"
+        description = "Admin endpoint to check a specific user's character-raider-guild links",
     )
     fun adminValidateLinkages(
         @Parameter(description = "User ID to validate")
-        @PathVariable userId: Long
+        @PathVariable userId: Long,
     ): ResponseEntity<UserLinkageValidationResult> {
         val result = userLinkageRefreshService.validateUserLinkages(UserId(userId))
         return ResponseEntity.ok(result)
@@ -99,11 +101,11 @@ class UserController(
     @PostMapping("/admin/{userId}/linkage/refresh")
     @Operation(
         summary = "Admin: Refresh user linkages by ID",
-        description = "Admin endpoint to repair a specific user's character-raider-guild links"
+        description = "Admin endpoint to repair a specific user's character-raider-guild links",
     )
     fun adminRefreshLinkages(
         @Parameter(description = "User ID to refresh")
-        @PathVariable userId: Long
+        @PathVariable userId: Long,
     ): ResponseEntity<UserLinkageRefreshResult> {
         val result = userLinkageRefreshService.refreshUserLinkages(UserId(userId))
         return ResponseEntity.ok(result)
@@ -112,7 +114,7 @@ class UserController(
     @PostMapping("/admin/linkage/refresh-all")
     @Operation(
         summary = "Admin: Refresh all users' linkages",
-        description = "Admin endpoint to repair all users' character-raider-guild links. Use with caution on large databases."
+        description = "Admin endpoint to repair all users' character-raider-guild links. Use with caution on large databases.",
     )
     fun adminRefreshAllLinkages(): ResponseEntity<AllUsersLinkageRefreshResult> {
         val result = userLinkageRefreshService.refreshAllUserLinkages()
@@ -124,12 +126,13 @@ class UserController(
     @GetMapping("/admin/{userId}/repair-guild-data")
     @Operation(
         summary = "Admin: Repair user's character guild data",
-        description = "Updates user's characters with guild info from matching raiders, then refreshes linkages. " +
-            "Use this to fix characters synced before guild info was added."
+        description =
+            "Updates user's characters with guild info from matching raiders, then refreshes linkages. " +
+                "Use this to fix characters synced before guild info was added.",
     )
     fun adminRepairUserGuildData(
         @Parameter(description = "User ID to repair")
-        @PathVariable userId: Long
+        @PathVariable userId: Long,
     ): ResponseEntity<UserCharacterGuildRepairResult> {
         val result = characterGuildDataRepairService.repairUserCharacterGuildData(UserId(userId))
         return ResponseEntity.ok(result)
@@ -138,9 +141,10 @@ class UserController(
     @GetMapping("/admin/repair-all-guild-data")
     @Operation(
         summary = "Admin: Repair all users' character guild data",
-        description = "Updates ALL users' characters with guild info from matching raiders, then refreshes linkages. " +
-            "This backfills guild_id for characters synced before guild info feature was added. " +
-            "WARNING: This may take a long time on large databases!"
+        description =
+            "Updates ALL users' characters with guild info from matching raiders, then refreshes linkages. " +
+                "This backfills guild_id for characters synced before guild info feature was added. " +
+                "WARNING: This may take a long time on large databases!",
     )
     fun adminRepairAllGuildData(): ResponseEntity<CharacterGuildRepairResult> {
         val result = characterGuildDataRepairService.repairAllCharacterGuildData()

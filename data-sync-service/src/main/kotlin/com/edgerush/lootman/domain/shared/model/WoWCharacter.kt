@@ -23,45 +23,37 @@ abstract class WoWCharacter(
      * Unique identifier for this character across the system.
      */
     characterId: CharacterId,
-
     /**
      * Character name in WoW.
      */
     name: String,
-
     /**
      * Server/realm the character belongs to.
      */
     realm: String,
-
     /**
      * Region (EU, US, KR, TW, CN).
      */
     region: String,
-
     /**
      * The character's class (Warrior, Mage, etc.).
      */
     characterClass: CharacterClass,
-
     /**
      * Blizzard's unique ID for this character (from Battle.net API).
      * May be null if character hasn't been linked to Battle.net.
      */
     blizzardId: Long?,
-
     /**
      * Account ID that owns this character.
      * Used for account-level attendance aggregation.
      * May be null if character hasn't been linked to an account.
      */
     accountId: AccountId?,
-
     /**
      * When this character record was first created.
      */
     createdAt: Instant,
-
     /**
      * When this character record was last updated.
      */

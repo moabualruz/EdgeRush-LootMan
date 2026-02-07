@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface RaiderWarcraftLogEntitySpringRepository :
     CrudRepository<RaiderWarcraftLogEntity, Long>,
     PagingAndSortingRepository<RaiderWarcraftLogEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<RaiderWarcraftLogEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<RaiderWarcraftLogEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
     fun findByRaiderId(raiderId: Long): List<RaiderWarcraftLogEntity>
 
-    fun findByRaiderIdAndDifficulty(raiderId: Long, difficulty: String): List<RaiderWarcraftLogEntity>
+    fun findByRaiderIdAndDifficulty(
+        raiderId: Long,
+        difficulty: String,
+    ): List<RaiderWarcraftLogEntity>
 
     fun deleteByRaiderId(raiderId: Long)
 }

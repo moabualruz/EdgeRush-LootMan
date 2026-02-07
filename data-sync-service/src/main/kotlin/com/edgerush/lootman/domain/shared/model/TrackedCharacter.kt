@@ -1,8 +1,8 @@
 package com.edgerush.lootman.domain.shared.model
 
+import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.shared.AccountId
 import com.edgerush.lootman.domain.shared.CharacterId
-import com.edgerush.lootman.domain.auth.model.UserId
 import java.time.Instant
 
 /**
@@ -24,62 +24,53 @@ data class TrackedCharacter(
     override val accountId: AccountId?,
     override val createdAt: Instant,
     override val updatedAt: Instant,
-
     /**
      * The user who owns this character (via Battle.net OAuth).
      */
     val userId: UserId,
-
     /**
      * Character level in WoW.
      */
     val level: Int,
-
     /**
      * Character race (Human, Orc, etc.).
      */
     val race: String,
-
     /**
      * Character faction (Alliance, Horde).
      */
     val faction: String,
-
     /**
      * Character specialization ID (from Blizzard API).
      */
     val specId: Int?,
-
     /**
      * Current guild name (if any).
      */
     val guildName: String?,
-
     /**
      * Current guild realm (if different from character realm).
      */
     val guildRealm: String?,
-
     /**
      * Guild ID if the character is in a tracked guild.
      */
     val guildId: String?,
-
     /**
      * When this character was last synced from Battle.net.
      */
     val lastSyncedAt: Instant,
 ) : WoWCharacter(
-    characterId = characterId,
-    name = name,
-    realm = realm,
-    region = region,
-    characterClass = characterClass,
-    blizzardId = blizzardId,
-    accountId = accountId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-) {
+        characterId = characterId,
+        name = name,
+        realm = realm,
+        region = region,
+        characterClass = characterClass,
+        blizzardId = blizzardId,
+        accountId = accountId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    ) {
     companion object {
         /**
          * Create a new TrackedCharacter from Battle.net API data.

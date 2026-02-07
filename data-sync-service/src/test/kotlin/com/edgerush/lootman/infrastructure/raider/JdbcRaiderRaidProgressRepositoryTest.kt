@@ -71,10 +71,11 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createRaidProgressEntity(1L, 100L),
-                createRaidProgressEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createRaidProgressEntity(1L, 100L),
+                    createRaidProgressEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -94,10 +95,11 @@ class JdbcRaiderRaidProgressRepositoryTest : UnitTest() {
         fun `should return raid progress for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createRaidProgressEntity(1L, raiderId, difficulty = "Heroic"),
-                createRaidProgressEntity(2L, raiderId, difficulty = "Mythic"),
-            )
+            val entities =
+                listOf(
+                    createRaidProgressEntity(1L, raiderId, difficulty = "Heroic"),
+                    createRaidProgressEntity(2L, raiderId, difficulty = "Mythic"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page

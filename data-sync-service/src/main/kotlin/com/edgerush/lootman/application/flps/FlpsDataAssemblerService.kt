@@ -9,7 +9,6 @@ import com.edgerush.lootman.domain.loot.repository.LootBanRepository
 import com.edgerush.lootman.domain.raider.repository.RaiderCrestCountRepository
 import com.edgerush.lootman.domain.raider.repository.RaiderVaultSlotRepository
 import com.edgerush.lootman.domain.shared.GuildId
-import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.GearSet
 import com.edgerush.lootman.domain.shared.model.Raider
 import com.edgerush.lootman.domain.shared.model.Wishlist

@@ -1,7 +1,6 @@
 package com.edgerush.lootman.api.auth
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-
 import org.springframework.stereotype.Component
 
 /**

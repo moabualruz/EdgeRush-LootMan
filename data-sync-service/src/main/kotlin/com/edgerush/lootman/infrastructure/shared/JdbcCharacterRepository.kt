@@ -24,61 +24,73 @@ import java.time.Instant
 class JdbcCharacterRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) : CharacterRepository {
-
     override fun findById(id: CharacterId): WoWCharacter? {
-        val sql = """
+        val sql =
+            """
             SELECT id, name, realm, region, character_class, blizzard_id, account_id,
                    created_at, updated_at
             FROM characters
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterRowMapper, id.value).firstOrNull()
     }
 
     override fun findByBlizzardId(blizzardId: Long): WoWCharacter? {
-        val sql = """
+        val sql =
+            """
             SELECT id, name, realm, region, character_class, blizzard_id, account_id,
                    created_at, updated_at
             FROM characters
             WHERE blizzard_id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterRowMapper, blizzardId).firstOrNull()
     }
 
-    override fun findByNameRealmRegion(name: String, realm: String, region: String): WoWCharacter? {
-        val sql = """
+    override fun findByNameRealmRegion(
+        name: String,
+        realm: String,
+        region: String,
+    ): WoWCharacter? {
+        val sql =
+            """
             SELECT id, name, realm, region, character_class, blizzard_id, account_id,
                    created_at, updated_at
             FROM characters
             WHERE LOWER(name) = LOWER(?)
               AND LOWER(realm) = LOWER(?)
               AND LOWER(region) = LOWER(?)
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterRowMapper, name, realm, region).firstOrNull()
     }
 
     override fun findByAccountId(accountId: AccountId): List<WoWCharacter> {
-        val sql = """
+        val sql =
+            """
             SELECT id, name, realm, region, character_class, blizzard_id, account_id,
                    created_at, updated_at
             FROM characters
             WHERE account_id = ?
             ORDER BY name
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(sql, characterRowMapper, accountId.value)
     }
 
-    override fun existsByNameRealmRegion(name: String, realm: String, region: String): Boolean {
-        val sql = """
+    override fun existsByNameRealmRegion(
+        name: String,
+        realm: String,
+        region: String,
+    ): Boolean {
+        val sql =
+            """
             SELECT COUNT(*) FROM characters
             WHERE LOWER(name) = LOWER(?)
               AND LOWER(realm) = LOWER(?)
               AND LOWER(region) = LOWER(?)
-        """.trimIndent()
+            """.trimIndent()
 
         val count = jdbcTemplate.queryForObject(sql, Long::class.java, name, realm, region) ?: 0L
         return count > 0
@@ -97,34 +109,37 @@ class JdbcCharacterRepository(
         }
 
         // Create new character
-        val sql = """
+        val sql =
+            """
             INSERT INTO characters (name, realm, region, character_class, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT (name, realm, region) DO UPDATE SET updated_at = EXCLUDED.updated_at
             RETURNING id
-        """.trimIndent()
+            """.trimIndent()
 
         val now = Instant.now()
-        val id = jdbcTemplate.queryForObject(
-            sql,
-            Long::class.java,
-            name,
-            realm,
-            region,
-            characterClass.name,
-            java.sql.Timestamp.from(now),
-            java.sql.Timestamp.from(now),
-        )
+        val id =
+            jdbcTemplate.queryForObject(
+                sql,
+                Long::class.java,
+                name,
+                realm,
+                region,
+                characterClass.name,
+                java.sql.Timestamp.from(now),
+                java.sql.Timestamp.from(now),
+            )
 
         return CharacterId(id!!)
     }
 
     override fun save(character: WoWCharacter): WoWCharacter {
-        val existingId = if (character.characterId.value > 0) {
-            findById(character.characterId)?.characterId?.value
-        } else {
-            null
-        }
+        val existingId =
+            if (character.characterId.value > 0) {
+                findById(character.characterId)?.characterId?.value
+            } else {
+                null
+            }
 
         return if (existingId != null) {
             update(character)
@@ -134,11 +149,12 @@ class JdbcCharacterRepository(
     }
 
     private fun insert(character: WoWCharacter): WoWCharacter {
-        val sql = """
+        val sql =
+            """
             INSERT INTO characters (name, realm, region, character_class, blizzard_id, account_id,
                                    created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
+            """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
 
@@ -166,8 +182,9 @@ class JdbcCharacterRepository(
             ps
         }, keyHolder)
 
-        val newId = (keyHolder.keys?.get("id") as? Number)?.toLong()
-            ?: throw IllegalStateException("Failed to get generated ID")
+        val newId =
+            (keyHolder.keys?.get("id") as? Number)?.toLong()
+                ?: throw IllegalStateException("Failed to get generated ID")
 
         return BaseCharacter(
             characterId = CharacterId(newId),
@@ -183,12 +200,13 @@ class JdbcCharacterRepository(
     }
 
     private fun update(character: WoWCharacter): WoWCharacter {
-        val sql = """
+        val sql =
+            """
             UPDATE characters
             SET name = ?, realm = ?, region = ?, character_class = ?,
                 blizzard_id = ?, account_id = ?, updated_at = ?
             WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         val now = Instant.now()
         jdbcTemplate.update(
@@ -216,10 +234,14 @@ class JdbcCharacterRepository(
         )
     }
 
-    override fun linkToAccount(characterId: CharacterId, accountId: AccountId) {
-        val sql = """
+    override fun linkToAccount(
+        characterId: CharacterId,
+        accountId: AccountId,
+    ) {
+        val sql =
+            """
             UPDATE characters SET account_id = ?, updated_at = ? WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -229,10 +251,14 @@ class JdbcCharacterRepository(
         )
     }
 
-    override fun linkToBlizzard(characterId: CharacterId, blizzardId: Long) {
-        val sql = """
+    override fun linkToBlizzard(
+        characterId: CharacterId,
+        blizzardId: Long,
+    ) {
+        val sql =
+            """
             UPDATE characters SET blizzard_id = ?, updated_at = ? WHERE id = ?
-        """.trimIndent()
+            """.trimIndent()
 
         jdbcTemplate.update(
             sql,
@@ -242,32 +268,33 @@ class JdbcCharacterRepository(
         )
     }
 
-    private val characterRowMapper = RowMapper { rs, _ ->
-        val accountIdValue = rs.getLong("account_id")
-        val accountId = if (rs.wasNull() || accountIdValue <= 0) null else AccountId(accountIdValue)
+    private val characterRowMapper =
+        RowMapper { rs, _ ->
+            val accountIdValue = rs.getLong("account_id")
+            val accountId = if (rs.wasNull() || accountIdValue <= 0) null else AccountId(accountIdValue)
 
-        val blizzardIdValue = rs.getLong("blizzard_id")
-        val blizzardId = if (rs.wasNull() || blizzardIdValue <= 0) null else blizzardIdValue
+            val blizzardIdValue = rs.getLong("blizzard_id")
+            val blizzardId = if (rs.wasNull() || blizzardIdValue <= 0) null else blizzardIdValue
 
-        val createdAtTimestamp = rs.getTimestamp("created_at")
-        val createdAt = createdAtTimestamp?.toInstant() ?: Instant.now()
+            val createdAtTimestamp = rs.getTimestamp("created_at")
+            val createdAt = createdAtTimestamp?.toInstant() ?: Instant.now()
 
-        val updatedAtTimestamp = rs.getTimestamp("updated_at")
-        val updatedAt = updatedAtTimestamp?.toInstant() ?: Instant.now()
+            val updatedAtTimestamp = rs.getTimestamp("updated_at")
+            val updatedAt = updatedAtTimestamp?.toInstant() ?: Instant.now()
 
-        val characterClassStr = rs.getString("character_class") ?: "UNKNOWN"
-        val characterClass = CharacterClass.fromString(characterClassStr)
+            val characterClassStr = rs.getString("character_class") ?: "UNKNOWN"
+            val characterClass = CharacterClass.fromString(characterClassStr)
 
-        BaseCharacter(
-            characterId = CharacterId(rs.getLong("id")),
-            name = rs.getString("name"),
-            realm = rs.getString("realm"),
-            region = rs.getString("region") ?: "eu",
-            characterClass = characterClass,
-            blizzardId = blizzardId,
-            accountId = accountId,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
-    }
+            BaseCharacter(
+                characterId = CharacterId(rs.getLong("id")),
+                name = rs.getString("name"),
+                realm = rs.getString("realm"),
+                region = rs.getString("region") ?: "eu",
+                characterClass = characterClass,
+                blizzardId = blizzardId,
+                accountId = accountId,
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+            )
+        }
 }

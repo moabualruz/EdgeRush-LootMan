@@ -17,8 +17,10 @@ import org.springframework.stereotype.Repository
 interface ApplicationEntitySpringRepository :
     CrudRepository<ApplicationEntity, Long>,
     PagingAndSortingRepository<ApplicationEntity, Long> {
-
-    fun findByStatus(status: String, pageable: Pageable): Page<ApplicationEntity>
+    fun findByStatus(
+        status: String,
+        pageable: Pageable,
+    ): Page<ApplicationEntity>
 
     fun countByStatus(status: String): Long
 
@@ -28,7 +30,10 @@ interface ApplicationEntitySpringRepository :
         """
         SELECT * FROM applications
         WHERE main_character_name = :characterName AND main_character_realm = :realm
-        """
+        """,
     )
-    fun findByMainCharacter(characterName: String, realm: String): List<ApplicationEntity>
+    fun findByMainCharacter(
+        characterName: String,
+        realm: String,
+    ): List<ApplicationEntity>
 }

@@ -24,7 +24,6 @@ class WoWAuditStartupRunner(
     private val guildConfigurationRepository: GuildConfigurationRepository,
     private val syncProperties: SyncProperties,
 ) : ApplicationRunner {
-
     private val logger = LoggerFactory.getLogger(WoWAuditStartupRunner::class.java)
 
     override fun run(args: ApplicationArguments?) {
@@ -37,8 +36,9 @@ class WoWAuditStartupRunner(
 
         try {
             // Get all guilds with WoWAudit configured (get up to 100 guilds)
-            val guilds = guildConfigurationRepository.findAll(offset = 0, limit = 100)
-                .filter { it.syncEnabled && !it.wowauditGuildUri.isNullOrBlank() }
+            val guilds =
+                guildConfigurationRepository.findAll(offset = 0, limit = 100)
+                    .filter { it.syncEnabled && !it.wowauditGuildUri.isNullOrBlank() }
 
             if (guilds.isEmpty()) {
                 logger.info("No guilds with WoWAudit sync enabled found, skipping startup sync")
@@ -50,18 +50,19 @@ class WoWAuditStartupRunner(
             for (guild in guilds) {
                 try {
                     logger.info("Syncing WoWAudit roster for guild: ${guild.guildName} (${guild.guildId})")
-                    val result = wowAuditRosterSyncService.syncRoster(guild.guildId)
-                        .subscribeOn(Schedulers.boundedElastic())
-                        .block()
+                    val result =
+                        wowAuditRosterSyncService.syncRoster(guild.guildId)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .block()
 
                     if (result != null && result.success) {
                         logger.info(
                             "WoWAudit sync completed for guild ${guild.guildName}: " +
-                                "created=${result.created}, updated=${result.updated}, skipped=${result.skipped}"
+                                "created=${result.created}, updated=${result.updated}, skipped=${result.skipped}",
                         )
                     } else {
                         logger.warn(
-                            "WoWAudit sync completed with errors for guild ${guild.guildName}: ${result?.error}"
+                            "WoWAudit sync completed with errors for guild ${guild.guildName}: ${result?.error}",
                         )
                     }
                 } catch (e: Exception) {

@@ -237,9 +237,10 @@ class RecruitmentApplicationController(
         @RequestParam name: String,
     ): ResponseEntity<CharacterLookupResponse> {
         return try {
-            val profile = raiderIOClient.fetchCharacterProfile(region, realm, name)
-                .subscribeOn(Schedulers.boundedElastic())
-                .block()
+            val profile =
+                raiderIOClient.fetchCharacterProfile(region, realm, name)
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .block()
             if (profile != null) {
                 ResponseEntity.ok(profile.toLookupResponse())
             } else {

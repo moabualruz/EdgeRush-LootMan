@@ -15,9 +15,9 @@ import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
 import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
 import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
-import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
 import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
+import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue

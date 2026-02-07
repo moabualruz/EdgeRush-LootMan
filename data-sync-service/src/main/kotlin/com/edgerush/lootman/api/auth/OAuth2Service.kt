@@ -165,7 +165,7 @@ class OAuth2Service(
 
         // Get user info
         val userInfo = getBattlenetUserInfo(accessToken)
-        
+
         return BattlenetAuthResult(userInfo, accessToken)
     }
 
@@ -229,5 +229,5 @@ class OAuth2Service(
 
 data class BattlenetAuthResult(
     val userInfo: BattlenetUserInfo,
-    val accessToken: String
+    val accessToken: String,
 )

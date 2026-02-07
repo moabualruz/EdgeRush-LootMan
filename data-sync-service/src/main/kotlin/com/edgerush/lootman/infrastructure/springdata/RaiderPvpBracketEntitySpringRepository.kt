@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface RaiderPvpBracketEntitySpringRepository :
     CrudRepository<RaiderPvpBracketEntity, Long>,
     PagingAndSortingRepository<RaiderPvpBracketEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<RaiderPvpBracketEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<RaiderPvpBracketEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
     fun findByRaiderId(raiderId: Long): List<RaiderPvpBracketEntity>
 
-    fun findByRaiderIdAndBracket(raiderId: Long, bracket: String): RaiderPvpBracketEntity?
+    fun findByRaiderIdAndBracket(
+        raiderId: Long,
+        bracket: String,
+    ): RaiderPvpBracketEntity?
 
     fun deleteByRaiderId(raiderId: Long)
 }

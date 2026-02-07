@@ -29,8 +29,9 @@ class WoWAuditAttendanceSyncService(
     private val guildConfigurationRepository: GuildConfigurationRepository,
 ) {
     private val logger = LoggerFactory.getLogger(WoWAuditAttendanceSyncService::class.java)
-    private val objectMapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     /**
      * Syncs attendance data from WoWAudit for a specific guild.
@@ -39,8 +40,9 @@ class WoWAuditAttendanceSyncService(
      * @return Sync result with counts
      */
     fun syncAttendance(guildId: String): Mono<WoWAuditSyncResult> {
-        val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
-            ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
+        val guildConfig =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
 
         if (guildConfig.wowauditGuildUri.isNullOrBlank()) {
             return Mono.error(IllegalArgumentException("WoWAudit guild URI not configured for guildId=$guildId"))
@@ -53,7 +55,10 @@ class WoWAuditAttendanceSyncService(
             .doOnSuccess { result ->
                 logger.info(
                     "WoWAudit attendance sync completed for guild={}: created={}, updated={}, skipped={}",
-                    guildId, result.created, result.updated, result.skipped
+                    guildId,
+                    result.created,
+                    result.updated,
+                    result.skipped,
                 )
             }
             .doOnError { ex ->
@@ -61,7 +66,10 @@ class WoWAuditAttendanceSyncService(
             }
     }
 
-    private fun parseAndSyncAttendance(body: String, guildId: String): WoWAuditSyncResult {
+    private fun parseAndSyncAttendance(
+        body: String,
+        guildId: String,
+    ): WoWAuditSyncResult {
         var created = 0
         var updated = 0
         var skipped = 0
@@ -71,14 +79,15 @@ class WoWAuditAttendanceSyncService(
 
             // WoWAudit attendance response structure can vary
             // It may have a "characters" array or be a direct array
-            val charactersNode = when {
-                node.has("characters") -> node.get("characters")
-                node.isArray -> node
-                else -> {
-                    logger.warn("WoWAudit attendance response has unexpected structure")
-                    return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+            val charactersNode =
+                when {
+                    node.has("characters") -> node.get("characters")
+                    node.isArray -> node
+                    else -> {
+                        logger.warn("WoWAudit attendance response has unexpected structure")
+                        return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+                    }
                 }
-            }
 
             if (!charactersNode.isArray) {
                 logger.warn("WoWAudit attendance characters is not an array")
@@ -107,7 +116,7 @@ class WoWAuditAttendanceSyncService(
                     // Lookup raider to get internal ID
                     val wowauditId = element.path("id").asLongOrNull()
                     var raider = wowauditId?.let { raiderEntityRepository.findByWowauditId(it) }
-                    
+
                     if (raider == null && characterName.isNotBlank()) {
                         // Fallback to name/realm lookup
                         val realmToSearch = characterRealm ?: "" // Fallback logic could be better but sticking to current scope
@@ -119,18 +128,18 @@ class WoWAuditAttendanceSyncService(
                     val encounter = null
                     val startDate = null
                     val endDate = null
-                    
+
                     val attendedAmountOfRaids = element.path("attended_raids").asIntOrNull()
                     val totalAmountOfRaids = element.path("total_raids").asIntOrNull()
                     val attendedPercentage = element.path("attendance_percentage").asDoubleOrNull() // e.g. 95.5
-                    
+
                     // These might be specific to recent raids or period
                     val selectedAmountOfEncounters = element.path("encounters_attended").asIntOrNull()
                     val totalAmountOfEncounters = element.path("total_encounters").asIntOrNull()
                     val selectedPercentage = element.path("encounters_percentage").asDoubleOrNull()
 
                     val internalRaiderId = raider?.id
-                    
+
                     if (internalRaiderId == null) {
                         // Optional: Create placeholder raider? No, Roster Sync should run first.
                         logger.debug("Skipping attendance for unknown raider: {} (ID: {})", characterName, wowauditId)
@@ -144,28 +153,29 @@ class WoWAuditAttendanceSyncService(
                     // We should probably check if it exists for this character+period/date.
                     // But for now, let's fix the linkage ID which is the primary reported issue.
 
-                    val entity = AttendanceStatEntity(
-                        instance = instance,
-                        encounter = encounter,
-                        startDate = startDate,
-                        endDate = endDate,
-                        characterId = internalRaiderId, // Use Internal ID
-                        characterName = characterName,
-                        characterRealm = characterRealm,
-                        characterClass = characterClass,
-                        characterRole = characterRole,
-                        characterRegion = characterRegion,
-                        attendedAmountOfRaids = attendedAmountOfRaids,
-                        totalAmountOfRaids = totalAmountOfRaids,
-                        attendedPercentage = attendedPercentage,
-                        selectedAmountOfEncounters = selectedAmountOfEncounters,
-                        totalAmountOfEncounters = totalAmountOfEncounters,
-                        selectedPercentage = selectedPercentage,
-                        teamId = teamId,
-                        seasonId = seasonId,
-                        periodId = periodId,
-                        syncedAt = now,
-                    )
+                    val entity =
+                        AttendanceStatEntity(
+                            instance = instance,
+                            encounter = encounter,
+                            startDate = startDate,
+                            endDate = endDate,
+                            characterId = internalRaiderId, // Use Internal ID
+                            characterName = characterName,
+                            characterRealm = characterRealm,
+                            characterClass = characterClass,
+                            characterRole = characterRole,
+                            characterRegion = characterRegion,
+                            attendedAmountOfRaids = attendedAmountOfRaids,
+                            totalAmountOfRaids = totalAmountOfRaids,
+                            attendedPercentage = attendedPercentage,
+                            selectedAmountOfEncounters = selectedAmountOfEncounters,
+                            totalAmountOfEncounters = totalAmountOfEncounters,
+                            selectedPercentage = selectedPercentage,
+                            teamId = teamId,
+                            seasonId = seasonId,
+                            periodId = periodId,
+                            syncedAt = now,
+                        )
 
                     attendanceStatRepository.save(entity)
                     created++

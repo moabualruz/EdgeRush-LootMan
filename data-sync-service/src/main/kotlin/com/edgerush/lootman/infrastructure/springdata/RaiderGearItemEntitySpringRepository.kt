@@ -16,22 +16,40 @@ import org.springframework.stereotype.Repository
 interface RaiderGearItemEntitySpringRepository :
     CrudRepository<RaiderGearItemEntity, Long>,
     PagingAndSortingRepository<RaiderGearItemEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<RaiderGearItemEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<RaiderGearItemEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
     fun findByRaiderId(raiderId: Long): List<RaiderGearItemEntity>
 
-    fun findByRaiderIdAndGearSet(raiderId: Long, gearSet: String): List<RaiderGearItemEntity>
+    fun findByRaiderIdAndGearSet(
+        raiderId: Long,
+        gearSet: String,
+    ): List<RaiderGearItemEntity>
 
-    fun findByRaiderIdAndGearSet(raiderId: Long, gearSet: String, pageable: Pageable): Page<RaiderGearItemEntity>
+    fun findByRaiderIdAndGearSet(
+        raiderId: Long,
+        gearSet: String,
+        pageable: Pageable,
+    ): Page<RaiderGearItemEntity>
 
-    fun countByRaiderIdAndGearSet(raiderId: Long, gearSet: String): Long
+    fun countByRaiderIdAndGearSet(
+        raiderId: Long,
+        gearSet: String,
+    ): Long
 
-    fun findByRaiderIdAndSlot(raiderId: Long, slot: String): List<RaiderGearItemEntity>
+    fun findByRaiderIdAndSlot(
+        raiderId: Long,
+        slot: String,
+    ): List<RaiderGearItemEntity>
 
     fun deleteByRaiderId(raiderId: Long)
 
-    fun deleteByRaiderIdAndGearSet(raiderId: Long, gearSet: String)
+    fun deleteByRaiderIdAndGearSet(
+        raiderId: Long,
+        gearSet: String,
+    )
 }

@@ -20,9 +20,7 @@ import org.springframework.stereotype.Repository
 class JdbcDiscordUserLinkRepository(
     private val springRepository: DiscordUserLinkEntitySpringRepository,
 ) : DiscordUserLinkRepository {
-
-    override fun findById(id: DiscordUserLinkId): DiscordUserLink? =
-        springRepository.findById(id.value).orElse(null)?.toDomain()
+    override fun findById(id: DiscordUserLinkId): DiscordUserLink? = springRepository.findById(id.value).orElse(null)?.toDomain()
 
     override fun findByDiscordUserId(discordUserId: DiscordUserId): List<DiscordUserLink> =
         springRepository.findByDiscordUserIdOrderByIsPrimaryDescLinkedAtAsc(discordUserId.value)
@@ -38,8 +36,7 @@ class JdbcDiscordUserLinkRepository(
     override fun existsByDiscordUserIdAndRaiderId(
         discordUserId: DiscordUserId,
         raiderId: RaiderId,
-    ): Boolean =
-        springRepository.existsByDiscordUserIdAndRaiderId(discordUserId.value, raiderId.value)
+    ): Boolean = springRepository.existsByDiscordUserIdAndRaiderId(discordUserId.value, raiderId.value)
 
     override fun save(link: DiscordUserLink): DiscordUserLink {
         val entity = link.toEntity()
@@ -51,27 +48,28 @@ class JdbcDiscordUserLinkRepository(
         springRepository.deleteById(id.value)
     }
 
-    override fun deleteByDiscordUserId(discordUserId: DiscordUserId): Int =
-        springRepository.deleteByDiscordUserId(discordUserId.value)
+    override fun deleteByDiscordUserId(discordUserId: DiscordUserId): Int = springRepository.deleteByDiscordUserId(discordUserId.value)
 
     override fun clearPrimaryForDiscordUser(discordUserId: DiscordUserId) {
         springRepository.clearPrimaryForDiscordUserId(discordUserId.value)
     }
 
-    override fun countByDiscordUserId(discordUserId: DiscordUserId): Long =
-        springRepository.countByDiscordUserId(discordUserId.value)
+    override fun countByDiscordUserId(discordUserId: DiscordUserId): Long = springRepository.countByDiscordUserId(discordUserId.value)
 
-    override fun findAll(offset: Long, limit: Int): List<DiscordUserLink> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("id"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<DiscordUserLink> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("id"),
+            )
         return springRepository.findAll(pageRequest).content.map { it.toDomain() }
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
     private fun DiscordUserLinkEntity.toDomain(): DiscordUserLink =
         DiscordUserLink(

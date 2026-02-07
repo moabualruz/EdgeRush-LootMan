@@ -42,20 +42,21 @@ class GuildContextControllerTest : UnitTest() {
         @Test
         fun `should return user guilds`() {
             // Given
-            val contexts = listOf(
-                createGuildContext(
-                    guildId = "guild-1",
-                    guildName = "First Guild",
-                    characterName = "TestChar",
-                    isActive = true,
-                ),
-                createGuildContext(
-                    guildId = "guild-2",
-                    guildName = "Second Guild",
-                    characterName = "AltChar",
-                    isActive = false,
-                ),
-            )
+            val contexts =
+                listOf(
+                    createGuildContext(
+                        guildId = "guild-1",
+                        guildName = "First Guild",
+                        characterName = "TestChar",
+                        isActive = true,
+                    ),
+                    createGuildContext(
+                        guildId = "guild-2",
+                        guildName = "Second Guild",
+                        characterName = "AltChar",
+                        isActive = false,
+                    ),
+                )
             every { guildContextService.getUserGuilds(testUserId) } returns contexts
 
             // When
@@ -87,12 +88,14 @@ class GuildContextControllerTest : UnitTest() {
         @Test
         fun `should include permissions in response`() {
             // Given
-            val context = createGuildContext(
-                permissions = listOf(
-                    GuildPermissionType.SETTINGS_ACCESS,
-                    GuildPermissionType.LOOT_MANAGEMENT,
-                ),
-            )
+            val context =
+                createGuildContext(
+                    permissions =
+                        listOf(
+                            GuildPermissionType.SETTINGS_ACCESS,
+                            GuildPermissionType.LOOT_MANAGEMENT,
+                        ),
+                )
             every { guildContextService.getUserGuilds(testUserId) } returns listOf(context)
 
             // When
@@ -123,13 +126,14 @@ class GuildContextControllerTest : UnitTest() {
         @Test
         fun `should return active guild context`() {
             // Given
-            val context = createGuildContext(
-                guildId = "active-guild",
-                guildName = "Active Guild",
-                characterName = "MainChar",
-                rank = "Officer",
-                isActive = true,
-            )
+            val context =
+                createGuildContext(
+                    guildId = "active-guild",
+                    guildName = "Active Guild",
+                    characterName = "MainChar",
+                    rank = "Officer",
+                    isActive = true,
+                )
             every { guildContextService.getActiveGuildContext(testUserId) } returns context
 
             // When
@@ -159,13 +163,14 @@ class GuildContextControllerTest : UnitTest() {
         @Test
         fun `should include all character details in response`() {
             // Given
-            val context = createGuildContext(
-                characterName = "Thrall",
-                characterRealm = "Tarren Mill",
-                characterClass = "Shaman",
-                characterMappingId = 42L,
-                raiderId = 100L,
-            )
+            val context =
+                createGuildContext(
+                    characterName = "Thrall",
+                    characterRealm = "Tarren Mill",
+                    characterClass = "Shaman",
+                    characterMappingId = 42L,
+                    raiderId = 100L,
+                )
             every { guildContextService.getActiveGuildContext(testUserId) } returns context
 
             // When
@@ -188,12 +193,13 @@ class GuildContextControllerTest : UnitTest() {
             // Given
             val mappingId = 42L
             val request = SetActiveCharacterRequest(characterMappingId = mappingId)
-            val context = createGuildContext(
-                guildId = "guild-1",
-                characterName = "NewActive",
-                characterMappingId = mappingId,
-                isActive = true,
-            )
+            val context =
+                createGuildContext(
+                    guildId = "guild-1",
+                    characterName = "NewActive",
+                    characterMappingId = mappingId,
+                    isActive = true,
+                )
             every {
                 guildContextService.setActiveCharacter(testUserId, UserCharacterMappingId(mappingId))
             } returns context
@@ -230,11 +236,12 @@ class GuildContextControllerTest : UnitTest() {
         fun `should return guild and permissions after switch`() {
             // Given
             val request = SetActiveCharacterRequest(characterMappingId = 42L)
-            val context = createGuildContext(
-                guildId = "switched-guild",
-                guildName = "Switched Guild",
-                permissions = listOf(GuildPermissionType.SETTINGS_ACCESS),
-            )
+            val context =
+                createGuildContext(
+                    guildId = "switched-guild",
+                    guildName = "Switched Guild",
+                    permissions = listOf(GuildPermissionType.SETTINGS_ACCESS),
+                )
             every {
                 guildContextService.setActiveCharacter(testUserId, any())
             } returns context
@@ -255,22 +262,24 @@ class GuildContextControllerTest : UnitTest() {
         @Test
         fun `should map all GuildContext fields to response`() {
             // Given
-            val context = GuildContext(
-                guildId = "test-guild",
-                guildName = "Test Guild",
-                characterName = "TestChar",
-                characterRealm = "Tarren Mill",
-                characterClass = "Warrior",
-                characterMappingId = 1L,
-                raiderId = 10L,
-                rank = "Guild Master",
-                permissions = listOf(
-                    GuildPermissionType.SETTINGS_ACCESS,
-                    GuildPermissionType.LOOT_MANAGEMENT,
-                    GuildPermissionType.MEMBER_MANAGEMENT,
-                ),
-                isActive = true,
-            )
+            val context =
+                GuildContext(
+                    guildId = "test-guild",
+                    guildName = "Test Guild",
+                    characterName = "TestChar",
+                    characterRealm = "Tarren Mill",
+                    characterClass = "Warrior",
+                    characterMappingId = 1L,
+                    raiderId = 10L,
+                    rank = "Guild Master",
+                    permissions =
+                        listOf(
+                            GuildPermissionType.SETTINGS_ACCESS,
+                            GuildPermissionType.LOOT_MANAGEMENT,
+                            GuildPermissionType.MEMBER_MANAGEMENT,
+                        ),
+                    isActive = true,
+                )
             every { guildContextService.getUserGuilds(testUserId) } returns listOf(context)
 
             // When
@@ -329,16 +338,17 @@ class GuildContextControllerTest : UnitTest() {
         rank: String? = "Member",
         permissions: List<GuildPermissionType> = emptyList(),
         isActive: Boolean = false,
-    ): GuildContext = GuildContext(
-        guildId = guildId,
-        guildName = guildName,
-        characterName = characterName,
-        characterRealm = characterRealm,
-        characterClass = characterClass,
-        characterMappingId = characterMappingId,
-        raiderId = raiderId,
-        rank = rank,
-        permissions = permissions,
-        isActive = isActive,
-    )
+    ): GuildContext =
+        GuildContext(
+            guildId = guildId,
+            guildName = guildName,
+            characterName = characterName,
+            characterRealm = characterRealm,
+            characterClass = characterClass,
+            characterMappingId = characterMappingId,
+            raiderId = raiderId,
+            rank = rank,
+            permissions = permissions,
+            isActive = isActive,
+        )
 }

@@ -866,17 +866,18 @@ class JdbcRaiderRepositoryTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = null,
         wowauditId: Long? = null,
-    ): Raider = RaiderFixtures.createRaider(
-        id = id,
-        guildId = guildId,
-        name = characterName,
-        realm = realm,
-        region = region,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = id,
+            guildId = guildId,
+            name = characterName,
+            realm = realm,
+            region = region,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

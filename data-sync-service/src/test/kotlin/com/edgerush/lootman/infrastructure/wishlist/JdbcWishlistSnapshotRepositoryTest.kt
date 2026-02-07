@@ -70,13 +70,14 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createEntity(
-                id = id,
-                raiderId = null,
-                teamId = null,
-                seasonId = null,
-                periodId = null,
-            )
+            val entity =
+                createEntity(
+                    id = id,
+                    raiderId = null,
+                    teamId = null,
+                    seasonId = null,
+                    periodId = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -99,10 +100,11 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createEntity(1L),
-                createEntity(2L),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L),
+                    createEntity(2L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -122,10 +124,11 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         fun `should return snapshots for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createEntity(1L, raiderId = raiderId),
-                createEntity(2L, raiderId = raiderId),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, raiderId = raiderId),
+                    createEntity(2L, raiderId = raiderId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page
@@ -162,9 +165,10 @@ class JdbcWishlistSnapshotRepositoryTest : UnitTest() {
         fun `should return snapshots for team`() {
             // Given
             val teamId = 100L
-            val entities = listOf(
-                createEntity(1L, teamId = teamId),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, teamId = teamId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByTeamId(teamId, any<Pageable>()) } returns page

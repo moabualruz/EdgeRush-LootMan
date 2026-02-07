@@ -53,51 +53,55 @@ class GuildContextService(
             val mapping: com.edgerush.lootman.domain.auth.model.UserCharacterMapping,
             val raider: com.edgerush.datasync.entity.RaiderEntity,
             val guildId: String,
-            val guildName: String
+            val guildName: String,
         )
 
-        val raiderInfos = mappings.mapNotNull { mapping ->
-            val raider = raiderEntityRepository.findById(mapping.raiderId.value)
-            if (raider == null) {
-                logger.warn("Raider not found for mapping: userId=${userId.value}, raiderId=${mapping.raiderId.value}")
-                return@mapNotNull null
+        val raiderInfos =
+            mappings.mapNotNull { mapping ->
+                val raider = raiderEntityRepository.findById(mapping.raiderId.value)
+                if (raider == null) {
+                    logger.warn("Raider not found for mapping: userId=${userId.value}, raiderId=${mapping.raiderId.value}")
+                    return@mapNotNull null
+                }
+
+                val guildId = raider.guildId
+                if (guildId.isNullOrBlank()) {
+                    logger.debug("Raider has no guild: raiderId=${raider.id}")
+                    return@mapNotNull null
+                }
+
+                val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
+                val guildName = guildConfig?.guildName ?: guildId
+
+                RaiderInfo(mapping, raider, guildId, guildName)
             }
-
-            val guildId = raider.guildId
-            if (guildId.isNullOrBlank()) {
-                logger.debug("Raider has no guild: raiderId=${raider.id}")
-                return@mapNotNull null
-            }
-
-            val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
-            val guildName = guildConfig?.guildName ?: guildId
-
-            RaiderInfo(mapping, raider, guildId, guildName)
-        }
 
         if (raiderInfos.isEmpty()) {
             return emptyList()
         }
 
         // Batch fetch all permissions for all guild/rank pairs
-        val guildRankPairs = raiderInfos
-            .filter { it.raider.rank != null }
-            .map { Pair(GuildId(it.guildId), it.raider.rank!!) }
-            .distinct()
+        val guildRankPairs =
+            raiderInfos
+                .filter { it.raider.rank != null }
+                .map { Pair(GuildId(it.guildId), it.raider.rank!!) }
+                .distinct()
 
-        val permissionsByGuildRank = if (guildRankPairs.isNotEmpty()) {
-            guildPermissionRepository.findByGuildIdAndRankNames(guildRankPairs)
-        } else {
-            emptyMap()
-        }
+        val permissionsByGuildRank =
+            if (guildRankPairs.isNotEmpty()) {
+                guildPermissionRepository.findByGuildIdAndRankNames(guildRankPairs)
+            } else {
+                emptyMap()
+            }
 
         // Build guild contexts using the pre-fetched permissions
         return raiderInfos.map { info ->
-            val permissions = if (info.raider.rank != null) {
-                permissionsByGuildRank[Pair(info.guildId, info.raider.rank)] ?: emptyList()
-            } else {
-                emptyList()
-            }
+            val permissions =
+                if (info.raider.rank != null) {
+                    permissionsByGuildRank[Pair(info.guildId, info.raider.rank)] ?: emptyList()
+                } else {
+                    emptyList()
+                }
 
             GuildContext(
                 guildId = info.guildId,

@@ -1,5 +1,6 @@
 package com.edgerush.lootman.infrastructure.external.blizzard
 
+import com.edgerush.lootman.api.auth.OAuth2Properties
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -7,12 +8,11 @@ import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.time.Instant
-import com.edgerush.lootman.api.auth.OAuth2Properties
 
 @Service
 class BlizzardDataService(
     private val properties: OAuth2Properties,
-    private val restTemplate: RestTemplate
+    private val restTemplate: RestTemplate,
 ) {
     private val logger = LoggerFactory.getLogger(BlizzardDataService::class.java)
 
@@ -39,7 +39,9 @@ class BlizzardDataService(
     @Synchronized
     private fun getAccessToken(): String {
         if (!isConfigured()) {
-            throw IllegalStateException("Blizzard API credentials not configured. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET environment variables.")
+            throw IllegalStateException(
+                "Blizzard API credentials not configured. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET environment variables.",
+            )
         }
 
         if (accessToken != null && Instant.now().isBefore(tokenExpiry)) {
@@ -47,20 +49,23 @@ class BlizzardDataService(
         }
 
         // Fetch new client credentials token using RestTemplate (avoids WebClient.block() issues)
-        val headers = HttpHeaders().apply {
-            setBasicAuth(clientId, clientSecret)
-            contentType = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
-        }
+        val headers =
+            HttpHeaders().apply {
+                setBasicAuth(clientId, clientSecret)
+                contentType = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
+            }
 
-        val response = restTemplate.exchange(
-            getAuthUrl(),
-            HttpMethod.POST,
-            HttpEntity("grant_type=client_credentials", headers),
-            TokenResponse::class.java
-        )
+        val response =
+            restTemplate.exchange(
+                getAuthUrl(),
+                HttpMethod.POST,
+                HttpEntity("grant_type=client_credentials", headers),
+                TokenResponse::class.java,
+            )
 
-        val tokenResponse = response.body
-            ?: throw IllegalStateException("Failed to retrieve Battle.net access token")
+        val tokenResponse =
+            response.body
+                ?: throw IllegalStateException("Failed to retrieve Battle.net access token")
 
         accessToken = tokenResponse.access_token
         tokenExpiry = Instant.now().plusSeconds(tokenResponse.expires_in - 60) // Buffer
@@ -73,24 +78,27 @@ class BlizzardDataService(
 
         try {
             // Use RestTemplate for synchronous call (more reliable than WebClient.block())
-            val headers = HttpHeaders().apply {
-                setBearerAuth(userAccessToken)
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(userAccessToken)
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardAccountProfileResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardAccountProfileResponse::class.java,
+                )
 
             val body = response.body
             logger.info("Blizzard API response: ${body?.wow_accounts?.size ?: 0} WoW accounts found")
 
-            val characters = body?.wow_accounts?.flatMap { account ->
-                logger.info("Account has ${account.characters.size} characters")
-                account.characters
-            } ?: emptyList()
+            val characters =
+                body?.wow_accounts?.flatMap { account ->
+                    logger.info("Account has ${account.characters.size} characters")
+                    account.characters
+                } ?: emptyList()
 
             logger.info("Total characters fetched: ${characters.size}")
             characters.take(5).forEach { char ->
@@ -105,7 +113,7 @@ class BlizzardDataService(
     }
 
     private fun getAsBaseUrl(): String {
-         return if (region == "cn") "gateway.battlenet.com.cn" else "$region.api.blizzard.com"
+        return if (region == "cn") "gateway.battlenet.com.cn" else "$region.api.blizzard.com"
     }
 
     fun getRaids(): List<BlizzardRaid> {
@@ -117,20 +125,23 @@ class BlizzardDataService(
         logger.info("Fetching raids from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                JournalInstanceIndexResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    JournalInstanceIndexResponse::class.java,
+                )
 
-            val raids = response.body?.instances?.map {
-                BlizzardRaid(it.id, it.name)
-            } ?: emptyList()
+            val raids =
+                response.body?.instances?.map {
+                    BlizzardRaid(it.id, it.name)
+                } ?: emptyList()
             logger.info("Fetched ${raids.size} raids")
             return raids
         } catch (e: Exception) {
@@ -138,7 +149,7 @@ class BlizzardDataService(
             return emptyList()
         }
     }
-    
+
     fun getRaidMaps(instanceId: Int): List<BlizzardMap> {
         // 1. Get Instance Details to find description/background if needed
         // 2. We actually need encounters to get maps, or journal-instance/{id} which usually lists maps/encounters
@@ -147,20 +158,23 @@ class BlizzardDataService(
         logger.info("Fetching raid maps for instance $instanceId from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                JournalInstanceDetailResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    JournalInstanceDetailResponse::class.java,
+                )
 
-            val maps = response.body?.maps?.map {
-                BlizzardMap(it.id, it.name, it.description)
-            } ?: emptyList()
+            val maps =
+                response.body?.maps?.map {
+                    BlizzardMap(it.id, it.name, it.description)
+                } ?: emptyList()
             logger.info("Fetched ${maps.size} maps for instance $instanceId")
             return maps
         } catch (e: Exception) {
@@ -168,7 +182,7 @@ class BlizzardDataService(
             return emptyList()
         }
     }
-    
+
     fun getMap(mapId: Int): BlizzardMapDetails? {
         // Fetch specific map data, ideally generating a tile URL or direct image URL if available
         // The Game Data API 'media' endpoint for Journal Media is often where the images live.
@@ -184,16 +198,18 @@ class BlizzardDataService(
         logger.info("Fetching playable classes from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardPlayableClassIndex::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardPlayableClassIndex::class.java,
+                )
 
             val classes = response.body?.classes ?: emptyList()
             logger.info("Fetched ${classes.size} playable classes")
@@ -212,16 +228,18 @@ class BlizzardDataService(
         logger.info("Fetching class details for ID $classId")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardPlayableClassDetail::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardPlayableClassDetail::class.java,
+                )
 
             return response.body
         } catch (e: Exception) {
@@ -238,16 +256,18 @@ class BlizzardDataService(
         logger.info("Fetching playable specializations from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardPlayableSpecIndex::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardPlayableSpecIndex::class.java,
+                )
 
             val specs = response.body?.character_specializations ?: emptyList()
             logger.info("Fetched ${specs.size} playable specializations")
@@ -265,16 +285,18 @@ class BlizzardDataService(
         val url = "${getBaseUrl()}/data/wow/playable-specialization/$specId?namespace=static-$region&locale=en_US"
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardSpecializationDetail::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardSpecializationDetail::class.java,
+                )
 
             return response.body
         } catch (e: Exception) {
@@ -290,16 +312,18 @@ class BlizzardDataService(
         val url = "${getBaseUrl()}/data/wow/media/playable-class/$classId?namespace=static-$region"
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardMediaResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardMediaResponse::class.java,
+                )
 
             return response.body?.assets?.firstOrNull { it.key == "icon" }?.value
         } catch (e: Exception) {
@@ -315,16 +339,18 @@ class BlizzardDataService(
         val url = "${getBaseUrl()}/data/wow/media/playable-specialization/$specId?namespace=static-$region"
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardMediaResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardMediaResponse::class.java,
+                )
 
             return response.body?.assets?.firstOrNull { it.key == "icon" }?.value
         } catch (e: Exception) {
@@ -341,21 +367,26 @@ class BlizzardDataService(
      * @param guildNameSlug The guild name as a slug (e.g., "dod" for "DoD")
      * @return List of guild members with their character info
      */
-    fun getGuildRoster(realmSlug: String, guildNameSlug: String): List<BlizzardGuildMember> {
+    fun getGuildRoster(
+        realmSlug: String,
+        guildNameSlug: String,
+    ): List<BlizzardGuildMember> {
         val url = "${getBaseUrl()}/data/wow/guild/$realmSlug/$guildNameSlug/roster?namespace=profile-$region&locale=en_US"
         logger.info("Fetching guild roster from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardGuildRosterResponse::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardGuildRosterResponse::class.java,
+                )
 
             val members = response.body?.members ?: emptyList()
             logger.info("Fetched ${members.size} guild members")
@@ -369,21 +400,26 @@ class BlizzardDataService(
     /**
      * Fetches guild information from Blizzard API.
      */
-    fun getGuildInfo(realmSlug: String, guildNameSlug: String): BlizzardGuildInfo? {
+    fun getGuildInfo(
+        realmSlug: String,
+        guildNameSlug: String,
+    ): BlizzardGuildInfo? {
         val url = "${getBaseUrl()}/data/wow/guild/$realmSlug/$guildNameSlug?namespace=profile-$region&locale=en_US"
         logger.info("Fetching guild info from: $url")
 
         try {
-            val headers = HttpHeaders().apply {
-                setBearerAuth(getAccessToken())
-            }
+            val headers =
+                HttpHeaders().apply {
+                    setBearerAuth(getAccessToken())
+                }
 
-            val response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity<Any>(headers),
-                BlizzardGuildInfo::class.java
-            )
+            val response =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(headers),
+                    BlizzardGuildInfo::class.java,
+                )
 
             return response.body
         } catch (e: Exception) {
@@ -394,13 +430,19 @@ class BlizzardDataService(
 }
 
 data class TokenResponse(val access_token: String, val expires_in: Long)
+
 data class JournalInstanceIndexResponse(val instances: List<JournalInstanceRef>)
+
 data class JournalInstanceRef(val id: Int, val name: String)
+
 data class JournalInstanceDetailResponse(val id: Int, val name: String, val maps: List<JournalMapRef> = emptyList())
+
 data class JournalMapRef(val id: Int, val name: String, val description: String?)
 
 data class BlizzardAccountProfileResponse(val wow_accounts: List<BlizzardWowAccount> = emptyList())
+
 data class BlizzardWowAccount(val characters: List<BlizzardProfileCharacter> = emptyList())
+
 data class BlizzardProfileCharacter(
     val id: Long,
     val name: String,
@@ -409,82 +451,101 @@ data class BlizzardProfileCharacter(
     val playable_class: BlizzardKeyName,
     val playable_race: BlizzardKeyName,
     val faction: BlizzardKeyName,
-    val guild: BlizzardCharacterGuild? = null  // Guild info if available
+    val guild: BlizzardCharacterGuild? = null, // Guild info if available
 )
+
 data class BlizzardRealm(val name: String, val slug: String? = null)
+
 data class BlizzardCharacterGuild(
     val name: String,
-    val realm: BlizzardRealm
+    val realm: BlizzardRealm,
 )
+
 data class BlizzardKeyName(val name: String)
 
 data class BlizzardRaid(val id: Int, val name: String)
+
 data class BlizzardMap(val id: Int, val name: String, val description: String?)
+
 data class BlizzardMapDetails(val id: Int, val imageUrl: String)
 
 // Playable Class API responses
 data class BlizzardPlayableClassIndex(val classes: List<BlizzardPlayableClass> = emptyList())
+
 data class BlizzardPlayableClass(
     val id: Int,
     val name: String,
-    val key: BlizzardKeyRef? = null
+    val key: BlizzardKeyRef? = null,
 )
+
 data class BlizzardPlayableClassDetail(
     val id: Int,
     val name: String,
     val power_type: BlizzardKeyName? = null,
-    val specializations: List<BlizzardSpecRef> = emptyList()
+    val specializations: List<BlizzardSpecRef> = emptyList(),
 )
+
 data class BlizzardSpecRef(val id: Int, val name: String)
+
 data class BlizzardKeyRef(val href: String)
 
 // Playable Specialization API responses
 data class BlizzardPlayableSpecIndex(val character_specializations: List<BlizzardPlayableSpecialization> = emptyList())
+
 data class BlizzardPlayableSpecialization(
     val id: Int,
     val name: String,
-    val key: BlizzardKeyRef? = null
+    val key: BlizzardKeyRef? = null,
 )
+
 data class BlizzardSpecializationDetail(
     val id: Int,
     val name: String,
     val playable_class: BlizzardClassRef,
-    val role: BlizzardRoleType? = null
+    val role: BlizzardRoleType? = null,
 )
+
 data class BlizzardClassRef(val id: Int, val name: String)
+
 data class BlizzardRoleType(val type: String, val name: String)
 
 // Media API responses
 data class BlizzardMediaResponse(val assets: List<BlizzardMediaAsset> = emptyList())
+
 data class BlizzardMediaAsset(val key: String, val value: String)
 
 // Guild Roster API responses
 data class BlizzardGuildRosterResponse(
     val guild: BlizzardGuildRef,
-    val members: List<BlizzardGuildMember> = emptyList()
+    val members: List<BlizzardGuildMember> = emptyList(),
 )
+
 data class BlizzardGuildRef(
     val id: Long,
     val name: String,
-    val realm: BlizzardRealmRef
+    val realm: BlizzardRealmRef,
 )
+
 data class BlizzardRealmRef(
     val id: Int,
     val name: String? = null,
-    val slug: String? = null
+    val slug: String? = null,
 )
+
 data class BlizzardGuildMember(
     val character: BlizzardGuildCharacter,
-    val rank: Int
+    val rank: Int,
 )
+
 data class BlizzardGuildCharacter(
     val id: Long,
     val name: String,
     val realm: BlizzardRealmRef,
     val level: Int,
     val playable_class: BlizzardKeyId,
-    val playable_race: BlizzardKeyId
+    val playable_race: BlizzardKeyId,
 )
+
 data class BlizzardKeyId(val id: Int)
 
 // Guild Info API response
@@ -495,6 +556,7 @@ data class BlizzardGuildInfo(
     val achievement_points: Int,
     val member_count: Int,
     val realm: BlizzardRealmRef,
-    val created_timestamp: Long? = null
+    val created_timestamp: Long? = null,
 )
+
 data class BlizzardFaction(val type: String, val name: String)

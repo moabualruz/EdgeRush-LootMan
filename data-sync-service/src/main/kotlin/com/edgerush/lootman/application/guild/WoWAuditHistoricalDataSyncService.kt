@@ -29,8 +29,9 @@ class WoWAuditHistoricalDataSyncService(
     private val guildConfigurationRepository: GuildConfigurationRepository,
 ) {
     private val logger = LoggerFactory.getLogger(WoWAuditHistoricalDataSyncService::class.java)
-    private val objectMapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     /**
      * Syncs historical data (gear/statistics) from WoWAudit for a specific guild and period.
@@ -39,9 +40,13 @@ class WoWAuditHistoricalDataSyncService(
      * @param periodId The WoWAudit period ID
      * @return Sync result with counts
      */
-    fun syncHistoricalData(guildId: String, periodId: Long): Mono<WoWAuditSyncResult> {
-        val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
-            ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
+    fun syncHistoricalData(
+        guildId: String,
+        periodId: Long,
+    ): Mono<WoWAuditSyncResult> {
+        val guildConfig =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
 
         if (guildConfig.wowauditGuildUri.isNullOrBlank()) {
             return Mono.error(IllegalArgumentException("WoWAudit guild URI not configured for guildId=$guildId"))
@@ -54,7 +59,11 @@ class WoWAuditHistoricalDataSyncService(
             .doOnSuccess { result ->
                 logger.info(
                     "WoWAudit historical data sync completed for guild={}, period={}: created={}, updated={}, skipped={}",
-                    guildId, periodId, result.created, result.updated, result.skipped
+                    guildId,
+                    periodId,
+                    result.created,
+                    result.updated,
+                    result.skipped,
                 )
             }
             .doOnError { ex ->
@@ -62,7 +71,10 @@ class WoWAuditHistoricalDataSyncService(
             }
     }
 
-    private fun parseAndSyncHistoricalData(body: String, guildId: String): WoWAuditSyncResult {
+    private fun parseAndSyncHistoricalData(
+        body: String,
+        guildId: String,
+    ): WoWAuditSyncResult {
         var created = 0
         var updated = 0
         var skipped = 0
@@ -71,14 +83,15 @@ class WoWAuditHistoricalDataSyncService(
             val node = objectMapper.readTree(body)
 
             // WoWAudit historical data response can be an array of characters
-            val charactersNode = when {
-                node.has("characters") -> node.get("characters")
-                node.isArray -> node
-                else -> {
-                    logger.warn("WoWAudit historical data response has unexpected structure")
-                    return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+            val charactersNode =
+                when {
+                    node.has("characters") -> node.get("characters")
+                    node.isArray -> node
+                    else -> {
+                        logger.warn("WoWAudit historical data response has unexpected structure")
+                        return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+                    }
                 }
-            }
 
             if (!charactersNode.isArray) {
                 logger.warn("WoWAudit historical data characters is not an array")
@@ -87,10 +100,12 @@ class WoWAuditHistoricalDataSyncService(
 
             for (element in charactersNode) {
                 try {
-                    val characterName = element.path("name").asText("")
-                        .ifBlank { element.path("character_name").asText("") }
-                    val characterRealm = element.path("realm").asText("")
-                        .ifBlank { element.path("character_realm").asText("") }
+                    val characterName =
+                        element.path("name").asText("")
+                            .ifBlank { element.path("character_name").asText("") }
+                    val characterRealm =
+                        element.path("realm").asText("")
+                            .ifBlank { element.path("character_realm").asText("") }
 
                     if (characterName.isBlank()) {
                         skipped++
@@ -146,16 +161,20 @@ class WoWAuditHistoricalDataSyncService(
         return WoWAuditSyncResult(created, updated, skipped, null)
     }
 
-    private fun processGearItems(gearNode: JsonNode, raiderId: Long) {
+    private fun processGearItems(
+        gearNode: JsonNode,
+        raiderId: Long,
+    ) {
         // Delete existing gear items for this raider
         val existingItems = raiderGearItemRepository.findByRaiderId(raiderId, 0, 1000)
         existingItems.forEach { item -> item.id?.let { raiderGearItemRepository.delete(it) } }
 
-        val slots = listOf(
-            "head", "neck", "shoulder", "back", "chest", "wrist",
-            "hands", "waist", "legs", "feet", "finger_1", "finger_2",
-            "trinket_1", "trinket_2", "main_hand", "off_hand"
-        )
+        val slots =
+            listOf(
+                "head", "neck", "shoulder", "back", "chest", "wrist",
+                "hands", "waist", "legs", "feet", "finger_1", "finger_2",
+                "trinket_1", "trinket_2", "main_hand", "off_hand",
+            )
 
         for (setName in listOf("equipped", "best", "spark")) {
             val setNode = gearNode.path(setName)
@@ -188,20 +207,25 @@ class WoWAuditHistoricalDataSyncService(
                         enchantQuality = enchantQuality,
                         upgradeLevel = upgradeLevel,
                         sockets = sockets,
-                        name = name
-                    )
+                        name = name,
+                    ),
                 )
             }
         }
     }
 
-    private fun processStatistics(statisticsNode: JsonNode, element: JsonNode, raiderId: Long) {
+    private fun processStatistics(
+        statisticsNode: JsonNode,
+        element: JsonNode,
+        raiderId: Long,
+    ) {
         val mythicPlusScore = statisticsNode.path("mplus_score").asDoubleOrNull()
         val weeklyHighest = statisticsNode.path("weekly_highest_mplus").asIntOrNull()
         val seasonHighest = statisticsNode.path("season_highest_mplus").asIntOrNull()
 
-        val worldQuestsNode = statisticsNode.path("worldQuests").takeIf { it.isObject }
-            ?: statisticsNode.path("world_quests").takeIf { it.isObject }
+        val worldQuestsNode =
+            statisticsNode.path("worldQuests").takeIf { it.isObject }
+                ?: statisticsNode.path("world_quests").takeIf { it.isObject }
         val worldQuestsTotal = worldQuestsNode?.path("done_total")?.asIntOrNull()
         val worldQuestsThisWeek = worldQuestsNode?.path("this_week")?.asIntOrNull()
 
@@ -214,20 +238,21 @@ class WoWAuditHistoricalDataSyncService(
         val honorLevel = statisticsNode.path("pvp").path("honor_level").asIntOrNull()
 
         val existingStats = raiderStatisticsRepository.findByRaiderId(raiderId)
-        val statsEntity = RaiderStatisticsEntity(
-            id = existingStats?.id,
-            raiderId = raiderId,
-            mythicPlusScore = mythicPlusScore,
-            weeklyHighestMplus = weeklyHighest,
-            seasonHighestMplus = seasonHighest,
-            worldQuestsTotal = worldQuestsTotal,
-            worldQuestsThisWeek = worldQuestsThisWeek,
-            collectiblesMounts = collectiblesMounts,
-            collectiblesToys = collectiblesToys,
-            collectiblesUniquePets = collectiblesUniquePets,
-            collectiblesLevel25Pets = collectiblesLevel25Pets,
-            honorLevel = honorLevel
-        )
+        val statsEntity =
+            RaiderStatisticsEntity(
+                id = existingStats?.id,
+                raiderId = raiderId,
+                mythicPlusScore = mythicPlusScore,
+                weeklyHighestMplus = weeklyHighest,
+                seasonHighestMplus = seasonHighest,
+                worldQuestsTotal = worldQuestsTotal,
+                worldQuestsThisWeek = worldQuestsThisWeek,
+                collectiblesMounts = collectiblesMounts,
+                collectiblesToys = collectiblesToys,
+                collectiblesUniquePets = collectiblesUniquePets,
+                collectiblesLevel25Pets = collectiblesLevel25Pets,
+                honorLevel = honorLevel,
+            )
         raiderStatisticsRepository.save(statsEntity)
     }
 

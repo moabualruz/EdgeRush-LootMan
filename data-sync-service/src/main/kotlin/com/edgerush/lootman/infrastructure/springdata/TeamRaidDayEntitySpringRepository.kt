@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface TeamRaidDayEntitySpringRepository :
     CrudRepository<TeamRaidDayEntity, Long>,
     PagingAndSortingRepository<TeamRaidDayEntity, Long> {
-
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<TeamRaidDayEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<TeamRaidDayEntity>
 
     fun countByTeamId(teamId: Long): Long
 
     fun findByTeamId(teamId: Long): List<TeamRaidDayEntity>
 
-    fun findByTeamIdAndWeekDay(teamId: Long, weekDay: Int): TeamRaidDayEntity?
+    fun findByTeamIdAndWeekDay(
+        teamId: Long,
+        weekDay: Int,
+    ): TeamRaidDayEntity?
 
     fun deleteByTeamId(teamId: Long)
 }

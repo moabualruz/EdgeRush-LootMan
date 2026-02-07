@@ -18,12 +18,17 @@ import java.time.LocalDateTime
 interface BehavioralActionEntitySpringRepository :
     CrudRepository<BehavioralActionEntity, Long>,
     PagingAndSortingRepository<BehavioralActionEntity, Long> {
-
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<BehavioralActionEntity>
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<BehavioralActionEntity>
 
     fun countByGuildId(guildId: String): Long
 
-    fun findByCharacterName(characterName: String, pageable: Pageable): Page<BehavioralActionEntity>
+    fun findByCharacterName(
+        characterName: String,
+        pageable: Pageable,
+    ): Page<BehavioralActionEntity>
 
     fun countByCharacterName(characterName: String): Long
 
@@ -33,9 +38,12 @@ interface BehavioralActionEntitySpringRepository :
         WHERE guild_id = :guildId AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
         ORDER BY applied_at DESC
-        """
+        """,
     )
-    fun findActiveByGuildId(guildId: String, now: LocalDateTime): List<BehavioralActionEntity>
+    fun findActiveByGuildId(
+        guildId: String,
+        now: LocalDateTime,
+    ): List<BehavioralActionEntity>
 
     @Query(
         """
@@ -43,7 +51,7 @@ interface BehavioralActionEntitySpringRepository :
         WHERE guild_id = :guildId AND character_name = :characterName AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
         ORDER BY applied_at DESC
-        """
+        """,
     )
     fun findActiveByGuildIdAndCharacterName(
         guildId: String,
@@ -51,22 +59,35 @@ interface BehavioralActionEntitySpringRepository :
         now: LocalDateTime,
     ): List<BehavioralActionEntity>
 
-    fun findByActionType(actionType: String, pageable: Pageable): Page<BehavioralActionEntity>
+    fun findByActionType(
+        actionType: String,
+        pageable: Pageable,
+    ): Page<BehavioralActionEntity>
 
     fun countByActionType(actionType: String): Long
 
-    fun findByGuildIdAndCharacterName(guildId: String, characterName: String, pageable: Pageable): Page<BehavioralActionEntity>
+    fun findByGuildIdAndCharacterName(
+        guildId: String,
+        characterName: String,
+        pageable: Pageable,
+    ): Page<BehavioralActionEntity>
 
-    fun countByGuildIdAndCharacterName(guildId: String, characterName: String): Long
+    fun countByGuildIdAndCharacterName(
+        guildId: String,
+        characterName: String,
+    ): Long
 
     @Query(
         """
         SELECT COUNT(*) FROM behavioral_actions
         WHERE guild_id = :guildId AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
-        """
+        """,
     )
-    fun countActiveByGuildId(guildId: String, now: LocalDateTime): Long
+    fun countActiveByGuildId(
+        guildId: String,
+        now: LocalDateTime,
+    ): Long
 
     @Query(
         """
@@ -79,7 +100,11 @@ interface BehavioralActionEntitySpringRepository :
         FROM behavioral_actions
         WHERE guild_id = :guildId AND character_name = :characterName AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
-        """
+        """,
     )
-    fun getTotalActiveDeduction(guildId: String, characterName: String, now: LocalDateTime): Double
+    fun getTotalActiveDeduction(
+        guildId: String,
+        characterName: String,
+        now: LocalDateTime,
+    ): Double
 }

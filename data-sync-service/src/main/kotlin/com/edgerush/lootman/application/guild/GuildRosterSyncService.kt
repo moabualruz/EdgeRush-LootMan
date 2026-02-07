@@ -90,23 +90,25 @@ class GuildRosterSyncService(
         val officerRanks = listOf("Guild Master", "Officer", "Veteran")
         // Raider ranks get view permissions only
         val raiderRanks = listOf("Main", "Raider", "Member", "Initiate")
-        val permissionTypes = listOf(
-            GuildPermissionType.SETTINGS_ACCESS,
-            GuildPermissionType.LOOT_MANAGEMENT,
-            GuildPermissionType.MEMBER_MANAGEMENT,
-            GuildPermissionType.VIEW_ALL_SCORES,
-        )
+        val permissionTypes =
+            listOf(
+                GuildPermissionType.SETTINGS_ACCESS,
+                GuildPermissionType.LOOT_MANAGEMENT,
+                GuildPermissionType.MEMBER_MANAGEMENT,
+                GuildPermissionType.VIEW_ALL_SCORES,
+            )
 
         var created = 0
         // Grant full permissions to officer ranks
         for (rank in officerRanks) {
             for (permissionType in permissionTypes) {
                 try {
-                    val permission = GuildPermission.create(
-                        guildId = GuildId(guildId),
-                        rankName = rank,
-                        permissionType = permissionType,
-                    )
+                    val permission =
+                        GuildPermission.create(
+                            guildId = GuildId(guildId),
+                            rankName = rank,
+                            permissionType = permissionType,
+                        )
                     guildPermissionRepository.save(permission)
                     created++
                 } catch (e: Exception) {
@@ -118,11 +120,12 @@ class GuildRosterSyncService(
         // Grant view-only permission to regular raider ranks
         for (rank in raiderRanks) {
             try {
-                val permission = GuildPermission.create(
-                    guildId = GuildId(guildId),
-                    rankName = rank,
-                    permissionType = GuildPermissionType.VIEW_ALL_SCORES,
-                )
+                val permission =
+                    GuildPermission.create(
+                        guildId = GuildId(guildId),
+                        rankName = rank,
+                        permissionType = GuildPermissionType.VIEW_ALL_SCORES,
+                    )
                 guildPermissionRepository.save(permission)
                 created++
             } catch (e: Exception) {
@@ -159,38 +162,40 @@ class GuildRosterSyncService(
 
         if (existing != null) {
             // Update existing raider
-            val updated = existing.copy(
-                characterName = character.name,
-                realm = realmName,
-                region = region,
-                guildId = guildId,
-                blizzardId = character.id,
-                clazz = className,
-                rank = rankName,
-                lastSync = now,
-            )
+            val updated =
+                existing.copy(
+                    characterName = character.name,
+                    realm = realmName,
+                    region = region,
+                    guildId = guildId,
+                    blizzardId = character.id,
+                    clazz = className,
+                    rank = rankName,
+                    lastSync = now,
+                )
             raiderEntityRepository.save(updated)
             return UpsertResult.UPDATED
         } else {
             // Create new raider
-            val newRaider = RaiderEntity(
-                characterName = character.name,
-                realm = realmName,
-                region = region,
-                guildId = guildId,
-                wowauditId = null,
-                clazz = className,
-                spec = "",
-                role = "",
-                rank = rankName,
-                status = "Active",
-                note = null,
-                blizzardId = character.id,
-                trackingSince = now,
-                joinDate = now,
-                blizzardLastModified = null,
-                lastSync = now,
-            )
+            val newRaider =
+                RaiderEntity(
+                    characterName = character.name,
+                    realm = realmName,
+                    region = region,
+                    guildId = guildId,
+                    wowauditId = null,
+                    clazz = className,
+                    spec = "",
+                    role = "",
+                    rank = rankName,
+                    status = "Active",
+                    note = null,
+                    blizzardId = character.id,
+                    trackingSince = now,
+                    joinDate = now,
+                    blizzardLastModified = null,
+                    lastSync = now,
+                )
             raiderEntityRepository.save(newRaider)
             return UpsertResult.CREATED
         }

@@ -26,16 +26,16 @@ data class BaseCharacter(
     override val createdAt: Instant,
     override val updatedAt: Instant,
 ) : WoWCharacter(
-    characterId = characterId,
-    name = name,
-    realm = realm,
-    region = region,
-    characterClass = characterClass,
-    blizzardId = blizzardId,
-    accountId = accountId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-) {
+        characterId = characterId,
+        name = name,
+        realm = realm,
+        region = region,
+        characterClass = characterClass,
+        blizzardId = blizzardId,
+        accountId = accountId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    ) {
     companion object {
         /**
          * Creates a new BaseCharacter with default timestamps.

@@ -128,16 +128,17 @@ class RaiderDataLoaderTest : UnitTest() {
         id: Long = 1L,
         guildId: String = "test-guild",
         name: String = "TestRaider",
-    ): Raider = RaiderFixtures.createRaider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        name = name,
-        realm = "TestRealm",
-        characterClass = CharacterClass.WARRIOR,
-        role = Role.DPS,
-        rank = "Raider",
-        status = RaiderStatus.ACTIVE,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            name = name,
+            realm = "TestRealm",
+            characterClass = CharacterClass.WARRIOR,
+            role = Role.DPS,
+            rank = "Raider",
+            status = RaiderStatus.ACTIVE,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 }

@@ -9,14 +9,14 @@ data class RecruitmentApplication(
     val details: RecruitmentDetails,
     val status: RecruitmentStatus,
     val review: RecruitmentReview?,
-    val timestamps: RecruitmentTimestamps
+    val timestamps: RecruitmentTimestamps,
 )
 
 data class RecruitmentApplicant(
     val battleNetId: String,
     val discordId: String,
     val email: String,
-    val character: RecruitmentCharacter
+    val character: RecruitmentCharacter,
 )
 
 data class RecruitmentCharacter(
@@ -25,12 +25,12 @@ data class RecruitmentCharacter(
     val characterClass: String,
     val specialization: String,
     val itemLevel: Double,
-    val scores: RecruitmentScores
+    val scores: RecruitmentScores,
 )
 
 data class RecruitmentScores(
     val raiderIoScore: Double?,
-    val bestParseAverage: Double?
+    val bestParseAverage: Double?,
 )
 
 data class RecruitmentDetails(
@@ -40,15 +40,15 @@ data class RecruitmentDetails(
     val raidDaysAvailable: List<String>,
     val previousGuilds: String,
     val reasonForLeaving: String,
-    val whyThisGuild: String
+    val whyThisGuild: String,
 )
 
 data class RecruitmentReview(
     val reviewedBy: String?,
-    val reviewedAt: Instant?
+    val reviewedAt: Instant?,
 )
 
 data class RecruitmentTimestamps(
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )

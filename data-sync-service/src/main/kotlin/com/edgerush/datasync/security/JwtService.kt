@@ -39,17 +39,19 @@ class JwtService(
         val claims = extractClaims(token)
 
         // Support both singular (from AuthenticationService) and plural (legacy) claim formats
-        val roles = when {
-            claims["roles"] is List<*> -> (claims["roles"] as List<*>).map { it.toString() }
-            claims["role"] is String -> listOf(claims["role"] as String)
-            else -> emptyList()
-        }
+        val roles =
+            when {
+                claims["roles"] is List<*> -> (claims["roles"] as List<*>).map { it.toString() }
+                claims["role"] is String -> listOf(claims["role"] as String)
+                else -> emptyList()
+            }
 
-        val guildIds = when {
-            claims["guildIds"] is List<*> -> (claims["guildIds"] as List<*>).map { it.toString() }
-            claims["guildId"] is String -> listOfNotNull(claims["guildId"] as? String)
-            else -> emptyList()
-        }
+        val guildIds =
+            when {
+                claims["guildIds"] is List<*> -> (claims["guildIds"] as List<*>).map { it.toString() }
+                claims["guildId"] is String -> listOfNotNull(claims["guildId"] as? String)
+                else -> emptyList()
+            }
 
         return AuthenticatedUser(
             id = claims.subject,

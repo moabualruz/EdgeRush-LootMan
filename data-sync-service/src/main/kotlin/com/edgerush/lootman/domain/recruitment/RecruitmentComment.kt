@@ -7,5 +7,5 @@ data class RecruitmentComment(
     val applicationId: String,
     val authorId: Long,
     val text: String,
-    val createdAt: Instant
+    val createdAt: Instant,
 )

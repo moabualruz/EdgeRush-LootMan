@@ -14,23 +14,26 @@ import java.time.ZoneOffset
 @Repository
 class JdbcRecruitmentRepository(
     private val jdbcTemplate: JdbcTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : RecruitmentRepository {
-
     override fun findById(id: String): RecruitmentApplication? {
         val sql = "SELECT * FROM enhanced_applications WHERE enhanced_application_id = ?"
         return jdbcTemplate.query(sql, applicationRowMapper, id).firstOrNull()?.toDomain()
     }
 
-    override fun findByGuildId(guildId: String, status: RecruitmentStatus?): List<RecruitmentApplication> {
-        val sql = if (status != null) {
-            "SELECT * FROM enhanced_applications WHERE guild_id = ? AND status = ? ORDER BY created_at DESC"
-        } else {
-            "SELECT * FROM enhanced_applications WHERE guild_id = ? ORDER BY created_at DESC"
-        }
-        
+    override fun findByGuildId(
+        guildId: String,
+        status: RecruitmentStatus?,
+    ): List<RecruitmentApplication> {
+        val sql =
+            if (status != null) {
+                "SELECT * FROM enhanced_applications WHERE guild_id = ? AND status = ? ORDER BY created_at DESC"
+            } else {
+                "SELECT * FROM enhanced_applications WHERE guild_id = ? ORDER BY created_at DESC"
+            }
+
         val args = if (status != null) arrayOf(guildId, status.name) else arrayOf(guildId)
-        
+
         return jdbcTemplate.query(sql, applicationRowMapper, *args).map { it.toDomain() }
     }
 
@@ -38,12 +41,13 @@ class JdbcRecruitmentRepository(
         // Upsert logic
         // Check if exists logic omitted for brevity, assuming Save = Insert OR Update based on existence
         // For simplicity, let's just do an UPSERT (INSERT ON CONFLICT) implementation pattern or check exists.
-        
-        val exists = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM enhanced_applications WHERE enhanced_application_id = ?",
-            Int::class.java,
-            application.id
-        ) ?: 0 > 0
+
+        val exists =
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM enhanced_applications WHERE enhanced_application_id = ?",
+                Int::class.java,
+                application.id,
+            ) ?: 0 > 0
 
         val entity = application.toEntity()
 
@@ -81,7 +85,7 @@ class JdbcRecruitmentRepository(
                 entity.previousGuilds, entity.reasonForLeaving, entity.whyThisGuild,
                 entity.status,
                 Timestamp.from(entity.createdAt.toInstant()),
-                Timestamp.from(entity.updatedAt.toInstant())
+                Timestamp.from(entity.updatedAt.toInstant()),
             )
         }
         return application
@@ -92,14 +96,15 @@ class JdbcRecruitmentRepository(
             INSERT INTO recruitment_comments (application_id, author_id, text, created_at)
             VALUES (?, ?, ?, ?) RETURNING id
         """
-        val id = jdbcTemplate.queryForObject(
-            sql,
-            Long::class.java,
-            comment.applicationId,
-            comment.authorId,
-            comment.text,
-            Timestamp.from(comment.createdAt)
-        )
+        val id =
+            jdbcTemplate.queryForObject(
+                sql,
+                Long::class.java,
+                comment.applicationId,
+                comment.authorId,
+                comment.text,
+                Timestamp.from(comment.createdAt),
+            )
         return comment.copy(id = id)
     }
 
@@ -108,89 +113,103 @@ class JdbcRecruitmentRepository(
         return jdbcTemplate.query(sql, commentRowMapper, applicationId).map { it.toDomain() }
     }
 
-    private val applicationRowMapper = RowMapper { rs, _ ->
-        RecruitmentApplicationEntity(
-            id = rs.getString("enhanced_application_id"),
-            guildId = rs.getString("guild_id"),
-            battleNetId = rs.getString("battle_net_id"),
-            discordId = rs.getString("discord_id"),
-            email = rs.getString("email"),
-            characterName = rs.getString("character_name"),
-            characterRealm = rs.getString("character_realm"),
-            characterClass = rs.getString("character_class"),
-            specialization = rs.getString("specialization"),
-            itemLevel = rs.getDouble("item_level"),
-            raiderIoScore = rs.getObject("raider_io_score") as? Double,
-            bestParseAverage = rs.getObject("best_parse_average") as? Double,
-            age = rs.getInt("age"),
-            location = rs.getString("location"),
-            timezone = rs.getString("timezone"),
-            raidDaysAvailable = rs.getString("raid_days_available"),
-            previousGuilds = rs.getString("previous_guilds"),
-            reasonForLeaving = rs.getString("reason_for_leaving"),
-            whyThisGuild = rs.getString("why_this_guild"),
-            status = rs.getString("status"),
-            reviewedBy = rs.getString("reviewed_by"),
-            reviewedAt = rs.getTimestamp("reviewed_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
-            createdAt = rs.getTimestamp("created_at").toInstant().atOffset(ZoneOffset.UTC),
-            updatedAt = rs.getTimestamp("updated_at").toInstant().atOffset(ZoneOffset.UTC)
-        )
-    }
+    private val applicationRowMapper =
+        RowMapper { rs, _ ->
+            RecruitmentApplicationEntity(
+                id = rs.getString("enhanced_application_id"),
+                guildId = rs.getString("guild_id"),
+                battleNetId = rs.getString("battle_net_id"),
+                discordId = rs.getString("discord_id"),
+                email = rs.getString("email"),
+                characterName = rs.getString("character_name"),
+                characterRealm = rs.getString("character_realm"),
+                characterClass = rs.getString("character_class"),
+                specialization = rs.getString("specialization"),
+                itemLevel = rs.getDouble("item_level"),
+                raiderIoScore = rs.getObject("raider_io_score") as? Double,
+                bestParseAverage = rs.getObject("best_parse_average") as? Double,
+                age = rs.getInt("age"),
+                location = rs.getString("location"),
+                timezone = rs.getString("timezone"),
+                raidDaysAvailable = rs.getString("raid_days_available"),
+                previousGuilds = rs.getString("previous_guilds"),
+                reasonForLeaving = rs.getString("reason_for_leaving"),
+                whyThisGuild = rs.getString("why_this_guild"),
+                status = rs.getString("status"),
+                reviewedBy = rs.getString("reviewed_by"),
+                reviewedAt = rs.getTimestamp("reviewed_at")?.toInstant()?.atOffset(ZoneOffset.UTC),
+                createdAt = rs.getTimestamp("created_at").toInstant().atOffset(ZoneOffset.UTC),
+                updatedAt = rs.getTimestamp("updated_at").toInstant().atOffset(ZoneOffset.UTC),
+            )
+        }
 
-    private val commentRowMapper = RowMapper { rs, _ ->
-        RecruitmentCommentEntity(
-            id = rs.getLong("id"),
-            applicationId = rs.getString("application_id"),
-            authorId = rs.getLong("author_id"),
-            text = rs.getString("text"),
-            createdAt = rs.getTimestamp("created_at").toInstant().atOffset(ZoneOffset.UTC)
-        )
-    }
+    private val commentRowMapper =
+        RowMapper { rs, _ ->
+            RecruitmentCommentEntity(
+                id = rs.getLong("id"),
+                applicationId = rs.getString("application_id"),
+                authorId = rs.getLong("author_id"),
+                text = rs.getString("text"),
+                createdAt = rs.getTimestamp("created_at").toInstant().atOffset(ZoneOffset.UTC),
+            )
+        }
 
     private fun RecruitmentApplicationEntity.toDomain(): RecruitmentApplication {
-        val daysList: List<String> = try {
-            objectMapper.readValue(this.raidDaysAvailable, object : TypeReference<List<String>>() {})
-        } catch (e: Exception) {
-            emptyList()
-        }
+        val daysList: List<String> =
+            try {
+                objectMapper.readValue(this.raidDaysAvailable, object : TypeReference<List<String>>() {})
+            } catch (e: Exception) {
+                emptyList()
+            }
 
         return RecruitmentApplication(
             id = this.id,
             guildId = this.guildId,
-            applicant = RecruitmentApplicant(
-                battleNetId = this.battleNetId,
-                discordId = this.discordId,
-                email = this.email,
-                character = RecruitmentCharacter(
-                    name = this.characterName,
-                    realm = this.characterRealm,
-                    characterClass = this.characterClass,
-                    specialization = this.specialization,
-                    itemLevel = this.itemLevel,
-                    scores = RecruitmentScores(
-                        raiderIoScore = this.raiderIoScore,
-                        bestParseAverage = this.bestParseAverage
-                    )
-                )
-            ),
-            details = RecruitmentDetails(
-                age = this.age,
-                location = this.location,
-                timezone = this.timezone,
-                raidDaysAvailable = daysList,
-                previousGuilds = this.previousGuilds,
-                reasonForLeaving = this.reasonForLeaving,
-                whyThisGuild = this.whyThisGuild
-            ),
-            status = try { RecruitmentStatus.valueOf(this.status) } catch (e: Exception) { RecruitmentStatus.PENDING },
-            review = RecruitmentReview(
-                reviewedBy = this.reviewedBy,
-                reviewedAt = this.reviewedAt?.toInstant()
-            ),
-            timestamps = RecruitmentTimestamps(
-                createdAt = this.createdAt.toInstant(),
-                updatedAt = this.updatedAt.toInstant()
-            )
+            applicant =
+                RecruitmentApplicant(
+                    battleNetId = this.battleNetId,
+                    discordId = this.discordId,
+                    email = this.email,
+                    character =
+                        RecruitmentCharacter(
+                            name = this.characterName,
+                            realm = this.characterRealm,
+                            characterClass = this.characterClass,
+                            specialization = this.specialization,
+                            itemLevel = this.itemLevel,
+                            scores =
+                                RecruitmentScores(
+                                    raiderIoScore = this.raiderIoScore,
+                                    bestParseAverage = this.bestParseAverage,
+                                ),
+                        ),
+                ),
+            details =
+                RecruitmentDetails(
+                    age = this.age,
+                    location = this.location,
+                    timezone = this.timezone,
+                    raidDaysAvailable = daysList,
+                    previousGuilds = this.previousGuilds,
+                    reasonForLeaving = this.reasonForLeaving,
+                    whyThisGuild = this.whyThisGuild,
+                ),
+            status =
+                try {
+                    RecruitmentStatus.valueOf(this.status)
+                } catch (e: Exception) {
+                    RecruitmentStatus.PENDING
+                },
+            review =
+                RecruitmentReview(
+                    reviewedBy = this.reviewedBy,
+                    reviewedAt = this.reviewedAt?.toInstant(),
+                ),
+            timestamps =
+                RecruitmentTimestamps(
+                    createdAt = this.createdAt.toInstant(),
+                    updatedAt = this.updatedAt.toInstant(),
+                ),
         )
     }
 
@@ -219,7 +238,7 @@ class JdbcRecruitmentRepository(
             reviewedBy = this.review?.reviewedBy,
             reviewedAt = this.review?.reviewedAt?.atOffset(ZoneOffset.UTC),
             createdAt = this.timestamps.createdAt.atOffset(ZoneOffset.UTC),
-            updatedAt = this.timestamps.updatedAt.atOffset(ZoneOffset.UTC)
+            updatedAt = this.timestamps.updatedAt.atOffset(ZoneOffset.UTC),
         )
     }
 
@@ -229,7 +248,7 @@ class JdbcRecruitmentRepository(
             applicationId = this.applicationId,
             authorId = this.authorId,
             text = this.text,
-            createdAt = this.createdAt.toInstant()
+            createdAt = this.createdAt.toInstant(),
         )
     }
 }

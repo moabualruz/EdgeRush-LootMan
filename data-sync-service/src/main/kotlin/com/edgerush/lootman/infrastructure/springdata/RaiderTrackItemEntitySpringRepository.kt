@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface RaiderTrackItemEntitySpringRepository :
     CrudRepository<RaiderTrackItemEntity, Long>,
     PagingAndSortingRepository<RaiderTrackItemEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<RaiderTrackItemEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<RaiderTrackItemEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
     fun findByRaiderId(raiderId: Long): List<RaiderTrackItemEntity>
 
-    fun findByRaiderIdAndTier(raiderId: Long, tier: String): RaiderTrackItemEntity?
+    fun findByRaiderIdAndTier(
+        raiderId: Long,
+        tier: String,
+    ): RaiderTrackItemEntity?
 
     fun deleteByRaiderId(raiderId: Long)
 }

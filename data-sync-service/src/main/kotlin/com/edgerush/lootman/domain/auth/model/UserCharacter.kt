@@ -12,17 +12,17 @@ data class UserCharacter(
     val userId: UserId,
     val name: String,
     val realm: String,
-    val className: String,  // Class name from Blizzard API (e.g., "Death Knight", "Mage")
-    val classId: Int? = null,  // Reference to wow_classes table (dynamic, from Blizzard API)
-    val specId: Int? = null,   // Reference to wow_specializations table (dynamic, from Blizzard API)
+    val className: String, // Class name from Blizzard API (e.g., "Death Knight", "Mage")
+    val classId: Int? = null, // Reference to wow_classes table (dynamic, from Blizzard API)
+    val specId: Int? = null, // Reference to wow_specializations table (dynamic, from Blizzard API)
     val level: Int,
     val race: String,
     val faction: String,
     val blizzardId: Long?,
-    val guildName: String? = null,   // Guild name from Battle.net API
-    val guildRealm: String? = null,  // Guild realm from Battle.net API
-    val guildId: String? = null,     // Reference to guild_configurations.guild_id if tracked
-    val lastSyncedAt: Instant = Instant.now()
+    val guildName: String? = null, // Guild name from Battle.net API
+    val guildRealm: String? = null, // Guild realm from Battle.net API
+    val guildId: String? = null, // Reference to guild_configurations.guild_id if tracked
+    val lastSyncedAt: Instant = Instant.now(),
 ) {
     fun identifier(): String = "$name-$realm"
 

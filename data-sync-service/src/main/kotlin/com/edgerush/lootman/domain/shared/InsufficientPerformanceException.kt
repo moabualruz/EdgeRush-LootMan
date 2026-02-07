@@ -10,5 +10,5 @@ class InsufficientPerformanceException(
     val actualScore: MechanicalAdherenceScore,
     val requiredThreshold: Double,
 ) : RuntimeException(
-    "Raider ${raiderId.value} has MAS ${actualScore.value} which is below required threshold $requiredThreshold"
-)
+        "Raider ${raiderId.value} has MAS ${actualScore.value} which is below required threshold $requiredThreshold",
+    )

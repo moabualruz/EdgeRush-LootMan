@@ -9,10 +9,12 @@ import org.springframework.stereotype.Repository
 interface UserCharacterEntitySpringRepository :
     CrudRepository<UserCharacterEntity, Long>,
     PagingAndSortingRepository<UserCharacterEntity, Long> {
-
     fun findByUserId(userId: Long): List<UserCharacterEntity>
+
     fun findByUserIdOrderByLevelDescCharacterNameAsc(userId: Long): List<UserCharacterEntity>
+
     fun deleteAllByUserId(userId: Long)
+
     fun findByUserIdAndCharacterNameIgnoreCaseAndRealmIgnoreCase(
         userId: Long,
         characterName: String,

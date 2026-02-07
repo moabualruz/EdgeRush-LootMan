@@ -27,8 +27,9 @@ class WoWAuditWishlistSyncService(
     private val guildConfigurationRepository: GuildConfigurationRepository,
 ) {
     private val logger = LoggerFactory.getLogger(WoWAuditWishlistSyncService::class.java)
-    private val objectMapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     /**
      * Syncs wishlists from WoWAudit for a specific guild.
@@ -37,8 +38,9 @@ class WoWAuditWishlistSyncService(
      * @return Sync result with counts
      */
     fun syncWishlists(guildId: String): Mono<WoWAuditSyncResult> {
-        val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
-            ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
+        val guildConfig =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
 
         if (guildConfig.wowauditGuildUri.isNullOrBlank()) {
             return Mono.error(IllegalArgumentException("WoWAudit guild URI not configured for guildId=$guildId"))
@@ -51,7 +53,10 @@ class WoWAuditWishlistSyncService(
             .doOnSuccess { result ->
                 logger.info(
                     "WoWAudit wishlist sync completed for guild={}: created={}, updated={}, skipped={}",
-                    guildId, result.created, result.updated, result.skipped
+                    guildId,
+                    result.created,
+                    result.updated,
+                    result.skipped,
                 )
             }
             .doOnError { ex ->
@@ -59,7 +64,10 @@ class WoWAuditWishlistSyncService(
             }
     }
 
-    private fun parseAndSyncWishlists(body: String, guildId: String): WoWAuditSyncResult {
+    private fun parseAndSyncWishlists(
+        body: String,
+        guildId: String,
+    ): WoWAuditSyncResult {
         var created = 0
         var updated = 0
         var skipped = 0
@@ -68,14 +76,15 @@ class WoWAuditWishlistSyncService(
             val node = objectMapper.readTree(body)
 
             // WoWAudit wishlist response can be an array of characters with wishlists
-            val charactersNode = when {
-                node.has("characters") -> node.get("characters")
-                node.isArray -> node
-                else -> {
-                    logger.warn("WoWAudit wishlist response has unexpected structure")
-                    return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+            val charactersNode =
+                when {
+                    node.has("characters") -> node.get("characters")
+                    node.isArray -> node
+                    else -> {
+                        logger.warn("WoWAudit wishlist response has unexpected structure")
+                        return WoWAuditSyncResult(0, 0, 0, "Unexpected response structure")
+                    }
                 }
-            }
 
             if (!charactersNode.isArray) {
                 logger.warn("WoWAudit wishlist characters is not an array")
@@ -91,10 +100,12 @@ class WoWAuditWishlistSyncService(
 
             for (element in charactersNode) {
                 try {
-                    val characterName = element.path("name").asText("")
-                        .ifBlank { element.path("character_name").asText("") }
-                    val characterRealm = element.path("realm").asText("")
-                        .ifBlank { element.path("character_realm").asText("") }
+                    val characterName =
+                        element.path("name").asText("")
+                            .ifBlank { element.path("character_name").asText("") }
+                    val characterRealm =
+                        element.path("realm").asText("")
+                            .ifBlank { element.path("character_realm").asText("") }
                     val characterRegion = element.path("region").asText(null)
 
                     if (characterName.isBlank() || characterRealm.isBlank()) {
@@ -107,9 +118,10 @@ class WoWAuditWishlistSyncService(
                     val raiderId = raider?.id
 
                     // Store the raw wishlist data as a snapshot
-                    val wishlistData = element.path("wishlist").takeIf { !it.isMissingNode && !it.isNull }
-                        ?: element.path("items").takeIf { !it.isMissingNode && !it.isNull }
-                        ?: element
+                    val wishlistData =
+                        element.path("wishlist").takeIf { !it.isMissingNode && !it.isNull }
+                            ?: element.path("items").takeIf { !it.isMissingNode && !it.isNull }
+                            ?: element
 
                     // Only store if there's actual wishlist data
                     if (wishlistData.isMissingNode || wishlistData.isNull ||
@@ -121,17 +133,18 @@ class WoWAuditWishlistSyncService(
 
                     val rawPayload = objectMapper.writeValueAsString(wishlistData)
 
-                    val entity = WishlistSnapshotEntity(
-                        raiderId = raiderId,
-                        characterName = characterName,
-                        characterRealm = characterRealm,
-                        characterRegion = characterRegion,
-                        teamId = teamId,
-                        seasonId = seasonId,
-                        periodId = periodId,
-                        rawPayload = rawPayload,
-                        syncedAt = now,
-                    )
+                    val entity =
+                        WishlistSnapshotEntity(
+                            raiderId = raiderId,
+                            characterName = characterName,
+                            characterRealm = characterRealm,
+                            characterRegion = characterRegion,
+                            teamId = teamId,
+                            seasonId = seasonId,
+                            periodId = periodId,
+                            rawPayload = rawPayload,
+                            syncedAt = now,
+                        )
 
                     wishlistSnapshotRepository.save(entity)
                     created++

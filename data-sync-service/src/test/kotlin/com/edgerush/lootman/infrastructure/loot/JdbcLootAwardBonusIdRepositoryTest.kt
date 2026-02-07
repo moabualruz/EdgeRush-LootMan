@@ -67,11 +67,12 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val id = 1L
-            val entity = createBonusIdEntity(
-                id = id,
-                lootAwardId = 100L,
-                bonusId = "6652",
-            )
+            val entity =
+                createBonusIdEntity(
+                    id = id,
+                    lootAwardId = 100L,
+                    bonusId = "6652",
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -89,11 +90,12 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
         fun `should handle null bonus id`() {
             // Given
             val id = 1L
-            val entity = createBonusIdEntity(
-                id = id,
-                lootAwardId = 100L,
-                bonusId = null,
-            )
+            val entity =
+                createBonusIdEntity(
+                    id = id,
+                    lootAwardId = 100L,
+                    bonusId = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -113,10 +115,11 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createBonusIdEntity(1L, 100L),
-                createBonusIdEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createBonusIdEntity(1L, 100L),
+                    createBonusIdEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -136,10 +139,11 @@ class JdbcLootAwardBonusIdRepositoryTest : UnitTest() {
         fun `should return bonus ids for loot award`() {
             // Given
             val lootAwardId = 100L
-            val entities = listOf(
-                createBonusIdEntity(1L, lootAwardId, "6652"),
-                createBonusIdEntity(2L, lootAwardId, "6653"),
-            )
+            val entities =
+                listOf(
+                    createBonusIdEntity(1L, lootAwardId, "6652"),
+                    createBonusIdEntity(2L, lootAwardId, "6653"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByLootAwardId(lootAwardId, any<Pageable>()) } returns page

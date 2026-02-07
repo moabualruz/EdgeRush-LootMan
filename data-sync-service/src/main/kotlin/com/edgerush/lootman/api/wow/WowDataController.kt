@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/wow")
 class WowDataController(
-    private val wowDataSyncService: WowDataSyncService
+    private val wowDataSyncService: WowDataSyncService,
 ) {
-
     /**
      * Get all WoW classes.
      */
@@ -29,9 +28,12 @@ class WowDataController(
      * Get a specific WoW class by ID.
      */
     @GetMapping("/classes/{id}")
-    fun getClassById(@PathVariable id: Int): ResponseEntity<WowClassDto> {
-        val wowClass = wowDataSyncService.getAllClasses().find { it.id == id }
-            ?: return ResponseEntity.notFound().build()
+    fun getClassById(
+        @PathVariable id: Int,
+    ): ResponseEntity<WowClassDto> {
+        val wowClass =
+            wowDataSyncService.getAllClasses().find { it.id == id }
+                ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(wowClass.toDto())
     }
 
@@ -39,7 +41,9 @@ class WowDataController(
      * Get all specializations for a class.
      */
     @GetMapping("/classes/{classId}/specializations")
-    fun getSpecsForClass(@PathVariable classId: Int): ResponseEntity<List<WowSpecializationDto>> {
+    fun getSpecsForClass(
+        @PathVariable classId: Int,
+    ): ResponseEntity<List<WowSpecializationDto>> {
         val specs = wowDataSyncService.getSpecsForClass(classId)
         return ResponseEntity.ok(specs.map { it.toDto() })
     }
@@ -71,7 +75,7 @@ data class WowClassDto(
     val name: String,
     val slug: String,
     val mediaUrl: String?,
-    val powerType: String?
+    val powerType: String?,
 )
 
 data class WowSpecializationDto(
@@ -80,7 +84,7 @@ data class WowSpecializationDto(
     val name: String,
     val slug: String,
     val role: String,
-    val mediaUrl: String?
+    val mediaUrl: String?,
 )
 
 data class SyncResultDto(
@@ -91,34 +95,37 @@ data class SyncResultDto(
     val specsUpdated: Int,
     val totalClasses: Int,
     val totalSpecs: Int,
-    val errors: List<String>
+    val errors: List<String>,
 )
 
 // Extension functions
-private fun WowClass.toDto() = WowClassDto(
-    id = id,
-    name = name,
-    slug = slug,
-    mediaUrl = mediaUrl,
-    powerType = powerType
-)
+private fun WowClass.toDto() =
+    WowClassDto(
+        id = id,
+        name = name,
+        slug = slug,
+        mediaUrl = mediaUrl,
+        powerType = powerType,
+    )
 
-private fun WowSpecialization.toDto() = WowSpecializationDto(
-    id = id,
-    classId = classId,
-    name = name,
-    slug = slug,
-    role = role.name,
-    mediaUrl = mediaUrl
-)
+private fun WowSpecialization.toDto() =
+    WowSpecializationDto(
+        id = id,
+        classId = classId,
+        name = name,
+        slug = slug,
+        role = role.name,
+        mediaUrl = mediaUrl,
+    )
 
-private fun SyncResult.toDto() = SyncResultDto(
-    success = success,
-    classesAdded = classesAdded,
-    classesUpdated = classesUpdated,
-    specsAdded = specsAdded,
-    specsUpdated = specsUpdated,
-    totalClasses = totalClasses,
-    totalSpecs = totalSpecs,
-    errors = errors
-)
+private fun SyncResult.toDto() =
+    SyncResultDto(
+        success = success,
+        classesAdded = classesAdded,
+        classesUpdated = classesUpdated,
+        specsAdded = specsAdded,
+        specsUpdated = specsUpdated,
+        totalClasses = totalClasses,
+        totalSpecs = totalSpecs,
+        errors = errors,
+    )

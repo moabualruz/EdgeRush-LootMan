@@ -11,11 +11,13 @@ import org.springframework.stereotype.Repository
 interface RefreshTokenEntitySpringRepository :
     CrudRepository<RefreshTokenEntity, Long>,
     PagingAndSortingRepository<RefreshTokenEntity, Long> {
-
     fun findByTokenHash(tokenHash: String): RefreshTokenEntity?
+
     fun findByUserIdOrderByCreatedAtDesc(userId: Long): List<RefreshTokenEntity>
 
-    @Query("SELECT * FROM user_refresh_tokens WHERE user_id = :userId AND revoked_at IS NULL AND expires_at > NOW() ORDER BY created_at DESC")
+    @Query(
+        "SELECT * FROM user_refresh_tokens WHERE user_id = :userId AND revoked_at IS NULL AND expires_at > NOW() ORDER BY created_at DESC",
+    )
     fun findValidByUserId(userId: Long): List<RefreshTokenEntity>
 
     fun deleteByUserId(userId: Long): Int

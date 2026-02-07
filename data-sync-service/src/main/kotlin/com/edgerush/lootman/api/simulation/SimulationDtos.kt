@@ -143,7 +143,10 @@ data class RaiderSimulationStatusResponse(
             )
         }
 
-        fun from(raiderId: Long, request: SimulationRequest): RaiderSimulationStatusResponse {
+        fun from(
+            raiderId: Long,
+            request: SimulationRequest,
+        ): RaiderSimulationStatusResponse {
             return RaiderSimulationStatusResponse(
                 raiderId = raiderId,
                 status = request.status.name,

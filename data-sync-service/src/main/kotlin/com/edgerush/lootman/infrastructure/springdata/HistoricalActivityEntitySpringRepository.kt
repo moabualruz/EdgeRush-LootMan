@@ -17,12 +17,17 @@ import org.springframework.stereotype.Repository
 interface HistoricalActivityEntitySpringRepository :
     CrudRepository<HistoricalActivityEntity, Long>,
     PagingAndSortingRepository<HistoricalActivityEntity, Long> {
-
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<HistoricalActivityEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<HistoricalActivityEntity>
 
     fun countByTeamId(teamId: Long): Long
 
-    fun findByCharacterId(characterId: Long, pageable: Pageable): Page<HistoricalActivityEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        pageable: Pageable,
+    ): Page<HistoricalActivityEntity>
 
     fun countByCharacterId(characterId: Long): Long
 
@@ -31,16 +36,22 @@ interface HistoricalActivityEntitySpringRepository :
         SELECT * FROM historical_activity
         WHERE character_name = :characterName AND character_realm = :characterRealm
         ORDER BY synced_at DESC
-        """
+        """,
     )
-    fun findByCharacterNameAndRealm(characterName: String, characterRealm: String): List<HistoricalActivityEntity>
+    fun findByCharacterNameAndRealm(
+        characterName: String,
+        characterRealm: String,
+    ): List<HistoricalActivityEntity>
 
     @Query(
         """
         SELECT * FROM historical_activity
         WHERE team_id = :teamId AND character_name = :characterName
         ORDER BY synced_at DESC
-        """
+        """,
     )
-    fun findByTeamIdAndCharacterName(teamId: Long, characterName: String): List<HistoricalActivityEntity>
+    fun findByTeamIdAndCharacterName(
+        teamId: Long,
+        characterName: String,
+    ): List<HistoricalActivityEntity>
 }

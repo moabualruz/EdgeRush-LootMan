@@ -67,20 +67,21 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val id = 1L
-            val entity = createGearItemEntity(
-                id = id,
-                raiderId = 100L,
-                gearSet = "equipped",
-                slot = "head",
-                itemId = 12345L,
-                itemLevel = 450,
-                quality = 4,
-                enchant = "Enchant",
-                enchantQuality = 3,
-                upgradeLevel = 2,
-                sockets = 1,
-                name = "Helm of Power",
-            )
+            val entity =
+                createGearItemEntity(
+                    id = id,
+                    raiderId = 100L,
+                    gearSet = "equipped",
+                    slot = "head",
+                    itemId = 12345L,
+                    itemLevel = 450,
+                    quality = 4,
+                    enchant = "Enchant",
+                    enchantQuality = 3,
+                    upgradeLevel = 2,
+                    sockets = 1,
+                    name = "Helm of Power",
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -107,18 +108,19 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createGearItemEntity(
-                id = id,
-                raiderId = 100L,
-                itemId = null,
-                itemLevel = null,
-                quality = null,
-                enchant = null,
-                enchantQuality = null,
-                upgradeLevel = null,
-                sockets = null,
-                name = null,
-            )
+            val entity =
+                createGearItemEntity(
+                    id = id,
+                    raiderId = 100L,
+                    itemId = null,
+                    itemLevel = null,
+                    quality = null,
+                    enchant = null,
+                    enchantQuality = null,
+                    upgradeLevel = null,
+                    sockets = null,
+                    name = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -145,10 +147,11 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createGearItemEntity(1L, 100L),
-                createGearItemEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createGearItemEntity(1L, 100L),
+                    createGearItemEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -168,10 +171,11 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
         fun `should return gear items for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createGearItemEntity(1L, raiderId, slot = "head"),
-                createGearItemEntity(2L, raiderId, slot = "chest"),
-            )
+            val entities =
+                listOf(
+                    createGearItemEntity(1L, raiderId, slot = "head"),
+                    createGearItemEntity(2L, raiderId, slot = "chest"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page
@@ -209,10 +213,11 @@ class JdbcRaiderGearItemRepositoryTest : UnitTest() {
             // Given
             val raiderId = 100L
             val gearSet = "equipped"
-            val entities = listOf(
-                createGearItemEntity(1L, raiderId, gearSet = gearSet, slot = "head"),
-                createGearItemEntity(2L, raiderId, gearSet = gearSet, slot = "chest"),
-            )
+            val entities =
+                listOf(
+                    createGearItemEntity(1L, raiderId, gearSet = gearSet, slot = "head"),
+                    createGearItemEntity(2L, raiderId, gearSet = gearSet, slot = "chest"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderIdAndGearSet(raiderId, gearSet, any<Pageable>()) } returns page

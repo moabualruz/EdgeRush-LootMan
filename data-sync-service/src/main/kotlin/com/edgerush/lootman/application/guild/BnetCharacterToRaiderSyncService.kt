@@ -33,7 +33,7 @@ class BnetCharacterToRaiderSyncService(
     private val logger = LoggerFactory.getLogger(BnetCharacterToRaiderSyncService::class.java)
 
     companion object {
-        private const val MIN_LEVEL_FOR_RAIDER = 70  // Only create raiders for near-max level characters
+        private const val MIN_LEVEL_FOR_RAIDER = 70 // Only create raiders for near-max level characters
     }
 
     /**
@@ -44,9 +44,13 @@ class BnetCharacterToRaiderSyncService(
      * @param defaultGuildId The fallback guild ID for characters not in a tracked guild
      * @return Result with counts of created/existing raiders
      */
-    fun syncCharactersToRaiders(userId: UserId, defaultGuildId: String): BnetCharacterSyncResult {
-        val characters = userCharacterRepository.findAllByUserId(userId)
-            .filter { it.level >= MIN_LEVEL_FOR_RAIDER }  // Only process high-level characters
+    fun syncCharactersToRaiders(
+        userId: UserId,
+        defaultGuildId: String,
+    ): BnetCharacterSyncResult {
+        val characters =
+            userCharacterRepository.findAllByUserId(userId)
+                .filter { it.level >= MIN_LEVEL_FOR_RAIDER } // Only process high-level characters
 
         var created = 0
         var existing = 0
@@ -56,10 +60,11 @@ class BnetCharacterToRaiderSyncService(
         for (character in characters) {
             try {
                 // Check if raider already exists
-                val existingRaider = raiderEntityRepository.findByCharacterNameAndRealm(
-                    character.name,
-                    character.realm
-                )
+                val existingRaider =
+                    raiderEntityRepository.findByCharacterNameAndRealm(
+                        character.name,
+                        character.realm,
+                    )
 
                 // Use character's actual guild if tracked, otherwise use default
                 val targetGuildId = character.guildId ?: defaultGuildId
@@ -81,7 +86,9 @@ class BnetCharacterToRaiderSyncService(
                     if (existingRaider.status == "BNET_ONLY" && character.guildId != null && existingRaider.guildId != character.guildId) {
                         updatedRaider = updatedRaider.copy(guildId = character.guildId)
                         needsUpdate = true
-                        logger.info("Updating raider ${character.name}-${character.realm} guild from ${existingRaider.guildId} to ${character.guildId}")
+                        logger.info(
+                            "Updating raider ${character.name}-${character.realm} guild from ${existingRaider.guildId} to ${character.guildId}",
+                        )
                     }
 
                     if (needsUpdate) {
@@ -90,24 +97,25 @@ class BnetCharacterToRaiderSyncService(
                     }
                 } else {
                     // Create new raider from Battle.net character
-                    val newRaider = RaiderEntity(
-                        characterName = character.name,
-                        realm = character.realm,
-                        region = "eu", // Default to EU, could be derived from realm
-                        guildId = targetGuildId,
-                        wowauditId = null, // Not from WoWAudit
-                        clazz = mapClassName(character.className),
-                        spec = "", // Not available from Battle.net basic character data
-                        role = guessRoleFromClass(character.className),
-                        rank = null, // No rank from Battle.net
-                        status = "BNET_ONLY", // Mark as Battle.net only (not tracked in WoWAudit)
-                        note = null,
-                        blizzardId = character.blizzardId,
-                        trackingSince = OffsetDateTime.now(),
-                        joinDate = null,
-                        blizzardLastModified = null,
-                        lastSync = OffsetDateTime.now()
-                    )
+                    val newRaider =
+                        RaiderEntity(
+                            characterName = character.name,
+                            realm = character.realm,
+                            region = "eu", // Default to EU, could be derived from realm
+                            guildId = targetGuildId,
+                            wowauditId = null, // Not from WoWAudit
+                            clazz = mapClassName(character.className),
+                            spec = "", // Not available from Battle.net basic character data
+                            role = guessRoleFromClass(character.className),
+                            rank = null, // No rank from Battle.net
+                            status = "BNET_ONLY", // Mark as Battle.net only (not tracked in WoWAudit)
+                            note = null,
+                            blizzardId = character.blizzardId,
+                            trackingSince = OffsetDateTime.now(),
+                            joinDate = null,
+                            blizzardLastModified = null,
+                            lastSync = OffsetDateTime.now(),
+                        )
 
                     raiderEntityRepository.save(newRaider)
                     created++
@@ -120,14 +128,15 @@ class BnetCharacterToRaiderSyncService(
             }
         }
 
-        val result = BnetCharacterSyncResult(
-            userId = userId.value,
-            totalCharacters = characters.size,
-            raidersCreated = created,
-            raidersExisting = existing,
-            raidersUpdated = updated,
-            errors = errors
-        )
+        val result =
+            BnetCharacterSyncResult(
+                userId = userId.value,
+                totalCharacters = characters.size,
+                raidersCreated = created,
+                raidersExisting = existing,
+                raidersUpdated = updated,
+                errors = errors,
+            )
 
         logger.info("Battle.net character sync completed for user ${userId.value}: $result")
         return result
@@ -163,7 +172,7 @@ data class BnetCharacterSyncResult(
     val raidersCreated: Int,
     val raidersExisting: Int,
     val raidersUpdated: Int,
-    val errors: Int
+    val errors: Int,
 ) {
     val success: Boolean get() = errors == 0
 }

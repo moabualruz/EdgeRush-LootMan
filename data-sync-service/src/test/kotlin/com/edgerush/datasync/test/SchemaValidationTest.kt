@@ -1,8 +1,8 @@
 package com.edgerush.datasync.test
 
 import com.edgerush.datasync.test.base.IntegrationTest
-import org.junit.jupiter.api.Test
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 /**
  * Schema validation tests to catch entity-database mismatches early.
@@ -13,28 +13,28 @@ import org.assertj.core.api.Assertions.assertThat
  * Run these tests after any migration changes to catch issues before deployment.
  */
 class SchemaValidationTest : IntegrationTest() {
-
     // ============================================================================
     // TABLE EXISTENCE TESTS
     // ============================================================================
 
     @Test
     fun `all core tables should exist`() {
-        val expectedTables = listOf(
-            "characters",
-            "raiders",
-            "guild_configurations",
-            "loot_awards",
-            "attendance_stats",
-            "users",
-            "wow_classes",
-            "wow_specializations",
-            "flps_default_modifiers",
-            "flps_guild_modifiers",
-            "simulation_profiles",
-            "simulation_requests",
-            "simulation_results",
-        )
+        val expectedTables =
+            listOf(
+                "characters",
+                "raiders",
+                "guild_configurations",
+                "loot_awards",
+                "attendance_stats",
+                "users",
+                "wow_classes",
+                "wow_specializations",
+                "flps_default_modifiers",
+                "flps_guild_modifiers",
+                "simulation_profiles",
+                "simulation_requests",
+                "simulation_results",
+            )
 
         val actualTables = getTableNames()
 
@@ -65,7 +65,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "blizzard_id",
                 "character_id",
                 "last_sync",
-            )
+            ),
         )
     }
 
@@ -97,7 +97,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "bnet_guild_name_slug",
                 "bnet_region",
                 "bnet_sync_enabled",
-            )
+            ),
         )
     }
 
@@ -119,7 +119,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "is_active",
                 "created_at",
                 "last_login",
-            )
+            ),
         )
     }
 
@@ -136,7 +136,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "media_url",
                 "power_type",
                 "synced_at",
-            )
+            ),
         )
     }
 
@@ -153,7 +153,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "role",
                 "media_url",
                 "synced_at",
-            )
+            ),
         )
     }
 
@@ -169,7 +169,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "character_realm",
                 "profile_content",
                 "created_at",
-            )
+            ),
         )
     }
 
@@ -189,7 +189,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "submitted_at",
                 "completed_at",
                 "error_message",
-            )
+            ),
         )
     }
 
@@ -207,7 +207,7 @@ class SchemaValidationTest : IntegrationTest() {
                 "dps_gain",
                 "percent_gain",
                 "simulated_at",
-            )
+            ),
         )
     }
 
@@ -218,7 +218,7 @@ class SchemaValidationTest : IntegrationTest() {
     private fun getTableNames(): List<String> {
         return jdbcTemplate.queryForList(
             "SELECT tablename FROM pg_tables WHERE schemaname = 'public'",
-            String::class.java
+            String::class.java,
         )
     }
 
@@ -226,7 +226,7 @@ class SchemaValidationTest : IntegrationTest() {
         return jdbcTemplate.queryForList(
             "SELECT column_name FROM information_schema.columns WHERE table_name = ?",
             String::class.java,
-            tableName
+            tableName,
         )
     }
 }

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import java.util.Optional
 
@@ -71,10 +70,11 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createCrestCountEntity(1L, 100L),
-                createCrestCountEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createCrestCountEntity(1L, 100L),
+                    createCrestCountEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -94,10 +94,11 @@ class JdbcRaiderCrestCountRepositoryTest : UnitTest() {
         fun `should return crest counts for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createCrestCountEntity(1L, raiderId, crestType = "Heroic"),
-                createCrestCountEntity(2L, raiderId, crestType = "Mythic"),
-            )
+            val entities =
+                listOf(
+                    createCrestCountEntity(1L, raiderId, crestType = "Heroic"),
+                    createCrestCountEntity(2L, raiderId, crestType = "Mythic"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page

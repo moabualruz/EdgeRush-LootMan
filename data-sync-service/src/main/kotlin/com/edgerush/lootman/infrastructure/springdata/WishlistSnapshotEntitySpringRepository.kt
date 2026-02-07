@@ -17,14 +17,19 @@ import org.springframework.stereotype.Repository
 interface WishlistSnapshotEntitySpringRepository :
     CrudRepository<WishlistSnapshotEntity, Long>,
     PagingAndSortingRepository<WishlistSnapshotEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<WishlistSnapshotEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<WishlistSnapshotEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
     fun findByRaiderId(raiderId: Long): List<WishlistSnapshotEntity>
 
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<WishlistSnapshotEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<WishlistSnapshotEntity>
 
     fun countByTeamId(teamId: Long): Long
 
@@ -33,15 +38,18 @@ interface WishlistSnapshotEntitySpringRepository :
         SELECT * FROM wishlist_snapshots
         WHERE character_name = :characterName AND character_realm = :characterRealm
         ORDER BY synced_at DESC
-        """
+        """,
     )
-    fun findByCharacterNameAndRealm(characterName: String, characterRealm: String): List<WishlistSnapshotEntity>
+    fun findByCharacterNameAndRealm(
+        characterName: String,
+        characterRealm: String,
+    ): List<WishlistSnapshotEntity>
 
     @Query(
         """
         SELECT * FROM wishlist_snapshots
         WHERE team_id = :teamId AND season_id = :seasonId AND period_id = :periodId
-        """
+        """,
     )
     fun findByTeamIdAndSeasonIdAndPeriodId(
         teamId: Long,

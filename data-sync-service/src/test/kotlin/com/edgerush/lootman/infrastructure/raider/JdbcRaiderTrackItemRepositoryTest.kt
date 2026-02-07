@@ -71,10 +71,11 @@ class JdbcRaiderTrackItemRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createTrackItemEntity(1L, 100L),
-                createTrackItemEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createTrackItemEntity(1L, 100L),
+                    createTrackItemEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -94,10 +95,11 @@ class JdbcRaiderTrackItemRepositoryTest : UnitTest() {
         fun `should return track items for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createTrackItemEntity(1L, raiderId, tier = "Normal"),
-                createTrackItemEntity(2L, raiderId, tier = "Heroic"),
-            )
+            val entities =
+                listOf(
+                    createTrackItemEntity(1L, raiderId, tier = "Normal"),
+                    createTrackItemEntity(2L, raiderId, tier = "Heroic"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page

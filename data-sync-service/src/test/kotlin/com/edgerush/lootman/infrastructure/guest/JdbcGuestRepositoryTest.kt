@@ -69,16 +69,17 @@ class JdbcGuestRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val guestId = 1L
-            val entity = createGuestEntity(
-                guestId = guestId,
-                name = "TestGuest",
-                realm = "Illidan",
-                clazz = "Mage",
-                role = "DPS",
-                blizzardId = 12345L,
-                trackingSince = now,
-                syncedAt = now,
-            )
+            val entity =
+                createGuestEntity(
+                    guestId = guestId,
+                    name = "TestGuest",
+                    realm = "Illidan",
+                    clazz = "Mage",
+                    role = "DPS",
+                    blizzardId = 12345L,
+                    trackingSince = now,
+                    syncedAt = now,
+                )
             every { springRepository.findByGuestId(guestId) } returns entity
 
             // When
@@ -101,14 +102,15 @@ class JdbcGuestRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val guestId = 1L
-            val entity = createGuestEntity(
-                guestId = guestId,
-                realm = null,
-                clazz = null,
-                role = null,
-                blizzardId = null,
-                trackingSince = null,
-            )
+            val entity =
+                createGuestEntity(
+                    guestId = guestId,
+                    realm = null,
+                    clazz = null,
+                    role = null,
+                    blizzardId = null,
+                    trackingSince = null,
+                )
             every { springRepository.findByGuestId(guestId) } returns entity
 
             // When
@@ -132,10 +134,11 @@ class JdbcGuestRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createGuestEntity(1L),
-                createGuestEntity(2L),
-            )
+            val entities =
+                listOf(
+                    createGuestEntity(1L),
+                    createGuestEntity(2L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page

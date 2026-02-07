@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/game-data")
 class GameDataController(
-    private val blizzardDataService: BlizzardDataService
+    private val blizzardDataService: BlizzardDataService,
 ) {
-
     @Operation(summary = "Get list of raids (Journal Instances)")
     @GetMapping("/raids")
     fun getRaids(): List<BlizzardRaid> {
@@ -20,7 +19,9 @@ class GameDataController(
 
     @Operation(summary = "Get maps for a specific raid instance")
     @GetMapping("/raids/{instanceId}/maps")
-    fun getRaidMaps(@PathVariable instanceId: Int): List<BlizzardMap> {
+    fun getRaidMaps(
+        @PathVariable instanceId: Int,
+    ): List<BlizzardMap> {
         return blizzardDataService.getRaidMaps(instanceId)
     }
 }

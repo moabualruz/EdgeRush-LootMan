@@ -14,39 +14,42 @@ import org.springframework.stereotype.Repository
 class JdbcTeamRaidDayRepository(
     private val springRepository: TeamRaidDayEntitySpringRepository,
 ) : TeamRaidDayRepository {
+    override fun findById(id: Long): TeamRaidDayEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): TeamRaidDayEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<TeamRaidDayEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt").and(Sort.by("id")),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt").and(Sort.by("id")),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<TeamRaidDayEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt").and(Sort.by("id")),
-        )
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<TeamRaidDayEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt").and(Sort.by("id")),
+            )
         return springRepository.findByTeamId(teamId, pageRequest).content
     }
 
-    override fun countByTeamId(teamId: Long): Long =
-        springRepository.countByTeamId(teamId)
+    override fun countByTeamId(teamId: Long): Long = springRepository.countByTeamId(teamId)
 
-    override fun save(entity: TeamRaidDayEntity): TeamRaidDayEntity =
-        springRepository.save(entity)
+    override fun save(entity: TeamRaidDayEntity): TeamRaidDayEntity = springRepository.save(entity)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

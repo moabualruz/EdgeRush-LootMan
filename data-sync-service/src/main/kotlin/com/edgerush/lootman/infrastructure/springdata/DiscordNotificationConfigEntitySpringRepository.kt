@@ -9,11 +9,24 @@ import org.springframework.stereotype.Repository
 interface DiscordNotificationConfigEntitySpringRepository :
     CrudRepository<DiscordNotificationConfigEntity, Long>,
     PagingAndSortingRepository<DiscordNotificationConfigEntity, Long> {
-
     fun findByGuildIdOrderByNotificationTypeAsc(guildId: String): List<DiscordNotificationConfigEntity>
-    fun findByGuildIdAndNotificationType(guildId: String, notificationType: String): DiscordNotificationConfigEntity?
+
+    fun findByGuildIdAndNotificationType(
+        guildId: String,
+        notificationType: String,
+    ): DiscordNotificationConfigEntity?
+
     fun findByGuildIdAndEnabledTrueOrderByNotificationTypeAsc(guildId: String): List<DiscordNotificationConfigEntity>
-    fun findByGuildIdAndNotificationTypeAndEnabledTrue(guildId: String, notificationType: String): DiscordNotificationConfigEntity?
+
+    fun findByGuildIdAndNotificationTypeAndEnabledTrue(
+        guildId: String,
+        notificationType: String,
+    ): DiscordNotificationConfigEntity?
+
     fun deleteByGuildId(guildId: String): Int
-    fun existsByGuildIdAndNotificationType(guildId: String, notificationType: String): Boolean
+
+    fun existsByGuildIdAndNotificationType(
+        guildId: String,
+        notificationType: String,
+    ): Boolean
 }

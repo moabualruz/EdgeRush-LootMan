@@ -23,7 +23,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-
 class AwardLootUseCaseTest : UnitTest() {
     private lateinit var lootAwardRepository: LootAwardRepository
     private lateinit var lootBanRepository: LootBanRepository
@@ -175,7 +174,6 @@ class AwardLootUseCaseTest : UnitTest() {
      */
     @org.junit.jupiter.api.Nested
     inner class MasThresholdValidation {
-
         private lateinit var raiderPerformanceRepository: RaiderPerformanceRepository
         private lateinit var flpsComponentCalculator: FlpsComponentCalculator
         private lateinit var useCaseWithMas: AwardLootUseCase
@@ -186,36 +184,39 @@ class AwardLootUseCaseTest : UnitTest() {
             flpsComponentCalculator = mockk()
             // Note: This will initially fail to compile because AwardLootUseCase
             // doesn't accept these new dependencies yet - that's the TDD approach
-            useCaseWithMas = AwardLootUseCase(
-                lootAwardRepository = lootAwardRepository,
-                lootBanRepository = lootBanRepository,
-                lootDistributionService = lootDistributionService,
-                raiderPerformanceRepository = raiderPerformanceRepository,
-                flpsComponentCalculator = flpsComponentCalculator,
-            )
+            useCaseWithMas =
+                AwardLootUseCase(
+                    lootAwardRepository = lootAwardRepository,
+                    lootBanRepository = lootBanRepository,
+                    lootDistributionService = lootDistributionService,
+                    raiderPerformanceRepository = raiderPerformanceRepository,
+                    flpsComponentCalculator = flpsComponentCalculator,
+                )
         }
 
         @Test
         fun `should reject loot award when raider MAS is below threshold`() {
             // Given
-            val command = AwardLootCommand(
-                itemId = ItemId(12345),
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC,
-            )
+            val command =
+                AwardLootCommand(
+                    itemId = ItemId(12345),
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                )
 
-            val lowPerformanceData = RaiderPerformanceData.create(
-                raiderId = command.raiderId,
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                totalDeaths = 10,
-                totalFights = 5,
-                avoidableDamagePercentage = 80.0,
-                periodStart = Instant.now().minusSeconds(2592000),
-                periodEnd = Instant.now(),
-            )
+            val lowPerformanceData =
+                RaiderPerformanceData.create(
+                    raiderId = command.raiderId,
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    totalDeaths = 10,
+                    totalFights = 5,
+                    avoidableDamagePercentage = 80.0,
+                    periodStart = Instant.now().minusSeconds(2592000),
+                    periodEnd = Instant.now(),
+                )
 
             every { lootBanRepository.findActiveByRaiderId(command.raiderId, command.guildId) } returns emptyList()
             every { lootDistributionService.isEligibleForLoot(command.raiderId, emptyList(), any()) } returns true
@@ -238,24 +239,26 @@ class AwardLootUseCaseTest : UnitTest() {
         @Test
         fun `should award loot when raider MAS meets threshold`() {
             // Given
-            val command = AwardLootCommand(
-                itemId = ItemId(12345),
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC,
-            )
+            val command =
+                AwardLootCommand(
+                    itemId = ItemId(12345),
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                )
 
-            val goodPerformanceData = RaiderPerformanceData.create(
-                raiderId = command.raiderId,
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                totalDeaths = 2,
-                totalFights = 10,
-                avoidableDamagePercentage = 15.0,
-                periodStart = Instant.now().minusSeconds(2592000),
-                periodEnd = Instant.now(),
-            )
+            val goodPerformanceData =
+                RaiderPerformanceData.create(
+                    raiderId = command.raiderId,
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    totalDeaths = 2,
+                    totalFights = 10,
+                    avoidableDamagePercentage = 15.0,
+                    periodStart = Instant.now().minusSeconds(2592000),
+                    periodEnd = Instant.now(),
+                )
 
             every { lootBanRepository.findActiveByRaiderId(command.raiderId, command.guildId) } returns emptyList()
             every { lootDistributionService.isEligibleForLoot(command.raiderId, emptyList(), any()) } returns true
@@ -277,14 +280,15 @@ class AwardLootUseCaseTest : UnitTest() {
         @Test
         fun `should award loot when no performance data exists with bypass flag`() {
             // Given - No performance data available (new raider)
-            val command = AwardLootCommand(
-                itemId = ItemId(12345),
-                raiderId = RaiderId(456L),
-                guildId = GuildId("guild-789"),
-                flpsScore = FlpsScore.of(0.85),
-                tier = LootTier.MYTHIC,
-                bypassMasCheck = true, // Officer override
-            )
+            val command =
+                AwardLootCommand(
+                    itemId = ItemId(12345),
+                    raiderId = RaiderId(456L),
+                    guildId = GuildId("guild-789"),
+                    flpsScore = FlpsScore.of(0.85),
+                    tier = LootTier.MYTHIC,
+                    bypassMasCheck = true, // Officer override
+                )
 
             every { lootBanRepository.findActiveByRaiderId(command.raiderId, command.guildId) } returns emptyList()
             every { lootDistributionService.isEligibleForLoot(command.raiderId, emptyList(), any()) } returns true
@@ -300,4 +304,3 @@ class AwardLootUseCaseTest : UnitTest() {
         }
     }
 }
-

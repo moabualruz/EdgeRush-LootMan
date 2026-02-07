@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Configuration
 data class RaidbotsConfig(
     var url: String = "https://www.raidbots.com",
     var apiKey: String = "",
-    var enabled: Boolean = false
+    var enabled: Boolean = false,
 )

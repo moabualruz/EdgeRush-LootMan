@@ -18,8 +18,10 @@ import java.time.OffsetDateTime
 interface LootAwardEntitySpringRepository :
     CrudRepository<LootAwardEntity, Long>,
     PagingAndSortingRepository<LootAwardEntity, Long> {
-
-    fun findByRaiderId(raiderId: Long, pageable: Pageable): Page<LootAwardEntity>
+    fun findByRaiderId(
+        raiderId: Long,
+        pageable: Pageable,
+    ): Page<LootAwardEntity>
 
     fun countByRaiderId(raiderId: Long): Long
 
@@ -34,7 +36,7 @@ interface LootAwardEntitySpringRepository :
         INNER JOIN raiders r ON la.raider_id = r.id
         WHERE r.guild_id = :guildId AND la.awarded_at BETWEEN :startDate AND :endDate
         ORDER BY la.awarded_at DESC
-        """
+        """,
     )
     fun findByGuildIdAndDateRange(
         guildId: String,
@@ -47,7 +49,7 @@ interface LootAwardEntitySpringRepository :
         SELECT COUNT(*) FROM loot_awards la
         INNER JOIN raiders r ON la.raider_id = r.id
         WHERE r.guild_id = :guildId AND la.awarded_at BETWEEN :startDate AND :endDate
-        """
+        """,
     )
     fun countByGuildIdAndDateRange(
         guildId: String,
@@ -60,7 +62,7 @@ interface LootAwardEntitySpringRepository :
         SELECT * FROM loot_awards
         WHERE raider_id = :raiderId AND awarded_at BETWEEN :startDate AND :endDate
         ORDER BY awarded_at DESC
-        """
+        """,
     )
     fun findByRaiderIdAndDateRange(
         raiderId: Long,
@@ -68,11 +70,17 @@ interface LootAwardEntitySpringRepository :
         endDate: OffsetDateTime,
     ): List<LootAwardEntity>
 
-    fun findByItemId(itemId: Long, pageable: Pageable): Page<LootAwardEntity>
+    fun findByItemId(
+        itemId: Long,
+        pageable: Pageable,
+    ): Page<LootAwardEntity>
 
     fun countByItemId(itemId: Long): Long
 
-    fun findByTier(tier: String, pageable: Pageable): Page<LootAwardEntity>
+    fun findByTier(
+        tier: String,
+        pageable: Pageable,
+    ): Page<LootAwardEntity>
 
     fun countByTier(tier: String): Long
 }

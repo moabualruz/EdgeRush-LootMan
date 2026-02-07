@@ -29,7 +29,10 @@ class WoWAuditClient(
     /**
      * Fetches loot history for a specific season.
      */
-    fun fetchLootHistory(seasonId: Long, apiKey: String? = null): Mono<String> = get("/v1/loot_history/$seasonId", apiKey)
+    fun fetchLootHistory(
+        seasonId: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/loot_history/$seasonId", apiKey)
 
     /**
      * Fetches all wishlists.
@@ -39,7 +42,10 @@ class WoWAuditClient(
     /**
      * Fetches a specific wishlist by ID.
      */
-    fun fetchWishlistDetail(id: Long, apiKey: String? = null): Mono<String> = get("/v1/wishlists/$id", apiKey)
+    fun fetchWishlistDetail(
+        id: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/wishlists/$id", apiKey)
 
     /**
      * Fetches team information.
@@ -59,23 +65,34 @@ class WoWAuditClient(
     /**
      * Fetches raids, optionally including past raids.
      */
-    fun fetchRaids(includePast: Boolean = true, apiKey: String? = null): Mono<String> =
-        get(if (includePast) "/v1/raids?include_past=true" else "/v1/raids", apiKey)
+    fun fetchRaids(
+        includePast: Boolean = true,
+        apiKey: String? = null,
+    ): Mono<String> = get(if (includePast) "/v1/raids?include_past=true" else "/v1/raids", apiKey)
 
     /**
      * Fetches a specific raid by ID.
      */
-    fun fetchRaidDetail(id: Long, apiKey: String? = null): Mono<String> = get("/v1/raids/$id", apiKey)
+    fun fetchRaidDetail(
+        id: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/raids/$id", apiKey)
 
     /**
      * Fetches historical data for a specific period.
      */
-    fun fetchHistoricalData(periodId: Long, apiKey: String? = null): Mono<String> = get("/v1/historical_data?period=$periodId", apiKey)
+    fun fetchHistoricalData(
+        periodId: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/historical_data?period=$periodId", apiKey)
 
     /**
      * Fetches history for a specific character.
      */
-    fun fetchCharacterHistory(characterId: Long, apiKey: String? = null): Mono<String> = get("/v1/historical_data/$characterId", apiKey)
+    fun fetchCharacterHistory(
+        characterId: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/historical_data/$characterId", apiKey)
 
     /**
      * Fetches guest information.
@@ -90,11 +107,17 @@ class WoWAuditClient(
     /**
      * Fetches a specific application by ID.
      */
-    fun fetchApplicationDetail(id: Long, apiKey: String? = null): Mono<String> = get("/v1/applications/$id", apiKey)
+    fun fetchApplicationDetail(
+        id: Long,
+        apiKey: String? = null,
+    ): Mono<String> = get("/v1/applications/$id", apiKey)
 
-    private fun get(path: String, apiKey: String?): Mono<String> {
+    private fun get(
+        path: String,
+        apiKey: String?,
+    ): Mono<String> {
         val request = webClient.get().uri(path)
-        
+
         if (!apiKey.isNullOrBlank()) {
             request.header(org.springframework.http.HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
         }

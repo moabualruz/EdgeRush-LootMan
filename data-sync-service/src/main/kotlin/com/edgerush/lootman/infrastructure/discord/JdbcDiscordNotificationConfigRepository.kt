@@ -18,7 +18,6 @@ import org.springframework.stereotype.Repository
 class JdbcDiscordNotificationConfigRepository(
     private val springRepository: DiscordNotificationConfigEntitySpringRepository,
 ) : DiscordNotificationConfigRepository {
-
     override fun findById(id: DiscordNotificationConfigId): DiscordNotificationConfig? =
         springRepository.findById(id.value).orElse(null)?.toDomain()
 
@@ -28,8 +27,7 @@ class JdbcDiscordNotificationConfigRepository(
     override fun findByGuildIdAndType(
         guildId: GuildId,
         type: DiscordNotificationType,
-    ): DiscordNotificationConfig? =
-        springRepository.findByGuildIdAndNotificationType(guildId.value, type.name)?.toDomain()
+    ): DiscordNotificationConfig? = springRepository.findByGuildIdAndNotificationType(guildId.value, type.name)?.toDomain()
 
     override fun findEnabledByGuildId(guildId: GuildId): List<DiscordNotificationConfig> =
         springRepository.findByGuildIdAndEnabledTrueOrderByNotificationTypeAsc(guildId.value)
@@ -52,14 +50,12 @@ class JdbcDiscordNotificationConfigRepository(
         springRepository.deleteById(id.value)
     }
 
-    override fun deleteByGuildId(guildId: GuildId): Int =
-        springRepository.deleteByGuildId(guildId.value)
+    override fun deleteByGuildId(guildId: GuildId): Int = springRepository.deleteByGuildId(guildId.value)
 
     override fun existsByGuildIdAndType(
         guildId: GuildId,
         type: DiscordNotificationType,
-    ): Boolean =
-        springRepository.existsByGuildIdAndNotificationType(guildId.value, type.name)
+    ): Boolean = springRepository.existsByGuildIdAndNotificationType(guildId.value, type.name)
 
     private fun DiscordNotificationConfigEntity.toDomain(): DiscordNotificationConfig =
         DiscordNotificationConfig(

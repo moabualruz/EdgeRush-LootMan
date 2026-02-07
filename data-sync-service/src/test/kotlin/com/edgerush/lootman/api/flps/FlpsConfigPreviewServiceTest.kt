@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.flps
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.application.flps.FlpsComponentCalculator
 import com.edgerush.lootman.application.flps.FlpsDataAssemblerService
 import com.edgerush.lootman.application.flps.RaiderFlpsData
@@ -11,9 +12,9 @@ import com.edgerush.lootman.domain.flps.model.FlpsScore
 import com.edgerush.lootman.domain.flps.model.ItemPriorityIndex
 import com.edgerush.lootman.domain.flps.model.MechanicalAdherenceScore
 import com.edgerush.lootman.domain.flps.model.RaiderMeritScore
-import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RaiderPerformanceData
 import com.edgerush.lootman.domain.flps.model.RaiderPreparationData
+import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue
@@ -31,8 +32,6 @@ import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
 import com.edgerush.lootman.domain.shared.model.RaiderStatus
 import com.edgerush.lootman.domain.shared.model.Role
-import com.edgerush.datasync.test.fixtures.RaiderFixtures
-import com.edgerush.lootman.domain.shared.model.Raider
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
@@ -310,18 +309,19 @@ class FlpsConfigPreviewServiceTest : UnitTest() {
         )
 
     private fun createTestRaiderData(): RaiderFlpsData {
-        val raider = RaiderFixtures.createRaider(
-            id = RaiderId(42L),
-            guildId = guildIdObj,
-            name = "TestRaider",
-            realm = "TestRealm",
-            characterClass = CharacterClass.WARRIOR,
-            role = Role.DPS,
-            rank = "Raider",
-            status = RaiderStatus.ACTIVE,
-            joinDate = null,
-            wowauditId = null,
-        )
+        val raider =
+            RaiderFixtures.createRaider(
+                id = RaiderId(42L),
+                guildId = guildIdObj,
+                name = "TestRaider",
+                realm = "TestRealm",
+                characterClass = CharacterClass.WARRIOR,
+                role = Role.DPS,
+                rank = "Raider",
+                status = RaiderStatus.ACTIVE,
+                joinDate = null,
+                wowauditId = null,
+            )
         return RaiderFlpsData(
             raider = raider,
             attendance = emptyList<AttendanceRecord>(),

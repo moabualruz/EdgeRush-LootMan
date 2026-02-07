@@ -16,14 +16,19 @@ import org.springframework.stereotype.Repository
 interface RecruitmentCommentEntitySpringRepository :
     CrudRepository<RecruitmentCommentEntity, Long>,
     PagingAndSortingRepository<RecruitmentCommentEntity, Long> {
-
-    fun findByApplicationId(applicationId: String, pageable: Pageable): Page<RecruitmentCommentEntity>
+    fun findByApplicationId(
+        applicationId: String,
+        pageable: Pageable,
+    ): Page<RecruitmentCommentEntity>
 
     fun countByApplicationId(applicationId: String): Long
 
     fun findByApplicationId(applicationId: String): List<RecruitmentCommentEntity>
 
-    fun findByAuthorId(authorId: Long, pageable: Pageable): Page<RecruitmentCommentEntity>
+    fun findByAuthorId(
+        authorId: Long,
+        pageable: Pageable,
+    ): Page<RecruitmentCommentEntity>
 
     fun countByAuthorId(authorId: Long): Long
 

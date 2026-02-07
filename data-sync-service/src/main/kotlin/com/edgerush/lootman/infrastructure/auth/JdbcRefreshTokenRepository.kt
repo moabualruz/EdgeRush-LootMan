@@ -17,12 +17,9 @@ import org.springframework.stereotype.Repository
 class JdbcRefreshTokenRepository(
     private val springRepository: RefreshTokenEntitySpringRepository,
 ) : RefreshTokenRepository {
+    override fun findById(id: RefreshTokenId): UserRefreshToken? = springRepository.findById(id.value).orElse(null)?.toDomain()
 
-    override fun findById(id: RefreshTokenId): UserRefreshToken? =
-        springRepository.findById(id.value).orElse(null)?.toDomain()
-
-    override fun findByTokenHash(tokenHash: String): UserRefreshToken? =
-        springRepository.findByTokenHash(tokenHash)?.toDomain()
+    override fun findByTokenHash(tokenHash: String): UserRefreshToken? = springRepository.findByTokenHash(tokenHash)?.toDomain()
 
     override fun findByUserId(userId: UserId): List<UserRefreshToken> =
         springRepository.findByUserIdOrderByCreatedAtDesc(userId.value).map { it.toDomain() }
@@ -40,14 +37,11 @@ class JdbcRefreshTokenRepository(
         springRepository.deleteById(id.value)
     }
 
-    override fun deleteByUserId(userId: UserId): Int =
-        springRepository.deleteByUserId(userId.value)
+    override fun deleteByUserId(userId: UserId): Int = springRepository.deleteByUserId(userId.value)
 
-    override fun revokeAllByUserId(userId: UserId): Int =
-        springRepository.revokeAllByUserId(userId.value)
+    override fun revokeAllByUserId(userId: UserId): Int = springRepository.revokeAllByUserId(userId.value)
 
-    override fun deleteExpired(): Int =
-        springRepository.deleteExpired()
+    override fun deleteExpired(): Int = springRepository.deleteExpired()
 
     private fun RefreshTokenEntity.toDomain(): UserRefreshToken =
         UserRefreshToken(

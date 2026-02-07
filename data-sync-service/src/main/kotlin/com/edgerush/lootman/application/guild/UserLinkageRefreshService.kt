@@ -1,7 +1,6 @@
 package com.edgerush.lootman.application.guild
 
 import com.edgerush.lootman.domain.auth.model.UserCharacterMapping
-import com.edgerush.lootman.domain.auth.model.UserCharacterMappingId
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.auth.repository.UserCharacterMappingRepository
 import com.edgerush.lootman.domain.auth.repository.UserCharacterRepository
@@ -9,7 +8,6 @@ import com.edgerush.lootman.domain.auth.repository.UserPreferencesRepository
 import com.edgerush.lootman.domain.auth.repository.UserRepository
 import com.edgerush.lootman.domain.raider.repository.RaiderEntityRepository
 import com.edgerush.lootman.domain.shared.GuildId
-import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -82,20 +80,20 @@ class UserLinkageRefreshService(
 
             // Step 5: Update user guild context
             updateUserGuildContext(userId)
-
         } catch (e: Exception) {
             logger.error("Error refreshing linkages for user ${userId.value}: ${e.message}", e)
             errors.add("Unexpected error: ${e.message}")
         }
 
-        val result = UserLinkageRefreshResult(
-            userId = userId.value,
-            orphanedMappingsRemoved = orphanedMappingsRemoved,
-            newLinksCreated = newLinksCreated,
-            preferencesFixed = preferencesFixed,
-            primaryFixed = primaryFixed,
-            errors = errors
-        )
+        val result =
+            UserLinkageRefreshResult(
+                userId = userId.value,
+                orphanedMappingsRemoved = orphanedMappingsRemoved,
+                newLinksCreated = newLinksCreated,
+                preferencesFixed = preferencesFixed,
+                primaryFixed = primaryFixed,
+                errors = errors,
+            )
 
         logger.info("Linkage refresh completed for user ${userId.value}: $result")
         return result
@@ -145,14 +143,15 @@ class UserLinkageRefreshService(
             offset += batchSize
         } while (batch.size == batchSize)
 
-        val result = AllUsersLinkageRefreshResult(
-            usersProcessed = usersProcessed,
-            totalOrphanedMappingsRemoved = totalOrphanedRemoved,
-            totalNewLinksCreated = totalLinksCreated,
-            totalPreferencesFixed = totalPreferencesFixed,
-            totalPrimaryFixed = totalPrimaryFixed,
-            userErrors = userErrors
-        )
+        val result =
+            AllUsersLinkageRefreshResult(
+                usersProcessed = usersProcessed,
+                totalOrphanedMappingsRemoved = totalOrphanedRemoved,
+                totalNewLinksCreated = totalLinksCreated,
+                totalPreferencesFixed = totalPreferencesFixed,
+                totalPrimaryFixed = totalPrimaryFixed,
+                userErrors = userErrors,
+            )
 
         logger.info("All users linkage refresh completed: $result")
         return result
@@ -197,18 +196,19 @@ class UserLinkageRefreshService(
                     if (!userCharacterMappingRepository.existsByUserIdAndRaiderId(userId, raider.id)) {
                         val isPrimary = existingMappings.isEmpty() && linked == 0
 
-                        val mapping = UserCharacterMapping.create(
-                            userId = userId,
-                            raiderId = raider.id,
-                            isPrimary = isPrimary
-                        )
+                        val mapping =
+                            UserCharacterMapping.create(
+                                userId = userId,
+                                raiderId = raider.id,
+                                isPrimary = isPrimary,
+                            )
 
                         userCharacterMappingRepository.save(mapping)
                         linked++
 
                         logger.info(
                             "Auto-linked character ${character.name}-${character.realm} to raider ${raider.id.value} " +
-                                "(guild: ${raider.guildId.value}, rank: ${raider.rank})"
+                                "(guild: ${raider.guildId.value}, rank: ${raider.rank})",
                         )
                     }
                 }
@@ -238,11 +238,12 @@ class UserLinkageRefreshService(
         }
 
         // Active mapping is broken, try to find a valid alternative
-        val validMappings = userCharacterMappingRepository.findByUserId(userId)
-            .filter { mapping ->
-                val raider = raiderEntityRepository.findById(mapping.raiderId.value)
-                raider != null && !raider.guildId.isNullOrBlank()
-            }
+        val validMappings =
+            userCharacterMappingRepository.findByUserId(userId)
+                .filter { mapping ->
+                    val raider = raiderEntityRepository.findById(mapping.raiderId.value)
+                    raider != null && !raider.guildId.isNullOrBlank()
+                }
 
         if (validMappings.isNotEmpty()) {
             val newActive = validMappings.find { it.isPrimary } ?: validMappings.first()
@@ -271,10 +272,11 @@ class UserLinkageRefreshService(
         if (hasPrimary) return false
 
         // No primary set, mark the first valid one as primary
-        val validMappings = mappings.filter { mapping ->
-            val raider = raiderEntityRepository.findById(mapping.raiderId.value)
-            raider != null && !raider.guildId.isNullOrBlank()
-        }
+        val validMappings =
+            mappings.filter { mapping ->
+                val raider = raiderEntityRepository.findById(mapping.raiderId.value)
+                raider != null && !raider.guildId.isNullOrBlank()
+            }
 
         if (validMappings.isNotEmpty()) {
             val newPrimary = validMappings.first()
@@ -315,8 +317,8 @@ class UserLinkageRefreshService(
                         realm = raider.realm,
                         guildId = raider.guildId,
                         rank = raider.rank,
-                        isPrimary = mapping.isPrimary
-                    )
+                        isPrimary = mapping.isPrimary,
+                    ),
                 )
                 if (mapping.isPrimary) hasPrimary = true
             }
@@ -333,8 +335,8 @@ class UserLinkageRefreshService(
                         realm = character.realm,
                         matchingRaiderId = raider.id.value,
                         matchingGuildId = raider.guildId.value,
-                        matchingRank = raider.rank
-                    )
+                        matchingRank = raider.rank,
+                    ),
                 )
             }
         }
@@ -365,10 +367,11 @@ class UserLinkageRefreshService(
             unlinkableCharacters = unlinkableCharacters,
             preferencesValid = preferencesValid,
             hasPrimaryCharacter = hasPrimary,
-            needsRefresh = orphanedMappings.isNotEmpty() ||
-                unlinkableCharacters.isNotEmpty() ||
-                !preferencesValid ||
-                (!hasPrimary && validMappings.isNotEmpty())
+            needsRefresh =
+                orphanedMappings.isNotEmpty() ||
+                    unlinkableCharacters.isNotEmpty() ||
+                    !preferencesValid ||
+                    (!hasPrimary && validMappings.isNotEmpty()),
         )
     }
 
@@ -382,7 +385,7 @@ class UserLinkageRefreshService(
 
         if (preferences?.activeCharacterMappingId != null) {
             val validMapping = userCharacterMappingRepository.findById(preferences.activeCharacterMappingId!!)
-            
+
             if (validMapping != null && validMapping.userId == userId) {
                 targetGuildId = raiderEntityRepository.findById(validMapping.raiderId.value)?.guildId
             }
@@ -409,7 +412,7 @@ class UserLinkageRefreshService(
                 }
             }
         }
-        
+
         return false
     }
 }
@@ -422,7 +425,7 @@ data class UserLinkageRefreshResult(
     val newLinksCreated: Int,
     val preferencesFixed: Boolean,
     val primaryFixed: Boolean,
-    val errors: List<String>
+    val errors: List<String>,
 ) {
     val success: Boolean get() = errors.isEmpty()
 }
@@ -433,7 +436,7 @@ data class AllUsersLinkageRefreshResult(
     val totalNewLinksCreated: Int,
     val totalPreferencesFixed: Int,
     val totalPrimaryFixed: Int,
-    val userErrors: Map<Long, List<String>>
+    val userErrors: Map<Long, List<String>>,
 ) {
     val success: Boolean get() = userErrors.isEmpty()
 }
@@ -447,7 +450,7 @@ data class UserLinkageValidationResult(
     val unlinkableCharacters: List<UnlinkableCharacterInfo>,
     val preferencesValid: Boolean,
     val hasPrimaryCharacter: Boolean,
-    val needsRefresh: Boolean
+    val needsRefresh: Boolean,
 )
 
 data class ValidMappingInfo(
@@ -457,7 +460,7 @@ data class ValidMappingInfo(
     val realm: String,
     val guildId: String?,
     val rank: String?,
-    val isPrimary: Boolean
+    val isPrimary: Boolean,
 )
 
 data class UnlinkableCharacterInfo(
@@ -465,5 +468,5 @@ data class UnlinkableCharacterInfo(
     val realm: String,
     val matchingRaiderId: Long,
     val matchingGuildId: String,
-    val matchingRank: String?
+    val matchingRank: String?,
 )

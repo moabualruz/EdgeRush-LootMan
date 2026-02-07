@@ -18,22 +18,26 @@ import java.time.Instant
 class JdbcAuditLogRepository(
     private val springRepository: AuditLogEntitySpringRepository,
 ) : AuditLogRepository {
-
     override fun save(auditLog: AuditLog): AuditLog {
         val entity = auditLog.toEntity()
         val savedEntity = springRepository.save(entity)
         return savedEntity.toDomain()
     }
 
-    override fun findByEntity(entityType: String, entityId: String): List<AuditLog> =
+    override fun findByEntity(
+        entityType: String,
+        entityId: String,
+    ): List<AuditLog> =
         springRepository.findByEntityTypeAndEntityIdOrderByTimestampDesc(entityType, entityId)
             .map { it.toDomain() }
 
     override fun findByUserId(userId: String): List<AuditLog> =
         springRepository.findByUserIdOrderByTimestampDesc(userId).map { it.toDomain() }
 
-    override fun findByTimeRange(from: Instant, to: Instant): List<AuditLog> =
-        springRepository.findByTimestampBetweenOrderByTimestampDesc(from, to).map { it.toDomain() }
+    override fun findByTimeRange(
+        from: Instant,
+        to: Instant,
+    ): List<AuditLog> = springRepository.findByTimestampBetweenOrderByTimestampDesc(from, to).map { it.toDomain() }
 
     override fun findByOperation(operation: AuditOperation): List<AuditLog> =
         springRepository.findByOperationOrderByTimestampDesc(operation.name).map { it.toDomain() }

@@ -14,27 +14,26 @@ import org.springframework.stereotype.Repository
 class JdbcGuestRepository(
     private val springRepository: GuestEntitySpringRepository,
 ) : GuestRepository {
+    override fun findById(guestId: Long): GuestEntity? = springRepository.findByGuestId(guestId)
 
-    override fun findById(guestId: Long): GuestEntity? =
-        springRepository.findByGuestId(guestId)
+    override fun existsById(guestId: Long): Boolean = springRepository.existsByGuestId(guestId)
 
-    override fun existsById(guestId: Long): Boolean =
-        springRepository.existsByGuestId(guestId)
-
-    override fun findAll(offset: Long, limit: Int): List<GuestEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<GuestEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun save(entity: GuestEntity): GuestEntity =
-        springRepository.save(entity)
+    override fun save(entity: GuestEntity): GuestEntity = springRepository.save(entity)
 
     override fun delete(guestId: Long) {
         springRepository.deleteByGuestId(guestId)

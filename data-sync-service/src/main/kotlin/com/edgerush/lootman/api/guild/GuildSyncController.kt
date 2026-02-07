@@ -4,18 +4,16 @@ import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.application.guild.GuildRosterSyncResult
 import com.edgerush.lootman.application.guild.GuildRosterSyncService
+import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
+import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
 import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
 import com.edgerush.lootman.application.guild.WoWAuditHistoricalDataSyncService
 import com.edgerush.lootman.application.guild.WoWAuditLootHistorySyncService
 import com.edgerush.lootman.application.guild.WoWAuditRosterSyncService
 import com.edgerush.lootman.application.guild.WoWAuditSyncResult
 import com.edgerush.lootman.application.guild.WoWAuditWishlistSyncService
-import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
-import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
 import com.edgerush.lootman.domain.auth.model.UserId
-import com.edgerush.lootman.domain.guild.model.GuildPermissionType
 import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
-import com.edgerush.lootman.domain.shared.GuildId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -67,8 +65,9 @@ class GuildSyncController(
     ): GuildSyncConfigResponse {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         return GuildSyncConfigResponse(
             guildId = config.guildId,
@@ -102,19 +101,21 @@ class GuildSyncController(
     ): GuildSyncConfigResponse {
         requireSettingsAccess(user, guildId)
 
-        val existing = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val existing =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
-        val updated = existing.copy(
-            wowauditGuildUri = request.wowauditGuildUri ?: existing.wowauditGuildUri,
-            wowauditApiKeyEncrypted = request.wowauditApiKey ?: existing.wowauditApiKeyEncrypted,
-            syncEnabled = request.syncEnabled ?: existing.syncEnabled,
-            bnetRealmSlug = request.bnetRealmSlug ?: existing.bnetRealmSlug,
-            bnetGuildNameSlug = request.bnetGuildNameSlug ?: existing.bnetGuildNameSlug,
-            bnetRegion = request.bnetRegion ?: existing.bnetRegion,
-            bnetSyncEnabled = request.bnetSyncEnabled ?: existing.bnetSyncEnabled,
-            updatedAt = OffsetDateTime.now(),
-        )
+        val updated =
+            existing.copy(
+                wowauditGuildUri = request.wowauditGuildUri ?: existing.wowauditGuildUri,
+                wowauditApiKeyEncrypted = request.wowauditApiKey ?: existing.wowauditApiKeyEncrypted,
+                syncEnabled = request.syncEnabled ?: existing.syncEnabled,
+                bnetRealmSlug = request.bnetRealmSlug ?: existing.bnetRealmSlug,
+                bnetGuildNameSlug = request.bnetGuildNameSlug ?: existing.bnetGuildNameSlug,
+                bnetRegion = request.bnetRegion ?: existing.bnetRegion,
+                bnetSyncEnabled = request.bnetSyncEnabled ?: existing.bnetSyncEnabled,
+                updatedAt = OffsetDateTime.now(),
+            )
 
         val saved = guildConfigurationRepository.save(updated)
         logger.info("Updated sync config for guild $guildId")
@@ -148,15 +149,16 @@ class GuildSyncController(
     ): ResponseEntity<GuildSyncTriggerResponse> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.bnetSyncEnabled) {
             return ResponseEntity.badRequest().body(
                 GuildSyncTriggerResponse(
                     success = false,
                     message = "Battle.net sync is disabled for this guild",
-                )
+                ),
             )
         }
 
@@ -169,7 +171,7 @@ class GuildSyncController(
                 GuildSyncTriggerResponse(
                     success = false,
                     message = "Battle.net realm and guild name must be configured before syncing",
-                )
+                ),
             )
         }
 
@@ -179,16 +181,17 @@ class GuildSyncController(
                 bnetLastSyncStatus = "IN_PROGRESS",
                 bnetLastSyncError = null,
                 updatedAt = OffsetDateTime.now(),
-            )
+            ),
         )
 
         return try {
-            val result = guildRosterSyncService.syncGuildRoster(
-                realmSlug = realmSlug,
-                guildNameSlug = guildNameSlug,
-                region = region,
-                guildId = guildId,
-            )
+            val result =
+                guildRosterSyncService.syncGuildRoster(
+                    realmSlug = realmSlug,
+                    guildNameSlug = guildNameSlug,
+                    region = region,
+                    guildId = guildId,
+                )
 
             // Update status to SUCCESS
             guildConfigurationRepository.save(
@@ -197,7 +200,7 @@ class GuildSyncController(
                     bnetLastSyncStatus = "SUCCESS",
                     bnetLastSyncError = null,
                     updatedAt = OffsetDateTime.now(),
-                )
+                ),
             )
 
             logger.info("Battle.net sync completed for guild $guildId: $result")
@@ -207,7 +210,7 @@ class GuildSyncController(
                     success = true,
                     message = "Synced ${result.total} members (created: ${result.created}, updated: ${result.updated}, skipped: ${result.skipped})",
                     result = result,
-                )
+                ),
             )
         } catch (e: Exception) {
             logger.error("Battle.net sync failed for guild $guildId", e)
@@ -218,14 +221,14 @@ class GuildSyncController(
                     bnetLastSyncStatus = "FAILED",
                     bnetLastSyncError = e.message ?: "Unknown error",
                     updatedAt = OffsetDateTime.now(),
-                )
+                ),
             )
 
             ResponseEntity.internalServerError().body(
                 GuildSyncTriggerResponse(
                     success = false,
                     message = "Sync failed: ${e.message}",
-                )
+                ),
             )
         }
     }
@@ -239,8 +242,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -248,8 +252,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -259,8 +263,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit guild URI must be configured before syncing",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -270,7 +274,7 @@ class GuildSyncController(
                 lastSyncStatus = "IN_PROGRESS",
                 lastSyncError = null,
                 updatedAt = OffsetDateTime.now(),
-            )
+            ),
         )
 
         return wowAuditRosterSyncService.syncRoster(guildId)
@@ -282,7 +286,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.total} raiders (created: ${result.created}, updated: ${result.updated}, skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -290,7 +294,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -303,7 +307,7 @@ class GuildSyncController(
                         lastSyncStatus = "FAILED",
                         lastSyncError = e.message ?: "Unknown error",
                         updatedAt = OffsetDateTime.now(),
-                    )
+                    ),
                 )
 
                 Mono.just(
@@ -311,8 +315,8 @@ class GuildSyncController(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -326,8 +330,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -335,8 +340,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -349,7 +354,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.total} attendance records (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -357,7 +362,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -368,8 +373,8 @@ class GuildSyncController(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -385,8 +390,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -394,8 +400,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -408,7 +414,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.total} loot awards (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -416,7 +422,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -427,8 +433,8 @@ class GuildSyncController(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -442,8 +448,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -451,8 +458,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -465,7 +472,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.total} wishlists (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -473,7 +480,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -484,8 +491,8 @@ class GuildSyncController(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -501,8 +508,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -510,8 +518,8 @@ class GuildSyncController(
                     WoWAuditSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -524,7 +532,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.total} characters (updated: ${result.updated}, skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -532,7 +540,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -543,8 +551,8 @@ class GuildSyncController(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -558,8 +566,9 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WoWAuditAllSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        val config = guildConfigurationRepository.findByGuildId(guildId)
-            ?: throw GuildNotFoundException(guildId)
+        val config =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: throw GuildNotFoundException(guildId)
 
         if (!config.syncEnabled) {
             return Mono.just(
@@ -567,8 +576,8 @@ class GuildSyncController(
                     WoWAuditAllSyncTriggerResponse(
                         success = false,
                         message = "WoWAudit sync is disabled for this guild",
-                    )
-                )
+                    ),
+                ),
             )
         }
 
@@ -585,7 +594,7 @@ class GuildSyncController(
             .map { (rosterResult, attendanceResult, wishlistResult) ->
                 val allSuccess = rosterResult.success && attendanceResult.success && wishlistResult.success
                 logger.info(
-                    "WoWAudit all sync completed for guild $guildId: roster=$rosterResult, attendance=$attendanceResult, wishlist=$wishlistResult"
+                    "WoWAudit all sync completed for guild $guildId: roster=$rosterResult, attendance=$attendanceResult, wishlist=$wishlistResult",
                 )
                 ResponseEntity.ok(
                     WoWAuditAllSyncTriggerResponse(
@@ -594,7 +603,7 @@ class GuildSyncController(
                         rosterResult = rosterResult,
                         attendanceResult = attendanceResult,
                         wishlistResult = wishlistResult,
-                    )
+                    ),
                 )
             }
             .onErrorResume { e ->
@@ -604,8 +613,8 @@ class GuildSyncController(
                         WoWAuditAllSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -631,7 +640,7 @@ class GuildSyncController(
                             success = true,
                             message = "Synced ${result.updated} raiders (skipped: ${result.skipped})",
                             result = result,
-                        )
+                        ),
                     )
                 } else {
                     ResponseEntity.internalServerError().body(
@@ -639,7 +648,7 @@ class GuildSyncController(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
-                        )
+                        ),
                     )
                 }
             }
@@ -650,8 +659,8 @@ class GuildSyncController(
                         WarcraftLogsSyncTriggerResponse(
                             success = false,
                             message = "Sync failed: ${e.message}",
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
     }
@@ -663,17 +672,21 @@ class GuildSyncController(
      * Permission is based on the user's character rank in the guild.
      * System admins bypass this check.
      */
-    private fun requireSettingsAccess(user: AuthenticatedUser, guildId: String) {
+    private fun requireSettingsAccess(
+        user: AuthenticatedUser,
+        guildId: String,
+    ) {
         // System admins can always access
         if (user.isSystemAdmin()) {
             return
         }
 
-        val userIdLong = user.id.toLongOrNull()
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid user authentication"
-            )
+        val userIdLong =
+            user.id.toLongOrNull()
+                ?: throw ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid user authentication",
+                )
 
         val userId = UserId(userIdLong)
         /*
@@ -690,7 +703,7 @@ class GuildSyncController(
                 "You do not have permission to access guild settings. Only guild officers can modify sync configuration."
             )
         }
-        */
+         */
         // Bypass permission check for local testing
         logger.warn("BYPASSING PERMISSION CHECK for User ${user.id} and guild $guildId")
         return

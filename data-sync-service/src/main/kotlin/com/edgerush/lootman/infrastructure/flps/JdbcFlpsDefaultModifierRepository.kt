@@ -14,39 +14,42 @@ import org.springframework.stereotype.Repository
 class JdbcFlpsDefaultModifierRepository(
     private val springRepository: FlpsDefaultModifierEntitySpringRepository,
 ) : FlpsDefaultModifierRepository {
+    override fun findById(id: Long): FlpsDefaultModifierEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): FlpsDefaultModifierEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<FlpsDefaultModifierEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("category", "modifierKey"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("category", "modifierKey"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByCategory(category: String, offset: Long, limit: Int): List<FlpsDefaultModifierEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("modifierKey"),
-        )
+    override fun findByCategory(
+        category: String,
+        offset: Long,
+        limit: Int,
+    ): List<FlpsDefaultModifierEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("modifierKey"),
+            )
         return springRepository.findByCategory(category, pageRequest).content
     }
 
-    override fun countByCategory(category: String): Long =
-        springRepository.countByCategory(category)
+    override fun countByCategory(category: String): Long = springRepository.countByCategory(category)
 
-    override fun save(modifier: FlpsDefaultModifierEntity): FlpsDefaultModifierEntity =
-        springRepository.save(modifier)
+    override fun save(modifier: FlpsDefaultModifierEntity): FlpsDefaultModifierEntity = springRepository.save(modifier)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

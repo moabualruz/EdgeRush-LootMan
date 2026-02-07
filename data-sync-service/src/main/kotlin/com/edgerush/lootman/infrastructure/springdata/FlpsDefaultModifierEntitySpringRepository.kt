@@ -16,12 +16,14 @@ import org.springframework.stereotype.Repository
 interface FlpsDefaultModifierEntitySpringRepository :
     CrudRepository<FlpsDefaultModifierEntity, Long>,
     PagingAndSortingRepository<FlpsDefaultModifierEntity, Long> {
-
     fun findByModifierKey(modifierKey: String): FlpsDefaultModifierEntity?
 
     fun existsByModifierKey(modifierKey: String): Boolean
 
-    fun findByCategory(category: String, pageable: Pageable): Page<FlpsDefaultModifierEntity>
+    fun findByCategory(
+        category: String,
+        pageable: Pageable,
+    ): Page<FlpsDefaultModifierEntity>
 
     fun countByCategory(category: String): Long
 }

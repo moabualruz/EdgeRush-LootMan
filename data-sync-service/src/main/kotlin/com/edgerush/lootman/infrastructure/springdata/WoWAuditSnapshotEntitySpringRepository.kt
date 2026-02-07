@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository
 interface WoWAuditSnapshotEntitySpringRepository :
     CrudRepository<WoWAuditSnapshotEntity, Long>,
     PagingAndSortingRepository<WoWAuditSnapshotEntity, Long> {
-
-    fun findByEndpoint(endpoint: String, pageable: Pageable): Page<WoWAuditSnapshotEntity>
+    fun findByEndpoint(
+        endpoint: String,
+        pageable: Pageable,
+    ): Page<WoWAuditSnapshotEntity>
 
     fun countByEndpoint(endpoint: String): Long
 

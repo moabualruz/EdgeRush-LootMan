@@ -37,10 +37,15 @@ class PartialSyncUseCase(
             // Use the existing roster sync service with the specific guild
             // This triggers a targeted sync for the character
             if (command.guildId != null) {
-                val result = wowAuditRosterSyncService.syncRoster(command.guildId)
-                    .block() // Wait for completion
+                val result =
+                    wowAuditRosterSyncService.syncRoster(command.guildId)
+                        .block() // Wait for completion
 
-                completeSyncRun(syncRun, "SUCCESS", "Synced ${command.characterName}: ${result?.created} created, ${result?.updated} updated")
+                completeSyncRun(
+                    syncRun,
+                    "SUCCESS",
+                    "Synced ${command.characterName}: ${result?.created} created, ${result?.updated} updated",
+                )
                 PartialSyncResult.success(command.characterName, syncRun.id!!)
             } else {
                 completeSyncRun(syncRun, "SKIPPED", "No guildId provided, cannot sync")
@@ -63,17 +68,21 @@ class PartialSyncUseCase(
                 startedAt = now,
                 completedAt = null,
                 message = "Syncing ${command.characterName}-${command.characterRealm}",
-            )
+            ),
         )
     }
 
-    private fun completeSyncRun(syncRun: SyncRunEntity, status: String, message: String?) {
+    private fun completeSyncRun(
+        syncRun: SyncRunEntity,
+        status: String,
+        message: String?,
+    ) {
         syncRunRepository.save(
             syncRun.copy(
                 status = status,
                 completedAt = OffsetDateTime.now(),
                 message = message,
-            )
+            ),
         )
     }
 }

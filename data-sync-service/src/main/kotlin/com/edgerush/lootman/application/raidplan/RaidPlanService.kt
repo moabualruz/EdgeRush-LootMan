@@ -117,8 +117,9 @@ class RaidPlanService(
         }
 
         request.steps?.let { newSteps ->
-             // Reconstitute with new steps 
-             plan = RaidPlan.reconstitute(
+            // Reconstitute with new steps
+            plan =
+                RaidPlan.reconstitute(
                     id = plan.id,
                     guildId = plan.guildId,
                     encounterId = plan.encounterId,
@@ -130,7 +131,7 @@ class RaidPlanService(
                     createdBy = plan.createdBy,
                     createdAt = plan.createdAt,
                     updatedAt = java.time.Instant.now(),
-             )
+                )
         }
 
         return raidPlanRepository.save(plan)
@@ -225,7 +226,7 @@ data class CreateRaidPlanRequest(
 data class UpdateRaidPlanRequest(
     val name: String? = null,
     val visibility: PlanVisibility? = null,
-    val steps: List<com.edgerush.lootman.domain.raidplan.model.PlanStep>? = null
+    val steps: List<com.edgerush.lootman.domain.raidplan.model.PlanStep>? = null,
 )
 
 /**

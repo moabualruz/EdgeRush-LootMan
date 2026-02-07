@@ -7,5 +7,5 @@ enum class RecruitmentStatus {
     TRIAL,
     ACCEPTED,
     REJECTED,
-    ARCHIVED
+    ARCHIVED,
 }

@@ -27,95 +27,79 @@ data class Raider(
      * RaiderIds if they're in multiple guilds or rejoin a guild.
      */
     val id: RaiderId,
-
     /**
      * Reference to the underlying character.
      * All performance data should be linked to this, not [id].
      */
     override val characterId: CharacterId,
-
     /**
      * Character name (inherited from WoWCharacter).
      */
     override val name: String,
-
     /**
      * Realm name (inherited from WoWCharacter).
      */
     override val realm: String,
-
     /**
      * Region (EU, US, etc.) - inherited from WoWCharacter.
      */
     override val region: String,
-
     /**
      * Character class (inherited from WoWCharacter).
      */
     override val characterClass: CharacterClass,
-
     /**
      * Blizzard ID (inherited from WoWCharacter).
      */
     override val blizzardId: Long?,
-
     /**
      * Account ID for aggregation (inherited from WoWCharacter).
      */
     override val accountId: AccountId?,
-
     /**
      * When the character record was created (inherited from WoWCharacter).
      */
     override val createdAt: Instant,
-
     /**
      * When the character record was last updated (inherited from WoWCharacter).
      */
     override val updatedAt: Instant,
-
     // ==================== RAIDER-SPECIFIC PROPERTIES ====================
-
     /**
      * Guild this raider belongs to.
      */
     val guildId: GuildId,
-
     /**
      * Raiding role (Tank, Healer, DPS).
      */
     val role: Role,
-
     /**
      * Guild rank (e.g., "Officer", "Raider", "Trial").
      */
     val rank: String?,
-
     /**
      * Current status in the guild roster.
      */
     val status: RaiderStatus,
-
     /**
      * When this player joined the guild.
      */
     val joinDate: LocalDateTime?,
-
     /**
      * WoWAudit ID for this raider (from WoWAudit sync).
      */
     val wowauditId: Long?,
 ) : WoWCharacter(
-    characterId = characterId,
-    name = name,
-    realm = realm,
-    region = region,
-    characterClass = characterClass,
-    blizzardId = blizzardId,
-    accountId = accountId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-) {
+        characterId = characterId,
+        name = name,
+        realm = realm,
+        region = region,
+        characterClass = characterClass,
+        blizzardId = blizzardId,
+        accountId = accountId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    ) {
     // Note: The parent class already validates name, realm, and region
 
     /**

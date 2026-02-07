@@ -11,7 +11,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -273,11 +272,12 @@ class JdbcGuildPermissionRepositoryTest : UnitTest() {
         @Test
         fun `should insert new permission`() {
             // Given
-            val permission = GuildPermission.create(
-                guildId = GuildId("test-guild"),
-                rankName = "Officer",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-            )
+            val permission =
+                GuildPermission.create(
+                    guildId = GuildId("test-guild"),
+                    rankName = "Officer",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                )
 
             every {
                 jdbcTemplate.update(any<org.springframework.jdbc.core.PreparedStatementCreator>(), any<GeneratedKeyHolder>())
@@ -299,12 +299,13 @@ class JdbcGuildPermissionRepositoryTest : UnitTest() {
         @Test
         fun `should update existing permission`() {
             // Given
-            val permission = GuildPermission(
-                id = GuildPermissionId(1L),
-                guildId = GuildId("test-guild"),
-                rankName = "Officer",
-                permissionType = GuildPermissionType.SETTINGS_ACCESS,
-            )
+            val permission =
+                GuildPermission(
+                    id = GuildPermissionId(1L),
+                    guildId = GuildId("test-guild"),
+                    rankName = "Officer",
+                    permissionType = GuildPermissionType.SETTINGS_ACCESS,
+                )
 
             every {
                 jdbcTemplate.update(
@@ -449,13 +450,14 @@ class JdbcGuildPermissionRepositoryTest : UnitTest() {
                 )
             } answers {
                 val rowMapper = secondArg<RowMapper<GuildPermission>>()
-                val rs = mockResultSet(
-                    id = 42L,
-                    guildId = "test-guild",
-                    rankName = "Guild Master",
-                    permissionType = "LOOT_MANAGEMENT",
-                    createdAt = now,
-                )
+                val rs =
+                    mockResultSet(
+                        id = 42L,
+                        guildId = "test-guild",
+                        rankName = "Guild Master",
+                        permissionType = "LOOT_MANAGEMENT",
+                        createdAt = now,
+                    )
                 listOf(rowMapper.mapRow(rs, 0))
             }
 

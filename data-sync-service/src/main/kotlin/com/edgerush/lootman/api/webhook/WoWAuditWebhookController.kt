@@ -31,8 +31,12 @@ class WoWAuditWebhookController(
         @RequestBody payload: WoWAuditWebhookPayload,
         @RequestHeader("X-WoWAudit-Token", required = false) token: String?,
     ): ResponseEntity<WebhookResponse> {
-        logger.info("Received WoWAudit webhook: eventType={}, character={}-{}",
-            payload.eventType, payload.characterName, payload.characterRealm)
+        logger.info(
+            "Received WoWAudit webhook: eventType={}, character={}-{}",
+            payload.eventType,
+            payload.characterName,
+            payload.characterRealm,
+        )
 
         // Token validation would be handled by a security filter in production
         // For now, we just log and process

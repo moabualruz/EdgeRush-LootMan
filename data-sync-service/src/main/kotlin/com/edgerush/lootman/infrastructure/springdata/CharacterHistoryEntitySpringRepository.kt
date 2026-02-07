@@ -17,12 +17,17 @@ import org.springframework.stereotype.Repository
 interface CharacterHistoryEntitySpringRepository :
     CrudRepository<CharacterHistoryEntity, Long>,
     PagingAndSortingRepository<CharacterHistoryEntity, Long> {
-
-    fun findByTeamId(teamId: Long, pageable: Pageable): Page<CharacterHistoryEntity>
+    fun findByTeamId(
+        teamId: Long,
+        pageable: Pageable,
+    ): Page<CharacterHistoryEntity>
 
     fun countByTeamId(teamId: Long): Long
 
-    fun findByCharacterId(characterId: Long, pageable: Pageable): Page<CharacterHistoryEntity>
+    fun findByCharacterId(
+        characterId: Long,
+        pageable: Pageable,
+    ): Page<CharacterHistoryEntity>
 
     fun countByCharacterId(characterId: Long): Long
 
@@ -40,7 +45,7 @@ interface CharacterHistoryEntitySpringRepository :
         """
         SELECT * FROM character_history
         WHERE character_id = :characterId AND season_id = :seasonId AND period_id = :periodId
-        """
+        """,
     )
     fun findByCharacterIdAndSeasonIdAndPeriodId(
         characterId: Long,
@@ -48,7 +53,14 @@ interface CharacterHistoryEntitySpringRepository :
         periodId: Long,
     ): CharacterHistoryEntity?
 
-    fun findBySeasonIdAndPeriodId(seasonId: Long, periodId: Long, pageable: Pageable): Page<CharacterHistoryEntity>
+    fun findBySeasonIdAndPeriodId(
+        seasonId: Long,
+        periodId: Long,
+        pageable: Pageable,
+    ): Page<CharacterHistoryEntity>
 
-    fun countBySeasonIdAndPeriodId(seasonId: Long, periodId: Long): Long
+    fun countBySeasonIdAndPeriodId(
+        seasonId: Long,
+        periodId: Long,
+    ): Long
 }

@@ -1,13 +1,13 @@
 package com.edgerush.lootman.api.simulation
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.lootman.application.raider.GetRaiderUseCase
 import com.edgerush.lootman.application.simulation.SimulationService
 import com.edgerush.lootman.domain.simulation.model.SimulationProfile
 import com.edgerush.lootman.domain.simulation.model.SimulationRequest
 import com.edgerush.lootman.domain.simulation.model.SimulationResult
 import com.edgerush.lootman.domain.simulation.model.SimulationStatus
 import com.edgerush.lootman.domain.simulation.repository.SimulationRepository
-import com.edgerush.lootman.application.raider.GetRaiderUseCase
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every

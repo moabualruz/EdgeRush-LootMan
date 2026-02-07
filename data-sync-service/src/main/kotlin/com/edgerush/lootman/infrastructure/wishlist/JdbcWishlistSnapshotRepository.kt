@@ -14,51 +14,58 @@ import org.springframework.stereotype.Repository
 class JdbcWishlistSnapshotRepository(
     private val springRepository: WishlistSnapshotEntitySpringRepository,
 ) : WishlistSnapshotRepository {
+    override fun findById(id: Long): WishlistSnapshotEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): WishlistSnapshotEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<WishlistSnapshotEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<WishlistSnapshotEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<WishlistSnapshotEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt"),
-        )
+    override fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<WishlistSnapshotEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt"),
+            )
         return springRepository.findByRaiderId(raiderId, pageRequest).content
     }
 
-    override fun countByRaiderId(raiderId: Long): Long =
-        springRepository.countByRaiderId(raiderId)
+    override fun countByRaiderId(raiderId: Long): Long = springRepository.countByRaiderId(raiderId)
 
-    override fun findByTeamId(teamId: Long, offset: Long, limit: Int): List<WishlistSnapshotEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by(Sort.Direction.DESC, "syncedAt"),
-        )
+    override fun findByTeamId(
+        teamId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<WishlistSnapshotEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by(Sort.Direction.DESC, "syncedAt"),
+            )
         return springRepository.findByTeamId(teamId, pageRequest).content
     }
 
-    override fun countByTeamId(teamId: Long): Long =
-        springRepository.countByTeamId(teamId)
+    override fun countByTeamId(teamId: Long): Long = springRepository.countByTeamId(teamId)
 
-    override fun save(entity: WishlistSnapshotEntity): WishlistSnapshotEntity =
-        springRepository.save(entity)
+    override fun save(entity: WishlistSnapshotEntity): WishlistSnapshotEntity = springRepository.save(entity)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

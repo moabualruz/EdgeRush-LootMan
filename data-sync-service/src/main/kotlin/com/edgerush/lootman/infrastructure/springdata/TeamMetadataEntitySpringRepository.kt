@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository
 interface TeamMetadataEntitySpringRepository :
     CrudRepository<TeamMetadataEntity, Long>,
     PagingAndSortingRepository<TeamMetadataEntity, Long> {
-
-    fun findByGuildId(guildId: Long, pageable: Pageable): Page<TeamMetadataEntity>
+    fun findByGuildId(
+        guildId: Long,
+        pageable: Pageable,
+    ): Page<TeamMetadataEntity>
 
     fun countByGuildId(guildId: Long): Long
 
@@ -25,9 +27,15 @@ interface TeamMetadataEntitySpringRepository :
 
     fun findByTeamId(teamId: Long): TeamMetadataEntity?
 
-    fun findByGuildIdAndTeamId(guildId: Long, teamId: Long): TeamMetadataEntity?
+    fun findByGuildIdAndTeamId(
+        guildId: Long,
+        teamId: Long,
+    ): TeamMetadataEntity?
 
-    fun findByRegion(region: String, pageable: Pageable): Page<TeamMetadataEntity>
+    fun findByRegion(
+        region: String,
+        pageable: Pageable,
+    ): Page<TeamMetadataEntity>
 
     fun countByRegion(region: String): Long
 

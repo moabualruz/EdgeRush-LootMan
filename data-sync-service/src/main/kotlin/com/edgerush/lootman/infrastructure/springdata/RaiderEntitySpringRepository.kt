@@ -17,22 +17,31 @@ import org.springframework.stereotype.Repository
 interface RaiderEntitySpringRepository :
     CrudRepository<RaiderEntity, Long>,
     PagingAndSortingRepository<RaiderEntity, Long> {
-
-    fun findByRealm(realm: String, pageable: Pageable): Page<RaiderEntity>
+    fun findByRealm(
+        realm: String,
+        pageable: Pageable,
+    ): Page<RaiderEntity>
 
     fun countByRealm(realm: String): Long
 
-    fun findByRegion(region: String, pageable: Pageable): Page<RaiderEntity>
+    fun findByRegion(
+        region: String,
+        pageable: Pageable,
+    ): Page<RaiderEntity>
 
     fun countByRegion(region: String): Long
 
-    fun findByCharacterNameAndRealm(characterName: String, realm: String): RaiderEntity?
+    fun findByCharacterNameAndRealm(
+        characterName: String,
+        realm: String,
+    ): RaiderEntity?
 
     /**
      * Case-insensitive lookup by character name and normalized realm.
      * Handles both slug format (twisting-nether) and display format (Twisting Nether).
      */
-    @Query("""
+    @Query(
+        """
         SELECT * FROM raiders
         WHERE LOWER(character_name) = LOWER(:characterName)
         AND (
@@ -41,8 +50,12 @@ interface RaiderEntitySpringRepository :
             OR LOWER(realm) = LOWER(REPLACE(:realm, ' ', '-'))
         )
         LIMIT 1
-    """)
-    fun findByCharacterNameAndRealmNormalized(characterName: String, realm: String): RaiderEntity?
+    """,
+    )
+    fun findByCharacterNameAndRealmNormalized(
+        characterName: String,
+        realm: String,
+    ): RaiderEntity?
 
     fun findByBlizzardId(blizzardId: Long): RaiderEntity?
 
@@ -50,7 +63,10 @@ interface RaiderEntitySpringRepository :
 
     fun findByWowauditIdIn(wowauditIds: List<Long>): List<RaiderEntity>
 
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<RaiderEntity>
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<RaiderEntity>
 
     fun countByGuildId(guildId: String): Long
 

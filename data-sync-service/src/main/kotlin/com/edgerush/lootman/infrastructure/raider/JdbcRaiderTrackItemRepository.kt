@@ -14,39 +14,42 @@ import org.springframework.stereotype.Repository
 class JdbcRaiderTrackItemRepository(
     private val springRepository: RaiderTrackItemEntitySpringRepository,
 ) : RaiderTrackItemRepository {
+    override fun findById(id: Long): RaiderTrackItemEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): RaiderTrackItemEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<RaiderTrackItemEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("id"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<RaiderTrackItemEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("id"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByRaiderId(raiderId: Long, offset: Long, limit: Int): List<RaiderTrackItemEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("tier"),
-        )
+    override fun findByRaiderId(
+        raiderId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<RaiderTrackItemEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("tier"),
+            )
         return springRepository.findByRaiderId(raiderId, pageRequest).content
     }
 
-    override fun countByRaiderId(raiderId: Long): Long =
-        springRepository.countByRaiderId(raiderId)
+    override fun countByRaiderId(raiderId: Long): Long = springRepository.countByRaiderId(raiderId)
 
-    override fun save(entity: RaiderTrackItemEntity): RaiderTrackItemEntity =
-        springRepository.save(entity)
+    override fun save(entity: RaiderTrackItemEntity): RaiderTrackItemEntity = springRepository.save(entity)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

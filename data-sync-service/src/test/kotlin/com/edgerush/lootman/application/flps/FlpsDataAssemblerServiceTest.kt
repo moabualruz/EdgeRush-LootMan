@@ -1,9 +1,11 @@
 package com.edgerush.lootman.application.flps
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.attendance.model.AttendanceRecord
 import com.edgerush.lootman.domain.attendance.repository.AttendanceRepository
 import com.edgerush.lootman.domain.flps.model.FlpsScore
+import com.edgerush.lootman.domain.flps.repository.RaiderPerformanceRepository
 import com.edgerush.lootman.domain.loot.model.LootAward
 import com.edgerush.lootman.domain.loot.model.LootAwardId
 import com.edgerush.lootman.domain.loot.model.LootBan
@@ -11,7 +13,8 @@ import com.edgerush.lootman.domain.loot.model.LootBanId
 import com.edgerush.lootman.domain.loot.model.LootTier
 import com.edgerush.lootman.domain.loot.repository.LootAwardRepository
 import com.edgerush.lootman.domain.loot.repository.LootBanRepository
-import com.edgerush.datasync.test.fixtures.RaiderFixtures
+import com.edgerush.lootman.domain.raider.repository.RaiderCrestCountRepository
+import com.edgerush.lootman.domain.raider.repository.RaiderVaultSlotRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -26,9 +29,6 @@ import com.edgerush.lootman.domain.shared.model.RaiderStatus
 import com.edgerush.lootman.domain.shared.model.Role
 import com.edgerush.lootman.domain.shared.model.Wishlist
 import com.edgerush.lootman.domain.shared.model.WishlistItem
-import com.edgerush.lootman.domain.flps.repository.RaiderPerformanceRepository
-import com.edgerush.lootman.domain.raider.repository.RaiderCrestCountRepository
-import com.edgerush.lootman.domain.raider.repository.RaiderVaultSlotRepository
 import com.edgerush.lootman.domain.shared.repository.GearRepository
 import com.edgerush.lootman.domain.shared.repository.RaiderRepository
 import com.edgerush.lootman.domain.shared.repository.WishlistRepository
@@ -299,18 +299,19 @@ class FlpsDataAssemblerServiceTest : UnitTest() {
     private fun createRaider(
         raiderId: RaiderId,
         guildId: GuildId,
-    ): Raider = RaiderFixtures.createRaider(
-        id = raiderId,
-        guildId = guildId,
-        name = "TestCharacter${raiderId.value}",
-        realm = "TestRealm",
-        characterClass = CharacterClass.WARRIOR,
-        role = Role.DPS,
-        rank = "Raider",
-        status = RaiderStatus.ACTIVE,
-        joinDate = LocalDateTime.now().minusMonths(6),
-        wowauditId = 12345L + raiderId.value,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = raiderId,
+            guildId = guildId,
+            name = "TestCharacter${raiderId.value}",
+            realm = "TestRealm",
+            characterClass = CharacterClass.WARRIOR,
+            role = Role.DPS,
+            rank = "Raider",
+            status = RaiderStatus.ACTIVE,
+            joinDate = LocalDateTime.now().minusMonths(6),
+            wowauditId = 12345L + raiderId.value,
+        )
 
     private fun createAttendanceRecord(
         raiderId: RaiderId,

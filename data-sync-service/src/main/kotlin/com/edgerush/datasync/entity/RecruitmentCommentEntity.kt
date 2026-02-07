@@ -9,16 +9,12 @@ import java.time.OffsetDateTime
 data class RecruitmentCommentEntity(
     @Id
     val id: Long? = null,
-
     @Column("application_id")
     val applicationId: String,
-
     @Column("author_id")
     val authorId: Long,
-
     @Column("text")
     val text: String,
-
     @Column("created_at")
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
 )

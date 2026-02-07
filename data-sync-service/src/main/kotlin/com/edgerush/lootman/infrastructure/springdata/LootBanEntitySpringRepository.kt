@@ -18,8 +18,10 @@ import java.time.LocalDateTime
 interface LootBanEntitySpringRepository :
     CrudRepository<LootBanEntity, Long>,
     PagingAndSortingRepository<LootBanEntity, Long> {
-
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<LootBanEntity>
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<LootBanEntity>
 
     fun countByGuildId(guildId: String): Long
 
@@ -29,25 +31,35 @@ interface LootBanEntitySpringRepository :
         WHERE guild_id = :guildId AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
         ORDER BY banned_at DESC
-        """
+        """,
     )
-    fun findActiveByGuildId(guildId: String, now: LocalDateTime): List<LootBanEntity>
+    fun findActiveByGuildId(
+        guildId: String,
+        now: LocalDateTime,
+    ): List<LootBanEntity>
 
     @Query(
         """
         SELECT COUNT(*) FROM loot_bans
         WHERE guild_id = :guildId AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
-        """
+        """,
     )
-    fun countActiveByGuildId(guildId: String, now: LocalDateTime): Long
+    fun countActiveByGuildId(
+        guildId: String,
+        now: LocalDateTime,
+    ): Long
 
     @Query(
         """
         SELECT COUNT(*) FROM loot_bans
         WHERE guild_id = :guildId AND character_name = :characterName AND is_active = true
         AND (expires_at IS NULL OR expires_at > :now)
-        """
+        """,
     )
-    fun countActiveBansForCharacter(guildId: String, characterName: String, now: LocalDateTime): Long
+    fun countActiveBansForCharacter(
+        guildId: String,
+        characterName: String,
+        now: LocalDateTime,
+    ): Long
 }

@@ -1,13 +1,13 @@
 package com.edgerush.lootman.api.graphql.mutation
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.application.raider.CreateRaiderCommand
 import com.edgerush.lootman.application.raider.CreateRaiderUseCase
 import com.edgerush.lootman.application.raider.DeleteRaiderCommand
 import com.edgerush.lootman.application.raider.DeleteRaiderUseCase
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
-import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -230,16 +230,17 @@ class RaiderMutationResolverTest : UnitTest() {
         characterClass: CharacterClass = CharacterClass.WARRIOR,
         role: Role = Role.DPS,
         status: RaiderStatus = RaiderStatus.ACTIVE,
-    ): Raider = RaiderFixtures.createRaider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        name = name,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = "Raider",
-        status = status,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            name = name,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = "Raider",
+            status = status,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 }

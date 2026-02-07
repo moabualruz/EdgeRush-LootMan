@@ -1,6 +1,7 @@
 package com.edgerush.lootman.api.raider
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.api.common.PaginationProperties
 import com.edgerush.lootman.application.raider.CreateRaiderCommand
 import com.edgerush.lootman.application.raider.CreateRaiderUseCase
@@ -13,7 +14,6 @@ import com.edgerush.lootman.application.raider.ListRaidersUseCase
 import com.edgerush.lootman.application.raider.PaginatedRaiders
 import com.edgerush.lootman.application.raider.UpdateRaiderCommand
 import com.edgerush.lootman.application.raider.UpdateRaiderUseCase
-import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import com.edgerush.lootman.domain.shared.model.CharacterClass
@@ -518,18 +518,19 @@ class RaiderControllerTest : UnitTest() {
         fun `should correctly map all raider fields to response`() {
             // Given
             val joinDate = LocalDateTime.of(2024, 1, 1, 0, 0)
-            val raider = RaiderFixtures.createRaider(
-                id = RaiderId(123L),
-                guildId = GuildId("test-guild"),
-                name = "CompleteChar",
-                realm = "CompleteRealm",
-                characterClass = CharacterClass.PALADIN,
-                role = Role.TANK,
-                rank = "Guild Master",
-                status = RaiderStatus.ACTIVE,
-                joinDate = joinDate,
-                wowauditId = 9876L,
-            )
+            val raider =
+                RaiderFixtures.createRaider(
+                    id = RaiderId(123L),
+                    guildId = GuildId("test-guild"),
+                    name = "CompleteChar",
+                    realm = "CompleteRealm",
+                    characterClass = CharacterClass.PALADIN,
+                    role = Role.TANK,
+                    rank = "Guild Master",
+                    status = RaiderStatus.ACTIVE,
+                    joinDate = joinDate,
+                    wowauditId = 9876L,
+                )
 
             every { getRaiderUseCase.execute(any()) } returns Result.success(raider)
 
@@ -581,16 +582,17 @@ class RaiderControllerTest : UnitTest() {
         status: RaiderStatus = RaiderStatus.ACTIVE,
         joinDate: LocalDateTime? = LocalDateTime.now(),
         wowauditId: Long? = null,
-    ): Raider = RaiderFixtures.createRaider(
-        id = id,
-        guildId = guildId,
-        name = characterName,
-        realm = realm,
-        characterClass = characterClass,
-        role = role,
-        rank = rank,
-        status = status,
-        joinDate = joinDate,
-        wowauditId = wowauditId,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = id,
+            guildId = guildId,
+            name = characterName,
+            realm = realm,
+            characterClass = characterClass,
+            role = role,
+            rank = rank,
+            status = status,
+            joinDate = joinDate,
+            wowauditId = wowauditId,
+        )
 }

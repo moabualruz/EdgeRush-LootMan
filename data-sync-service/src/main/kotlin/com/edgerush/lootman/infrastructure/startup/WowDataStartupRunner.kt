@@ -21,7 +21,6 @@ class WowDataStartupRunner(
     private val wowDataSyncService: WowDataSyncService,
     private val syncProperties: SyncProperties,
 ) : ApplicationRunner {
-
     private val logger = LoggerFactory.getLogger(WowDataStartupRunner::class.java)
 
     override fun run(args: ApplicationArguments?) {

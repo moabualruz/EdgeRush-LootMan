@@ -280,13 +280,14 @@ class WebClientConfigTest : UnitTest() {
         @Test
         fun `should use configured timeout values`() {
             // Arrange
-            val customProperties = HttpClientsProperties(
-                connectTimeoutMs = 3000,
-                readTimeoutMs = 6000,
-                writeTimeoutMs = 6000,
-                maxRetries = 5,
-                retryBackoffMs = 1000,
-            )
+            val customProperties =
+                HttpClientsProperties(
+                    connectTimeoutMs = 3000,
+                    readTimeoutMs = 6000,
+                    writeTimeoutMs = 6000,
+                    maxRetries = 5,
+                    retryBackoffMs = 1000,
+                )
             val config = WebClientConfig(customProperties)
             val syncProperties = createSyncProperties()
 
@@ -356,10 +357,11 @@ class WebClientConfigTest : UnitTest() {
         @Test
         fun `ServerErrorException should contain status code and message`() {
             // Arrange & Act
-            val exception = ServerErrorException(
-                statusCode = mockk { every { value() } returns 503 },
-                message = "Service Unavailable",
-            )
+            val exception =
+                ServerErrorException(
+                    statusCode = mockk { every { value() } returns 503 },
+                    message = "Service Unavailable",
+                )
 
             // Assert
             exception.message shouldBe "Service Unavailable"

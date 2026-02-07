@@ -28,9 +28,10 @@ class WoWAuditWebhookControllerTest : UnitTest() {
     private lateinit var partialSyncUseCase: PartialSyncUseCase
     private lateinit var controller: WoWAuditWebhookController
     private lateinit var mockMvc: MockMvc
-    private val objectMapper = ObjectMapper()
-        .registerKotlinModule()
-        .registerModule(JavaTimeModule())
+    private val objectMapper =
+        ObjectMapper()
+            .registerKotlinModule()
+            .registerModule(JavaTimeModule())
 
     @BeforeEach
     fun setup() {
@@ -41,16 +42,16 @@ class WoWAuditWebhookControllerTest : UnitTest() {
 
     @Nested
     inner class HandleCharacterUpdateTests {
-
         @Test
         fun `should return 202 Accepted when webhook processes successfully`() {
             // Given
-            val payload = WoWAuditWebhookPayload(
-                eventType = "character.updated",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                guildId = "test-guild",
-            )
+            val payload =
+                WoWAuditWebhookPayload(
+                    eventType = "character.updated",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    guildId = "test-guild",
+                )
 
             every { partialSyncUseCase.execute(any()) } returns PartialSyncResult.success("TestChar", 123L)
 
@@ -59,7 +60,7 @@ class WoWAuditWebhookControllerTest : UnitTest() {
                 post("/api/v1/webhooks/wowaudit")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(payload))
-                    .header("X-WoWAudit-Token", "test-token")
+                    .header("X-WoWAudit-Token", "test-token"),
             )
                 .andExpect(status().isAccepted)
                 .andExpect(jsonPath("$.accepted").value(true))
@@ -71,11 +72,12 @@ class WoWAuditWebhookControllerTest : UnitTest() {
         @Test
         fun `should return 202 Accepted even when sync fails`() {
             // Given
-            val payload = WoWAuditWebhookPayload(
-                eventType = "character.updated",
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-            )
+            val payload =
+                WoWAuditWebhookPayload(
+                    eventType = "character.updated",
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                )
 
             every { partialSyncUseCase.execute(any()) } returns PartialSyncResult.failure("TestChar", "Sync failed")
 
@@ -83,7 +85,7 @@ class WoWAuditWebhookControllerTest : UnitTest() {
             mockMvc.perform(
                 post("/api/v1/webhooks/wowaudit")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(payload))
+                    .content(objectMapper.writeValueAsString(payload)),
             )
                 .andExpect(status().isAccepted)
                 .andExpect(jsonPath("$.accepted").value(false))
@@ -93,12 +95,13 @@ class WoWAuditWebhookControllerTest : UnitTest() {
         @Test
         fun `should handle request without auth token`() {
             // Given - Token is optional for now
-            val payload = WoWAuditWebhookPayload(
-                eventType = "loot.awarded",
-                characterName = "RichChar",
-                characterRealm = "RichRealm",
-                guildId = "rich-guild",
-            )
+            val payload =
+                WoWAuditWebhookPayload(
+                    eventType = "loot.awarded",
+                    characterName = "RichChar",
+                    characterRealm = "RichRealm",
+                    guildId = "rich-guild",
+                )
 
             every { partialSyncUseCase.execute(any()) } returns PartialSyncResult.success("RichChar", 456L)
 
@@ -106,7 +109,7 @@ class WoWAuditWebhookControllerTest : UnitTest() {
             mockMvc.perform(
                 post("/api/v1/webhooks/wowaudit")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(payload))
+                    .content(objectMapper.writeValueAsString(payload)),
             )
                 .andExpect(status().isAccepted)
                 .andExpect(jsonPath("$.accepted").value(true))
@@ -115,7 +118,6 @@ class WoWAuditWebhookControllerTest : UnitTest() {
 
     @Nested
     inner class HealthCheckTests {
-
         @Test
         fun `should return healthy status`() {
             // When/Then

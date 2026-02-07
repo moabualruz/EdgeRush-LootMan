@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository
 interface LootAwardWishDataEntitySpringRepository :
     CrudRepository<LootAwardWishDataEntity, Long>,
     PagingAndSortingRepository<LootAwardWishDataEntity, Long> {
-
-    fun findByLootAwardId(lootAwardId: Long, pageable: Pageable): Page<LootAwardWishDataEntity>
+    fun findByLootAwardId(
+        lootAwardId: Long,
+        pageable: Pageable,
+    ): Page<LootAwardWishDataEntity>
 
     fun countByLootAwardId(lootAwardId: Long): Long
 

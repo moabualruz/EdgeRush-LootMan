@@ -47,17 +47,13 @@ class InMemoryUserRepository : UserRepository {
 
     override fun existsByBattlenetId(battlenetId: String): Boolean = storage.values.any { it.battlenetId == battlenetId }
 
-    override fun findByUsername(username: String): User? =
-        storage.values.find { it.username.equals(username, ignoreCase = true) }
+    override fun findByUsername(username: String): User? = storage.values.find { it.username.equals(username, ignoreCase = true) }
 
-    override fun findByEmail(email: String): User? =
-        storage.values.find { it.email?.equals(email, ignoreCase = true) == true }
+    override fun findByEmail(email: String): User? = storage.values.find { it.email?.equals(email, ignoreCase = true) == true }
 
-    override fun existsByUsername(username: String): Boolean =
-        storage.values.any { it.username.equals(username, ignoreCase = true) }
+    override fun existsByUsername(username: String): Boolean = storage.values.any { it.username.equals(username, ignoreCase = true) }
 
-    override fun existsByEmail(email: String): Boolean =
-        storage.values.any { it.email?.equals(email, ignoreCase = true) == true }
+    override fun existsByEmail(email: String): Boolean = storage.values.any { it.email?.equals(email, ignoreCase = true) == true }
 
     override fun findAll(
         offset: Long,

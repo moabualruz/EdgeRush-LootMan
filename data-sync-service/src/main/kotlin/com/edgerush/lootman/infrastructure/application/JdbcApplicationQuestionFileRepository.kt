@@ -14,39 +14,42 @@ import org.springframework.stereotype.Repository
 class JdbcApplicationQuestionFileRepository(
     private val springRepository: ApplicationQuestionFileEntitySpringRepository,
 ) : ApplicationQuestionFileRepository {
+    override fun findById(id: Long): ApplicationQuestionFileEntity? = springRepository.findById(id).orElse(null)
 
-    override fun findById(id: Long): ApplicationQuestionFileEntity? =
-        springRepository.findById(id).orElse(null)
+    override fun existsById(id: Long): Boolean = springRepository.existsById(id)
 
-    override fun existsById(id: Long): Boolean =
-        springRepository.existsById(id)
-
-    override fun findAll(offset: Long, limit: Int): List<ApplicationQuestionFileEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("id"),
-        )
+    override fun findAll(
+        offset: Long,
+        limit: Int,
+    ): List<ApplicationQuestionFileEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("id"),
+            )
         return springRepository.findAll(pageRequest).content
     }
 
-    override fun count(): Long =
-        springRepository.count()
+    override fun count(): Long = springRepository.count()
 
-    override fun findByApplicationId(applicationId: Long, offset: Long, limit: Int): List<ApplicationQuestionFileEntity> {
-        val pageRequest = PageRequest.of(
-            (offset / limit).toInt(),
-            limit,
-            Sort.by("questionPosition"),
-        )
+    override fun findByApplicationId(
+        applicationId: Long,
+        offset: Long,
+        limit: Int,
+    ): List<ApplicationQuestionFileEntity> {
+        val pageRequest =
+            PageRequest.of(
+                (offset / limit).toInt(),
+                limit,
+                Sort.by("questionPosition"),
+            )
         return springRepository.findByApplicationId(applicationId, pageRequest).content
     }
 
-    override fun countByApplicationId(applicationId: Long): Long =
-        springRepository.countByApplicationId(applicationId)
+    override fun countByApplicationId(applicationId: Long): Long = springRepository.countByApplicationId(applicationId)
 
-    override fun save(entity: ApplicationQuestionFileEntity): ApplicationQuestionFileEntity =
-        springRepository.save(entity)
+    override fun save(entity: ApplicationQuestionFileEntity): ApplicationQuestionFileEntity = springRepository.save(entity)
 
     override fun delete(id: Long) {
         springRepository.deleteById(id)

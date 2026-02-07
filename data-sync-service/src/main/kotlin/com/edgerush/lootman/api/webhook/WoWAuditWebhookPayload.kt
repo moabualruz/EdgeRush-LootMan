@@ -24,12 +24,13 @@ data class WoWAuditWebhookPayload(
     /**
      * Converts this payload to a partial sync command.
      */
-    fun toCommand() = PartialSyncCommand(
-        characterName = characterName,
-        characterRealm = characterRealm,
-        guildId = guildId,
-        eventType = eventType,
-    )
+    fun toCommand() =
+        PartialSyncCommand(
+            characterName = characterName,
+            characterRealm = characterRealm,
+            guildId = guildId,
+            eventType = eventType,
+        )
 }
 
 /**
@@ -52,14 +53,20 @@ data class PartialSyncResult(
     val syncRunId: Long?,
 ) {
     companion object {
-        fun success(characterName: String, syncRunId: Long) = PartialSyncResult(
+        fun success(
+            characterName: String,
+            syncRunId: Long,
+        ) = PartialSyncResult(
             success = true,
             characterName = characterName,
             message = "Character synced successfully",
             syncRunId = syncRunId,
         )
 
-        fun failure(characterName: String, error: String?) = PartialSyncResult(
+        fun failure(
+            characterName: String,
+            error: String?,
+        ) = PartialSyncResult(
             success = false,
             characterName = characterName,
             message = error ?: "Unknown error",
@@ -77,10 +84,11 @@ data class WebhookResponse(
     val syncRunId: Long?,
 ) {
     companion object {
-        fun from(result: PartialSyncResult) = WebhookResponse(
-            accepted = result.success,
-            message = result.message ?: "Processed",
-            syncRunId = result.syncRunId,
-        )
+        fun from(result: PartialSyncResult) =
+            WebhookResponse(
+                accepted = result.success,
+                message = result.message ?: "Processed",
+                syncRunId = result.syncRunId,
+            )
     }
 }

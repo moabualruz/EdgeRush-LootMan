@@ -11,7 +11,6 @@ data class AttendanceAggregationConfig(
      * How attendance is aggregated.
      */
     val mode: AggregationMode = AggregationMode.CHARACTER,
-
     /**
      * Scope of attendance aggregation.
      */
@@ -27,10 +26,11 @@ data class AttendanceAggregationConfig(
          * Configuration for account-level aggregation within the guild.
          * All characters on the same account contribute to a single attendance score.
          */
-        val ACCOUNT_BASED = AttendanceAggregationConfig(
-            mode = AggregationMode.ACCOUNT,
-            scope = AggregationScope.GUILD,
-        )
+        val ACCOUNT_BASED =
+            AttendanceAggregationConfig(
+                mode = AggregationMode.ACCOUNT,
+                scope = AggregationScope.GUILD,
+            )
     }
 }
 
@@ -52,8 +52,7 @@ enum class AggregationMode {
     ;
 
     companion object {
-        fun fromString(value: String): AggregationMode? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): AggregationMode? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }
 
@@ -74,7 +73,6 @@ enum class AggregationScope {
     ;
 
     companion object {
-        fun fromString(value: String): AggregationScope? =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): AggregationScope? = entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
     }
 }

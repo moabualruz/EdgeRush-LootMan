@@ -17,12 +17,17 @@ import org.springframework.stereotype.Repository
 interface RecruitmentApplicationEntitySpringRepository :
     CrudRepository<RecruitmentApplicationEntity, String>,
     PagingAndSortingRepository<RecruitmentApplicationEntity, String> {
-
-    fun findByGuildId(guildId: String, pageable: Pageable): Page<RecruitmentApplicationEntity>
+    fun findByGuildId(
+        guildId: String,
+        pageable: Pageable,
+    ): Page<RecruitmentApplicationEntity>
 
     fun countByGuildId(guildId: String): Long
 
-    fun findByStatus(status: String, pageable: Pageable): Page<RecruitmentApplicationEntity>
+    fun findByStatus(
+        status: String,
+        pageable: Pageable,
+    ): Page<RecruitmentApplicationEntity>
 
     fun countByStatus(status: String): Long
 
@@ -31,20 +36,30 @@ interface RecruitmentApplicationEntitySpringRepository :
         SELECT * FROM enhanced_applications
         WHERE guild_id = :guildId AND status = :status
         ORDER BY created_at DESC
-        """
+        """,
     )
-    fun findByGuildIdAndStatusQuery(guildId: String, status: String): List<RecruitmentApplicationEntity>
+    fun findByGuildIdAndStatusQuery(
+        guildId: String,
+        status: String,
+    ): List<RecruitmentApplicationEntity>
 
     // Derived query method for pagination (without @Query)
-    fun findByGuildIdAndStatus(guildId: String, status: String, pageable: Pageable): Page<RecruitmentApplicationEntity>
+    fun findByGuildIdAndStatus(
+        guildId: String,
+        status: String,
+        pageable: Pageable,
+    ): Page<RecruitmentApplicationEntity>
 
     @Query(
         """
         SELECT COUNT(*) FROM enhanced_applications
         WHERE guild_id = :guildId AND status = :status
-        """
+        """,
     )
-    fun countByGuildIdAndStatus(guildId: String, status: String): Long
+    fun countByGuildIdAndStatus(
+        guildId: String,
+        status: String,
+    ): Long
 
     fun findByDiscordId(discordId: String): List<RecruitmentApplicationEntity>
 
@@ -54,7 +69,10 @@ interface RecruitmentApplicationEntitySpringRepository :
         """
         SELECT * FROM enhanced_applications
         WHERE character_name = :characterName AND character_realm = :characterRealm
-        """
+        """,
     )
-    fun findByCharacterNameAndRealm(characterName: String, characterRealm: String): List<RecruitmentApplicationEntity>
+    fun findByCharacterNameAndRealm(
+        characterName: String,
+        characterRealm: String,
+    ): List<RecruitmentApplicationEntity>
 }

@@ -1,8 +1,8 @@
 package com.edgerush.lootman.application.wow
 
 import com.edgerush.lootman.domain.wow.model.WowClass
-import com.edgerush.lootman.domain.wow.model.WowSpecialization
 import com.edgerush.lootman.domain.wow.model.WowRole
+import com.edgerush.lootman.domain.wow.model.WowSpecialization
 import com.edgerush.lootman.domain.wow.repository.WowClassRepository
 import com.edgerush.lootman.domain.wow.repository.WowSpecializationRepository
 import com.edgerush.lootman.infrastructure.external.blizzard.BlizzardDataService
@@ -17,7 +17,7 @@ import java.time.Instant
 class WowDataSyncService(
     private val blizzardDataService: BlizzardDataService,
     private val wowClassRepository: WowClassRepository,
-    private val wowSpecializationRepository: WowSpecializationRepository
+    private val wowSpecializationRepository: WowSpecializationRepository,
 ) {
     private val logger = LoggerFactory.getLogger(WowDataSyncService::class.java)
 
@@ -35,13 +35,15 @@ class WowDataSyncService(
 
         // Check if Blizzard API credentials are configured
         if (!isBlizzardApiConfigured()) {
-            logger.warn("Blizzard API credentials not configured, skipping WoW data sync. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET to enable.")
+            logger.warn(
+                "Blizzard API credentials not configured, skipping WoW data sync. Set BATTLENET_CLIENT_ID and BATTLENET_CLIENT_SECRET to enable.",
+            )
             return SyncResult(
                 classesAdded = 0,
                 classesUpdated = 0,
                 specsAdded = 0,
                 specsUpdated = 0,
-                errors = listOf("Blizzard API credentials not configured")
+                errors = listOf("Blizzard API credentials not configured"),
             )
         }
 
@@ -64,14 +66,15 @@ class WowDataSyncService(
 
                     val existingClass = wowClassRepository.findById(blizzardClass.id)
 
-                    val wowClass = WowClass(
-                        id = blizzardClass.id,
-                        name = blizzardClass.name,
-                        slug = blizzardClass.name.lowercase().replace(" ", "-"),
-                        mediaUrl = mediaUrl,
-                        powerType = classDetail?.power_type?.name,
-                        syncedAt = Instant.now()
-                    )
+                    val wowClass =
+                        WowClass(
+                            id = blizzardClass.id,
+                            name = blizzardClass.name,
+                            slug = blizzardClass.name.lowercase().replace(" ", "-"),
+                            mediaUrl = mediaUrl,
+                            powerType = classDetail?.power_type?.name,
+                            syncedAt = Instant.now(),
+                        )
 
                     wowClassRepository.save(wowClass)
 
@@ -94,15 +97,16 @@ class WowDataSyncService(
 
                                 val role = specDetail.role?.type?.let { WowRole.fromString(it) } ?: WowRole.DPS
 
-                                val wowSpec = WowSpecialization(
-                                    id = specRef.id,
-                                    classId = blizzardClass.id,
-                                    name = specRef.name,
-                                    slug = specRef.name.lowercase().replace(" ", "-"),
-                                    role = role,
-                                    mediaUrl = specMediaUrl,
-                                    syncedAt = Instant.now()
-                                )
+                                val wowSpec =
+                                    WowSpecialization(
+                                        id = specRef.id,
+                                        classId = blizzardClass.id,
+                                        name = specRef.name,
+                                        slug = specRef.name.lowercase().replace(" ", "-"),
+                                        role = role,
+                                        mediaUrl = specMediaUrl,
+                                        syncedAt = Instant.now(),
+                                    )
 
                                 wowSpecializationRepository.save(wowSpec)
 
@@ -127,8 +131,9 @@ class WowDataSyncService(
                 }
             }
 
-            logger.info("WoW data sync completed: $classesAdded classes added, $classesUpdated updated, $specsAdded specs added, $specsUpdated updated")
-
+            logger.info(
+                "WoW data sync completed: $classesAdded classes added, $classesUpdated updated, $specsAdded specs added, $specsUpdated updated",
+            )
         } catch (e: Exception) {
             val errorMsg = "Fatal error during WoW data sync: ${e.message}"
             logger.error(errorMsg, e)
@@ -140,7 +145,7 @@ class WowDataSyncService(
             classesUpdated = classesUpdated,
             specsAdded = specsAdded,
             specsUpdated = specsUpdated,
-            errors = errors
+            errors = errors,
         )
     }
 
@@ -170,8 +175,7 @@ class WowDataSyncService(
     /**
      * Gets all specs for a class.
      */
-    fun getSpecsForClass(classId: Int): List<WowSpecialization> =
-        wowSpecializationRepository.findByClassId(classId)
+    fun getSpecsForClass(classId: Int): List<WowSpecialization> = wowSpecializationRepository.findByClassId(classId)
 
     /**
      * Gets a spec by name with flexible matching.
@@ -191,7 +195,7 @@ data class SyncResult(
     val classesUpdated: Int,
     val specsAdded: Int,
     val specsUpdated: Int,
-    val errors: List<String>
+    val errors: List<String>,
 ) {
     val success: Boolean get() = errors.isEmpty()
     val totalClasses: Int get() = classesAdded + classesUpdated

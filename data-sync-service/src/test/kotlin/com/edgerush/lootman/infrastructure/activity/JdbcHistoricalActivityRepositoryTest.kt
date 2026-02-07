@@ -70,13 +70,14 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createEntity(
-                id = id,
-                characterId = null,
-                periodId = null,
-                teamId = null,
-                seasonId = null,
-            )
+            val entity =
+                createEntity(
+                    id = id,
+                    characterId = null,
+                    periodId = null,
+                    teamId = null,
+                    seasonId = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -97,10 +98,11 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createEntity(1L),
-                createEntity(2L),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L),
+                    createEntity(2L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -120,10 +122,11 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
         fun `should return activities for character`() {
             // Given
             val characterId = 100L
-            val entities = listOf(
-                createEntity(1L, characterId = characterId),
-                createEntity(2L, characterId = characterId),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, characterId = characterId),
+                    createEntity(2L, characterId = characterId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByCharacterId(characterId, any<Pageable>()) } returns page
@@ -159,9 +162,10 @@ class JdbcHistoricalActivityRepositoryTest : UnitTest() {
         fun `should return activities for team`() {
             // Given
             val teamId = 100L
-            val entities = listOf(
-                createEntity(1L, teamId = teamId),
-            )
+            val entities =
+                listOf(
+                    createEntity(1L, teamId = teamId),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByTeamId(teamId, any<Pageable>()) } returns page

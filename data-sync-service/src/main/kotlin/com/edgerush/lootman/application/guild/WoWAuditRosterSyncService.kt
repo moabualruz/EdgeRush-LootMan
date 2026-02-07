@@ -48,8 +48,9 @@ class WoWAuditRosterSyncService(
     private val raiderWarcraftLogRepository: RaiderWarcraftLogRepository,
 ) {
     private val logger = LoggerFactory.getLogger(WoWAuditRosterSyncService::class.java)
-    private val objectMapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper =
+        jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     /**
      * Syncs raiders from WoWAudit for a specific guild.
@@ -58,8 +59,9 @@ class WoWAuditRosterSyncService(
      * @return Sync result with counts
      */
     fun syncRoster(guildId: String): Mono<WoWAuditSyncResult> {
-        val guildConfig = guildConfigurationRepository.findByGuildId(guildId)
-            ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
+        val guildConfig =
+            guildConfigurationRepository.findByGuildId(guildId)
+                ?: return Mono.error(IllegalArgumentException("Guild configuration not found for guildId=$guildId"))
 
         if (guildConfig.wowauditGuildUri.isNullOrBlank()) {
             return Mono.error(IllegalArgumentException("WoWAudit guild URI not configured for guildId=$guildId"))
@@ -76,8 +78,13 @@ class WoWAuditRosterSyncService(
                     .map { body -> parseAndSyncRoster(body, guildId, teamInfo, fallbackRegion) }
             }
             .doOnSuccess { result ->
-                logger.info("WoWAudit roster sync completed for guild={}: created={}, updated={}, skipped={}",
-                    guildId, result.created, result.updated, result.skipped)
+                logger.info(
+                    "WoWAudit roster sync completed for guild={}: created={}, updated={}, skipped={}",
+                    guildId,
+                    result.created,
+                    result.updated,
+                    result.skipped,
+                )
                 updateGuildSyncStatus(guildConfig, "SUCCESS", null)
             }
             .doOnError { ex ->
@@ -93,7 +100,7 @@ class WoWAuditRosterSyncService(
                     val node = objectMapper.readTree(body)
                     TeamInfo(
                         region = node.path("region").asText(""),
-                        realm = node.path("realm").asText("")
+                        realm = node.path("realm").asText(""),
                     )
                 } catch (ex: Exception) {
                     logger.warn("Failed to parse team info: {}", ex.message)
@@ -105,7 +112,12 @@ class WoWAuditRosterSyncService(
                 Mono.just(TeamInfo("", ""))
             }
 
-    private fun parseAndSyncRoster(body: String, guildId: String, teamInfo: TeamInfo, fallbackRegion: String): WoWAuditSyncResult {
+    private fun parseAndSyncRoster(
+        body: String,
+        guildId: String,
+        teamInfo: TeamInfo,
+        fallbackRegion: String,
+    ): WoWAuditSyncResult {
         // Use WoWAudit team region if available, otherwise use guild's bnet_region
         val defaultRegion = teamInfo.region.ifBlank { fallbackRegion }
         val defaultRealm = teamInfo.realm
@@ -147,7 +159,7 @@ class WoWAuditRosterSyncService(
         element: JsonNode,
         guildId: String,
         defaultRegion: String,
-        defaultRealm: String
+        defaultRealm: String,
     ): UpsertResult {
         val name = element.path("name").asText("")
         if (name.isBlank()) return UpsertResult.SKIPPED
@@ -176,43 +188,44 @@ class WoWAuditRosterSyncService(
         }
 
         val isNew = existing == null
-        val entity = if (existing != null) {
-            existing.copy(
-                region = region.ifBlank { existing.region },
-                guildId = guildId,
-                wowauditId = wowauditId ?: existing.wowauditId,
-                clazz = clazz.ifBlank { existing.clazz },
-                spec = spec.ifBlank { existing.spec },
-                role = role.ifBlank { existing.role },
-                rank = rank ?: existing.rank,
-                status = status ?: existing.status,
-                note = note ?: existing.note,
-                blizzardId = blizzardId ?: existing.blizzardId,
-                trackingSince = trackingSince ?: existing.trackingSince,
-                joinDate = joinDate ?: existing.joinDate,
-                blizzardLastModified = blizzardLastModified ?: existing.blizzardLastModified,
-                lastSync = now
-            )
-        } else {
-            RaiderEntity(
-                characterName = name,
-                realm = realm,
-                region = region,
-                guildId = guildId,
-                wowauditId = wowauditId,
-                clazz = clazz,
-                spec = spec,
-                role = role,
-                rank = rank,
-                status = status,
-                note = note,
-                blizzardId = blizzardId,
-                trackingSince = trackingSince ?: now,
-                joinDate = joinDate,
-                blizzardLastModified = blizzardLastModified,
-                lastSync = now
-            )
-        }
+        val entity =
+            if (existing != null) {
+                existing.copy(
+                    region = region.ifBlank { existing.region },
+                    guildId = guildId,
+                    wowauditId = wowauditId ?: existing.wowauditId,
+                    clazz = clazz.ifBlank { existing.clazz },
+                    spec = spec.ifBlank { existing.spec },
+                    role = role.ifBlank { existing.role },
+                    rank = rank ?: existing.rank,
+                    status = status ?: existing.status,
+                    note = note ?: existing.note,
+                    blizzardId = blizzardId ?: existing.blizzardId,
+                    trackingSince = trackingSince ?: existing.trackingSince,
+                    joinDate = joinDate ?: existing.joinDate,
+                    blizzardLastModified = blizzardLastModified ?: existing.blizzardLastModified,
+                    lastSync = now,
+                )
+            } else {
+                RaiderEntity(
+                    characterName = name,
+                    realm = realm,
+                    region = region,
+                    guildId = guildId,
+                    wowauditId = wowauditId,
+                    clazz = clazz,
+                    spec = spec,
+                    role = role,
+                    rank = rank,
+                    status = status,
+                    note = note,
+                    blizzardId = blizzardId,
+                    trackingSince = trackingSince ?: now,
+                    joinDate = joinDate,
+                    blizzardLastModified = blizzardLastModified,
+                    lastSync = now,
+                )
+            }
 
         val saved = raiderEntityRepository.save(entity)
         val raiderId = saved.id ?: return if (isNew) UpsertResult.CREATED else UpsertResult.UPDATED
@@ -226,7 +239,10 @@ class WoWAuditRosterSyncService(
         return if (isNew) UpsertResult.CREATED else UpsertResult.UPDATED
     }
 
-    private fun processGearItems(element: JsonNode, raiderId: Long) {
+    private fun processGearItems(
+        element: JsonNode,
+        raiderId: Long,
+    ) {
         val gearNode = element.path("gear")
         if (gearNode.isMissingNode || gearNode.isNull) return
 
@@ -234,11 +250,12 @@ class WoWAuditRosterSyncService(
         val existingItems = raiderGearItemRepository.findByRaiderId(raiderId, 0, 1000)
         existingItems.forEach { item -> item.id?.let { raiderGearItemRepository.delete(it) } }
 
-        val slots = listOf(
-            "head", "neck", "shoulder", "back", "chest", "wrist",
-            "hands", "waist", "legs", "feet", "finger_1", "finger_2",
-            "trinket_1", "trinket_2", "main_hand", "off_hand"
-        )
+        val slots =
+            listOf(
+                "head", "neck", "shoulder", "back", "chest", "wrist",
+                "hands", "waist", "legs", "feet", "finger_1", "finger_2",
+                "trinket_1", "trinket_2", "main_hand", "off_hand",
+            )
 
         for (setName in listOf("equipped", "best", "spark")) {
             val setNode = gearNode.path(setName)
@@ -271,14 +288,17 @@ class WoWAuditRosterSyncService(
                         enchantQuality = enchantQuality,
                         upgradeLevel = upgradeLevel,
                         sockets = sockets,
-                        name = name
-                    )
+                        name = name,
+                    ),
                 )
             }
         }
     }
 
-    private fun processStatistics(element: JsonNode, raiderId: Long) {
+    private fun processStatistics(
+        element: JsonNode,
+        raiderId: Long,
+    ) {
         val statisticsNode = element.path("statistics")
         if (statisticsNode.isMissingNode || statisticsNode.isNull) return
 
@@ -286,8 +306,9 @@ class WoWAuditRosterSyncService(
         val weeklyHighest = statisticsNode.path("weekly_highest_mplus").asIntOrNull()
         val seasonHighest = statisticsNode.path("season_highest_mplus").asIntOrNull()
 
-        val worldQuestsNode = statisticsNode.path("worldQuests").takeIf { it.isObject }
-            ?: statisticsNode.path("world_quests").takeIf { it.isObject }
+        val worldQuestsNode =
+            statisticsNode.path("worldQuests").takeIf { it.isObject }
+                ?: statisticsNode.path("world_quests").takeIf { it.isObject }
         val worldQuestsTotal = worldQuestsNode?.path("done_total")?.asIntOrNull()
         val worldQuestsThisWeek = worldQuestsNode?.path("this_week")?.asIntOrNull()
 
@@ -300,31 +321,37 @@ class WoWAuditRosterSyncService(
         val honorLevel = statisticsNode.path("pvp").path("honor_level").asIntOrNull()
 
         val existingStats = raiderStatisticsRepository.findByRaiderId(raiderId)
-        val statsEntity = RaiderStatisticsEntity(
-            id = existingStats?.id,
-            raiderId = raiderId,
-            mythicPlusScore = mythicPlusScore,
-            weeklyHighestMplus = weeklyHighest,
-            seasonHighestMplus = seasonHighest,
-            worldQuestsTotal = worldQuestsTotal,
-            worldQuestsThisWeek = worldQuestsThisWeek,
-            collectiblesMounts = collectiblesMounts,
-            collectiblesToys = collectiblesToys,
-            collectiblesUniquePets = collectiblesUniquePets,
-            collectiblesLevel25Pets = collectiblesLevel25Pets,
-            honorLevel = honorLevel
-        )
+        val statsEntity =
+            RaiderStatisticsEntity(
+                id = existingStats?.id,
+                raiderId = raiderId,
+                mythicPlusScore = mythicPlusScore,
+                weeklyHighestMplus = weeklyHighest,
+                seasonHighestMplus = seasonHighest,
+                worldQuestsTotal = worldQuestsTotal,
+                worldQuestsThisWeek = worldQuestsThisWeek,
+                collectiblesMounts = collectiblesMounts,
+                collectiblesToys = collectiblesToys,
+                collectiblesUniquePets = collectiblesUniquePets,
+                collectiblesLevel25Pets = collectiblesLevel25Pets,
+                honorLevel = honorLevel,
+            )
         raiderStatisticsRepository.save(statsEntity)
     }
 
-    private fun updateGuildSyncStatus(config: GuildConfigurationEntity, status: String, error: String?) {
+    private fun updateGuildSyncStatus(
+        config: GuildConfigurationEntity,
+        status: String,
+        error: String?,
+    ) {
         try {
-            val updated = config.copy(
-                lastSyncAt = OffsetDateTime.now(),
-                lastSyncStatus = status,
-                lastSyncError = error,
-                updatedAt = OffsetDateTime.now()
-            )
+            val updated =
+                config.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = error,
+                    updatedAt = OffsetDateTime.now(),
+                )
             guildConfigurationRepository.save(updated)
         } catch (ex: Exception) {
             logger.warn("Failed to update guild sync status: {}", ex.message)
@@ -370,12 +397,12 @@ class WoWAuditRosterSyncService(
     private enum class UpsertResult {
         CREATED,
         UPDATED,
-        SKIPPED
+        SKIPPED,
     }
 
     private data class TeamInfo(
         val region: String,
-        val realm: String
+        val realm: String,
     )
 }
 
@@ -383,7 +410,7 @@ data class WoWAuditSyncResult(
     val created: Int,
     val updated: Int,
     val skipped: Int,
-    val error: String?
+    val error: String?,
 ) {
     val total: Int get() = created + updated + skipped
     val success: Boolean get() = error == null

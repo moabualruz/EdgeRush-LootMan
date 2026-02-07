@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository
 class JdbcUserCharacterRepository(
     private val springRepository: UserCharacterEntitySpringRepository,
 ) : UserCharacterRepository {
-
     override fun save(character: UserCharacter): UserCharacter {
         val entity = character.toEntity()
         val savedEntity = springRepository.save(entity)
@@ -24,8 +23,9 @@ class JdbcUserCharacterRepository(
         val userId = characters.first().userId
 
         // Get existing characters by (name, realm) for upsert matching
-        val existing = findAllByUserId(userId)
-            .associateBy { "${it.name.lowercase()}-${it.realm.lowercase()}" }
+        val existing =
+            findAllByUserId(userId)
+                .associateBy { "${it.name.lowercase()}-${it.realm.lowercase()}" }
 
         return characters.map { char ->
             val key = "${char.name.lowercase()}-${char.realm.lowercase()}"

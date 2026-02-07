@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository
 interface ApplicationAltEntitySpringRepository :
     CrudRepository<ApplicationAltEntity, Long>,
     PagingAndSortingRepository<ApplicationAltEntity, Long> {
-
-    fun findByApplicationId(applicationId: Long, pageable: Pageable): Page<ApplicationAltEntity>
+    fun findByApplicationId(
+        applicationId: Long,
+        pageable: Pageable,
+    ): Page<ApplicationAltEntity>
 
     fun countByApplicationId(applicationId: Long): Long
 

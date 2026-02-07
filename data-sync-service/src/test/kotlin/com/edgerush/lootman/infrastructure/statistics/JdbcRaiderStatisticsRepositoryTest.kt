@@ -67,20 +67,21 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
         fun `should map all entity fields correctly`() {
             // Given
             val id = 1L
-            val entity = createStatisticsEntity(
-                id = id,
-                raiderId = 100L,
-                mythicPlusScore = 2500.5,
-                weeklyHighestMplus = 20,
-                seasonHighestMplus = 22,
-                worldQuestsTotal = 1000,
-                worldQuestsThisWeek = 50,
-                collectiblesMounts = 300,
-                collectiblesToys = 150,
-                collectiblesUniquePets = 200,
-                collectiblesLevel25Pets = 50,
-                honorLevel = 100,
-            )
+            val entity =
+                createStatisticsEntity(
+                    id = id,
+                    raiderId = 100L,
+                    mythicPlusScore = 2500.5,
+                    weeklyHighestMplus = 20,
+                    seasonHighestMplus = 22,
+                    worldQuestsTotal = 1000,
+                    worldQuestsThisWeek = 50,
+                    collectiblesMounts = 300,
+                    collectiblesToys = 150,
+                    collectiblesUniquePets = 200,
+                    collectiblesLevel25Pets = 50,
+                    honorLevel = 100,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -107,20 +108,21 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
         fun `should handle null optional fields`() {
             // Given
             val id = 1L
-            val entity = createStatisticsEntity(
-                id = id,
-                raiderId = 100L,
-                mythicPlusScore = null,
-                weeklyHighestMplus = null,
-                seasonHighestMplus = null,
-                worldQuestsTotal = null,
-                worldQuestsThisWeek = null,
-                collectiblesMounts = null,
-                collectiblesToys = null,
-                collectiblesUniquePets = null,
-                collectiblesLevel25Pets = null,
-                honorLevel = null,
-            )
+            val entity =
+                createStatisticsEntity(
+                    id = id,
+                    raiderId = 100L,
+                    mythicPlusScore = null,
+                    weeklyHighestMplus = null,
+                    seasonHighestMplus = null,
+                    worldQuestsTotal = null,
+                    worldQuestsThisWeek = null,
+                    collectiblesMounts = null,
+                    collectiblesToys = null,
+                    collectiblesUniquePets = null,
+                    collectiblesLevel25Pets = null,
+                    honorLevel = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -149,10 +151,11 @@ class JdbcRaiderStatisticsRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createStatisticsEntity(1L, 100L),
-                createStatisticsEntity(2L, 101L),
-            )
+            val entities =
+                listOf(
+                    createStatisticsEntity(1L, 100L),
+                    createStatisticsEntity(2L, 101L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page

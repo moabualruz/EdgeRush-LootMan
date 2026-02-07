@@ -30,20 +30,23 @@ import java.util.*
  */
 class JwtServiceTest : UnitTest() {
     // Use Base64-encoded secret key (at least 256 bits = 32 bytes)
-    private val testSecretBase64 = Base64.getEncoder().encodeToString(
-        "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes".toByteArray()
-    )
+    private val testSecretBase64 =
+        Base64.getEncoder().encodeToString(
+            "test-secret-key-must-be-at-least-256-bits-long-for-security-purposes".toByteArray(),
+        )
 
-    private val defaultJwtProperties = JwtProperties(
-        secret = testSecretBase64,
-        accessTokenValidityMinutes = 60,
-        refreshTokenValidityDays = 90,
-        issuer = "test-issuer",
-    )
+    private val defaultJwtProperties =
+        JwtProperties(
+            secret = testSecretBase64,
+            accessTokenValidityMinutes = 60,
+            refreshTokenValidityDays = 90,
+            issuer = "test-issuer",
+        )
 
-    private val defaultOAuth2Properties = OAuth2Properties(
-        jwt = defaultJwtProperties,
-    )
+    private val defaultOAuth2Properties =
+        OAuth2Properties(
+            jwt = defaultJwtProperties,
+        )
 
     private val defaultKeyProvider = JwtKeyProvider(defaultOAuth2Properties)
     private val jwtService = JwtService(defaultKeyProvider, defaultOAuth2Properties)
@@ -345,16 +348,18 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for token with wrong signature`() {
             // Arrange - create a token with a different secret
-            val differentSecretBase64 = Base64.getEncoder().encodeToString(
-                "different-secret-key-must-be-at-least-256-bits-long-for-security".toByteArray()
-            )
-            val differentService = createServiceWithProperties(
-                JwtProperties(
-                    secret = differentSecretBase64,
-                    accessTokenValidityMinutes = 60,
-                    issuer = "test-issuer",
+            val differentSecretBase64 =
+                Base64.getEncoder().encodeToString(
+                    "different-secret-key-must-be-at-least-256-bits-long-for-security".toByteArray(),
                 )
-            )
+            val differentService =
+                createServiceWithProperties(
+                    JwtProperties(
+                        secret = differentSecretBase64,
+                        accessTokenValidityMinutes = 60,
+                        issuer = "test-issuer",
+                    ),
+                )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -373,13 +378,14 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should return false for expired token`() {
             // Arrange - create service with very short expiration (0 minutes = immediate)
-            val shortExpirationService = createServiceWithProperties(
-                JwtProperties(
-                    secret = testSecretBase64,
-                    accessTokenValidityMinutes = 0,
-                    issuer = "test-issuer",
+            val shortExpirationService =
+                createServiceWithProperties(
+                    JwtProperties(
+                        secret = testSecretBase64,
+                        accessTokenValidityMinutes = 0,
+                        issuer = "test-issuer",
+                    ),
                 )
-            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -466,13 +472,14 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should throw exception for expired token`() {
             // Arrange - create service with very short expiration
-            val shortExpirationService = createServiceWithProperties(
-                JwtProperties(
-                    secret = testSecretBase64,
-                    accessTokenValidityMinutes = 0,
-                    issuer = "test-issuer",
+            val shortExpirationService =
+                createServiceWithProperties(
+                    JwtProperties(
+                        secret = testSecretBase64,
+                        accessTokenValidityMinutes = 0,
+                        issuer = "test-issuer",
+                    ),
                 )
-            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -661,12 +668,13 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should allow configuration of all properties via constructor`() {
             // Arrange & Act
-            val properties = JwtProperties(
-                secret = "custom-secret",
-                accessTokenValidityMinutes = 120,
-                refreshTokenValidityDays = 30,
-                issuer = "custom-issuer",
-            )
+            val properties =
+                JwtProperties(
+                    secret = "custom-secret",
+                    accessTokenValidityMinutes = 120,
+                    refreshTokenValidityDays = 30,
+                    issuer = "custom-issuer",
+                )
 
             // Assert
             properties.secret shouldBe "custom-secret"
@@ -681,11 +689,12 @@ class JwtServiceTest : UnitTest() {
             val original = JwtProperties()
 
             // Act
-            val copied = original.copy(
-                secret = "new-secret",
-                accessTokenValidityMinutes = 30,
-                issuer = "new-issuer",
-            )
+            val copied =
+                original.copy(
+                    secret = "new-secret",
+                    accessTokenValidityMinutes = 30,
+                    issuer = "new-issuer",
+                )
 
             // Assert
             copied.secret shouldBe "new-secret"
@@ -816,13 +825,14 @@ class JwtServiceTest : UnitTest() {
         @Test
         fun `should work with custom issuer`() {
             // Arrange
-            val customService = createServiceWithProperties(
-                JwtProperties(
-                    secret = testSecretBase64,
-                    accessTokenValidityMinutes = 60,
-                    issuer = "custom-application-issuer",
+            val customService =
+                createServiceWithProperties(
+                    JwtProperties(
+                        secret = testSecretBase64,
+                        accessTokenValidityMinutes = 60,
+                        issuer = "custom-application-issuer",
+                    ),
                 )
-            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",
@@ -842,13 +852,14 @@ class JwtServiceTest : UnitTest() {
         fun `should work with different expiration times`() {
             // Arrange
             val sevenDaysInMinutes = 7 * 24 * 60L // 7 days in minutes
-            val longExpirationService = createServiceWithProperties(
-                JwtProperties(
-                    secret = testSecretBase64,
-                    accessTokenValidityMinutes = sevenDaysInMinutes,
-                    issuer = "test-issuer",
+            val longExpirationService =
+                createServiceWithProperties(
+                    JwtProperties(
+                        secret = testSecretBase64,
+                        accessTokenValidityMinutes = sevenDaysInMinutes,
+                        issuer = "test-issuer",
+                    ),
                 )
-            )
             val user =
                 AuthenticatedUser(
                     id = "user-123",

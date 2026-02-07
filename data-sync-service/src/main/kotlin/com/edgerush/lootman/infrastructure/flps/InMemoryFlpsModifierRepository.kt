@@ -7,6 +7,7 @@ import com.edgerush.lootman.domain.flps.repository.IpiWeights
 import com.edgerush.lootman.domain.flps.repository.RmsWeights
 import com.edgerush.lootman.domain.flps.repository.RoleMultipliers
 import com.edgerush.lootman.domain.shared.GuildId
+
 /**
  * In-memory implementation of FlpsModifierRepository.
  *

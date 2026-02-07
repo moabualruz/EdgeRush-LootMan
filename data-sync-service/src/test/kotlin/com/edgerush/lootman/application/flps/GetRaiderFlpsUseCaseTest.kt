@@ -1,6 +1,7 @@
 package com.edgerush.lootman.application.flps
 
 import com.edgerush.datasync.test.base.UnitTest
+import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.flps.model.AttendanceCommitmentScore
 import com.edgerush.lootman.domain.flps.model.ExternalPreparationScore
 import com.edgerush.lootman.domain.flps.model.FlpsScore
@@ -13,7 +14,6 @@ import com.edgerush.lootman.domain.flps.model.RecencyDecayFactor
 import com.edgerush.lootman.domain.flps.model.RoleMultiplier
 import com.edgerush.lootman.domain.flps.model.TierBonus
 import com.edgerush.lootman.domain.flps.model.UpgradeValue
-import com.edgerush.datasync.test.fixtures.RaiderFixtures
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.ItemId
 import com.edgerush.lootman.domain.shared.RaiderId
@@ -193,18 +193,19 @@ class GetRaiderFlpsUseCaseTest : UnitTest() {
         id: Long = 1L,
         guildId: String = "test-guild",
         name: String = "TestRaider",
-    ): Raider = RaiderFixtures.createRaider(
-        id = RaiderId(id),
-        guildId = GuildId(guildId),
-        name = name,
-        realm = "TestRealm",
-        characterClass = CharacterClass.WARRIOR,
-        role = Role.DPS,
-        rank = "Raider",
-        status = RaiderStatus.ACTIVE,
-        joinDate = LocalDateTime.now(),
-        wowauditId = id,
-    )
+    ): Raider =
+        RaiderFixtures.createRaider(
+            id = RaiderId(id),
+            guildId = GuildId(guildId),
+            name = name,
+            realm = "TestRealm",
+            characterClass = CharacterClass.WARRIOR,
+            role = Role.DPS,
+            rank = "Raider",
+            status = RaiderStatus.ACTIVE,
+            joinDate = LocalDateTime.now(),
+            wowauditId = id,
+        )
 
     private fun createTestRaiderData(raider: Raider): RaiderFlpsData =
         RaiderFlpsData(

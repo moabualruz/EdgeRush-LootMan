@@ -36,31 +36,32 @@ class PartialSyncUseCaseTest : UnitTest() {
 
     @Nested
     inner class ExecuteTests {
-
         @Test
         fun `should execute partial sync successfully when guildId is provided`() {
             // Given
-            val command = PartialSyncCommand(
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                guildId = "test-guild",
-                eventType = "character.updated",
-            )
+            val command =
+                PartialSyncCommand(
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    guildId = "test-guild",
+                    eventType = "character.updated",
+                )
 
-            val savedSyncRun = SyncRunEntity(
-                id = 123L,
-                source = "wowaudit-webhook-character.updated",
-                status = "RUNNING",
-                startedAt = OffsetDateTime.now(),
-                completedAt = null,
-                message = "Syncing TestChar-TestRealm",
-            )
+            val savedSyncRun =
+                SyncRunEntity(
+                    id = 123L,
+                    source = "wowaudit-webhook-character.updated",
+                    status = "RUNNING",
+                    startedAt = OffsetDateTime.now(),
+                    completedAt = null,
+                    message = "Syncing TestChar-TestRealm",
+                )
 
             val syncResult = WoWAuditSyncResult(created = 0, updated = 1, skipped = 0, error = null)
 
             val entitySlot = slot<SyncRunEntity>()
-            every { syncRunRepository.save(capture(entitySlot)) } answers { 
-                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured 
+            every { syncRunRepository.save(capture(entitySlot)) } answers {
+                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured
             }
             every { wowAuditRosterSyncService.syncRoster("test-guild") } returns Mono.just(syncResult)
 
@@ -79,25 +80,27 @@ class PartialSyncUseCaseTest : UnitTest() {
         @Test
         fun `should return failure when guildId is not provided`() {
             // Given
-            val command = PartialSyncCommand(
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                guildId = null,
-                eventType = "character.updated",
-            )
+            val command =
+                PartialSyncCommand(
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    guildId = null,
+                    eventType = "character.updated",
+                )
 
-            val savedSyncRun = SyncRunEntity(
-                id = 456L,
-                source = "wowaudit-webhook-character.updated",
-                status = "RUNNING",
-                startedAt = OffsetDateTime.now(),
-                completedAt = null,
-                message = "Syncing TestChar-TestRealm",
-            )
+            val savedSyncRun =
+                SyncRunEntity(
+                    id = 456L,
+                    source = "wowaudit-webhook-character.updated",
+                    status = "RUNNING",
+                    startedAt = OffsetDateTime.now(),
+                    completedAt = null,
+                    message = "Syncing TestChar-TestRealm",
+                )
 
             val entitySlot = slot<SyncRunEntity>()
-            every { syncRunRepository.save(capture(entitySlot)) } answers { 
-                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured 
+            every { syncRunRepository.save(capture(entitySlot)) } answers {
+                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured
             }
 
             // When
@@ -114,25 +117,27 @@ class PartialSyncUseCaseTest : UnitTest() {
         @Test
         fun `should handle sync service exception gracefully`() {
             // Given
-            val command = PartialSyncCommand(
-                characterName = "TestChar",
-                characterRealm = "TestRealm",
-                guildId = "test-guild",
-                eventType = "character.updated",
-            )
+            val command =
+                PartialSyncCommand(
+                    characterName = "TestChar",
+                    characterRealm = "TestRealm",
+                    guildId = "test-guild",
+                    eventType = "character.updated",
+                )
 
-            val savedSyncRun = SyncRunEntity(
-                id = 789L,
-                source = "wowaudit-webhook-character.updated",
-                status = "RUNNING",
-                startedAt = OffsetDateTime.now(),
-                completedAt = null,
-                message = "Syncing TestChar-TestRealm",
-            )
+            val savedSyncRun =
+                SyncRunEntity(
+                    id = 789L,
+                    source = "wowaudit-webhook-character.updated",
+                    status = "RUNNING",
+                    startedAt = OffsetDateTime.now(),
+                    completedAt = null,
+                    message = "Syncing TestChar-TestRealm",
+                )
 
             val entitySlot = slot<SyncRunEntity>()
-            every { syncRunRepository.save(capture(entitySlot)) } answers { 
-                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured 
+            every { syncRunRepository.save(capture(entitySlot)) } answers {
+                if (entitySlot.captured.id == null) savedSyncRun else entitySlot.captured
             }
             every { wowAuditRosterSyncService.syncRoster("test-guild") } returns Mono.error(RuntimeException("API error"))
 

@@ -67,12 +67,13 @@ class JdbcRaiderWarcraftLogRepositoryTest : UnitTest() {
         fun `should map all database fields to entity`() {
             // Given
             val id = 1L
-            val entity = createWarcraftLogEntity(
-                id = id,
-                raiderId = 100L,
-                difficulty = "Mythic",
-                score = 95,
-            )
+            val entity =
+                createWarcraftLogEntity(
+                    id = id,
+                    raiderId = 100L,
+                    difficulty = "Mythic",
+                    score = 95,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -91,12 +92,13 @@ class JdbcRaiderWarcraftLogRepositoryTest : UnitTest() {
         fun `should handle null score`() {
             // Given
             val id = 1L
-            val entity = createWarcraftLogEntity(
-                id = id,
-                raiderId = 100L,
-                difficulty = "Heroic",
-                score = null,
-            )
+            val entity =
+                createWarcraftLogEntity(
+                    id = id,
+                    raiderId = 100L,
+                    difficulty = "Heroic",
+                    score = null,
+                )
             every { springRepository.findById(id) } returns Optional.of(entity)
 
             // When
@@ -116,10 +118,11 @@ class JdbcRaiderWarcraftLogRepositoryTest : UnitTest() {
             // Given
             val offset = 10L
             val limit = 5
-            val entities = listOf(
-                createWarcraftLogEntity(1L, 100L),
-                createWarcraftLogEntity(2L, 100L),
-            )
+            val entities =
+                listOf(
+                    createWarcraftLogEntity(1L, 100L),
+                    createWarcraftLogEntity(2L, 100L),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findAll(any<Pageable>()) } returns page
@@ -139,10 +142,11 @@ class JdbcRaiderWarcraftLogRepositoryTest : UnitTest() {
         fun `should return warcraft logs for raider`() {
             // Given
             val raiderId = 100L
-            val entities = listOf(
-                createWarcraftLogEntity(1L, raiderId, difficulty = "Heroic"),
-                createWarcraftLogEntity(2L, raiderId, difficulty = "Mythic"),
-            )
+            val entities =
+                listOf(
+                    createWarcraftLogEntity(1L, raiderId, difficulty = "Heroic"),
+                    createWarcraftLogEntity(2L, raiderId, difficulty = "Mythic"),
+                )
             val page = PageImpl(entities)
 
             every { springRepository.findByRaiderId(raiderId, any<Pageable>()) } returns page
