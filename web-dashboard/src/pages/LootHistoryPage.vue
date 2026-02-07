@@ -320,19 +320,19 @@ const averageFlps = computed(() => {
               <span class="text-gray-400">Sort by:</span>
               <button
                 @click="toggleSort('awardedAt')"
-                :class="['px-2 py-1 rounded', sortColumn === 'awardedAt' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'awardedAt' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
               >
                 Date {{ sortColumn === 'awardedAt' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
               </button>
               <button
                 @click="toggleSort('itemName')"
-                :class="['px-2 py-1 rounded', sortColumn === 'itemName' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'itemName' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
               >
                 Item {{ sortColumn === 'itemName' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
               </button>
               <button
                 @click="toggleSort('flpsAtAward')"
-                :class="['px-2 py-1 rounded', sortColumn === 'flpsAtAward' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700']"
+                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'flpsAtAward' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
               >
                 FLPS {{ sortColumn === 'flpsAtAward' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
               </button>

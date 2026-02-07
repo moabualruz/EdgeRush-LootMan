@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import BattlenetIcon from '@/components/icons/BattlenetIcon.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -151,9 +152,8 @@ watch(() => authStore.isAuthenticated, (newVal) => {
           <!-- Login/Register Form -->
           <form @submit.prevent="handleSubmit" class="space-y-5">
             <!-- Username -->
-            <!-- Username -->
             <div class="group">
-              <label for="username" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
+              <label for="username" class="label">
                 {{ mode === 'login' ? 'Identity' : 'Username' }}
               </label>
               <input
@@ -161,33 +161,33 @@ watch(() => authStore.isAuthenticated, (newVal) => {
                 v-model="username"
                 type="text"
                 :placeholder="mode === 'login' ? 'Username or Email' : 'Choose a username'"
-                class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                class="input"
                 required
               />
             </div>
 
             <!-- Email (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label for="email" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Email Address</label>
+              <label for="email" class="label">Email Address</label>
               <input
                 id="email"
                 v-model="email"
                 type="email"
                 placeholder="name@example.com"
-                class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                class="input"
                 required
               />
             </div>
 
             <!-- Password -->
             <div class="group">
-              <label for="password" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Password</label>
+              <label for="password" class="label">Password</label>
               <input
                 id="password"
                 v-model="password"
                 type="password"
                 placeholder="••••••••"
-                class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                class="input"
                 required
               />
               <div v-if="mode === 'login'" class="mt-2 text-right">
@@ -202,13 +202,13 @@ watch(() => authStore.isAuthenticated, (newVal) => {
 
             <!-- Confirm Password (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label for="confirmPassword" class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Confirm Password</label>
+              <label for="confirmPassword" class="label">Confirm Password</label>
               <input
                 id="confirmPassword"
                 v-model="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                class="input"
                 required
               />
               <p v-if="confirmPassword && password !== confirmPassword" class="mt-1 text-xs text-destructive">
@@ -218,11 +218,11 @@ watch(() => authStore.isAuthenticated, (newVal) => {
 
             <!-- Role Selection (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Account Type</label>
+              <label class="label">Account Type</label>
               <div class="relative">
                 <select
                   v-model="role"
-                  class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none cursor-pointer"
+                  class="input appearance-none cursor-pointer"
                 >
                   <option value="RAIDER" class="bg-gray-900">Raider</option>
                   <option value="GUILD_ADMIN" class="bg-gray-900">Guild Admin</option>
@@ -237,7 +237,7 @@ watch(() => authStore.isAuthenticated, (newVal) => {
             <button
               type="submit"
               :disabled="!isFormValid"
-              class="w-full py-3.5 px-4 bg-primary hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-bold rounded-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-0.5"
+              class="w-full btn-primary py-3.5"
             >
               {{ mode === 'login' ? 'Sign In' : 'Create Account' }}
             </button>
@@ -282,9 +282,7 @@ watch(() => authStore.isAuthenticated, (newVal) => {
               @click="loginWithBattlenet"
               class="flex items-center justify-center px-4 py-3 rounded-lg bg-[#148EFF]/10 hover:bg-[#148EFF]/20 border border-[#148EFF]/20 text-[#148EFF] hover:text-white font-semibold transition-all duration-300 group"
             >
-              <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/>
-              </svg>
+              <BattlenetIcon class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" />
               Battle.net
             </button>
           </div>

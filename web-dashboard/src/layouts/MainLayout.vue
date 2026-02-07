@@ -40,11 +40,17 @@ const navItems = [
   { path: '/leaderboard', label: 'Leaderboards', icon: 'trophy' },
   { path: '/performance', label: 'Analysis', icon: 'chart' },
   { path: '/attendance', label: 'Attendance', icon: 'calendar' },
+  { path: '/raid-plans', label: 'Raid Strategy', icon: 'map' },
 ]
 
 const secondaryNavItems = [
   { path: '/gear', label: 'My Gear', icon: 'shield' },
   { path: '/history', label: 'History', icon: 'clock' },
+]
+
+const toolsItems = [
+  { path: '/droptimizer', label: 'Droptimizer', icon: 'trending-up' },
+  { path: '/top-gear', label: 'Top Gear', icon: 'sliders' },
 ]
 
 const adminNavItems = [
@@ -139,6 +145,59 @@ function handleLogout() {
           >
             <NavigationIcon :name="item.icon" class="w-5 h-5 transition-colors group-hover:text-primary" :class="route.path === item.path ? 'text-primary' : 'text-muted-foreground'" />
             {{ item.label }}
+          </RouterLink>
+        </div>
+
+        <!-- Tools Group -->
+        <div class="space-y-1">
+          <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Tools</p>
+          <RouterLink
+            v-for="item in toolsItems"
+            :key="item.path"
+            :to="item.path"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+            :class="[
+              route.path === item.path
+                ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10'
+                : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+            ]"
+          >
+            <NavigationIcon :name="item.icon" class="w-5 h-5 transition-colors group-hover:text-primary" :class="route.path === item.path ? 'text-primary' : 'text-muted-foreground'" />
+            {{ item.label }}
+          </RouterLink>
+        </div>
+
+        <!-- Community Group -->
+        <div class="space-y-1">
+          <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Community</p>
+          <RouterLink
+            to="/recruitment"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+            :class="[
+              route.path === '/recruitment'
+                ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10'
+                : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+            ]"
+          >
+            <NavigationIcon name="users" class="w-5 h-5 transition-colors group-hover:text-primary" :class="route.path === '/recruitment' ? 'text-primary' : 'text-muted-foreground'" />
+            Recruitment
+          </RouterLink>
+        </div>
+
+        <!-- Guild Management Group -->
+        <div v-if="guildContextStore.canAccessSettings" class="space-y-1">
+          <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Management</p>
+          <RouterLink
+            to="/guild-settings"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+            :class="[
+              route.path === '/guild-settings'
+                ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10'
+                : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+            ]"
+          >
+            <NavigationIcon name="settings" class="w-5 h-5 transition-colors group-hover:text-primary" :class="route.path === '/guild-settings' ? 'text-primary' : 'text-muted-foreground'" />
+            Guild Settings
           </RouterLink>
         </div>
 

@@ -7,6 +7,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
+            'vue': 'vue/dist/vue.esm-bundler.js',
         },
     },
     server: {
@@ -34,13 +35,11 @@ export default defineConfig({
         // Rollup options for code splitting
         rollupOptions: {
             output: {
-                // Manual chunk splitting for optimal caching
-                manualChunks: {
-                    // Core Vue framework
-                    'vendor-vue': ['vue', 'vue-router', 'pinia'],
-                    // HTTP and data fetching
-                    'vendor-http': ['axios', '@tanstack/vue-query'],
-                },
+                // Manual chunk splitting removed to avoid naming conflicts in Docker
+                // manualChunks: {
+                //   'vendor-vue': ['vue', 'vue-router', 'pinia'],
+                //   'vendor-http': ['axios', '@tanstack/vue-query'],
+                // },
                 // Asset file naming for cache busting
                 assetFileNames: function (assetInfo) {
                     var _a;

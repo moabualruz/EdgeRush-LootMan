@@ -45,6 +45,9 @@ export interface GuildSyncTriggerResponse {
 /**
  * Fetch sync configuration for a guild.
  */
+/**
+ * Fetch sync configuration for a guild.
+ */
 export const fetchGuildSyncConfig = async (guildId: string): Promise<GuildSyncConfig> => {
   const response = await api.get<GuildSyncConfig>(`/v1/guilds/${guildId}/sync/config`)
   return response.data
@@ -74,5 +77,13 @@ export const triggerBnetSync = async (guildId: string): Promise<GuildSyncTrigger
  */
 export const triggerWowauditSync = async (guildId: string): Promise<GuildSyncTriggerResponse> => {
   const response = await api.post<GuildSyncTriggerResponse>(`/v1/guilds/${guildId}/sync/wowaudit/trigger`)
+  return response.data
+}
+
+/**
+ * Trigger Warcraft Logs guild roster sync.
+ */
+export const triggerWarcraftLogsSync = async (guildId: string): Promise<GuildSyncTriggerResponse> => {
+  const response = await api.post<GuildSyncTriggerResponse>(`/v1/guilds/${guildId}/sync/warcraftlogs/trigger`)
   return response.data
 }

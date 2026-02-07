@@ -125,6 +125,9 @@ async function saveSyncConfig() {
       bnetRealmSlug: bnetRealmSlug.value || undefined,
       bnetGuildNameSlug: bnetGuildNameSlug.value || undefined,
       bnetRegion: bnetRegion.value || undefined,
+      // Automatically enable sync when saving configuration
+      syncEnabled: true,
+      bnetSyncEnabled: true,
     })
     wowauditApiKey.value = '' // Clear the API key field after save
     syncMessage.value = { type: 'success', text: 'Configuration saved successfully!' }
