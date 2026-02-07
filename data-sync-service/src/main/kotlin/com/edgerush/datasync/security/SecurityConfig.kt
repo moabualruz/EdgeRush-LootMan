@@ -42,6 +42,9 @@ class SecurityConfig(
                             // FLPS endpoints - public read access
                             pathMatchers(HttpMethod.GET, "/api/v1/flps/**").permitAll()
 
+                            // Auth endpoints - public access
+                            pathMatchers("/api/v1/auth/**").permitAll()
+
                             // All GET requests - authenticated users
                             pathMatchers(HttpMethod.GET, "/api/v1/**").authenticated()
 
