@@ -10,7 +10,9 @@ import ScoreBreakdown from "@/components/ScoreBreakdown.vue";
 import FlpsVisualization from "@/components/FlpsVisualization.vue";
 import RecentLoot from "@/components/RecentLoot.vue";
 import SkeletonCard from "@/components/SkeletonCard.vue";
+
 import SkeletonProfile from "@/components/SkeletonProfile.vue";
+import PageHeader from "@/components/ui/PageHeader.vue";
 
 const authStore = useAuthStore();
 const guildContextStore = useGuildContextStore();
@@ -57,24 +59,18 @@ const hasRequiredData = computed(() => {
 
 <template>
   <div class="space-y-8">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-white mb-2 text-glow">
-          Mission Control
-        </h1>
-        <p class="text-muted-foreground">
-          Your performance command center for
-          {{ guildContextStore.activeGuild?.guildName || "your guild" }}
-        </p>
-      </div>
-      <div v-if="flpsData" class="flex gap-2">
+    <PageHeader
+      title="Mission Control"
+      :subtitle="`Your performance command center for ${guildContextStore.activeGuild?.guildName || 'your guild'}`"
+    >
+      <template #actions v-if="flpsData">
         <span
           class="px-3 py-1 rounded-full text-xs font-medium border border-border bg-black/40 text-muted-foreground"
         >
           Updated: Today
         </span>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <!-- Loading state -->
     <div v-if="flpsLoading && guildId" class="space-y-6">

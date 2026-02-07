@@ -3,6 +3,10 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useGuildContextStore } from '@/stores/guildContext'
+import { useToast } from '@/composables/useToast'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import ConfigEditor from '@/components/admin/ConfigEditor.vue'
 import {
   fetchGuildPermissions,
@@ -22,6 +26,7 @@ import type { GuildPermission, PermissionTypeInfo } from '@/types'
 const router = useRouter()
 const guildContextStore = useGuildContextStore()
 const queryClient = useQueryClient()
+const toast = useToast()
 
 const activeTab = ref<'sync' | 'flps' | 'permissions'>('sync')
 
@@ -50,21 +55,20 @@ const { data: syncConfig, isLoading: syncConfigLoading, refetch: refetchSyncConf
 
 // Sync config form state
 const wowauditApiKey = ref('')
-const wowauditGuildUri = ref('')
-const bnetRealmSlug = ref('')
-const bnetGuildNameSlug = ref('')
+const wowauditGuildUri = ref('eu/twisting-nether/dod')
+const bnetRealmSlug = ref('twisting-nether')
+const bnetGuildNameSlug = ref('dod')
 const bnetRegion = ref('eu')
 const syncSaving = ref(false)
 const bnetSyncing = ref(false)
 const wowauditSyncing = ref(false)
-const syncMessage = ref<{ type: 'success' | 'error'; text: string } | null>(null)
 
 // Populate form when sync config loads
 watch(syncConfig, (config) => {
   if (config) {
-    wowauditGuildUri.value = config.wowauditGuildUri ?? ''
-    bnetRealmSlug.value = config.bnetRealmSlug ?? ''
-    bnetGuildNameSlug.value = config.bnetGuildNameSlug ?? ''
+    wowauditGuildUri.value = config.wowauditGuildUri ?? 'eu/twisting-nether/dod'
+    bnetRealmSlug.value = config.bnetRealmSlug ?? 'twisting-nether'
+    bnetGuildNameSlug.value = config.bnetGuildNameSlug ?? 'dod'
     bnetRegion.value = config.bnetRegion ?? 'eu'
   }
 })
@@ -117,7 +121,6 @@ function handleRemovePermission(permission: GuildPermission) {
 
 async function saveSyncConfig() {
   syncSaving.value = true
-  syncMessage.value = null
   try {
     await updateGuildSyncConfig(guildId.value, {
       wowauditGuildUri: wowauditGuildUri.value || undefined,
@@ -130,10 +133,10 @@ async function saveSyncConfig() {
       bnetSyncEnabled: true,
     })
     wowauditApiKey.value = '' // Clear the API key field after save
-    syncMessage.value = { type: 'success', text: 'Configuration saved successfully!' }
+    toast.success('Settings Saved', 'Configuration saved successfully!')
     refetchSyncConfig()
   } catch (error) {
-    syncMessage.value = { type: 'error', text: 'Failed to save configuration. Please try again.' }
+    toast.error('Save Failed', 'Failed to save configuration. Please try again.')
   } finally {
     syncSaving.value = false
   }
@@ -141,19 +144,18 @@ async function saveSyncConfig() {
 
 async function handleBnetSync() {
   bnetSyncing.value = true
-  syncMessage.value = null
   try {
     const result = await triggerBnetSync(guildId.value)
     if (result.success) {
-      syncMessage.value = { type: 'success', text: result.message }
+      toast.success('Sync Started', result.message)
       // Refresh the guild context to pick up new raiders
       guildContextStore.fetchGuilds()
     } else {
-      syncMessage.value = { type: 'error', text: result.message }
+      toast.error('Sync Failed', result.message)
     }
     refetchSyncConfig()
   } catch (error) {
-    syncMessage.value = { type: 'error', text: 'Failed to trigger sync. Please try again.' }
+    toast.error('Sync Error', 'Failed to trigger sync. Please try again.')
   } finally {
     bnetSyncing.value = false
   }
@@ -161,19 +163,18 @@ async function handleBnetSync() {
 
 async function handleWowauditSync() {
   wowauditSyncing.value = true
-  syncMessage.value = null
   try {
     const result = await triggerWowauditSync(guildId.value)
     if (result.success) {
-      syncMessage.value = { type: 'success', text: result.message }
+      toast.success('Sync Started', result.message)
       // Refresh the guild context to pick up new raiders
       guildContextStore.fetchGuilds()
     } else {
-      syncMessage.value = { type: 'error', text: result.message }
+      toast.error('Sync Failed', result.message)
     }
     refetchSyncConfig()
   } catch (error) {
-    syncMessage.value = { type: 'error', text: 'Failed to trigger WoWAudit sync. Please try again.' }
+    toast.error('Sync Error', 'Failed to trigger WoWAudit sync. Please try again.')
   } finally {
     wowauditSyncing.value = false
   }
@@ -231,18 +232,7 @@ function getPermissionDescription(type: string): string {
     <div>
       <!-- Data Sync Configuration -->
       <div v-if="activeTab === 'sync'" class="space-y-6">
-        <!-- Message display -->
-        <div
-          v-if="syncMessage"
-          :class="[
-            'alert',
-            syncMessage.type === 'success' ? 'alert-info border-green-500/50 bg-green-500/10 text-green-200' : 'alert-error'
-          ]"
-        >
-          <svg v-if="syncMessage.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <div class="alert-description">{{ syncMessage.text }}</div>
-        </div>
+        <!-- Message display (REMOVED) -->
 
         <!-- Loading state -->
         <div v-if="syncConfigLoading" class="flex items-center justify-center py-8">
@@ -259,41 +249,30 @@ function getPermissionDescription(type: string): string {
 
             <div class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="label">Region</label>
-                  <select v-model="bnetRegion" class="input">
-                    <option value="eu">Europe (EU)</option>
-                    <option value="us">Americas (US)</option>
-                    <option value="kr">Korea (KR)</option>
-                    <option value="tw">Taiwan (TW)</option>
-                  </select>
-                </div>
+                <BaseSelect
+                  v-model="bnetRegion"
+                  label="Region"
+                  :options="[
+                    { value: 'eu', label: 'Europe (EU)' },
+                    { value: 'us', label: 'Americas (US)' },
+                    { value: 'kr', label: 'Korea (KR)' },
+                    { value: 'tw', label: 'Taiwan (TW)' }
+                  ]"
+                />
 
-                <div>
-                  <label class="label">Realm Slug</label>
-                  <input
-                    v-model="bnetRealmSlug"
-                    type="text"
-                    placeholder="e.g., twisting-nether"
-                    class="input"
-                  />
-                  <p class="text-xs text-gray-500 mt-1">
-                    Lowercase, hyphens for spaces
-                  </p>
-                </div>
+                <BaseInput
+                  v-model="bnetRealmSlug"
+                  label="Realm Slug"
+                  placeholder="e.g., twisting-nether"
+                  hint="Lowercase, hyphens for spaces"
+                />
 
-                <div>
-                  <label class="label">Guild Name Slug</label>
-                  <input
-                    v-model="bnetGuildNameSlug"
-                    type="text"
-                    placeholder="e.g., dod"
-                    class="input"
-                  />
-                  <p class="text-xs text-gray-500 mt-1">
-                    Lowercase, hyphens for spaces
-                  </p>
-                </div>
+                <BaseInput
+                  v-model="bnetGuildNameSlug"
+                  label="Guild Name Slug"
+                  placeholder="e.g., dod"
+                  hint="Lowercase, hyphens for spaces"
+                />
               </div>
 
               <!-- Sync status -->
@@ -322,13 +301,14 @@ function getPermissionDescription(type: string): string {
               </div>
 
               <div class="flex justify-end gap-4">
-                <button
+                <BaseButton
+                  variant="secondary"
                   @click="handleBnetSync"
-                  class="btn-secondary"
-                  :disabled="bnetSyncing || !bnetRealmSlug || !bnetGuildNameSlug"
+                  :loading="bnetSyncing"
+                  :disabled="!bnetRealmSlug || !bnetGuildNameSlug"
                 >
                   {{ bnetSyncing ? 'Syncing...' : 'Sync Now' }}
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -342,27 +322,24 @@ function getPermissionDescription(type: string): string {
 
             <div class="space-y-4">
               <div>
-                <label class="label">API Key</label>
-                <input
+                <BaseInput
                   v-model="wowauditApiKey"
                   type="password"
+                  label="API Key"
                   placeholder="Enter your WoWAudit API key (leave blank to keep existing)"
-                  class="input"
                 />
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-gray-500 mt-1 ml-1">
                   {{ syncConfig?.wowauditApiKeyConfigured ? 'API key is configured.' : 'No API key configured.' }}
                 </p>
               </div>
 
               <div>
-                <label class="label">Guild URI</label>
-                <input
+                <BaseInput
                   v-model="wowauditGuildUri"
-                  type="text"
+                  label="Guild URI"
                   placeholder="e.g., eu/tarren-mill/your-guild-name"
-                  class="input"
                 />
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-gray-500 mt-1 ml-1">
                   Format: region/realm/guild-name (all lowercase, hyphens for spaces)
                 </p>
               </div>
@@ -393,26 +370,26 @@ function getPermissionDescription(type: string): string {
               </div>
 
               <div class="flex justify-end gap-4">
-                <button
+                <BaseButton
+                  variant="secondary"
                   @click="handleWowauditSync"
-                  class="btn-secondary"
-                  :disabled="wowauditSyncing || !wowauditGuildUri || !syncConfig?.wowauditApiKeyConfigured"
+                  :loading="wowauditSyncing"
+                  :disabled="!wowauditGuildUri || !syncConfig?.wowauditApiKeyConfigured"
                 >
                   {{ wowauditSyncing ? 'Syncing...' : 'Sync Now' }}
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
 
           <!-- Save button -->
           <div class="flex justify-end">
-            <button
+            <BaseButton
               @click="saveSyncConfig"
-              class="btn-primary"
-              :disabled="syncSaving"
+              :loading="syncSaving"
             >
               {{ syncSaving ? 'Saving...' : 'Save All Settings' }}
-            </button>
+            </BaseButton>
           </div>
         </template>
       </div>
@@ -429,33 +406,33 @@ function getPermissionDescription(type: string): string {
           </p>
 
           <!-- Add new permission -->
-          <div class="flex flex-col md:flex-row gap-4 p-4 bg-gray-700/50 rounded-lg mb-6">
-            <div class="flex-1">
-              <label class="label">Rank Name</label>
-              <input
+          <div class="flex flex-col md:flex-row gap-4 p-4 bg-gray-700/50 rounded-lg mb-6 items-end">
+             <div class="flex-1 w-full">
+              <BaseInput
                 v-model="newPermissionRank"
-                type="text"
+                label="Rank Name"
                 placeholder="e.g., Guild Master, Officer, Raider"
-                class="input"
               />
             </div>
-            <div class="flex-1">
-              <label class="label">Permission Type</label>
-              <select v-model="newPermissionType" class="input">
-                <option value="">Select permission...</option>
+            <div class="flex-1 w-full">
+              <BaseSelect
+                v-model="newPermissionType"
+                label="Permission Type"
+                placeholder="Select permission..."
+              >
                 <option v-for="type in permissionTypes" :key="type.name" :value="type.name">
                   {{ type.name }} - {{ type.description }}
                 </option>
-              </select>
+              </BaseSelect>
             </div>
-            <div class="flex items-end">
-              <button
+            <div class="flex-none">
+              <BaseButton
                 @click="handleAddPermission"
-                class="btn-primary"
-                :disabled="!newPermissionRank || !newPermissionType || addPermissionMutation.isPending.value"
+                :loading="addPermissionMutation.isPending.value"
+                :disabled="!newPermissionRank || !newPermissionType"
               >
-                {{ addPermissionMutation.isPending.value ? 'Adding...' : 'Add Permission' }}
-              </button>
+                Add Permission
+              </BaseButton>
             </div>
           </div>
 

@@ -9,6 +9,9 @@ import {
   type LinkageRefreshResult,
 } from "@/api/user";
 import BattlenetIcon from "@/components/icons/BattlenetIcon.vue";
+import PageHeader from '@/components/ui/PageHeader.vue';
+import BaseCard from '@/components/ui/BaseCard.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.user);
@@ -33,41 +36,17 @@ const formatDate = (dateStr: string | undefined) => {
 
 // Class color helper
 const getClassColor = (className: string) => {
-  const map: Record<string, string> = {
-    DEATH_KNIGHT: "bg-[#C41E3A]/20 text-[#C41E3A]",
-    DEMON_HUNTER: "bg-[#A330C9]/20 text-[#A330C9]",
-    DRUID: "bg-[#FF7D0A]/20 text-[#FF7D0A]",
-    EVOKER: "bg-[#33937F]/20 text-[#33937F]",
-    HUNTER: "bg-[#ABD473]/20 text-[#ABD473]",
-    MAGE: "bg-[#69CCF0]/20 text-[#69CCF0]",
-    MONK: "bg-[#00FF96]/20 text-[#00FF96]",
-    PALADIN: "bg-[#F58CBA]/20 text-[#F58CBA]",
-    PRIEST: "bg-[#FFFFFF]/20 text-[#FFFFFF]",
-    ROGUE: "bg-[#FFF569]/20 text-[#FFF569]",
-    SHAMAN: "bg-[#0070DE]/20 text-[#0070DE]",
-    WARLOCK: "bg-[#9482C9]/20 text-[#9482C9]",
-    WARRIOR: "bg-[#C79C6E]/20 text-[#C79C6E]",
-  };
-  return map[className] || "bg-gray-500/20 text-gray-500";
+  if (!className) return "bg-gray-500/20 text-gray-500";
+  const normalized = className.toUpperCase().replace('_', '');
+  // Dynamically using class names might be purgable by Tailwind, but let's stick to safe colors or standard construction
+  // For now using specific map or just constructing it if safelisted
+  return `bg-class-${normalized.toLowerCase()}/20 text-class-${normalized.toLowerCase()}`;
 };
 
-const getClassColorText = (className: string) => {
-  const map: Record<string, string> = {
-    DEATH_KNIGHT: "text-[#C41E3A]",
-    DEMON_HUNTER: "text-[#A330C9]",
-    DRUID: "text-[#FF7D0A]",
-    EVOKER: "text-[#33937F]",
-    HUNTER: "text-[#ABD473]",
-    MAGE: "text-[#69CCF0]",
-    MONK: "text-[#00FF96]",
-    PALADIN: "text-[#F58CBA]",
-    PRIEST: "text-[#FFFFFF]",
-    ROGUE: "text-[#FFF569]",
-    SHAMAN: "text-[#0070DE]",
-    WARLOCK: "text-[#9482C9]",
-    WARRIOR: "text-[#C79C6E]",
-  };
-  return map[className] || "text-gray-500";
+const getClassTextColor = (className: string) => {
+  if (!className) return "text-gray-500";
+  const normalized = className.toUpperCase().replace('_', '');
+  return `text-class-${normalized.toLowerCase()}`;
 };
 
 // Fetch OAuth URLs
@@ -124,38 +103,32 @@ onMounted(() => {
 
 <template>
   <div class="space-y-8 animate-fade-in">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight text-white mb-2 text-glow">
-        My Profile
-      </h1>
-      <p class="text-muted-foreground">
-        Manage your identity and linked connections
-      </p>
-    </div>
+    <PageHeader
+      title="My Profile"
+      subtitle="Manage your identity and linked connections"
+    />
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" v-if="user">
       <!-- User Info Card -->
-      <div
-        class="glass-card p-6 border-white/10 flex flex-col h-full bg-gradient-to-br from-black/40 to-black/20"
-      >
-        <h2
-          class="text-lg font-semibold text-white mb-6 flex items-center gap-2"
-        >
-          <svg
-            class="w-5 h-5 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-          User Information
-        </h2>
+      <BaseCard>
+        <template #header>
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg
+                class="w-5 h-5 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+            </svg>
+            User Information
+            </h2>
+        </template>
 
         <div class="flex items-start gap-5 mb-8">
           <div
@@ -209,30 +182,28 @@ onMounted(() => {
             </span>
           </div>
         </div>
-      </div>
+      </BaseCard>
 
       <!-- Linked Accounts Card -->
-      <div
-        class="glass-card p-6 border-white/10 flex flex-col h-full bg-gradient-to-br from-black/40 to-black/20"
-      >
-        <h2
-          class="text-lg font-semibold text-white mb-6 flex items-center gap-2"
-        >
-          <svg
-            class="w-5 h-5 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-            />
-          </svg>
-          Linked Accounts
-        </h2>
+    <BaseCard>
+        <template #header>
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg
+                class="w-5 h-5 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+            </svg>
+            Linked Accounts
+            </h2>
+        </template>
 
         <div class="space-y-4">
           <!-- Discord -->
@@ -386,28 +357,28 @@ onMounted(() => {
             </button>
           </div>
         </div>
-      </div>
+
+      </BaseCard>
       <!-- User Characters Card -->
-      <div
-        class="glass-card p-6 border-white/10 flex flex-col h-full bg-gradient-to-br from-black/40 to-black/20 lg:col-span-2"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-            <svg
-              class="w-5 h-5 text-primary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            My Characters
-          </h2>
+      <BaseCard class="lg:col-span-2">
+        <template #header>
+            <div class="flex items-center justify-between w-full">
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                <svg
+                class="w-5 h-5 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+                </svg>
+                My Characters
+            </h2>
           <div class="flex items-center gap-3">
             <button
               @click="handleFixLinkages"
@@ -434,26 +405,6 @@ onMounted(() => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <svg
-                v-else
-                class="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
               {{ fixingLinkages ? "Fixing..." : "Fix Links" }}
             </button>
             <a
@@ -478,8 +429,7 @@ onMounted(() => {
             </a>
           </div>
         </div>
-
-        <!-- Linkage Fix Result -->
+        </template>    <!-- Linkage Fix Result -->
         <div
           v-if="linkageResult"
           class="mb-4 p-4 rounded-lg border"
@@ -681,7 +631,7 @@ onMounted(() => {
             <div class="overflow-hidden">
               <div
                 class="font-medium text-white truncate"
-                :class="getClassColorText(char.className)"
+                :class="getClassTextColor(char.className)"
               >
                 {{ char.name }}
               </div>
@@ -696,7 +646,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </BaseCard>
+  </div>
   </div>
 </template>

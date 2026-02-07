@@ -5,6 +5,7 @@
  * Mimics the ScoreCard component's loading state.
  */
 import Skeleton from './Skeleton.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 
 export interface SkeletonCardProps {
   showHeader?: boolean
@@ -22,7 +23,7 @@ withDefaults(defineProps<SkeletonCardProps>(), {
 </script>
 
 <template>
-  <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
+  <BaseCard>
     <!-- Header -->
     <Skeleton
       v-if="showHeader"
@@ -40,5 +41,5 @@ withDefaults(defineProps<SkeletonCardProps>(), {
         :width="i === lines ? '80%' : '100%'"
       />
     </div>
-  </div>
+  </BaseCard>
 </template>

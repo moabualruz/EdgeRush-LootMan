@@ -73,6 +73,20 @@ export default {
           druid: '#FF7D0A',
           demonhunter: '#A330C9',
           evoker: '#33937F',
+          // Aliases for uppercase usage if needed, or stick to lowercase
+          DEATH_KNIGHT: '#C41F3B',
+          DEMON_HUNTER: '#A330C9',
+          DRUID: '#FF7D0A',
+          EVOKER: '#33937F',
+          HUNTER: '#ABD473',
+          MAGE: '#69CCF0',
+          MONK: '#00FF96',
+          PALADIN: '#F58CBA',
+          PRIEST: '#FFFFFF',
+          ROGUE: '#FFF569',
+          SHAMAN: '#0070DE',
+          WARLOCK: '#9482C9',
+          WARRIOR: '#C79C6E',
         }
       },
       borderRadius: {

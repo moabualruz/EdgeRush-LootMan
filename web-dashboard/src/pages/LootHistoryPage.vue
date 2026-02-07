@@ -15,6 +15,10 @@ import { DonutChart, BarChart } from '@/components/charts'
 import AwardLootModal from '@/components/loot/AwardLootModal.vue'
 import LootContextMenu from '@/components/loot/LootContextMenu.vue'
 import EditLootModal from '@/components/loot/EditLootModal.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
 import type { LootAward } from '@/types'
 
 const authStore = useAuthStore()
@@ -189,19 +193,22 @@ const averageFlps = computed(() => {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">Loot History</h1>
-      <button
-        class="btn-primary"
-        @click="isAwardModalOpen = true"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        Award Loot
-      </button>
-    </div>
+    <PageHeader title="Loot History">
+      <template #actions>
+        <BaseButton
+          variant="primary"
+          @click="isAwardModalOpen = true"
+        >
+          <template #icon-left>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </template>
+          Award Loot
+        </BaseButton>
+      </template>
+    </PageHeader>
 
     <!-- Loading state with skeletons -->
     <div v-if="isLoading && guildId" class="space-y-6">
@@ -234,80 +241,79 @@ const averageFlps = computed(() => {
     <!-- Content -->
     <div v-else-if="data" class="space-y-6">
       <!-- Empty state -->
-      <div v-if="data.awards.length === 0" class="card text-center py-8">
+      <BaseCard v-if="data.awards.length === 0" class="text-center py-8">
         <p class="text-gray-400">No loot history found.</p>
-      </div>
+      </BaseCard>
 
       <template v-else>
         <!-- Stats Summary -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="card text-center">
+          <BaseCard class="text-center">
             <div class="text-3xl font-bold text-primary-400">{{ data.awards.length }}</div>
             <div class="text-sm text-gray-400 mt-1">Total Items</div>
-          </div>
-          <div class="card text-center">
+          </BaseCard>
+          <BaseCard class="text-center">
             <div class="text-3xl font-bold text-blue-400">{{ formatScore(averageFlps) }}</div>
             <div class="text-sm text-gray-400 mt-1">Avg FLPS at Award</div>
-          </div>
-          <div class="card text-center">
+          </BaseCard>
+          <BaseCard class="text-center">
             <div class="text-3xl font-bold text-green-400">
               {{ data.awards.filter(a => a.rdfExpired).length }}
             </div>
             <div class="text-sm text-gray-400 mt-1">RDF Cleared</div>
-          </div>
+          </BaseCard>
         </div>
 
         <!-- Charts Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- RDF Status Chart -->
-          <div v-if="rdfBreakdown.length > 0" class="card">
-            <h2 class="text-lg font-semibold mb-4">RDF Status</h2>
+          <BaseCard v-if="rdfBreakdown.length > 0" title="RDF Status">
             <DonutChart
               :data="rdfBreakdown"
               :size="160"
               center-label="Items"
             />
-          </div>
+          </BaseCard>
 
           <!-- Monthly Loot Chart -->
-          <div v-if="monthlyLoot.length > 0" class="card">
-            <h2 class="text-lg font-semibold mb-4">Loot by Month</h2>
+          <BaseCard v-if="monthlyLoot.length > 0" title="Loot by Month">
             <BarChart
               :data="monthlyLoot"
               :height="180"
               bar-color="#8b5cf6"
             />
-          </div>
+          </BaseCard>
         </div>
 
         <!-- Loot items list -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold">Recent Loot</h2>
-            <div class="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
+        <BaseCard title="Recent Loot">
+          <template #header>
+            <div class="relative w-64">
+              <BaseInput
                 v-model="searchQuery"
-                type="text"
                 placeholder="Search items..."
-                class="input pl-10 w-64"
-              />
+                class="pl-10"
+              >
+                <template #prepend>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-gray-400"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </template>
+              </BaseInput>
             </div>
-          </div>
+          </template>
           
           <!-- No results -->
           <div v-if="filteredAwards.length === 0 && debouncedQuery" class="text-center py-6">
@@ -318,24 +324,27 @@ const averageFlps = computed(() => {
             <!-- Sort Controls -->
             <div class="flex items-center gap-4 mb-4 text-sm">
               <span class="text-gray-400">Sort by:</span>
-              <button
+              <BaseButton
                 @click="toggleSort('awardedAt')"
-                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'awardedAt' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
+                size="sm"
+                :variant="sortColumn === 'awardedAt' ? 'primary' : 'secondary'"
               >
                 Date {{ sortColumn === 'awardedAt' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
-              </button>
-              <button
+              </BaseButton>
+              <BaseButton
                 @click="toggleSort('itemName')"
-                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'itemName' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
+                size="sm"
+                :variant="sortColumn === 'itemName' ? 'primary' : 'secondary'"
               >
                 Item {{ sortColumn === 'itemName' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
-              </button>
-              <button
+              </BaseButton>
+              <BaseButton
                 @click="toggleSort('flpsAtAward')"
-                :class="['btn-secondary py-1 px-3 min-h-0 h-8', sortColumn === 'flpsAtAward' ? '!bg-primary-600 !text-white !border-primary-600' : '']"
+                size="sm"
+                :variant="sortColumn === 'flpsAtAward' ? 'primary' : 'secondary'"
               >
                 FLPS {{ sortColumn === 'flpsAtAward' ? (sortDir === 'desc' ? '↓' : '↑') : '' }}
-              </button>
+              </BaseButton>
             </div>
             
             <!-- Items List -->
@@ -383,41 +392,44 @@ const averageFlps = computed(() => {
               Showing {{ currentPage * pageSize + 1 }}-{{ Math.min((currentPage + 1) * pageSize, sortedAwards.length) }} of {{ sortedAwards.length }}
             </span>
             <div class="flex items-center gap-2">
-              <button
+              <BaseButton
                 @click="currentPage = 0"
                 :disabled="currentPage === 0"
-                class="px-2 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                size="sm"
+                variant="secondary"
               >
                 First
-              </button>
-              <button
+              </BaseButton>
+              <BaseButton
                 @click="currentPage--"
                 :disabled="currentPage === 0"
-                class="px-3 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                size="sm"
+                variant="secondary"
               >
                 ←
-              </button>
+              </BaseButton>
               <span class="text-sm text-gray-300 px-2">
                 Page {{ currentPage + 1 }} of {{ totalPages }}
               </span>
-              <button
+              <BaseButton
                 @click="currentPage++"
                 :disabled="currentPage >= totalPages - 1"
-                class="px-3 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                size="sm"
+                variant="secondary"
               >
                 →
-              </button>
-              <button
+              </BaseButton>
+              <BaseButton
                 @click="currentPage = totalPages - 1"
                 :disabled="currentPage >= totalPages - 1"
-                class="px-2 py-1 text-sm rounded bg-gray-700 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                size="sm"
+                variant="secondary"
               >
                 Last
-              </button>
+              </BaseButton>
             </div>
           </div>
-        </template>
-        </div>
+        </BaseCard>
       </template>
     </div>
 

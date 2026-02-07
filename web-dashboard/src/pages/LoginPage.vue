@@ -3,6 +3,9 @@ import { ref, computed, watch } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BattlenetIcon from '@/components/icons/BattlenetIcon.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -131,10 +134,12 @@ watch(() => authStore.isAuthenticated, (newVal) => {
       </div>
 
       <!-- Login Card -->
-      <div class="glass-card p-8 border-white/10 backdrop-blur-xl bg-black/40">
-        <h2 class="text-2xl font-bold text-center text-white mb-8">
-          {{ mode === 'login' ? 'Welcome Back' : 'Join the Ranks' }}
-        </h2>
+      <BaseCard class="p-8 border-white/10 backdrop-blur-xl bg-black/40">
+        <template #header>
+          <h2 class="text-2xl font-bold text-center text-white w-full">
+            {{ mode === 'login' ? 'Welcome Back' : 'Join the Ranks' }}
+          </h2>
+        </template>
 
         <!-- Loading state -->
         <div v-if="isLoading" class="text-center py-12">
@@ -152,42 +157,34 @@ watch(() => authStore.isAuthenticated, (newVal) => {
           <!-- Login/Register Form -->
           <form @submit.prevent="handleSubmit" class="space-y-5">
             <!-- Username -->
-            <div class="group">
-              <label for="username" class="label">
-                {{ mode === 'login' ? 'Identity' : 'Username' }}
-              </label>
-              <input
-                id="username"
-                v-model="username"
-                type="text"
-                :placeholder="mode === 'login' ? 'Username or Email' : 'Choose a username'"
-                class="input"
-                required
-              />
-            </div>
+            <BaseInput
+              id="username"
+              v-model="username"
+              :label="mode === 'login' ? 'Identity' : 'Username'"
+              :placeholder="mode === 'login' ? 'Username or Email' : 'Choose a username'"
+              required
+            />
 
             <!-- Email (register only) -->
-            <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label for="email" class="label">Email Address</label>
-              <input
+            <div v-if="mode === 'register'" class="animate-fade-in-up">
+              <BaseInput
                 id="email"
                 v-model="email"
                 type="email"
+                label="Email Address"
                 placeholder="name@example.com"
-                class="input"
                 required
               />
             </div>
 
             <!-- Password -->
             <div class="group">
-              <label for="password" class="label">Password</label>
-              <input
+              <BaseInput
                 id="password"
                 v-model="password"
                 type="password"
+                label="Password"
                 placeholder="••••••••"
-                class="input"
                 required
               />
               <div v-if="mode === 'login'" class="mt-2 text-right">
@@ -201,28 +198,25 @@ watch(() => authStore.isAuthenticated, (newVal) => {
             </div>
 
             <!-- Confirm Password (register only) -->
-            <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label for="confirmPassword" class="label">Confirm Password</label>
-              <input
+            <div v-if="mode === 'register'" class="animate-fade-in-up">
+              <BaseInput
                 id="confirmPassword"
                 v-model="confirmPassword"
                 type="password"
+                label="Confirm Password"
                 placeholder="••••••••"
-                class="input"
                 required
+                :error="confirmPassword && password !== confirmPassword ? 'Passwords do not match' : undefined"
               />
-              <p v-if="confirmPassword && password !== confirmPassword" class="mt-1 text-xs text-destructive">
-                Passwords do not match
-              </p>
             </div>
 
             <!-- Role Selection (register only) -->
             <div v-if="mode === 'register'" class="group animate-fade-in-up">
-              <label class="label">Account Type</label>
+              <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">Account Type</label>
               <div class="relative">
                 <select
                   v-model="role"
-                  class="input appearance-none cursor-pointer"
+                  class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none cursor-pointer"
                 >
                   <option value="RAIDER" class="bg-gray-900">Raider</option>
                   <option value="GUILD_ADMIN" class="bg-gray-900">Guild Admin</option>
@@ -234,13 +228,15 @@ watch(() => authStore.isAuthenticated, (newVal) => {
             </div>
 
             <!-- Submit Button -->
-            <button
+            <BaseButton
               type="submit"
               :disabled="!isFormValid"
-              class="w-full btn-primary py-3.5"
+              block
+              size="lg"
+              class="py-3.5"
             >
               {{ mode === 'login' ? 'Sign In' : 'Create Account' }}
-            </button>
+            </BaseButton>
           </form>
 
           <!-- Toggle mode -->
@@ -287,7 +283,7 @@ watch(() => authStore.isAuthenticated, (newVal) => {
             </button>
           </div>
         </template>
-      </div>
+      </BaseCard>
 
       <!-- Footer -->
       <div class="mt-8 text-center text-xs text-muted-foreground opacity-60">

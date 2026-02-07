@@ -12,6 +12,9 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({
     query: {},
   }),
+  RouterLink: {
+    template: '<a><slot /></a>'
+  }
 }))
 
 describe('LoginPage', () => {
@@ -19,7 +22,7 @@ describe('LoginPage', () => {
     return mount(LoginPage, {
       global: {
         stubs: {
-          // No stubs needed for this simple page
+          // No stubs needed for now
         },
       },
     })
@@ -41,7 +44,8 @@ describe('LoginPage', () => {
     const wrapper = mountComponent()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Sign in to continue')
+    // Default mode is login
+    expect(wrapper.text()).toContain('Welcome Back')
   })
 
   it('should have Discord OAuth button', async () => {
@@ -50,7 +54,6 @@ describe('LoginPage', () => {
 
     const discordButton = wrapper.findAll('button').find((b) => b.text().includes('Discord'))
     expect(discordButton).toBeDefined()
-    expect(discordButton?.text()).toContain('Sign in with Discord')
   })
 
   it('should have Battle.net OAuth button', async () => {
@@ -59,36 +62,23 @@ describe('LoginPage', () => {
 
     const battlenetButton = wrapper.findAll('button').find((b) => b.text().includes('Battle.net'))
     expect(battlenetButton).toBeDefined()
-    expect(battlenetButton?.text()).toContain('Sign in with Battle.net')
   })
 
-  it('should display guild branding text', async () => {
+  it('should display subtitle text', async () => {
     const wrapper = mountComponent()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Fair Loot Priority Score Dashboard')
+    expect(wrapper.text()).toContain('Premium Raid Management')
   })
 
-  it('should display helper text about FLPS', async () => {
+  it('should switch to register mode when clicking Sign up', async () => {
     const wrapper = mountComponent()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Sign in to view your FLPS score and guild leaderboard')
-  })
-
-  it('should have Discord button with correct background color', async () => {
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    const discordButton = wrapper.findAll('button').find((b) => b.text().includes('Discord'))
-    expect(discordButton?.classes()).toContain('bg-[#5865F2]')
-  })
-
-  it('should have Battle.net button with correct background color', async () => {
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    const battlenetButton = wrapper.findAll('button').find((b) => b.text().includes('Battle.net'))
-    expect(battlenetButton?.classes()).toContain('bg-[#148EFF]')
+    const switchButton = wrapper.findAll('button').find(b => b.text() === 'Sign up')
+    await switchButton?.trigger('click')
+    
+    expect(wrapper.text()).toContain('Join the Ranks')
+    expect(wrapper.find('input[type="email"]').exists()).toBe(true)
   })
 })

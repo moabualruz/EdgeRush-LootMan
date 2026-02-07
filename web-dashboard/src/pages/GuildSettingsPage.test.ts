@@ -29,20 +29,30 @@ vi.mock('vue-router', () => ({
   }),
 }))
 
+// Mock useToast
+const toastSuccessMock = vi.fn()
+const toastErrorMock = vi.fn()
+vi.mock('@/composables/useToast', () => ({
+  useToast: () => ({
+    success: toastSuccessMock,
+    error: toastErrorMock,
+  }),
+}))
+
 describe('GuildSettingsPage', () => {
   const mockGuildId = 'guild-123'
   const mockSyncConfig = {
     guildId: mockGuildId,
     guildName: 'Test Guild',
-    wowauditGuildUri: 'eu/realm/guild',
+    wowauditGuildUri: 'eu/twisting-nether/dod',
     wowauditBaseUrl: 'https://wowaudit.com',
     wowauditApiKeyConfigured: true,
     syncEnabled: false, // Originally disabled
     lastSyncAt: null,
     lastSyncStatus: null,
     lastSyncError: null,
-    bnetRealmSlug: 'realm-slug',
-    bnetGuildNameSlug: 'guild-slug',
+    bnetRealmSlug: 'twisting-nether',
+    bnetGuildNameSlug: 'dod',
     bnetRegion: 'eu',
     bnetSyncEnabled: false, // Originally disabled
     bnetLastSyncAt: null,
@@ -66,7 +76,12 @@ describe('GuildSettingsPage', () => {
             initialState: {
               guildContext: {
                 currentGuildId: mockGuildId,
-                activeGuild: { id: mockGuildId, guildName: 'Test Guild', role: 'OFFICER' },
+                activeGuild: { 
+                  guildId: mockGuildId, 
+                  guildName: 'Test Guild', 
+                  role: 'OFFICER',
+                  permissions: ['SETTINGS_ACCESS']
+                },
                 userGuilds: [],
                 loading: false,
               },
@@ -95,6 +110,7 @@ describe('GuildSettingsPage', () => {
     // Simulate user input
     const inputs = wrapper.findAll('input')
     const keyInput = inputs.find(i => i.attributes('type') === 'password')
+    expect(keyInput?.exists()).toBe(true)
     await keyInput?.setValue('new-api-key')
 
     // Find and click save button

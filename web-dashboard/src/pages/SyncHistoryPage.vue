@@ -4,6 +4,9 @@ import { useQuery } from '@tanstack/vue-query'
 import { syncApi } from '@/api/sync'
 import { useSyncTrigger } from '@/composables/useSyncTrigger'
 import SyncLogViewer from '@/components/SyncLogViewer.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 // Sync trigger mutations
 const triggerWoWAudit = useSyncTrigger('WoWAudit')
@@ -129,61 +132,58 @@ function closeLogViewer() {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">Sync History</h1>
-        <p class="text-gray-400 text-sm mt-1">
-          View data synchronization history from external sources
-        </p>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button
-          @click="triggerWoWAudit.mutate()"
-          :disabled="triggerWoWAudit.isPending.value"
-          class="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-medium flex items-center"
-        >
-          <span v-if="triggerWoWAudit.isPending.value" class="animate-spin mr-2">⟳</span>
-          Sync WoWAudit
-        </button>
-        <button
-          @click="triggerWarcraftLogs.mutate()"
-          :disabled="triggerWarcraftLogs.isPending.value"
-          class="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-medium flex items-center"
-        >
-          <span v-if="triggerWarcraftLogs.isPending.value" class="animate-spin mr-2">⟳</span>
-          Sync WarcraftLogs
-        </button>
-        <button
-          @click="refetch()"
-          class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm"
-        >
-          Refresh
-        </button>
-      </div>
-    </div>
+    <PageHeader
+      title="Sync History"
+      subtitle="View data synchronization history from external sources"
+    >
+      <template #actions>
+        <div class="flex items-center space-x-2">
+          <BaseButton
+            @click="triggerWoWAudit.mutate()"
+            :loading="triggerWoWAudit.isPending.value"
+            variant="secondary"
+          >
+            Sync WoWAudit
+          </BaseButton>
+          <BaseButton
+            @click="triggerWarcraftLogs.mutate()"
+            :loading="triggerWarcraftLogs.isPending.value"
+            variant="secondary"
+          >
+            Sync WarcraftLogs
+          </BaseButton>
+          <BaseButton
+            @click="refetch()"
+            variant="ghost"
+          >
+            Refresh
+          </BaseButton>
+        </div>
+      </template>
+    </PageHeader>
 
     <!-- Filters -->
-    <div class="card mb-6">
+    <BaseCard class="mb-6">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Source filters -->
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-400">Source:</span>
-          <button
+          <BaseButton
             @click="clearFilters"
-            class="px-3 py-1 rounded text-sm"
-            :class="!selectedSource && !selectedStatus ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+            size="sm"
+            :variant="!selectedSource && !selectedStatus ? 'primary' : 'secondary'"
           >
             All
-          </button>
-          <button
+          </BaseButton>
+          <BaseButton
             v-for="source in sources"
             :key="source"
             @click="setSourceFilter(source)"
-            class="px-3 py-1 rounded text-sm"
-            :class="selectedSource === source ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+            size="sm"
+            :variant="selectedSource === source ? 'primary' : 'secondary'"
           >
             {{ source }}
-          </button>
+          </BaseButton>
         </div>
 
         <div class="border-l border-gray-700 h-6"></div>
@@ -191,27 +191,28 @@ function closeLogViewer() {
         <!-- Status filters -->
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-400">Status:</span>
-          <button
+          <BaseButton
             v-for="status in statuses"
             :key="status"
             @click="setStatusFilter(status)"
-            class="px-3 py-1 rounded text-sm"
-            :class="selectedStatus === status ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+            size="sm"
+            :variant="selectedStatus === status ? 'primary' : 'secondary'"
           >
             {{ status }}
-          </button>
+          </BaseButton>
         </div>
 
         <div v-if="selectedSource || selectedStatus" class="ml-auto">
-          <button
+          <BaseButton
             @click="clearFilters"
-            class="text-sm text-gray-400 hover:text-white"
+            variant="ghost"
+            size="sm"
           >
             Clear filters
-          </button>
+          </BaseButton>
         </div>
       </div>
-    </div>
+    </BaseCard>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">
@@ -228,9 +229,9 @@ function closeLogViewer() {
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="syncRuns.length === 0" class="card text-center py-12">
+    <BaseCard v-else-if="syncRuns.length === 0" class="text-center py-12">
       <p class="text-gray-400">No sync runs found.</p>
-    </div>
+    </BaseCard>
 
     <!-- Sync runs list -->
     <div v-else>
@@ -289,38 +290,40 @@ function closeLogViewer() {
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="card mt-6">
+      <BaseCard v-if="totalPages > 1" class="mt-6">
         <div class="flex items-center justify-between">
-          <button
+          <BaseButton
             @click="goToPage(currentPage - 1)"
             :disabled="currentPage === 0"
-            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="secondary"
+            size="sm"
           >
             Previous
-          </button>
+          </BaseButton>
 
           <div class="flex items-center space-x-2">
-            <button
+            <BaseButton
               v-for="page in Math.min(totalPages, 5)"
               :key="page - 1"
               @click="goToPage(page - 1)"
-              class="w-8 h-8 rounded text-sm"
-              :class="currentPage === page - 1 ? 'bg-primary-600 text-white' : 'bg-gray-700 hover:bg-gray-600'"
+              size="sm"
+              :variant="currentPage === page - 1 ? 'primary' : 'secondary'"
             >
               {{ page }}
-            </button>
+            </BaseButton>
             <span v-if="totalPages > 5" class="text-gray-400">...</span>
           </div>
 
-          <button
+          <BaseButton
             @click="goToPage(currentPage + 1)"
             :disabled="currentPage >= totalPages - 1"
-            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="secondary"
+            size="sm"
           >
             Next
-          </button>
+          </BaseButton>
         </div>
-      </div>
+      </BaseCard>
     </div>
 
     <!-- Log Viewer Modal -->
