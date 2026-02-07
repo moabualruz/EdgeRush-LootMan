@@ -80,6 +80,9 @@ class UserLinkageRefreshService(
             // Step 4: Ensure at least one character is primary
             primaryFixed = ensurePrimaryCharacter(userId)
 
+            // Step 5: Update user guild context
+            updateUserGuildContext(userId)
+
         } catch (e: Exception) {
             logger.error("Error refreshing linkages for user ${userId.value}: ${e.message}", e)
             errors.add("Unexpected error: ${e.message}")
@@ -367,6 +370,47 @@ class UserLinkageRefreshService(
                 !preferencesValid ||
                 (!hasPrimary && validMappings.isNotEmpty())
         )
+    }
+
+    /**
+     * Updates the user's guild context based on their active or primary character.
+     */
+    private fun updateUserGuildContext(userId: UserId): Boolean {
+        // 1. Try to find the guild from active character preference
+        val preferences = userPreferencesRepository.findByUserId(userId)
+        var targetGuildId: String? = null
+
+        if (preferences?.activeCharacterMappingId != null) {
+            val validMapping = userCharacterMappingRepository.findById(preferences.activeCharacterMappingId!!)
+            
+            if (validMapping != null && validMapping.userId == userId) {
+                targetGuildId = raiderEntityRepository.findById(validMapping.raiderId.value)?.guildId
+            }
+        }
+
+        // 2. If no active guild found, try primary character
+        if (targetGuildId == null) {
+            val primaryMapping = userCharacterMappingRepository.findByUserId(userId).find { it.isPrimary }
+            if (primaryMapping != null) {
+                targetGuildId = raiderEntityRepository.findById(primaryMapping.raiderId.value)?.guildId
+            }
+        }
+
+        // 3. Update user if guild found
+        if (targetGuildId != null) {
+            val user = userRepository.findById(userId)
+            if (user != null) {
+                // Only update if changed
+                if (user.guildId?.value != targetGuildId) {
+                    val updatedUser = user.withGuild(GuildId(targetGuildId))
+                    userRepository.save(updatedUser)
+                    logger.info("Updated guild context for user ${userId.value} to $targetGuildId")
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 }
 

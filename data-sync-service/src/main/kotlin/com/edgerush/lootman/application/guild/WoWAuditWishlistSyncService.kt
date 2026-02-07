@@ -46,7 +46,7 @@ class WoWAuditWishlistSyncService(
 
         logger.info("Starting WoWAudit wishlist sync for guild={}", guildId)
 
-        return wowAuditClient.fetchWishlists()
+        return wowAuditClient.fetchWishlists(guildConfig.wowauditApiKeyEncrypted)
             .map { body -> parseAndSyncWishlists(body, guildId) }
             .doOnSuccess { result ->
                 logger.info(

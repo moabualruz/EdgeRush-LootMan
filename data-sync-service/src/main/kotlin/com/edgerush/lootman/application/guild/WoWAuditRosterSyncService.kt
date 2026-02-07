@@ -70,9 +70,9 @@ class WoWAuditRosterSyncService(
         // Use guild's bnet_region as fallback if WoWAudit doesn't provide region
         val fallbackRegion = guildConfig.bnetRegion ?: "eu"
 
-        return fetchTeamInfo()
+        return fetchTeamInfo(guildConfig.wowauditApiKeyEncrypted)
             .flatMap { teamInfo ->
-                wowAuditClient.fetchRoster()
+                wowAuditClient.fetchRoster(guildConfig.wowauditApiKeyEncrypted)
                     .map { body -> parseAndSyncRoster(body, guildId, teamInfo, fallbackRegion) }
             }
             .doOnSuccess { result ->
@@ -86,8 +86,8 @@ class WoWAuditRosterSyncService(
             }
     }
 
-    private fun fetchTeamInfo(): Mono<TeamInfo> =
-        wowAuditClient.fetchTeam()
+    private fun fetchTeamInfo(apiKey: String?): Mono<TeamInfo> =
+        wowAuditClient.fetchTeam(apiKey)
             .map { body ->
                 try {
                     val node = objectMapper.readTree(body)

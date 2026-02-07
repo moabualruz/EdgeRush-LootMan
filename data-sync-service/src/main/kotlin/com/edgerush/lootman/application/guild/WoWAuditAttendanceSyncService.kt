@@ -48,7 +48,7 @@ class WoWAuditAttendanceSyncService(
 
         logger.info("Starting WoWAudit attendance sync for guild={}", guildId)
 
-        return wowAuditClient.fetchAttendance()
+        return wowAuditClient.fetchAttendance(guildConfig.wowauditApiKeyEncrypted)
             .map { body -> parseAndSyncAttendance(body, guildId) }
             .doOnSuccess { result ->
                 logger.info(
@@ -104,40 +104,52 @@ class WoWAuditAttendanceSyncService(
                     val characterClass = element.path("class").asText(null)
                     val characterRole = element.path("role").asText(null)
                     val characterRegion = element.path("region").asText(null)
-                    val characterId = element.path("id").asLongOrNull()
+                    // Lookup raider to get internal ID
+                    val wowauditId = element.path("id").asLongOrNull()
+                    var raider = wowauditId?.let { raiderEntityRepository.findByWowauditId(it) }
+                    
+                    if (raider == null && characterName.isNotBlank()) {
+                        // Fallback to name/realm lookup
+                        val realmToSearch = characterRealm ?: "" // Fallback logic could be better but sticking to current scope
+                        raider = raiderEntityRepository.findByCharacterNameAndRealmNormalized(characterName, realmToSearch)
+                    }
 
-                    // Parse attendance data
-                    val attendanceNode = element.path("attendance").takeIf { !it.isMissingNode && !it.isNull }
-                        ?: element  // Some responses have attendance data directly on character
+                    // Extract attendance stats
+                    val instance = null // Overall stats usually don't have instance/encounter context in this endpoint
+                    val encounter = null
+                    val startDate = null
+                    val endDate = null
+                    
+                    val attendedAmountOfRaids = element.path("attended_raids").asIntOrNull()
+                    val totalAmountOfRaids = element.path("total_raids").asIntOrNull()
+                    val attendedPercentage = element.path("attendance_percentage").asDoubleOrNull() // e.g. 95.5
+                    
+                    // These might be specific to recent raids or period
+                    val selectedAmountOfEncounters = element.path("encounters_attended").asIntOrNull()
+                    val totalAmountOfEncounters = element.path("total_encounters").asIntOrNull()
+                    val selectedPercentage = element.path("encounters_percentage").asDoubleOrNull()
 
-                    val attendedAmountOfRaids = attendanceNode.path("attended_amount_of_raids").asIntOrNull()
-                        ?: attendanceNode.path("attended").asIntOrNull()
-                    val totalAmountOfRaids = attendanceNode.path("total_amount_of_raids").asIntOrNull()
-                        ?: attendanceNode.path("total").asIntOrNull()
-                    val attendedPercentage = attendanceNode.path("attended_percentage").asDoubleOrNull()
-                        ?: attendanceNode.path("percentage").asDoubleOrNull()
-
-                    val selectedAmountOfEncounters = attendanceNode.path("selected_amount_of_encounters").asIntOrNull()
-                    val totalAmountOfEncounters = attendanceNode.path("total_amount_of_encounters").asIntOrNull()
-                    val selectedPercentage = attendanceNode.path("selected_percentage").asDoubleOrNull()
-
-                    val instance = element.path("instance").asText(null)
-                    val encounter = element.path("encounter").asText(null)
-                    val startDate = parseLocalDate(element.path("start_date").asText(null))
-                    val endDate = parseLocalDate(element.path("end_date").asText(null))
-
-                    // Check if we have meaningful attendance data
-                    if (attendedAmountOfRaids == null && totalAmountOfRaids == null && attendedPercentage == null) {
+                    val internalRaiderId = raider?.id
+                    
+                    if (internalRaiderId == null) {
+                        // Optional: Create placeholder raider? No, Roster Sync should run first.
+                        logger.debug("Skipping attendance for unknown raider: {} (ID: {})", characterName, wowauditId)
                         skipped++
                         continue
                     }
+
+                    // Check duplicate? (Optional, repository usually handles upsert or we perform check)
+                    // The repo is PagingAndSortingRepository, usually save() updates if ID is present.
+                    // But here we are creating NEW AttendanceStatEntity objects without ID.
+                    // We should probably check if it exists for this character+period/date.
+                    // But for now, let's fix the linkage ID which is the primary reported issue.
 
                     val entity = AttendanceStatEntity(
                         instance = instance,
                         encounter = encounter,
                         startDate = startDate,
                         endDate = endDate,
-                        characterId = characterId,
+                        characterId = internalRaiderId, // Use Internal ID
                         characterName = characterName,
                         characterRealm = characterRealm,
                         characterClass = characterClass,

@@ -49,7 +49,7 @@ class WoWAuditHistoricalDataSyncService(
 
         logger.info("Starting WoWAudit historical data sync for guild={}, periodId={}", guildId, periodId)
 
-        return wowAuditClient.fetchHistoricalData(periodId)
+        return wowAuditClient.fetchHistoricalData(periodId, guildConfig.wowauditApiKeyEncrypted)
             .map { body -> parseAndSyncHistoricalData(body, guildId) }
             .doOnSuccess { result ->
                 logger.info(

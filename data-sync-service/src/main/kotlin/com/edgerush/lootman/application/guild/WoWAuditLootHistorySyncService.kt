@@ -48,7 +48,7 @@ class WoWAuditLootHistorySyncService(
 
         logger.info("Starting WoWAudit loot history sync for guild={}, seasonId={}", guildId, seasonId)
 
-        return wowAuditClient.fetchLootHistory(seasonId)
+        return wowAuditClient.fetchLootHistory(seasonId, guildConfig.wowauditApiKeyEncrypted)
             .map { body -> parseAndSyncLootHistory(body, guildId) }
             .doOnSuccess { result ->
                 logger.info(
