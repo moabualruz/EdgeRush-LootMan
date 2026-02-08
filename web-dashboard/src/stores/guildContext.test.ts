@@ -7,7 +7,12 @@ import type { GuildContext } from '@/types'
 vi.mock('@/api/guildContext', () => ({
   fetchUserGuilds: vi.fn(),
   fetchActiveGuildContext: vi.fn(),
+
   setActiveCharacter: vi.fn(),
+}))
+
+vi.mock('@/api/user', () => ({
+  fetchUserCharacters: vi.fn().mockResolvedValue([]),
 }))
 
 import {

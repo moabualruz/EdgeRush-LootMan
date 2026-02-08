@@ -85,11 +85,9 @@ class WoWAuditRosterSyncService(
                     result.updated,
                     result.skipped,
                 )
-                updateGuildSyncStatus(guildConfig, "SUCCESS", null)
             }
             .doOnError { ex ->
                 logger.error("WoWAudit roster sync failed for guild={}: {}", guildId, ex.message, ex)
-                updateGuildSyncStatus(guildConfig, "FAILED", ex.message)
             }
     }
 
@@ -339,24 +337,7 @@ class WoWAuditRosterSyncService(
         raiderStatisticsRepository.save(statsEntity)
     }
 
-    private fun updateGuildSyncStatus(
-        config: GuildConfigurationEntity,
-        status: String,
-        error: String?,
-    ) {
-        try {
-            val updated =
-                config.copy(
-                    lastSyncAt = OffsetDateTime.now(),
-                    lastSyncStatus = status,
-                    lastSyncError = error,
-                    updatedAt = OffsetDateTime.now(),
-                )
-            guildConfigurationRepository.save(updated)
-        } catch (ex: Exception) {
-            logger.warn("Failed to update guild sync status: {}", ex.message)
-        }
-    }
+
 
     private fun parseOffsetDateTime(text: String?): OffsetDateTime? {
         if (text.isNullOrBlank()) return null

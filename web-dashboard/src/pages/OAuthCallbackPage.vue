@@ -60,7 +60,34 @@ onMounted(async () => {
     router.push(redirectPath)
   } catch (err: any) {
     console.error('OAuth callback error:', err)
-    error.value = err.response?.data?.message || err.message || 'Authentication failed'
+    
+    // If linking failed due to invalid token/session (400 or 401), retry as a fresh login
+    // This handles the case where a stale token exists in localStorage but is rejected by backend
+    // The auth code is likely still valid since the backend rejected the request before exchanging it
+    if (isLinking && (err.response?.status === 400 || err.response?.status === 401)) {
+      console.warn('Linking failed due to invalid session, attempting fresh login...')
+      try {
+        // Clear invalid tokens
+        authStore.logout() 
+        
+        if (provider === 'discord') {
+          await authStore.loginWithDiscord(code)
+        } else if (provider === 'battlenet') {
+          await authStore.loginWithBattlenet(code)
+        }
+        
+        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/dashboard'
+        localStorage.removeItem('redirectAfterLogin')
+        router.push(redirectPath)
+        return
+      } catch (retryErr: any) {
+        console.error('Retry login failed:', retryErr)
+        error.value = retryErr.response?.data?.message || retryErr.message || 'Authentication failed'
+      }
+    } else {
+      error.value = err.response?.data?.message || err.message || 'Authentication failed'
+    }
+    
     loading.value = false
   }
 })

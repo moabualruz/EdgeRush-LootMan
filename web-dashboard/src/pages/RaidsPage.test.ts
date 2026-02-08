@@ -3,6 +3,8 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 import RaidsPage from './RaidsPage.vue'
 import { raidsApi, type Raid } from '@/api/raids'
+import { useGuildContextStore } from '@/stores/guildContext'
+import { useAuthStore } from '@/stores/auth'
 
 // Mock the APIs
 vi.mock('@/api/raids', () => ({
@@ -98,6 +100,31 @@ describe('RaidsPage', () => {
     mockPush.mockClear()
     vi.mocked(raidsApi.getUpcomingRaids).mockResolvedValue(mockUpcomingRaids)
     vi.mocked(raidsApi.getPastRaids).mockResolvedValue(mockPastRaids)
+
+    // Set up store state
+    const guildStore = useGuildContextStore()
+    guildStore.activeGuild = {
+      guildId: 'test-guild',
+      guildName: 'Test Guild',
+      characterName: 'TestChar',
+      characterRealm: 'TestRealm',
+      characterClass: 'WARRIOR',
+      characterMappingId: 1,
+      raiderId: 1,
+      rank: 'Member',
+      permissions: [],
+      isActive: true,
+    }
+
+    const authStore = useAuthStore()
+    authStore.user = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      guildId: 'test-guild',
+      role: 'RAIDER',
+      linkedCharacters: [],
+    }
   })
 
   it('should render page title "Raids"', async () => {

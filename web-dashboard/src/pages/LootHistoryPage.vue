@@ -429,6 +429,7 @@ const averageFlps = computed(() => {
               </BaseButton>
             </div>
           </div>
+          </template>
         </BaseCard>
       </template>
     </div>

@@ -1,9 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import RaidCalendar from './RaidCalendar.vue'
 import type { Raid } from '@/api/raids'
 
 describe('RaidCalendar', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-15T12:00:00Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   const mockRaids: Raid[] = [
     {
       id: 1,
@@ -135,7 +144,7 @@ describe('RaidCalendar', () => {
 
   it('should accept selectedDate prop', () => {
     const wrapper = mountComponent({
-      selectedDate: new Date('2026-01-15'),
+      selectedDate: new Date('2026-01-15T12:00:00Z'),
     })
     const selectedDay = wrapper.find('.selected-day')
     expect(selectedDay.exists()).toBe(true)

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useGuildContextStore } from '@/stores/guildContext'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
@@ -25,6 +26,7 @@ import type { GuildPermission, PermissionTypeInfo } from '@/types'
 
 const router = useRouter()
 const guildContextStore = useGuildContextStore()
+const authStore = useAuthStore()
 const queryClient = useQueryClient()
 const toast = useToast()
 
@@ -50,7 +52,7 @@ onMounted(() => {
 const { data: syncConfig, isLoading: syncConfigLoading, refetch: refetchSyncConfig } = useQuery({
   queryKey: ['guildSyncConfig', guildId],
   queryFn: () => fetchGuildSyncConfig(guildId.value),
-  enabled: computed(() => !!guildId.value),
+  enabled: computed(() => !!guildId.value && authStore.isAuthenticated),
 })
 
 // Sync config form state
@@ -77,7 +79,7 @@ watch(syncConfig, (config) => {
 const { data: permissions, isLoading: permissionsLoading } = useQuery({
   queryKey: ['guildPermissions', guildId],
   queryFn: () => fetchGuildPermissions(guildId.value),
-  enabled: computed(() => !!guildId.value),
+  enabled: computed(() => !!guildId.value && authStore.isAuthenticated),
 })
 
 const { data: permissionTypes } = useQuery({

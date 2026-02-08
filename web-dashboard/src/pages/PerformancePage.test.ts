@@ -5,6 +5,8 @@ import PerformancePage from './PerformancePage.vue'
 import { performanceApi, type WarcraftLogsReport } from '@/api/performance'
 import { flpsApi } from '@/api/flps'
 import type { PerformanceMetrics, FlpsScore } from '@/types'
+import { useGuildContextStore } from '@/stores/guildContext'
+import { useAuthStore } from '@/stores/auth'
 
 // Mock the APIs
 vi.mock('@/api/performance', () => ({
@@ -106,6 +108,31 @@ describe('PerformancePage', () => {
     vi.mocked(performanceApi.getMyPerformance).mockResolvedValue(mockPerformanceData)
     vi.mocked(flpsApi.getMyFlps).mockResolvedValue(mockFlpsData)
     vi.mocked(performanceApi.getWarcraftLogsReports).mockResolvedValue(mockWclReports)
+
+    // Set up store state
+    const guildStore = useGuildContextStore()
+    guildStore.activeGuild = {
+      guildId: 'test-guild',
+      guildName: 'Test Guild',
+      characterName: 'TestChar',
+      characterRealm: 'TestRealm',
+      characterClass: 'WARRIOR',
+      characterMappingId: 1,
+      raiderId: 1,
+      rank: 'Member',
+      permissions: [],
+      isActive: true,
+    }
+
+    const authStore = useAuthStore()
+    authStore.user = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      guildId: 'test-guild',
+      role: 'RAIDER',
+      linkedCharacters: [],
+    }
   })
 
   it('should render page title "Performance Metrics"', async () => {

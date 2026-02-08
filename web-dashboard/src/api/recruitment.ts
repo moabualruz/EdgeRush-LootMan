@@ -159,10 +159,17 @@ export const recruitmentApi = {
   },
 
   async getApplications(guildId: string, status?: RecruitmentStatus): Promise<RecruitmentApplication[]> {
-    const response = await api.get<RecruitmentApplication[]>('/api/recruitment/applications', {
-      params: { guildId, status }
-    })
-    return response.data
+    try {
+      const response = await api.get<RecruitmentApplication[]>('/api/recruitment/applications', {
+        params: { guildId, status }
+      })
+      return response.data
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        return []
+      }
+      throw error
+    }
   },
 
   async getApplication(id: string): Promise<RecruitmentApplication> {

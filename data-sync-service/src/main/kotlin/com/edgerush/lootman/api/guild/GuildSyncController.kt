@@ -269,46 +269,65 @@ class GuildSyncController(
         }
 
         // Update status to IN_PROGRESS
-        guildConfigurationRepository.save(
-            config.copy(
-                lastSyncStatus = "IN_PROGRESS",
-                lastSyncError = null,
-                updatedAt = OffsetDateTime.now(),
-            ),
+        val inProgressConfig = config.copy(
+            lastSyncStatus = "IN_PROGRESS",
+            lastSyncError = null,
+            updatedAt = OffsetDateTime.now(),
         )
+        guildConfigurationRepository.save(inProgressConfig)
 
         return wowAuditRosterSyncService.syncRoster(guildId)
-            .map { result ->
+            .flatMap { result ->
+                // Update status to SUCCESS or PARTIAL based on result
+                val status = if (result.success) "SUCCESS" else "FAILED" // Or "COMPLETED_WITH_ERRORS"
+                val errorMsg = result.error
+
+                // Fetch latest config to avoid stale object overwrite
+                val currentConfig = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                
+                val updatedConfig = currentConfig.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = errorMsg,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updatedConfig)
+
                 if (result.success) {
                     logger.info("WoWAudit sync completed for guild $guildId: $result")
-                    ResponseEntity.ok(
+                    Mono.just(ResponseEntity.ok(
                         WoWAuditSyncTriggerResponse(
                             success = true,
                             message = "Synced ${result.total} raiders (created: ${result.created}, updated: ${result.updated}, skipped: ${result.skipped})",
                             result = result,
                         ),
-                    )
+                    ))
                 } else {
-                    ResponseEntity.internalServerError().body(
+                    Mono.just(ResponseEntity.internalServerError().body(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
                         ),
-                    )
+                    ))
                 }
             }
             .onErrorResume { e ->
                 logger.error("WoWAudit sync failed for guild $guildId", e)
 
                 // Update status to FAILED
-                guildConfigurationRepository.save(
-                    config.copy(
-                        lastSyncStatus = "FAILED",
-                        lastSyncError = e.message ?: "Unknown error",
-                        updatedAt = OffsetDateTime.now(),
-                    ),
-                )
+                try {
+                    val errorConfig = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                    guildConfigurationRepository.save(
+                        errorConfig.copy(
+                            lastSyncStatus = "FAILED",
+                            lastSyncError = e.message ?: "Unknown error",
+                            updatedAt = OffsetDateTime.now(),
+                        ),
+                    )
+                } catch (ex: Exception) {
+                    logger.error("Failed to update guild config status to FAILED", ex)
+                }
 
                 Mono.just(
                     ResponseEntity.internalServerError().body(
@@ -346,24 +365,35 @@ class GuildSyncController(
         }
 
         return wowAuditAttendanceSyncService.syncAttendance(guildId)
-            .map { result ->
+            .flatMap { result ->
+                // Update status
+                val status = if (result.success) "SUCCESS" else "FAILED"
+                val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                val updated = configToUpdate.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = result.error,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updated)
+
                 if (result.success) {
                     logger.info("WoWAudit attendance sync completed for guild $guildId: $result")
-                    ResponseEntity.ok(
+                    Mono.just(ResponseEntity.ok(
                         WoWAuditSyncTriggerResponse(
                             success = true,
                             message = "Synced ${result.total} attendance records (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
                         ),
-                    )
+                    ))
                 } else {
-                    ResponseEntity.internalServerError().body(
+                    Mono.just(ResponseEntity.internalServerError().body(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
                         ),
-                    )
+                    ))
                 }
             }
             .onErrorResume { e ->
@@ -406,24 +436,35 @@ class GuildSyncController(
         }
 
         return wowAuditLootHistorySyncService.syncLootHistory(guildId, seasonId)
-            .map { result ->
+            .flatMap { result ->
+                // Update status
+                val status = if (result.success) "SUCCESS" else "FAILED"
+                val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                val updated = configToUpdate.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = result.error,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updated)
+
                 if (result.success) {
                     logger.info("WoWAudit loot history sync completed for guild $guildId, season $seasonId: $result")
-                    ResponseEntity.ok(
+                    Mono.just(ResponseEntity.ok(
                         WoWAuditSyncTriggerResponse(
                             success = true,
                             message = "Synced ${result.total} loot awards (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
                         ),
-                    )
+                    ))
                 } else {
-                    ResponseEntity.internalServerError().body(
+                    Mono.just(ResponseEntity.internalServerError().body(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
                         ),
-                    )
+                    ))
                 }
             }
             .onErrorResume { e ->
@@ -464,24 +505,35 @@ class GuildSyncController(
         }
 
         return wowAuditWishlistSyncService.syncWishlists(guildId)
-            .map { result ->
+            .flatMap { result ->
+                // Update status
+                val status = if (result.success) "SUCCESS" else "FAILED"
+                val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                val updated = configToUpdate.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = result.error,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updated)
+
                 if (result.success) {
                     logger.info("WoWAudit wishlist sync completed for guild $guildId: $result")
-                    ResponseEntity.ok(
+                    Mono.just(ResponseEntity.ok(
                         WoWAuditSyncTriggerResponse(
                             success = true,
                             message = "Synced ${result.total} wishlists (created: ${result.created}, skipped: ${result.skipped})",
                             result = result,
                         ),
-                    )
+                    ))
                 } else {
-                    ResponseEntity.internalServerError().body(
+                    Mono.just(ResponseEntity.internalServerError().body(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
                         ),
-                    )
+                    ))
                 }
             }
             .onErrorResume { e ->
@@ -524,24 +576,35 @@ class GuildSyncController(
         }
 
         return wowAuditHistoricalDataSyncService.syncHistoricalData(guildId, periodId)
-            .map { result ->
+            .flatMap { result ->
+                // Update status
+                val status = if (result.success) "SUCCESS" else "FAILED"
+                val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                val updated = configToUpdate.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = result.error,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updated)
+
                 if (result.success) {
                     logger.info("WoWAudit historical data sync completed for guild $guildId, period $periodId: $result")
-                    ResponseEntity.ok(
+                    Mono.just(ResponseEntity.ok(
                         WoWAuditSyncTriggerResponse(
                             success = true,
                             message = "Synced ${result.total} characters (updated: ${result.updated}, skipped: ${result.skipped})",
                             result = result,
                         ),
-                    )
+                    ))
                 } else {
-                    ResponseEntity.internalServerError().body(
+                    Mono.just(ResponseEntity.internalServerError().body(
                         WoWAuditSyncTriggerResponse(
                             success = false,
                             message = "Sync completed with errors: ${result.error}",
                             result = result,
                         ),
-                    )
+                    ))
                 }
             }
             .onErrorResume { e ->
@@ -591,12 +654,24 @@ class GuildSyncController(
                 wowAuditWishlistSyncService.syncWishlists(guildId)
                     .map { wishlistResult -> Triple(rosterResult, attendanceResult, wishlistResult) }
             }
-            .map { (rosterResult, attendanceResult, wishlistResult) ->
+            .flatMap { (rosterResult, attendanceResult, wishlistResult) ->
                 val allSuccess = rosterResult.success && attendanceResult.success && wishlistResult.success
+                
+                // Update status
+                val status = if (allSuccess) "SUCCESS" else "COMPLETED_WITH_ERRORS"
+                val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
+                val updated = configToUpdate.copy(
+                    lastSyncAt = OffsetDateTime.now(),
+                    lastSyncStatus = status,
+                    lastSyncError = if (!allSuccess) "Check partial results for details" else null,
+                    updatedAt = OffsetDateTime.now(),
+                )
+                guildConfigurationRepository.save(updated)
+
                 logger.info(
                     "WoWAudit all sync completed for guild $guildId: roster=$rosterResult, attendance=$attendanceResult, wishlist=$wishlistResult",
                 )
-                ResponseEntity.ok(
+                Mono.just(ResponseEntity.ok(
                     WoWAuditAllSyncTriggerResponse(
                         success = allSuccess,
                         message = if (allSuccess) "All syncs completed successfully" else "Some syncs completed with errors",
@@ -604,7 +679,7 @@ class GuildSyncController(
                         attendanceResult = attendanceResult,
                         wishlistResult = wishlistResult,
                     ),
-                )
+                ))
             }
             .onErrorResume { e ->
                 logger.error("WoWAudit all sync failed for guild $guildId", e)
