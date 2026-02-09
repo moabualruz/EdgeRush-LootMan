@@ -1,5 +1,6 @@
 package com.edgerush.lootman.api.auth
 
+import com.edgerush.datasync.security.AdminModeConfig
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.Instant
 
 /**
  * REST controller for authentication endpoints.
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Authentication", description = "Authentication and token management")
 class AuthController(
     private val authenticationService: AuthenticationService,
+    private val adminModeConfig: AdminModeConfig,
 ) {
     // ============= Local Authentication =============
 
@@ -51,6 +54,16 @@ class AuthController(
     fun login(
         @RequestBody request: LoginRequest,
     ): ResponseEntity<TokenResponse> {
+        // In admin mode, accept any credentials
+        if (adminModeConfig.isEnabled()) {
+            return ResponseEntity.ok(
+                TokenResponse(
+                    accessToken = "admin-mode-token",
+                    refreshToken = "admin-mode-refresh",
+                    expiresIn = 86400,
+                ),
+            )
+        }
         val tokens = authenticationService.loginLocal(request.usernameOrEmail, request.password)
         return ResponseEntity.ok(tokens)
     }
@@ -138,9 +151,24 @@ class AuthController(
     )
     fun getCurrentUser(
         @Parameter(description = "JWT access token", required = true)
-        @RequestHeader("Authorization") authorization: String,
+        @RequestHeader("Authorization", required = false) authorization: String?,
     ): UserProfileResponse {
-        val token = extractBearerToken(authorization)
+        // In admin mode, return a synthetic admin profile
+        if (adminModeConfig.isEnabled()) {
+            return UserProfileResponse(
+                id = 0L,
+                discordId = null,
+                battlenetId = null,
+                username = "Admin",
+                email = "admin@edgerush.com",
+                avatarUrl = null,
+                role = "ADMIN",
+                guildId = "dod",
+                createdAt = Instant.now(),
+                lastLogin = Instant.now(),
+            )
+        }
+        val token = extractBearerToken(authorization ?: throw IllegalArgumentException("Authorization header required"))
         return authenticationService.getCurrentUser(token)
     }
 

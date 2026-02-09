@@ -151,11 +151,11 @@ class BlizzardDataService(
     }
 
     fun getRaidMaps(instanceId: Int): List<BlizzardMap> {
-        // 1. Get Instance Details to find description/background if needed
-        // 2. We actually need encounters to get maps, or journal-instance/{id} which usually lists maps/encounters
+        // Fetch Journal Instance detail to get its encounters (bosses)
+        // The Blizzard API returns an 'encounters' array, not 'maps'
 
         val url = "${getBaseUrl()}/data/wow/journal-instance/$instanceId?namespace=static-$region&locale=en_US"
-        logger.info("Fetching raid maps for instance $instanceId from: $url")
+        logger.info("Fetching raid encounters for instance $instanceId from: $url")
 
         try {
             val headers =
@@ -171,14 +171,14 @@ class BlizzardDataService(
                     JournalInstanceDetailResponse::class.java,
                 )
 
-            val maps =
-                response.body?.maps?.map {
-                    BlizzardMap(it.id, it.name, it.description)
+            val encounters =
+                response.body?.encounters?.map {
+                    BlizzardMap(it.id, it.name, null)
                 } ?: emptyList()
-            logger.info("Fetched ${maps.size} maps for instance $instanceId")
-            return maps
+            logger.info("Fetched ${encounters.size} encounters for instance $instanceId")
+            return encounters
         } catch (e: Exception) {
-            logger.error("Failed to fetch raid maps for instance $instanceId: ${e.message}", e)
+            logger.error("Failed to fetch raid encounters for instance $instanceId: ${e.message}", e)
             return emptyList()
         }
     }
@@ -435,9 +435,16 @@ data class JournalInstanceIndexResponse(val instances: List<JournalInstanceRef>)
 
 data class JournalInstanceRef(val id: Int, val name: String)
 
-data class JournalInstanceDetailResponse(val id: Int, val name: String, val maps: List<JournalMapRef> = emptyList())
+data class JournalInstanceDetailResponse(
+    val id: Int,
+    val name: String,
+    val encounters: List<JournalEncounterRef> = emptyList(),
+    val map: JournalMapRef? = null,
+)
 
-data class JournalMapRef(val id: Int, val name: String, val description: String?)
+data class JournalEncounterRef(val id: Int, val name: String)
+
+data class JournalMapRef(val id: Int, val name: String)
 
 data class BlizzardAccountProfileResponse(val wow_accounts: List<BlizzardWowAccount> = emptyList())
 

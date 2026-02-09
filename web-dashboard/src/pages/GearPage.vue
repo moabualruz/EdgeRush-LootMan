@@ -94,7 +94,7 @@ function getIlvlColor(ilvl: number): string {
 function hasIssue(item: GearItem | undefined, slot: GearSlot): boolean {
   if (!item) return false
   if (!gearData.value) return false
-  return gearData.value.missingEnchants.includes(slot) || gearData.value.missingGems.includes(slot)
+  return (gearData.value.missingEnchants ?? []).includes(slot) || (gearData.value.missingGems ?? []).includes(slot)
 }
 
 function getVaultProgress(slot: VaultSlot): string {
@@ -131,41 +131,41 @@ function getVaultProgress(slot: VaultSlot): string {
       <!-- Summary Cards -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="card text-center">
-          <div :class="['text-3xl font-bold', getIlvlColor(gearData.equippedItemLevel)]">
-            {{ gearData.equippedItemLevel.toFixed(1) }}
+          <div :class="['text-3xl font-bold', getIlvlColor(gearData.equippedItemLevel ?? 0)]">
+            {{ (gearData.equippedItemLevel ?? 0).toFixed(1) }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Equipped iLvl</div>
         </div>
         <div class="card text-center">
           <div class="text-3xl font-bold text-primary-400">
-            {{ gearData.averageItemLevel.toFixed(1) }}
+            {{ (gearData.averageItemLevel ?? 0).toFixed(1) }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Average iLvl</div>
         </div>
         <div class="card text-center">
           <div class="text-3xl font-bold text-purple-400">
-            {{ gearData.tierPieceCount }}/5
+            {{ gearData.tierPieceCount ?? 0 }}/5
           </div>
           <div class="text-sm text-gray-400 mt-1">Tier Pieces</div>
         </div>
         <div class="card text-center">
-          <div :class="['text-3xl font-bold', gearData.missingEnchants.length + gearData.missingGems.length > 0 ? 'text-red-400' : 'text-green-400']">
-            {{ gearData.missingEnchants.length + gearData.missingGems.length }}
+          <div :class="['text-3xl font-bold', (gearData.missingEnchants?.length ?? 0) + (gearData.missingGems?.length ?? 0) > 0 ? 'text-red-400' : 'text-green-400']">
+            {{ (gearData.missingEnchants?.length ?? 0) + (gearData.missingGems?.length ?? 0) }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Missing Enchants/Gems</div>
         </div>
       </div>
 
       <!-- Warnings -->
-      <div v-if="gearData.missingEnchants.length > 0 || gearData.missingGems.length > 0" class="alert alert-warning border-l-yellow-500 bg-yellow-950/20 text-yellow-200 border-y border-r border-yellow-500/20">
+      <div v-if="(gearData.missingEnchants?.length ?? 0) > 0 || (gearData.missingGems?.length ?? 0) > 0" class="alert alert-warning border-l-yellow-500 bg-yellow-950/20 text-yellow-200 border-y border-r border-yellow-500/20">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-yellow-500"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <div>
            <h5 class="alert-title text-yellow-500">Equipment Issues</h5>
            <ul class="text-sm mt-1 space-y-1 opacity-90">
-              <li v-for="slot in gearData.missingEnchants" :key="`enchant-${slot}`">
+              <li v-for="slot in (gearData.missingEnchants ?? [])" :key="`enchant-${slot}`">
                 Missing enchant on {{ getSlotName(slot) }}
               </li>
-              <li v-for="slot in gearData.missingGems" :key="`gem-${slot}`">
+              <li v-for="slot in (gearData.missingGems ?? [])" :key="`gem-${slot}`">
                 Missing gem on {{ getSlotName(slot) }}
               </li>
             </ul>
@@ -198,11 +198,11 @@ function getVaultProgress(slot: VaultSlot): string {
                   </div>
                   <div class="flex items-center space-x-2 text-xs text-gray-400 mt-0.5">
                     <span v-if="item.enchantName" class="text-green-400">{{ item.enchantName }}</span>
-                    <span v-else-if="gearData.missingEnchants.includes(slot)" class="text-red-400">No Enchant</span>
+                    <span v-else-if="(gearData.missingEnchants ?? []).includes(slot)" class="text-red-400">No Enchant</span>
                     <span v-if="item.gems.length > 0" class="text-blue-400">
                       {{ item.gems.length }}/{{ item.socketCount }} gems
                     </span>
-                    <span v-else-if="item.socketCount > 0 && gearData.missingGems.includes(slot)" class="text-red-400">
+                    <span v-else-if="item.socketCount > 0 && (gearData.missingGems ?? []).includes(slot)" class="text-red-400">
                       No Gems
                     </span>
                   </div>

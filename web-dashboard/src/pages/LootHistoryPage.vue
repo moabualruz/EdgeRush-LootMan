@@ -19,15 +19,18 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import type { LootAward } from '@/types'
+import type { LootAward, LootHistoryResponse } from '@/types'
 
 const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
 const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
 const { data, isLoading, error } = useQuery({
-  queryKey: ['myLootHistory', guildId, 50],
-  queryFn: () => lootApi.getMyLootHistory(guildId.value!, 50),
+  queryKey: ['guildLootHistory', guildId, 50],
+  queryFn: async () => {
+    const awards = await lootApi.getGuildLootHistory(guildId.value!, 50)
+    return { raiderId: 0, characterName: 'Guild', awards } as LootHistoryResponse
+  },
   enabled: computed(() => !!guildId.value),
 })
 
@@ -378,9 +381,10 @@ const averageFlps = computed(() => {
                   ]"
                 >
                   <span v-if="award.rdfExpired">RDF Expired</span>
-                  <span v-else>
-                    RDF: {{ formatRelativeTime(award.rdfExpiresAt!) }}
+                  <span v-else-if="award.rdfExpiresAt">
+                    RDF: {{ formatRelativeTime(award.rdfExpiresAt) }}
                   </span>
+                  <span v-else>RDF Active</span>
                 </div>
               </div>
             </div>

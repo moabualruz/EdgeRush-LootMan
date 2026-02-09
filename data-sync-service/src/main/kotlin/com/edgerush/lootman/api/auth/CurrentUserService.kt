@@ -1,7 +1,9 @@
 package com.edgerush.lootman.api.auth
 
+import com.edgerush.datasync.security.AdminModeConfig
 import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.domain.auth.model.UserId
+import com.edgerush.lootman.domain.raider.repository.RaiderEntityRepository
 import com.edgerush.lootman.domain.shared.GuildId
 import com.edgerush.lootman.domain.shared.RaiderId
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
@@ -27,6 +29,8 @@ class GuildAccessDeniedException(userId: Long, guildId: String) :
 @Service
 class CurrentUserService(
     private val userCharacterMappingService: UserCharacterMappingService,
+    private val raiderRepository: RaiderEntityRepository,
+    private val adminModeConfig: AdminModeConfig,
 ) {
     /**
      * Gets the current authenticated user from the security context.
@@ -44,9 +48,11 @@ class CurrentUserService(
         return getCurrentUser().flatMap { user ->
             val userIdLong = user.id.toLongOrNull()
 
-            // If in admin mode and no valid user ID, we can't get a raider ID
-            if (user.isAdminMode && userIdLong == null) {
-                return@flatMap Mono.error(NoLinkedRaiderException(-1L))
+            // In admin mode, return the first raider from the default guild
+            if (user.isAdminMode && (userIdLong == null || userIdLong == 0L)) {
+                val firstRaider = raiderRepository.findByGuildId("dod", 0, 1).firstOrNull()
+                    ?: return@flatMap Mono.error(NoLinkedRaiderException(-1L))
+                return@flatMap Mono.just(RaiderId(firstRaider.id!!))
             }
 
             if (userIdLong == null) {
@@ -69,9 +75,11 @@ class CurrentUserService(
     fun getCurrentUserPrimaryRaiderIdBlocking(authenticatedUser: AuthenticatedUser): RaiderId {
         val userIdLong = authenticatedUser.id.toLongOrNull()
 
-        // If in admin mode and no valid user ID, we can't get a raider ID
-        if (authenticatedUser.isAdminMode && userIdLong == null) {
-            throw NoLinkedRaiderException(-1L)
+        // In admin mode, return the first raider from the default guild
+        if (adminModeConfig.isEnabled() && (userIdLong == null || userIdLong == 0L)) {
+            val firstRaider = raiderRepository.findByGuildId("dod", 0, 1).firstOrNull()
+                ?: throw NoLinkedRaiderException(-1L)
+            return RaiderId(firstRaider.id!!)
         }
 
         if (userIdLong == null) {

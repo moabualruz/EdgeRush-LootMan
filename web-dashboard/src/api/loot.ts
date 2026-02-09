@@ -23,8 +23,24 @@ export const lootApi = {
   },
 
   async getGuildLootHistory(guildId: string, limit = 50): Promise<LootAward[]> {
-    const response = await api.get<LootAward[]>(`/v1/loot/guilds/${guildId}/history?limit=${limit}`)
-    return response.data
+    const response = await api.get<{ awards: any[] } | any[]>(`/v1/loot/guilds/${guildId}/history?limit=${limit}`)
+    // Backend returns { awards: [...] } wrapper with different field names
+    const raw = response.data
+    const rawAwards: any[] = Array.isArray(raw) ? raw : (raw as any).awards ?? []
+    
+    // Map backend fields to frontend LootAward type
+    return rawAwards.map((a: any) => ({
+      id: a.id ?? 0,
+      itemId: a.itemId ?? 0,
+      itemName: a.itemName ?? `Item #${a.itemId ?? 'Unknown'}`,
+      raiderId: a.raiderId ?? 0,
+      characterName: a.characterName ?? 'Unknown',
+      awardedAt: a.awardedAt ?? new Date().toISOString(),
+      flpsAtAward: a.flpsAtAward ?? a.flpsScore ?? 0,
+      rdfExpired: a.rdfExpired ?? false,
+      rdfExpiresAt: a.rdfExpiresAt,
+      notes: a.notes,
+    }))
   },
 
   async awardLoot(guildId: string, data: AwardLootRequest): Promise<LootAward> {

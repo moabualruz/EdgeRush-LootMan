@@ -201,7 +201,12 @@ class JdbcLootAwardRepository(
                 raiderId = RaiderId(rs.getLong("raider_id")),
                 guildId = GuildId(guildIdStr),
                 awardedAt = rs.getTimestamp("awarded_at").toInstant(),
-                flpsScore = FlpsScore.of(rs.getDouble("flps")),
+                flpsScore = run {
+                    val rawFlps = rs.getDouble("flps")
+                    // DB stores FLPS on 0-100 scale (from WoWAudit sync), normalize to 0.0-1.0
+                    val normalized = if (rawFlps > 1.0) rawFlps / 100.0 else rawFlps
+                    FlpsScore.of(normalized.coerceIn(0.0, 1.0))
+                },
                 tier = tier,
             )
         }

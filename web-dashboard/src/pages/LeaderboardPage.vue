@@ -38,12 +38,40 @@ const isModalOpen = ref(false)
 const selectedRaider = ref<FlpsScore | null>(null)
 
 function openRaiderDetail(entry: LeaderboardEntry) {
-  // Find the full FlpsScore from the report
-  const fullScore = flpsReport.value?.raiders.find(r => r.raiderId === entry.raiderId)
-  if (fullScore) {
-    selectedRaider.value = fullScore
-    isModalOpen.value = true
+  // Try to find the calculation from the report (API returns 'calculations' not 'raiders')
+  const reportData = flpsReport.value as any
+  const calculations = reportData?.calculations || reportData?.raiders || []
+  const calc = calculations.find((r: any) => String(r.raiderId) === String(entry.raiderId))
+
+  // Build FlpsScore from leaderboard entry + report data if available
+  const rmsData = calc?.components?.rms
+  const ipiData = calc?.components?.ipi
+
+  const score: FlpsScore = {
+    raiderId: entry.raiderId,
+    characterName: entry.characterName,
+    characterClass: entry.characterClass,
+    role: entry.role,
+    flps: entry.flps,
+    rms: {
+      value: rmsData?.total ?? 0,
+      acs: rmsData?.acs ?? 0,
+      mas: rmsData?.mas ?? 0,
+      eps: rmsData?.eps ?? 0,
+    },
+    ipi: {
+      value: ipiData?.total ?? 0,
+      uv: ipiData?.uv ?? 0,
+      tierBonus: ipiData?.tb ?? 0,
+      roleMultiplier: ipiData?.rm ?? 0,
+    },
+    rdf: calc?.components?.rdf ?? 0,
+    eligible: entry.eligible,
+    rank: entry.rank,
   }
+
+  selectedRaider.value = score
+  isModalOpen.value = true
 }
 
 function closeModal() {
