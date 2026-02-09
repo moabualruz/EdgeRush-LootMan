@@ -36,6 +36,10 @@ services:
       WOWAUDIT_GUILD_URI: ${WOWAUDIT_GUILD_URI}
       SYNC_RUN_ON_STARTUP: ${SYNC_RUN_ON_STARTUP:-false}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      # Warcraft Logs Configuration
+      WARCRAFT_LOGS_ENABLED: ${WARCRAFT_LOGS_ENABLED:-false}
+      WARCRAFT_LOGS_CLIENT_ID: ${WARCRAFT_LOGS_CLIENT_ID:-}
+      WARCRAFT_LOGS_CLIENT_SECRET: ${WARCRAFT_LOGS_CLIENT_SECRET:-}
       # Simulation Configuration
       SIMULATION_DOCKER_IMAGE: ${SIMULATION_DOCKER_IMAGE:-simulationcraftorg/simc}
       SIMULATION_DOCKER_PROFILE_DIR: /home/gradle/project/simc-profiles
