@@ -240,28 +240,28 @@ function isToday(date: Date): boolean {
           <div
             :class="[
               'text-3xl font-bold',
-              getAttendanceColor(attendanceData.attendanceRate),
+              getAttendanceColor(attendanceData.attendanceRate ?? 0),
             ]"
           >
-            {{ (attendanceData.attendanceRate * 100).toFixed(0) }}%
+            {{ ((attendanceData.attendanceRate ?? 0) * 100).toFixed(0) }}%
           </div>
           <div class="text-sm text-gray-400 mt-1">Attendance Rate</div>
         </div>
         <div class="card text-center">
           <div class="text-3xl font-bold text-primary-400">
-            {{ attendanceData.attendedRaids }}/{{ attendanceData.totalRaids }}
+            {{ attendanceData.attendedRaids ?? 0 }}/{{ attendanceData.totalRaids ?? 0 }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Raids Attended</div>
         </div>
         <div class="card text-center">
           <div class="text-3xl font-bold text-yellow-400">
-            {{ attendanceData.lateRaids }}
+            {{ attendanceData.lateRaids ?? 0 }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Late Arrivals</div>
         </div>
         <div class="card text-center">
           <div class="text-3xl font-bold text-blue-400">
-            {{ attendanceData.streak }}
+            {{ attendanceData.streak ?? 0 }}
           </div>
           <div class="text-sm text-gray-400 mt-1">Current Streak</div>
         </div>
@@ -275,13 +275,13 @@ function isToday(date: Date): boolean {
           </h2>
           <div class="space-y-4">
             <ProgressBar
-              :value="attendanceData.attendanceRate * 100"
+              :value="(attendanceData.attendanceRate ?? 0) * 100"
               :max="100"
               label="Attendance Rate"
               :color="
-                attendanceData.attendanceRate >= 0.9
+                (attendanceData.attendanceRate ?? 0) >= 0.9
                   ? '#22c55e'
-                  : attendanceData.attendanceRate >= 0.75
+                  : (attendanceData.attendanceRate ?? 0) >= 0.75
                     ? '#eab308'
                     : '#ef4444'
               "
@@ -291,7 +291,7 @@ function isToday(date: Date): boolean {
                 >Excused absences not counted against you</span
               >
               <span class="text-blue-400"
-                >{{ attendanceData.excusedRaids }} excused</span
+                >{{ attendanceData.excusedRaids ?? 0 }} excused</span
               >
             </div>
           </div>

@@ -78,8 +78,38 @@ export interface VaultOptions {
 
 export const gearApi = {
   async getMyGear(guildId: string): Promise<RaiderGear> {
-    const response = await api.get<RaiderGear>(`/v1/gear/guilds/${guildId}/me`)
-    return response.data
+    // Backend returns GearSetResponse with different field names
+    // We transform it into the RaiderGear shape the UI expects
+    const response = await api.get<any>(`/v1/gear/guilds/${guildId}/me`)
+    const raw = response.data
+
+    const items: GearItem[] = (raw.items ?? []).map((item: any) => ({
+      id: item.id ?? item.itemId ?? 0,
+      itemId: item.itemId ?? 0,
+      itemName: item.itemName ?? item.name ?? 'Unknown Item',
+      slot: item.slot ?? 'UNKNOWN',
+      itemLevel: item.itemLevel ?? 0,
+      quality: item.quality ?? 'COMMON',
+      enchantId: item.enchantId,
+      enchantName: item.enchantName ?? item.enchant ?? undefined,
+      gems: item.gems ?? [],
+      socketCount: item.socketCount ?? item.sockets ?? 0,
+      isTierPiece: item.isTierPiece ?? false,
+      upgradeLevel: item.upgradeLevel,
+      maxUpgradeLevel: item.maxUpgradeLevel,
+    }))
+
+    return {
+      raiderId: raw.raiderId ?? 0,
+      characterName: raw.characterName ?? raw.raiderName ?? '',
+      averageItemLevel: raw.averageItemLevel ?? 0,
+      equippedItemLevel: raw.equippedItemLevel ?? raw.averageItemLevel ?? 0,
+      items,
+      missingEnchants: raw.missingEnchants ?? [],
+      missingGems: raw.missingGems ?? [],
+      tierPieceCount: raw.tierPieceCount ?? items.filter(i => i.isTierPiece).length,
+      lastUpdated: raw.lastUpdated ?? null,
+    }
   },
 
   async getRaiderGear(raiderId: number): Promise<RaiderGear> {

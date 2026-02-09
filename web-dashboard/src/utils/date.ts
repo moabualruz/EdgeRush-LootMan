@@ -19,7 +19,9 @@ export function formatDateTime(dateString: string): string {
 }
 
 export function formatRelativeTime(dateString: string): string {
+  if (!dateString) return 'Never'
   const date = new Date(dateString)
+  if (isNaN(date.getTime())) return 'Unknown'
   const now = new Date()
   const diffMs = date.getTime() - now.getTime()
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))

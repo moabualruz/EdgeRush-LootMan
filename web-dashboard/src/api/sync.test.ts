@@ -27,7 +27,7 @@ describe('syncApi', () => {
 
       const result = await syncApi.getSyncRuns()
 
-      expect(api.get).toHaveBeenCalledWith('/api/sync-runs', { params: { page: 0, size: 20 } })
+      expect(api.get).toHaveBeenCalledWith('/sync-runs', { params: { page: 0, size: 20 } })
       expect(result).toEqual(mockResponse)
     })
   })
@@ -46,7 +46,7 @@ describe('syncApi', () => {
 
       const result = await syncApi.triggerSync('WoWAudit')
 
-      expect(api.post).toHaveBeenCalledWith('/api/sync/trigger/WoWAudit')
+      expect(api.post).toHaveBeenCalledWith('/sync/trigger/WoWAudit')
       expect(result).toEqual(mockRun)
       expect(result.status).toBe('RUNNING')
     })
@@ -64,7 +64,7 @@ describe('syncApi', () => {
 
       const result = await syncApi.triggerSync('WarcraftLogs')
 
-      expect(api.post).toHaveBeenCalledWith('/api/sync/trigger/WarcraftLogs')
+      expect(api.post).toHaveBeenCalledWith('/sync/trigger/WarcraftLogs')
       expect(result.source).toBe('WarcraftLogs')
     })
   })
@@ -80,7 +80,7 @@ describe('syncApi', () => {
 
       const result = await syncApi.getSyncLogs(1)
 
-      expect(api.get).toHaveBeenCalledWith('/api/sync-runs/1/logs')
+      expect(api.get).toHaveBeenCalledWith('/sync-runs/1/logs')
       expect(result).toHaveLength(3)
       expect(result[0].level).toBe('INFO')
       expect(result[2].level).toBe('WARN')

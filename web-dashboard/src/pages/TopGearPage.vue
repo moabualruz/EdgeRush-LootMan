@@ -32,20 +32,20 @@ const profiles = [
   { value: 'custom', label: 'Custom', icon: '⚙️' },
 ]
 
-// Fetch guild raiders for character selector
-const { data: flpsReport } = useQuery({
-  queryKey: ['flpsReport', guildId],
-  queryFn: () => flpsApi.getFlpsReport(guildId.value),
+// Fetch guild raiders for character selector via leaderboard (has character names)
+const { data: leaderboard } = useQuery({
+  queryKey: ['leaderboard', guildId],
+  queryFn: () => flpsApi.getLeaderboard(guildId.value),
   enabled: computed(() => !!guildId.value),
 })
 
 const characters = computed(() => {
-  if (!flpsReport.value?.raiders) return []
-  return flpsReport.value.raiders.map(r => ({
-    name: r.characterName,
+  if (!leaderboard.value?.entries) return []
+  return leaderboard.value.entries.map(e => ({
+    name: e.characterName,
     realm: 'TwistingNether',
-    class: r.characterClass,
-    role: r.role,
+    class: e.characterClass,
+    role: e.role,
   }))
 })
 

@@ -94,13 +94,13 @@ export interface AddNoteRequest {
 export const applicationsApi = {
   async getApplications(page = 0, size = 20): Promise<PagedResponse<Application>> {
     const response = await api.get<PagedResponse<Application>>(
-      `/api/applications?page=${page}&size=${size}`
+      `/applications?page=${page}&size=${size}`
     )
     return response.data
   },
 
   async getApplication(id: number): Promise<Application> {
-    const response = await api.get<Application>(`/api/applications/${id}`)
+    const response = await api.get<Application>(`/applications/${id}`)
     return response.data
   },
 
@@ -110,30 +110,30 @@ export const applicationsApi = {
     size = 20
   ): Promise<PagedResponse<Application>> {
     const response = await api.get<PagedResponse<Application>>(
-      `/api/applications/status/${status}?page=${page}&size=${size}`
+      `/applications/status/${status}?page=${page}&size=${size}`
     )
     return response.data
   },
 
   async updateApplication(id: number, request: UpdateApplicationRequest): Promise<Application> {
-    const response = await api.put<Application>(`/api/applications/${id}`, request)
+    const response = await api.put<Application>(`/applications/${id}`, request)
     return response.data
   },
 
   async deleteApplication(id: number): Promise<void> {
-    await api.delete(`/api/applications/${id}`)
+    await api.delete(`/applications/${id}`)
   },
 
   // Public submission endpoint
   async submitApplication(request: SubmitApplicationRequest): Promise<Application> {
-    const response = await api.post<Application>('/api/applications', request)
+    const response = await api.post<Application>('/applications', request)
     return response.data
   },
 
   // Get my application (for applicants to check status)
   async getMyApplication(): Promise<Application | null> {
     try {
-      const response = await api.get<Application>('/api/applications/me')
+      const response = await api.get<Application>('/applications/me')
       return response.data
     } catch {
       return null
@@ -142,31 +142,31 @@ export const applicationsApi = {
 
   // Officer actions
   async approveApplication(id: number, notes?: string): Promise<Application> {
-    const response = await api.post<Application>(`/api/applications/${id}/approve`, { notes })
+    const response = await api.post<Application>(`/applications/${id}/approve`, { notes })
     return response.data
   },
 
   async declineApplication(id: number, reason: string): Promise<Application> {
-    const response = await api.post<Application>(`/api/applications/${id}/decline`, { reason })
+    const response = await api.post<Application>(`/applications/${id}/decline`, { reason })
     return response.data
   },
 
   async requestInfo(id: number, message: string): Promise<Application> {
-    const response = await api.post<Application>(`/api/applications/${id}/request-info`, { message })
+    const response = await api.post<Application>(`/applications/${id}/request-info`, { message })
     return response.data
   },
 
   // Notes management
   async addNote(applicationId: number, request: AddNoteRequest): Promise<ApplicationNote> {
     const response = await api.post<ApplicationNote>(
-      `/api/applications/${applicationId}/notes`,
+      `/applications/${applicationId}/notes`,
       request
     )
     return response.data
   },
 
   async getNotes(applicationId: number): Promise<ApplicationNote[]> {
-    const response = await api.get<ApplicationNote[]>(`/api/applications/${applicationId}/notes`)
+    const response = await api.get<ApplicationNote[]>(`/applications/${applicationId}/notes`)
     return response.data
   },
 }

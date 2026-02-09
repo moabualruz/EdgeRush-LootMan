@@ -25,43 +25,43 @@ export interface SyncLog {
 
 export const syncApi = {
   async getSyncRuns(page = 0, size = 20): Promise<PagedSyncRunResponse> {
-    const response = await api.get<PagedSyncRunResponse>('/api/sync-runs', {
+    const response = await api.get<PagedSyncRunResponse>('/sync-runs', {
       params: { page, size },
     })
     return response.data
   },
 
   async getSyncRunsBySource(source: string, page = 0, size = 20): Promise<PagedSyncRunResponse> {
-    const response = await api.get<PagedSyncRunResponse>(`/api/sync-runs/source/${source}`, {
+    const response = await api.get<PagedSyncRunResponse>(`/sync-runs/source/${source}`, {
       params: { page, size },
     })
     return response.data
   },
 
   async getSyncRunsByStatus(status: string, page = 0, size = 20): Promise<PagedSyncRunResponse> {
-    const response = await api.get<PagedSyncRunResponse>(`/api/sync-runs/status/${status}`, {
+    const response = await api.get<PagedSyncRunResponse>(`/sync-runs/status/${status}`, {
       params: { page, size },
     })
     return response.data
   },
 
   async getSyncRunById(id: number): Promise<SyncRun> {
-    const response = await api.get<SyncRun>(`/api/sync-runs/${id}`)
+    const response = await api.get<SyncRun>(`/sync-runs/${id}`)
     return response.data
   },
 
   async getCountBySource(source: string): Promise<{ count: number }> {
-    const response = await api.get<{ count: number }>(`/api/sync-runs/source/${source}/count`)
+    const response = await api.get<{ count: number }>(`/sync-runs/source/${source}/count`)
     return response.data
   },
 
   async triggerSync(source: 'WoWAudit' | 'WarcraftLogs'): Promise<SyncRun> {
-    const response = await api.post<SyncRun>(`/api/sync/trigger/${source}`)
+    const response = await api.post<SyncRun>(`/sync/trigger/${source}`)
     return response.data
   },
 
   async getSyncLogs(syncRunId: number): Promise<SyncLog[]> {
-    const response = await api.get<SyncLog[]>(`/api/sync-runs/${syncRunId}/logs`)
+    const response = await api.get<SyncLog[]>(`/sync-runs/${syncRunId}/logs`)
     return response.data
   },
 }

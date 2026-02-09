@@ -28,18 +28,20 @@ export const lootApi = {
     const raw = response.data
     const rawAwards: any[] = Array.isArray(raw) ? raw : (raw as any).awards ?? []
     
-    // Map backend fields to frontend LootAward type
+    // Map backend LootAwardDto fields to frontend LootAward type
+    // Backend: id, itemId, raiderId, guildId, awardedAt, flpsScore, tier, isActive
+    // Frontend: id, itemId, itemName, raiderId, characterName, awardedAt, flpsAtAward, rdfExpired, rdfExpiresAt, notes
     return rawAwards.map((a: any) => ({
-      id: a.id ?? 0,
+      id: a.id ? Number(a.id) : 0,
       itemId: a.itemId ?? 0,
       itemName: a.itemName ?? `Item #${a.itemId ?? 'Unknown'}`,
-      raiderId: a.raiderId ?? 0,
-      characterName: a.characterName ?? 'Unknown',
+      raiderId: a.raiderId ? Number(a.raiderId) : 0,
+      characterName: a.characterName ?? a.raiderName ?? `Raider #${a.raiderId ?? '?'}`,
       awardedAt: a.awardedAt ?? new Date().toISOString(),
       flpsAtAward: a.flpsAtAward ?? a.flpsScore ?? 0,
-      rdfExpired: a.rdfExpired ?? false,
+      rdfExpired: a.rdfExpired ?? (a.isActive === false),
       rdfExpiresAt: a.rdfExpiresAt,
-      notes: a.notes,
+      notes: a.notes ?? a.tier ?? undefined,
     }))
   },
 

@@ -50,8 +50,48 @@ export interface AttendanceCalendarEntry {
 
 export const attendanceApi = {
   async getMyAttendance(guildId: string): Promise<AttendanceReport> {
-    const response = await api.get<AttendanceReport>(`/v1/attendance/guilds/${guildId}/me`)
-    return response.data
+    // Backend returns AttendanceReportResponse with nested stats object
+    // We transform it into the flat AttendanceReport shape the UI expects
+    const response = await api.get<any>(`/v1/attendance/guilds/${guildId}/me`)
+    const raw = response.data
+
+    // Handle both shapes: flat (from MeController) or nested stats (from AttendanceController)
+    if (raw.stats) {
+      return {
+        raiderId: raw.raiderId ?? 0,
+        characterName: raw.characterName ?? raw.raiderName ?? '',
+        totalRaids: raw.stats.totalRaids ?? 0,
+        attendedRaids: raw.stats.attendedRaids ?? 0,
+        lateRaids: raw.stats.lateRaids ?? raw.stats.missedRaids ?? 0,
+        excusedRaids: raw.stats.excusedRaids ?? 0,
+        attendanceRate: (raw.stats.attendancePercentage ?? 0),
+        lastRaidDate: raw.lastRaidDate,
+        streak: raw.currentStreak ?? 0,
+        records: [],
+      }
+    }
+
+    // Flat shape (from MeController PersonalAttendanceResponse)
+    return {
+      raiderId: raw.raiderId ?? 0,
+      characterName: raw.characterName ?? raw.raiderName ?? '',
+      totalRaids: raw.totalRaids ?? 0,
+      attendedRaids: raw.attendedRaids ?? 0,
+      lateRaids: raw.breakdown?.late ?? 0,
+      excusedRaids: raw.breakdown?.excused ?? 0,
+      attendanceRate: raw.overallRate ?? raw.attendanceRate ?? 0,
+      lastRaidDate: raw.lastRaidDate,
+      streak: raw.currentStreak ?? raw.streak ?? 0,
+      records: (raw.recentAttendance ?? raw.records ?? []).map((r: any) => ({
+        id: r.id ?? 0,
+        raiderId: raw.raiderId ?? 0,
+        raidId: r.raidId ?? 0,
+        raidName: r.raidName ?? '',
+        raidDate: r.raidDate ?? '',
+        status: r.status ?? 'ABSENT',
+        notes: r.note ?? r.notes,
+      })),
+    }
   },
 
   async getAttendanceReport(guildId: string, raiderId: number): Promise<AttendanceReport> {

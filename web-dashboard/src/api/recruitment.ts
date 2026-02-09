@@ -145,14 +145,14 @@ export interface GetApplicationsOptions {
 export const recruitmentApi = {
     // --- NEW METHODS ---
   async searchCandidate(name: string, realm: string, region: string = 'eu'): Promise<RecruitmentCharacter> {
-    const response = await api.get<RecruitmentCharacter>('/api/recruitment/candidates/search', {
+    const response = await api.get<RecruitmentCharacter>('/recruitment/candidates/search', {
       params: { name, realm, region }
     })
     return response.data
   },
 
   async createApplication(guildId: string, command: CreateApplicationCommand): Promise<RecruitmentApplication> {
-    const response = await api.post<RecruitmentApplication>('/api/recruitment/applications', command, {
+    const response = await api.post<RecruitmentApplication>('/recruitment/applications', command, {
       params: { guildId }
     })
     return response.data
@@ -160,7 +160,7 @@ export const recruitmentApi = {
 
   async getApplications(guildId: string, status?: RecruitmentStatus): Promise<RecruitmentApplication[]> {
     try {
-      const response = await api.get<RecruitmentApplication[]>('/api/recruitment/applications', {
+      const response = await api.get<RecruitmentApplication[]>('/recruitment/applications', {
         params: { guildId, status }
       })
       return response.data
@@ -173,19 +173,19 @@ export const recruitmentApi = {
   },
 
   async getApplication(id: string): Promise<RecruitmentApplication> {
-    const response = await api.get<RecruitmentApplication>(`/api/recruitment/applications/${id}`)
+    const response = await api.get<RecruitmentApplication>(`/recruitment/applications/${id}`)
     return response.data
   },
 
   async updateStatus(id: string, status: RecruitmentStatus, reviewer: string): Promise<RecruitmentApplication> {
-    const response = await api.put<RecruitmentApplication>(`/api/recruitment/applications/${id}/status`, null, {
+    const response = await api.put<RecruitmentApplication>(`/recruitment/applications/${id}/status`, null, {
       params: { status, reviewer }
     })
     return response.data
   },
 
   async addComment(id: string, authorId: number, text: string): Promise<RecruitmentComment> {
-    const response = await api.post<RecruitmentComment>(`/api/recruitment/applications/${id}/comments`, text, {
+    const response = await api.post<RecruitmentComment>(`/recruitment/applications/${id}/comments`, text, {
         headers: { 'Content-Type': 'application/json' },
         params: { authorId }
     })

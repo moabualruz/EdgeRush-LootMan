@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { gearApi, type GearSlot, type ItemQuality, type GearItem, type VaultSlot } from '@/api/gear'
+import { flpsApi } from '@/api/flps'
 import { formatRelativeTime } from '@/utils/date'
 import { useAuthStore } from '@/stores/auth'
 import { useGuildContextStore } from '@/stores/guildContext'
@@ -10,17 +11,55 @@ const authStore = useAuthStore()
 const guildContextStore = useGuildContextStore()
 const guildId = computed(() => guildContextStore.currentGuildId || authStore.user?.guildId)
 
-// Queries
+// Check if user is admin/officer (can view all characters)
+const isPrivileged = computed(() => {
+  const role = authStore.user?.role
+  return role === 'ADMIN' || role === 'OFFICER'
+})
+
+// Character selector state
+const selectedRaiderId = ref<number | null>(null)
+
+// Fetch guild raiders for character selector (admin/officer only)
+const { data: leaderboard } = useQuery({
+  queryKey: ['leaderboard', guildId],
+  queryFn: () => flpsApi.getLeaderboard(guildId.value!),
+  enabled: computed(() => !!guildId.value && isPrivileged.value),
+})
+
+const characters = computed(() => {
+  if (!leaderboard.value?.entries) return []
+  return leaderboard.value.entries.map(e => ({
+    raiderId: e.raiderId,
+    name: e.characterName,
+    class: e.characterClass,
+    role: e.role,
+  }))
+})
+
+// Auto-select first character when data loads
+watch(characters, (chars) => {
+  if (chars.length > 0 && !selectedRaiderId.value) {
+    selectedRaiderId.value = chars[0].raiderId
+  }
+}, { immediate: true })
+
+// Queries — use raider-specific endpoint for admin, /me for regular users
 const { data: gearData, isLoading: gearLoading, error: gearError } = useQuery({
-  queryKey: ['myGear', guildId],
-  queryFn: () => gearApi.getMyGear(guildId.value!),
-  enabled: computed(() => !!guildId.value),
+  queryKey: ['gear', guildId, selectedRaiderId, isPrivileged],
+  queryFn: () => {
+    if (isPrivileged.value && selectedRaiderId.value) {
+      return gearApi.getRaiderGear(selectedRaiderId.value)
+    }
+    return gearApi.getMyGear(guildId.value!)
+  },
+  enabled: computed(() => !!guildId.value && (!isPrivileged.value || !!selectedRaiderId.value)),
 })
 
 const { data: vaultData, isLoading: vaultLoading } = useQuery({
   queryKey: ['myVault', guildId],
   queryFn: () => gearApi.getMyVaultOptions(guildId.value!),
-  enabled: computed(() => !!guildId.value),
+  enabled: computed(() => !!guildId.value && !isPrivileged.value),
 })
 
 // Slot display order
@@ -107,8 +146,20 @@ function getVaultProgress(slot: VaultSlot): string {
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Gear</h1>
-      <div v-if="gearData" class="text-sm text-gray-400">
-        {{ gearData.characterName }}
+      <div class="flex items-center gap-4">
+        <!-- Character Selector (admin/officer only) -->
+        <select
+          v-if="isPrivileged && characters.length > 0"
+          v-model="selectedRaiderId"
+          class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
+        >
+          <option v-for="char in characters" :key="char.raiderId" :value="char.raiderId">
+            {{ char.name }} ({{ char.class }})
+          </option>
+        </select>
+        <div v-else-if="gearData" class="text-sm text-gray-400">
+          {{ gearData.characterName }}
+        </div>
       </div>
     </div>
 
@@ -317,7 +368,7 @@ function getVaultProgress(slot: VaultSlot): string {
 
       <!-- Last Updated -->
       <div class="text-sm text-gray-500 text-center">
-        Last updated: {{ formatRelativeTime(gearData.lastUpdated) }}
+        Last updated: {{ gearData.lastUpdated ? formatRelativeTime(gearData.lastUpdated) : 'Never' }}
       </div>
     </div>
   </div>
