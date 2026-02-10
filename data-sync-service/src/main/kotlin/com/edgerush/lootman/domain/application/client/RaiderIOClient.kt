@@ -137,6 +137,24 @@ data class RaiderIOGear(
     val itemLevelEquipped: Double?,
     @JsonProperty("item_level_total")
     val itemLevelTotal: Double?,
+    val items: Map<String, RaiderIOGearItem?>?,
+)
+
+data class RaiderIOGearItem(
+    @JsonProperty("item_id")
+    val itemId: Long?,
+    @JsonProperty("item_level")
+    val itemLevel: Int?,
+    @JsonProperty("item_quality")
+    val itemQuality: Int?,
+    val name: String?,
+    val icon: String?,
+    @JsonProperty("is_legendary")
+    val isLegendary: Boolean?,
+    val enchants: List<Int?>?,
+    val gems: List<Int?>?,
+    val bonuses: List<Int?>?,
+    val tier: String?,
 )
 
 data class RaiderIOMythicPlusSeasonScore(

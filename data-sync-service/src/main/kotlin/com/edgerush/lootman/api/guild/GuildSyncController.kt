@@ -4,6 +4,8 @@ import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.application.guild.GuildRosterSyncResult
 import com.edgerush.lootman.application.guild.GuildRosterSyncService
+import com.edgerush.lootman.application.guild.RaiderIOPreparationSyncService
+import com.edgerush.lootman.application.guild.WarcraftLogsPerformanceSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
 import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
@@ -52,6 +54,8 @@ class GuildSyncController(
     private val wowAuditWishlistSyncService: WoWAuditWishlistSyncService,
     private val wowAuditHistoricalDataSyncService: WoWAuditHistoricalDataSyncService,
     private val warcraftLogsRosterSyncService: WarcraftLogsRosterSyncService,
+    private val warcraftLogsPerformanceSyncService: WarcraftLogsPerformanceSyncService,
+    private val raiderIOPreparationSyncService: RaiderIOPreparationSyncService,
     private val guildContextService: GuildContextService,
 ) {
     private val logger = LoggerFactory.getLogger(GuildSyncController::class.java)
@@ -695,7 +699,7 @@ class GuildSyncController(
     }
 
     @PostMapping("/warcraftlogs/trigger")
-    @Operation(summary = "Trigger Warcraft Logs guild roster sync")
+    @Operation(summary = "Trigger Warcraft Logs guild roster and performance sync")
     fun triggerWarcraftLogsSync(
         @Parameter(description = "Guild ID")
         @PathVariable guildId: String,
@@ -703,29 +707,82 @@ class GuildSyncController(
     ): Mono<ResponseEntity<WarcraftLogsSyncTriggerResponse>> {
         requireSettingsAccess(user, guildId)
 
-        // Ideally check config.warcraftLogsEnabled but it might likely not exist in Entity yet.
-        // Assuming enabled if Bnet/WoWAudit is setup or implicit.
-
+        // Run roster sync (parse scores) first, then chain performance sync (fight-level data)
         return warcraftLogsRosterSyncService.syncRoster(guildId)
-            .map { result ->
-                if (result.success) {
-                    logger.info("Warcraft Logs sync completed for guild $guildId: $result")
-                    ResponseEntity.ok(
-                        WarcraftLogsSyncTriggerResponse(
-                            success = true,
-                            message = "Synced ${result.updated} raiders (skipped: ${result.skipped})",
-                            result = result,
-                        ),
-                    )
-                } else {
-                    ResponseEntity.internalServerError().body(
-                        WarcraftLogsSyncTriggerResponse(
-                            success = false,
-                            message = "Sync completed with errors: ${result.error}",
-                            result = result,
+            .flatMap { rosterResult ->
+                if (!rosterResult.success) {
+                    // Roster sync failed, skip performance sync
+                    return@flatMap Mono.just(
+                        ResponseEntity.internalServerError().body(
+                            WarcraftLogsSyncTriggerResponse(
+                                success = false,
+                                message = "Roster sync failed: ${rosterResult.error}",
+                                result = rosterResult,
+                            ),
                         ),
                     )
                 }
+
+                // Chain performance sync after successful roster sync
+                warcraftLogsPerformanceSyncService.syncPerformanceData(guildId)
+                    .map { perfResult ->
+                        logger.info(
+                            "Warcraft Logs sync completed for guild {}: roster={}, performance={}",
+                            guildId, rosterResult, perfResult,
+                        )
+                        val perfMsg = if (perfResult.success) {
+                            "Performance: ${perfResult.reportsInserted} reports, ${perfResult.fightsInserted} fights, ${perfResult.performanceRowsInserted} perf rows"
+                        } else {
+                            "Performance sync error: ${perfResult.error}"
+                        }
+
+                        // Fire-and-forget RaiderIO preparation sync (runs in background)
+                        // This takes several minutes (1 API call per raider) so we don't wait for it
+                        raiderIOPreparationSyncService.syncPreparationData(guildId)
+                            .subscribe(
+                                { prepResult ->
+                                    logger.info(
+                                        "RaiderIO preparation sync completed for guild {}: synced={}, skipped={}, failed={}",
+                                        guildId, prepResult.synced, prepResult.skipped, prepResult.failed,
+                                    )
+                                },
+                                { error ->
+                                    logger.warn("RaiderIO preparation sync failed for guild {}: {}", guildId, error.message)
+                                },
+                            )
+
+                        ResponseEntity.ok(
+                            WarcraftLogsSyncTriggerResponse(
+                                success = true,
+                                message = "Roster: synced ${rosterResult.updated} raiders (skipped: ${rosterResult.skipped}). $perfMsg. Preparation sync started in background.",
+                                result = rosterResult,
+                            ),
+                        )
+                    }
+                    .onErrorResume { perfError ->
+                        // Performance sync failed but roster sync succeeded — still try preparation in background
+                        logger.warn("Performance sync failed for guild {} (roster sync was ok): {}", guildId, perfError.message)
+
+                        raiderIOPreparationSyncService.syncPreparationData(guildId)
+                            .subscribe(
+                                { prepResult ->
+                                    logger.info("RaiderIO preparation sync completed for guild {}: synced={}", guildId, prepResult.synced)
+                                },
+                                { error ->
+                                    logger.warn("RaiderIO preparation sync also failed for guild {}: {}", guildId, error.message)
+                                },
+                            )
+
+                        Mono.just(
+                            ResponseEntity.ok(
+                                WarcraftLogsSyncTriggerResponse(
+                                    success = true,
+                                    message = "Roster: synced ${rosterResult.updated} raiders. Performance sync failed: ${perfError.message}. Preparation sync started in background.",
+                                    result = rosterResult,
+                                ),
+                            ),
+                        )
+                    }
             }
             .onErrorResume { e ->
                 logger.error("Warcraft Logs sync failed for guild $guildId", e)

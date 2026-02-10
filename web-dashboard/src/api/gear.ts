@@ -113,8 +113,37 @@ export const gearApi = {
   },
 
   async getRaiderGear(raiderId: number): Promise<RaiderGear> {
-    const response = await api.get<RaiderGear>(`/v1/gear/raider-gear-items/raider/${raiderId}`)
-    return response.data
+    // Use GearController endpoint (returns GearSetResponse) not the CRUD endpoint
+    const response = await api.get<any>(`/v1/gear/raider/${raiderId}`)
+    const raw = response.data
+
+    const items: GearItem[] = (raw.items ?? []).map((item: any) => ({
+      id: item.id ?? item.itemId ?? 0,
+      itemId: item.itemId ?? 0,
+      itemName: item.itemName ?? item.name ?? 'Unknown Item',
+      slot: item.slot ?? 'UNKNOWN',
+      itemLevel: item.itemLevel ?? 0,
+      quality: item.quality ?? 'COMMON',
+      enchantId: item.enchantId,
+      enchantName: item.enchantName ?? item.enchant ?? undefined,
+      gems: item.gems ?? [],
+      socketCount: item.socketCount ?? item.sockets ?? 0,
+      isTierPiece: item.isTierPiece ?? false,
+      upgradeLevel: item.upgradeLevel,
+      maxUpgradeLevel: item.maxUpgradeLevel,
+    }))
+
+    return {
+      raiderId: raw.raiderId ?? raiderId,
+      characterName: raw.characterName ?? raw.raiderName ?? '',
+      averageItemLevel: raw.averageItemLevel ?? 0,
+      equippedItemLevel: raw.equippedItemLevel ?? raw.averageItemLevel ?? 0,
+      items,
+      missingEnchants: raw.missingEnchants ?? [],
+      missingGems: raw.missingGems ?? [],
+      tierPieceCount: raw.tierPieceCount ?? items.filter(i => i.isTierPiece).length,
+      lastUpdated: raw.lastUpdated ?? null,
+    }
   },
 
   async getCharacterGear(characterId: number): Promise<RaiderGear> {

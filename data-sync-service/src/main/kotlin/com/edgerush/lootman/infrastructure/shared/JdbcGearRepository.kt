@@ -95,7 +95,7 @@ class JdbcGearRepository(
     private val gearItemRowMapper =
         RowMapper { rs, _ ->
             val slotStr = rs.getString("slot")
-            val slot = EquipmentSlot.entries.firstOrNull { it.name == slotStr } ?: EquipmentSlot.HEAD
+            val slot = EquipmentSlot.entries.firstOrNull { it.name.equals(slotStr, ignoreCase = true) } ?: EquipmentSlot.HEAD
 
             val qualityInt = rs.getInt("quality")
             val quality = ItemQuality.fromInt(qualityInt) ?: ItemQuality.EPIC

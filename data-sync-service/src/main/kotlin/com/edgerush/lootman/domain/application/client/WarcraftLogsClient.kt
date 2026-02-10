@@ -114,6 +114,90 @@ class WarcraftLogsClient(
             }
     }
 
+    /**
+     * Fetches guild reports from Warcraft Logs with fight-level performance data.
+     *
+     * Returns report metadata, fights, and per-fight player performance (deaths, DPS/HPS, parse %).
+     * Used to populate the warcraft_logs_reports/fights/performance tables for MAS calculation.
+     *
+     * @param guildName The guild name (as it appears on WCL)
+     * @param serverSlug The server slug (lowercase, hyphenated)
+     * @param serverRegion The region (us, eu, kr, tw, cn)
+     * @param limit Maximum number of reports to fetch (default 10)
+     * @return List of guild report data, or empty list on error
+     */
+    fun fetchGuildReports(
+        guildName: String,
+        serverSlug: String,
+        serverRegion: String,
+        limit: Int = 10,
+    ): Mono<List<GuildReportData>> {
+        val normalizedServer = normalizeServerSlug(serverSlug)
+        val normalizedRegion = serverRegion.lowercase()
+
+        val query = buildGuildReportsQuery(guildName, normalizedServer, normalizedRegion, limit)
+
+        return webClient
+            .post()
+            .uri("/api/v2/client")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer ${tokenProvider.getAccessToken()}")
+            .bodyValue(query)
+            .retrieve()
+            .onStatus({ it.is4xxClientError }) { response ->
+                response.bodyToMono(String::class.java)
+                    .defaultIfEmpty("Guild not found")
+                    .flatMap { Mono.error(WarcraftLogsNotFoundException("Guild not found: $guildName-$normalizedServer-$normalizedRegion")) }
+            }
+            .onStatus({ it.is5xxServerError }) { response ->
+                response.bodyToMono(String::class.java)
+                    .defaultIfEmpty("Warcraft Logs server error")
+                    .flatMap { Mono.error(WarcraftLogsServerException(it)) }
+            }
+            .bodyToMono(GuildReportsGraphQLResponse::class.java)
+            .timeout(Duration.ofSeconds(60))
+            .map { response ->
+                val reports = response.data?.reportData?.reports?.data ?: emptyList()
+                reports.map { report ->
+                    val fights = report.fights?.filter { it.encounterID != null && it.encounterID > 0 } ?: emptyList()
+                    GuildReportData(
+                        reportCode = report.code ?: "",
+                        title = report.title ?: "",
+                        owner = report.owner?.name ?: "",
+                        startTime = report.startTime ?: 0L,
+                        endTime = report.endTime ?: 0L,
+                        zone = report.zone?.name,
+                        fights = fights.map { fight ->
+                            GuildReportFight(
+                                fightId = fight.id ?: 0,
+                                encounterId = fight.encounterID ?: 0,
+                                encounterName = fight.name ?: "Unknown",
+                                difficulty = fight.difficulty ?: 0,
+                                kill = fight.kill ?: false,
+                                startTimeOffset = fight.startTime ?: 0L,
+                                endTimeOffset = fight.endTime ?: 0L,
+                                bossPercentage = fight.bossPercentage ?: 0.0,
+                                playerDetails = emptyList(), // WCL fights API returns friendlyPlayers (IDs only), not player details
+                            )
+                        },
+                    )
+                }
+            }
+            .doOnSubscribe {
+                log.debug("Fetching guild reports for {}-{}-{}", guildName, normalizedServer, normalizedRegion)
+            }
+            .doOnSuccess { reports ->
+                log.debug("Fetched {} guild reports for {}", reports.size, guildName)
+            }
+            .doOnError { error ->
+                log.warn("Failed to fetch guild reports for {}-{}-{}: {}", guildName, normalizedServer, normalizedRegion, error.message)
+            }
+            .onErrorResume { e ->
+                log.warn("Returning empty reports due to error: {}", e.message)
+                Mono.just(emptyList())
+            }
+    }
+
     private fun buildGraphQLQuery(
         characterName: String,
         serverSlug: String,
@@ -153,6 +237,53 @@ class WarcraftLogsClient(
         )
     }
 
+    private fun buildGuildReportsQuery(
+        guildName: String,
+        serverSlug: String,
+        serverRegion: String,
+        limit: Int,
+    ): Map<String, Any> {
+        val query =
+            """
+            query GuildReports(${'$'}guildName: String!, ${'$'}serverSlug: String!, ${'$'}serverRegion: String!, ${'$'}limit: Int!) {
+                reportData {
+                    reports(guildName: ${'$'}guildName, guildServerSlug: ${'$'}serverSlug, guildServerRegion: ${'$'}serverRegion, limit: ${'$'}limit) {
+                        data {
+                            code
+                            title
+                            startTime
+                            endTime
+                            owner { name }
+                            zone { name }
+                            fights(killType: Encounters) {
+                                id
+                                encounterID
+                                name
+                                difficulty
+                                kill
+                                startTime
+                                endTime
+                                bossPercentage
+                                friendlyPlayers
+                            }
+                        }
+                    }
+                }
+            }
+            """.trimIndent()
+
+        return mapOf(
+            "query" to query,
+            "variables" to
+                mapOf(
+                    "guildName" to guildName,
+                    "serverSlug" to serverSlug,
+                    "serverRegion" to serverRegion,
+                    "limit" to limit,
+                ),
+        )
+    }
+
     /**
      * Normalizes server name to slug format (lowercase, hyphenated).
      */
@@ -188,7 +319,52 @@ data class EncounterParse(
     val rankPercent: Double,
 )
 
-// GraphQL Response DTOs
+// ============================================================================
+// Guild Report Data Models
+// ============================================================================
+
+/**
+ * Parsed guild report data from Warcraft Logs.
+ */
+data class GuildReportData(
+    val reportCode: String,
+    val title: String,
+    val owner: String,
+    val startTime: Long,
+    val endTime: Long,
+    val zone: String?,
+    val fights: List<GuildReportFight>,
+)
+
+/**
+ * A single fight (boss encounter) within a report.
+ */
+data class GuildReportFight(
+    val fightId: Int,
+    val encounterId: Int,
+    val encounterName: String,
+    val difficulty: Int,
+    val kill: Boolean,
+    val startTimeOffset: Long,
+    val endTimeOffset: Long,
+    val bossPercentage: Double,
+    val playerDetails: List<GuildReportPlayerPerformance>,
+)
+
+/**
+ * Performance data for a single player in a fight.
+ */
+data class GuildReportPlayerPerformance(
+    val name: String,
+    val server: String,
+    val type: String,
+    val spec: String,
+    val deaths: Int,
+)
+
+// ============================================================================
+// GraphQL Response DTOs — Character Parses
+// ============================================================================
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class WarcraftLogsGraphQLResponse(
@@ -239,6 +415,72 @@ internal data class WarcraftLogsRanking(
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class WarcraftLogsEncounter(
     val name: String?,
+)
+
+// ============================================================================
+// GraphQL Response DTOs — Guild Reports
+// ============================================================================
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportsGraphQLResponse(
+    val data: GuildReportsData?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportsData(
+    val reportData: GuildReportsReportData?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportsReportData(
+    val reports: GuildReportsPage?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportsPage(
+    val data: List<GuildReportNode>?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportNode(
+    val code: String?,
+    val title: String?,
+    val startTime: Long?,
+    val endTime: Long?,
+    val owner: GuildReportOwner?,
+    val zone: GuildReportZone?,
+    val fights: List<GuildReportFightNode>?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportOwner(
+    val name: String?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportZone(
+    val name: String?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportFightNode(
+    val id: Int?,
+    val encounterID: Int?,
+    val name: String?,
+    val difficulty: Int?,
+    val kill: Boolean?,
+    val startTime: Long?,
+    val endTime: Long?,
+    val bossPercentage: Double?,
+    val friendlyPlayers: List<Int>?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class GuildReportPlayerDetail(
+    val name: String?,
+    val server: String?,
+    val type: String?,
+    val spec: String?,
 )
 
 class WarcraftLogsNotFoundException(message: String) : RuntimeException(message)

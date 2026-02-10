@@ -26,6 +26,7 @@ const selectedRealm = ref<string>('')
 const sourceFilter = ref<'all' | 'raid' | 'dungeon' | 'vault'>('all')
 const slotFilter = ref<string>('all')
 const isSimulating = ref(false)
+const simulationError = ref<string | null>(null)
 
 // Slots for filtering
 const slots = [
@@ -101,15 +102,22 @@ const submitMutation = useMutation({
   mutationFn: () =>
     simulationApi.submitSimulation(guildId.value, selectedCharacter.value, {
       characterRealm: selectedRealm.value,
-      characterClass: 'Warrior', // TODO: Get from character data
+      characterClass: characters.value.find(c => c.name === selectedCharacter.value)?.class ?? 'Warrior',
       characterSpec: 'Arms',
       iterations: 10000,
       fightLengthSeconds: 300,
     }),
   onSuccess: () => {
+    simulationError.value = null
     isSimulating.value = true
     // Poll for completion
     pollSimulation()
+  },
+  onError: (error: any) => {
+    isSimulating.value = false
+    simulationError.value = error?.response?.data?.message
+      || error?.message
+      || 'Simulation service unavailable. Is the SimulationCraft Docker container running?'
   },
 })
 
@@ -171,6 +179,7 @@ function pollSimulation() {
 }
 
 function runSimulation() {
+  simulationError.value = null
   submitMutation.mutate()
 }
 
@@ -272,6 +281,22 @@ function handleItemClick(result: SimulationResultDto) {
             </svg>
             {{ isSimulating ? 'Simulating...' : 'Run Simulation' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div
+      v-if="simulationError"
+      class="bg-red-900/30 border border-red-700 rounded-lg p-4 mb-6"
+    >
+      <div class="flex items-center gap-3">
+        <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.27 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <div>
+          <p class="text-red-300 font-medium">Simulation Failed</p>
+          <p class="text-red-400 text-sm">{{ simulationError }}</p>
         </div>
       </div>
     </div>

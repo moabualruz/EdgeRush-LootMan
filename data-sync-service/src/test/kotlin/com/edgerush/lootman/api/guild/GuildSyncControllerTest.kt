@@ -6,6 +6,10 @@ import com.edgerush.datasync.test.base.UnitTest
 import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.application.guild.GuildRosterSyncResult
 import com.edgerush.lootman.application.guild.GuildRosterSyncService
+import com.edgerush.lootman.application.guild.RaiderIOPreparationSyncService
+import com.edgerush.lootman.application.guild.PreparationDataSyncResult
+import com.edgerush.lootman.application.guild.WarcraftLogsPerformanceSyncService
+import com.edgerush.lootman.application.guild.PerformanceSyncResult
 import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
 import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
@@ -35,6 +39,8 @@ class GuildSyncControllerTest : UnitTest() {
     private lateinit var wowAuditWishlistSyncService: WoWAuditWishlistSyncService
     private lateinit var wowAuditHistoricalDataSyncService: WoWAuditHistoricalDataSyncService
     private lateinit var warcraftLogsRosterSyncService: WarcraftLogsRosterSyncService
+    private lateinit var warcraftLogsPerformanceSyncService: WarcraftLogsPerformanceSyncService
+    private lateinit var raiderIOPreparationSyncService: RaiderIOPreparationSyncService
     private lateinit var guildContextService: GuildContextService
     private lateinit var controller: GuildSyncController
 
@@ -50,6 +56,8 @@ class GuildSyncControllerTest : UnitTest() {
         wowAuditWishlistSyncService = mockk()
         wowAuditHistoricalDataSyncService = mockk()
         warcraftLogsRosterSyncService = mockk()
+        warcraftLogsPerformanceSyncService = mockk()
+        raiderIOPreparationSyncService = mockk()
         guildContextService = mockk()
 
         controller =
@@ -62,6 +70,8 @@ class GuildSyncControllerTest : UnitTest() {
                 wowAuditWishlistSyncService,
                 wowAuditHistoricalDataSyncService,
                 warcraftLogsRosterSyncService,
+                warcraftLogsPerformanceSyncService,
+                raiderIOPreparationSyncService,
                 guildContextService,
             )
     }
@@ -211,6 +221,14 @@ class GuildSyncControllerTest : UnitTest() {
                 Mono.just(
                     WarcraftLogsSyncResult(created = 0, updated = 3, skipped = 0, error = null),
                 )
+            every { warcraftLogsPerformanceSyncService.syncPerformanceData(guildId, any()) } returns
+                Mono.just(
+                    PerformanceSyncResult(reportsInserted = 1, fightsInserted = 3, performanceRowsInserted = 10),
+                )
+            every { raiderIOPreparationSyncService.syncPreparationData(guildId) } returns
+                Mono.just(
+                    PreparationDataSyncResult(synced = 5, skipped = 1, failed = 0),
+                )
 
             // When
             val response = controller.triggerWarcraftLogsSync(guildId, user).block()
@@ -218,6 +236,8 @@ class GuildSyncControllerTest : UnitTest() {
             // Then
             response?.body?.success shouldBe true
             verify { warcraftLogsRosterSyncService.syncRoster(guildId) }
+            verify { warcraftLogsPerformanceSyncService.syncPerformanceData(guildId, any()) }
+            verify { raiderIOPreparationSyncService.syncPreparationData(guildId) }
         }
     }
 

@@ -81,9 +81,10 @@ class WoWAuditLootHistorySyncService(
         try {
             val node = objectMapper.readTree(body)
 
-            // WoWAudit loot history response can be an array or have a "loot" field
+            // WoWAudit loot history response: {"history_items": [...]} or {"loot": [...]} or array
             val lootNode =
                 when {
+                    node.has("history_items") -> node.get("history_items")
                     node.has("loot") -> node.get("loot")
                     node.isArray -> node
                     else -> {
@@ -106,7 +107,7 @@ class WoWAuditLootHistorySyncService(
                         UpsertResult.SKIPPED -> skipped++
                     }
                 } catch (ex: Exception) {
-                    val itemName = element.path("item_name").asText("unknown")
+                    val itemName = element.path("name").asText(element.path("item_name").asText("unknown"))
                     logger.warn("Failed to process loot award for item {}: {}", itemName, ex.message)
                     skipped++
                 }
@@ -123,20 +124,26 @@ class WoWAuditLootHistorySyncService(
         element: JsonNode,
         guildId: String,
     ): UpsertResult {
-        // Extract character info
-        val characterName =
-            element.path("character").path("name").asText("")
-                .ifBlank { element.path("character_name").asText("") }
-        val characterRealm =
-            element.path("character").path("realm").asText("")
-                .ifBlank { element.path("character_realm").asText("") }
+        // WoWAudit loot response uses character_id (their internal ID) mapped to raiders.wowaudit_id
+        val wowauditCharacterId = element.path("character_id").asLongOrNull()
 
-        if (characterName.isBlank()) return UpsertResult.SKIPPED
+        // Try lookup by WoWAudit character_id first, then fall back to name/realm
+        val raider = if (wowauditCharacterId != null) {
+            raiderEntityRepository.findByWowauditId(wowauditCharacterId)
+        } else {
+            // Fallback: try character name/realm extraction
+            val characterName =
+                element.path("character").path("name").asText("")
+                    .ifBlank { element.path("character_name").asText("") }
+            val characterRealm =
+                element.path("character").path("realm").asText("")
+                    .ifBlank { element.path("character_realm").asText("") }
+            if (characterName.isBlank()) return UpsertResult.SKIPPED
+            raiderEntityRepository.findByCharacterNameAndRealmNormalized(characterName, characterRealm)
+        }
 
-        // Find raider by character name and realm
-        val raider = raiderEntityRepository.findByCharacterNameAndRealmNormalized(characterName, characterRealm)
         if (raider == null) {
-            logger.debug("Raider not found for loot award: {} - {}", characterName, characterRealm)
+            logger.debug("Raider not found for loot award: wowauditId={}", wowauditCharacterId)
             return UpsertResult.SKIPPED
         }
 
@@ -149,7 +156,8 @@ class WoWAuditLootHistorySyncService(
                 ?: return UpsertResult.SKIPPED
 
         val itemName =
-            element.path("item_name").asText("")
+            element.path("name").asText("")
+                .ifBlank { element.path("item_name").asText("") }
                 .ifBlank { element.path("item").path("name").asText("") }
                 .ifBlank { "Unknown Item" }
 
@@ -184,18 +192,25 @@ class WoWAuditLootHistorySyncService(
                 responseTypeName = element.path("response_type").path("name").asText(null)?.takeIf { it.isNotBlank() },
                 responseTypeRgba = element.path("response_type").path("rgba").asText(null)?.takeIf { it.isNotBlank() },
                 responseTypeExcluded = element.path("response_type").path("excluded").booleanValue(),
-                propagatedResponseTypeId = element.path("propagated_response_type").path("id").asIntOrNull(),
-                propagatedResponseTypeName = element.path("propagated_response_type").path("name").asText(null)?.takeIf { it.isNotBlank() },
-                propagatedResponseTypeRgba = element.path("propagated_response_type").path("rgba").asText(null)?.takeIf { it.isNotBlank() },
-                propagatedResponseTypeExcluded = element.path("propagated_response_type").path("excluded").booleanValue(),
+                // WoWAudit nests propagated type under response_type.propagated_to
+                propagatedResponseTypeId = element.path("response_type").path("propagated_to").path("id").asIntOrNull()
+                    ?: element.path("propagated_response_type").path("id").asIntOrNull(),
+                propagatedResponseTypeName = element.path("response_type").path("propagated_to").path("name").asText(null)?.takeIf { it.isNotBlank() }
+                    ?: element.path("propagated_response_type").path("name").asText(null)?.takeIf { it.isNotBlank() },
+                propagatedResponseTypeRgba = element.path("response_type").path("propagated_to").path("rgba").asText(null)?.takeIf { it.isNotBlank() }
+                    ?: element.path("propagated_response_type").path("rgba").asText(null)?.takeIf { it.isNotBlank() },
+                propagatedResponseTypeExcluded = element.path("response_type").path("propagated_to").path("excluded").booleanValue(),
                 sameResponseAmount = element.path("same_response_amount").asIntOrNull(),
                 note = element.path("note").asText(null)?.takeIf { it.isNotBlank() },
                 wishValue = element.path("wish_value").asIntOrNull(),
                 difficulty = element.path("difficulty").asText(null)?.takeIf { it.isNotBlank() },
                 discarded = element.path("discarded").booleanValue(),
                 characterId = raider.characterId,
-                awardedByCharacterId = element.path("awarded_by").path("character_id").asLongOrNull(),
-                awardedByName = element.path("awarded_by").path("name").asText(null)?.takeIf { it.isNotBlank() },
+                // WoWAudit uses top-level awarded_by_character_id / awarded_by_name
+                awardedByCharacterId = element.path("awarded_by_character_id").asLongOrNull()
+                    ?: element.path("awarded_by").path("character_id").asLongOrNull(),
+                awardedByName = element.path("awarded_by_name").asText(null)?.takeIf { it.isNotBlank() }
+                    ?: element.path("awarded_by").path("name").asText(null)?.takeIf { it.isNotBlank() },
             )
 
         lootAwardRepository.save(entity)
