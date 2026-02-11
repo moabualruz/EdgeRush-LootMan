@@ -247,7 +247,7 @@ class ApplicationDataFetchServiceTest : UnitTest() {
         region = "us",
         realm = "Illidan",
         profileUrl = "https://raider.io/characters/us/illidan/Arthas",
-        gear = RaiderIOGear(itemLevelEquipped = 495.5, itemLevelTotal = 500.0),
+        gear = RaiderIOGear(itemLevelEquipped = 495.5, itemLevelTotal = 500.0, items = null),
         mythicPlusScoresBySeason = mythicPlusScores,
         raidProgression = null,
     )

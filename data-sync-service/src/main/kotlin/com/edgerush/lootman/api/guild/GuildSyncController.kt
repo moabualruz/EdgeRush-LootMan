@@ -4,15 +4,21 @@ import com.edgerush.datasync.security.AuthenticatedUser
 import com.edgerush.lootman.application.guild.GuildContextService
 import com.edgerush.lootman.application.guild.GuildRosterSyncResult
 import com.edgerush.lootman.application.guild.GuildRosterSyncService
+import com.edgerush.lootman.application.guild.PeriodSyncResult
 import com.edgerush.lootman.application.guild.RaiderIOPreparationSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsPerformanceSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
+import com.edgerush.lootman.application.guild.WoWAuditApplicationsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
+import com.edgerush.lootman.application.guild.WoWAuditGuestsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditHistoricalDataSyncService
 import com.edgerush.lootman.application.guild.WoWAuditLootHistorySyncService
+import com.edgerush.lootman.application.guild.WoWAuditPeriodSyncService
+import com.edgerush.lootman.application.guild.WoWAuditRaidsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditRosterSyncService
 import com.edgerush.lootman.application.guild.WoWAuditSyncResult
+import com.edgerush.lootman.application.guild.WoWAuditTeamSyncService
 import com.edgerush.lootman.application.guild.WoWAuditWishlistSyncService
 import com.edgerush.lootman.domain.auth.model.UserId
 import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
@@ -53,6 +59,11 @@ class GuildSyncController(
     private val wowAuditLootHistorySyncService: WoWAuditLootHistorySyncService,
     private val wowAuditWishlistSyncService: WoWAuditWishlistSyncService,
     private val wowAuditHistoricalDataSyncService: WoWAuditHistoricalDataSyncService,
+    private val wowAuditPeriodSyncService: WoWAuditPeriodSyncService,
+    private val wowAuditTeamSyncService: WoWAuditTeamSyncService,
+    private val wowAuditRaidsSyncService: WoWAuditRaidsSyncService,
+    private val wowAuditGuestsSyncService: WoWAuditGuestsSyncService,
+    private val wowAuditApplicationsSyncService: WoWAuditApplicationsSyncService,
     private val warcraftLogsRosterSyncService: WarcraftLogsRosterSyncService,
     private val warcraftLogsPerformanceSyncService: WarcraftLogsPerformanceSyncService,
     private val raiderIOPreparationSyncService: RaiderIOPreparationSyncService,
@@ -624,8 +635,117 @@ class GuildSyncController(
             }
     }
 
+    @PostMapping("/wowaudit/period/trigger")
+    @Operation(summary = "Trigger WoWAudit period sync")
+    fun triggerWowauditPeriodSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+        return wowAuditPeriodSyncService.syncPeriod(guildId)
+            .map { periodResult ->
+                ResponseEntity.ok(
+                    WoWAuditSyncTriggerResponse(
+                        success = periodResult.syncResult.success,
+                        message = "Period sync: periodId=${periodResult.currentPeriodId}, seasonId=${periodResult.currentSeasonId}",
+                        result = periodResult.syncResult,
+                    ),
+                )
+            }
+            .onErrorResume { e ->
+                Mono.just(ResponseEntity.internalServerError().body(
+                    WoWAuditSyncTriggerResponse(success = false, message = "Period sync failed: ${e.message}"),
+                ))
+            }
+    }
+
+    @PostMapping("/wowaudit/team/trigger")
+    @Operation(summary = "Trigger WoWAudit team metadata sync")
+    fun triggerWowauditTeamSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+        return wowAuditTeamSyncService.syncTeam(guildId)
+            .map { result ->
+                ResponseEntity.ok(
+                    WoWAuditSyncTriggerResponse(success = result.success, message = "Team sync completed", result = result),
+                )
+            }
+            .onErrorResume { e ->
+                Mono.just(ResponseEntity.internalServerError().body(
+                    WoWAuditSyncTriggerResponse(success = false, message = "Team sync failed: ${e.message}"),
+                ))
+            }
+    }
+
+    @PostMapping("/wowaudit/raids/trigger")
+    @Operation(summary = "Trigger WoWAudit raids sync (raids, signups, encounters)")
+    fun triggerWowauditRaidsSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+        return wowAuditRaidsSyncService.syncRaids(guildId)
+            .map { result ->
+                ResponseEntity.ok(
+                    WoWAuditSyncTriggerResponse(success = result.success, message = "Raids sync completed", result = result),
+                )
+            }
+            .onErrorResume { e ->
+                Mono.just(ResponseEntity.internalServerError().body(
+                    WoWAuditSyncTriggerResponse(success = false, message = "Raids sync failed: ${e.message}"),
+                ))
+            }
+    }
+
+    @PostMapping("/wowaudit/guests/trigger")
+    @Operation(summary = "Trigger WoWAudit guests sync")
+    fun triggerWowauditGuestsSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+        return wowAuditGuestsSyncService.syncGuests(guildId)
+            .map { result ->
+                ResponseEntity.ok(
+                    WoWAuditSyncTriggerResponse(success = result.success, message = "Guests sync completed", result = result),
+                )
+            }
+            .onErrorResume { e ->
+                Mono.just(ResponseEntity.internalServerError().body(
+                    WoWAuditSyncTriggerResponse(success = false, message = "Guests sync failed: ${e.message}"),
+                ))
+            }
+    }
+
+    @PostMapping("/wowaudit/applications/trigger")
+    @Operation(summary = "Trigger WoWAudit applications sync")
+    fun triggerWowauditApplicationsSync(
+        @Parameter(description = "Guild ID")
+        @PathVariable guildId: String,
+        @AuthenticationPrincipal user: AuthenticatedUser,
+    ): Mono<ResponseEntity<WoWAuditSyncTriggerResponse>> {
+        requireSettingsAccess(user, guildId)
+        return wowAuditApplicationsSyncService.syncApplications(guildId)
+            .map { result ->
+                ResponseEntity.ok(
+                    WoWAuditSyncTriggerResponse(success = result.success, message = "Applications sync completed", result = result),
+                )
+            }
+            .onErrorResume { e ->
+                Mono.just(ResponseEntity.internalServerError().body(
+                    WoWAuditSyncTriggerResponse(success = false, message = "Applications sync failed: ${e.message}"),
+                ))
+            }
+    }
+
     @PostMapping("/wowaudit/all/trigger")
-    @Operation(summary = "Trigger all WoWAudit syncs (roster, attendance, wishlist)")
+    @Operation(summary = "Trigger ALL WoWAudit syncs (period, team, roster, attendance, wishlist, loot, historical, raids, guests, applications)")
     fun triggerWowauditAllSync(
         @Parameter(description = "Guild ID")
         @PathVariable guildId: String,
@@ -648,20 +768,129 @@ class GuildSyncController(
             )
         }
 
-        // Run all syncs in sequence
-        return wowAuditRosterSyncService.syncRoster(guildId)
-            .flatMap { rosterResult ->
+        // Results accumulator
+        data class AllSyncAccumulator(
+            val periodResult: PeriodSyncResult? = null,
+            val teamResult: WoWAuditSyncResult? = null,
+            val rosterResult: WoWAuditSyncResult? = null,
+            val attendanceResult: WoWAuditSyncResult? = null,
+            val wishlistResult: WoWAuditSyncResult? = null,
+            val lootResult: WoWAuditSyncResult? = null,
+            val historicalResult: WoWAuditSyncResult? = null,
+            val raidsResult: WoWAuditSyncResult? = null,
+            val guestsResult: WoWAuditSyncResult? = null,
+            val applicationsResult: WoWAuditSyncResult? = null,
+        )
+
+        // Step 1: Period (gets seasonId and periodId for downstream)
+        return wowAuditPeriodSyncService.syncPeriod(guildId)
+            .onErrorResume { e ->
+                logger.warn("Period sync failed for guild {}: {}", guildId, e.message)
+                Mono.just(PeriodSyncResult(WoWAuditSyncResult(0, 0, 0, e.message)))
+            }
+            .map { periodResult -> AllSyncAccumulator(periodResult = periodResult) }
+            // Step 2: Team
+            .flatMap { acc ->
+                wowAuditTeamSyncService.syncTeam(guildId)
+                    .onErrorResume { e ->
+                        logger.warn("Team sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(teamResult = it) }
+            }
+            // Step 3: Roster
+            .flatMap { acc ->
+                wowAuditRosterSyncService.syncRoster(guildId)
+                    .onErrorResume { e ->
+                        logger.warn("Roster sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(rosterResult = it) }
+            }
+            // Step 4: Attendance
+            .flatMap { acc ->
                 wowAuditAttendanceSyncService.syncAttendance(guildId)
-                    .map { attendanceResult -> Pair(rosterResult, attendanceResult) }
+                    .onErrorResume { e ->
+                        logger.warn("Attendance sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(attendanceResult = it) }
             }
-            .flatMap { (rosterResult, attendanceResult) ->
+            // Step 5: Wishlists
+            .flatMap { acc ->
                 wowAuditWishlistSyncService.syncWishlists(guildId)
-                    .map { wishlistResult -> Triple(rosterResult, attendanceResult, wishlistResult) }
+                    .onErrorResume { e ->
+                        logger.warn("Wishlist sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(wishlistResult = it) }
             }
-            .flatMap { (rosterResult, attendanceResult, wishlistResult) ->
-                val allSuccess = rosterResult.success && attendanceResult.success && wishlistResult.success
-                
-                // Update status
+            // Step 6: Loot History (uses seasonId from period sync)
+            .flatMap { acc ->
+                val seasonId = acc.periodResult?.currentSeasonId
+                if (seasonId != null) {
+                    wowAuditLootHistorySyncService.syncLootHistory(guildId, seasonId)
+                        .onErrorResume { e ->
+                            logger.warn("Loot history sync failed: {}", e.message)
+                            Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                        }
+                        .map { acc.copy(lootResult = it) }
+                } else {
+                    logger.info("Skipping loot history sync – no seasonId available from period")
+                    Mono.just(acc.copy(lootResult = WoWAuditSyncResult(0, 0, 0, "Skipped: no seasonId")))
+                }
+            }
+            // Step 7: Historical Data (uses periodId from period sync)
+            .flatMap { acc ->
+                val periodId = acc.periodResult?.currentPeriodId
+                if (periodId != null) {
+                    wowAuditHistoricalDataSyncService.syncHistoricalData(guildId, periodId)
+                        .onErrorResume { e ->
+                            logger.warn("Historical data sync failed: {}", e.message)
+                            Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                        }
+                        .map { acc.copy(historicalResult = it) }
+                } else {
+                    logger.info("Skipping historical data sync – no periodId available from period")
+                    Mono.just(acc.copy(historicalResult = WoWAuditSyncResult(0, 0, 0, "Skipped: no periodId")))
+                }
+            }
+            // Step 8: Raids
+            .flatMap { acc ->
+                wowAuditRaidsSyncService.syncRaids(guildId)
+                    .onErrorResume { e ->
+                        logger.warn("Raids sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(raidsResult = it) }
+            }
+            // Step 9: Guests
+            .flatMap { acc ->
+                wowAuditGuestsSyncService.syncGuests(guildId)
+                    .onErrorResume { e ->
+                        logger.warn("Guests sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(guestsResult = it) }
+            }
+            // Step 10: Applications
+            .flatMap { acc ->
+                wowAuditApplicationsSyncService.syncApplications(guildId)
+                    .onErrorResume { e ->
+                        logger.warn("Applications sync failed: {}", e.message)
+                        Mono.just(WoWAuditSyncResult(0, 0, 0, e.message))
+                    }
+                    .map { acc.copy(applicationsResult = it) }
+            }
+            // Build response
+            .flatMap { acc ->
+                val results = listOfNotNull(
+                    acc.periodResult?.syncResult, acc.teamResult, acc.rosterResult,
+                    acc.attendanceResult, acc.wishlistResult, acc.lootResult,
+                    acc.historicalResult, acc.raidsResult, acc.guestsResult, acc.applicationsResult,
+                )
+                val allSuccess = results.all { it.success }
+
                 val status = if (allSuccess) "SUCCESS" else "COMPLETED_WITH_ERRORS"
                 val configToUpdate = guildConfigurationRepository.findByGuildId(guildId) ?: config
                 val updated = configToUpdate.copy(
@@ -672,16 +901,21 @@ class GuildSyncController(
                 )
                 guildConfigurationRepository.save(updated)
 
-                logger.info(
-                    "WoWAudit all sync completed for guild $guildId: roster=$rosterResult, attendance=$attendanceResult, wishlist=$wishlistResult",
-                )
+                logger.info("WoWAudit all sync completed for guild {}: status={}", guildId, status)
                 Mono.just(ResponseEntity.ok(
                     WoWAuditAllSyncTriggerResponse(
                         success = allSuccess,
-                        message = if (allSuccess) "All syncs completed successfully" else "Some syncs completed with errors",
-                        rosterResult = rosterResult,
-                        attendanceResult = attendanceResult,
-                        wishlistResult = wishlistResult,
+                        message = if (allSuccess) "All 10 syncs completed successfully" else "Some syncs completed with errors",
+                        rosterResult = acc.rosterResult,
+                        attendanceResult = acc.attendanceResult,
+                        wishlistResult = acc.wishlistResult,
+                        lootResult = acc.lootResult,
+                        historicalResult = acc.historicalResult,
+                        raidsResult = acc.raidsResult,
+                        guestsResult = acc.guestsResult,
+                        applicationsResult = acc.applicationsResult,
+                        periodResult = acc.periodResult?.syncResult,
+                        teamResult = acc.teamResult,
                     ),
                 ))
             }
@@ -896,9 +1130,16 @@ data class WarcraftLogsSyncTriggerResponse(
 data class WoWAuditAllSyncTriggerResponse(
     val success: Boolean,
     val message: String,
+    val periodResult: WoWAuditSyncResult? = null,
+    val teamResult: WoWAuditSyncResult? = null,
     val rosterResult: WoWAuditSyncResult? = null,
     val attendanceResult: WoWAuditSyncResult? = null,
     val wishlistResult: WoWAuditSyncResult? = null,
+    val lootResult: WoWAuditSyncResult? = null,
+    val historicalResult: WoWAuditSyncResult? = null,
+    val raidsResult: WoWAuditSyncResult? = null,
+    val guestsResult: WoWAuditSyncResult? = null,
+    val applicationsResult: WoWAuditSyncResult? = null,
 )
 
 class GuildNotFoundException(guildId: String) : RuntimeException("Guild not found: $guildId")

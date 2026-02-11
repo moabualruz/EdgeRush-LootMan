@@ -197,7 +197,7 @@ class RaiderIOClientTest : UnitTest() {
                     region = "us",
                     realm = "Illidan",
                     profileUrl = "https://raider.io/characters/us/illidan/Test",
-                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
+                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0, items = null),
                     mythicPlusScoresBySeason =
                         listOf(
                             RaiderIOMythicPlusSeasonScore(
@@ -267,7 +267,7 @@ class RaiderIOClientTest : UnitTest() {
                     region = "us",
                     realm = "Illidan",
                     profileUrl = "https://raider.io/characters/us/illidan/Test",
-                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0),
+                    gear = RaiderIOGear(itemLevelEquipped = 489.5, itemLevelTotal = 495.0, items = null),
                     mythicPlusScoresBySeason = null,
                     raidProgression = null,
                 )

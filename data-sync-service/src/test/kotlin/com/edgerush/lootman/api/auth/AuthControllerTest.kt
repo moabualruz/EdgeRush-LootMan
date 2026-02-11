@@ -20,12 +20,15 @@ import java.time.Instant
  */
 class AuthControllerTest : UnitTest() {
     private lateinit var authenticationService: AuthenticationService
+    private lateinit var adminModeConfig: com.edgerush.datasync.security.AdminModeConfig
     private lateinit var controller: AuthController
 
     @BeforeEach
     fun setup() {
         authenticationService = mockk()
-        controller = AuthController(authenticationService)
+        adminModeConfig = mockk()
+        every { adminModeConfig.isEnabled() } returns false
+        controller = AuthController(authenticationService, adminModeConfig)
     }
 
     @Nested

@@ -12,11 +12,16 @@ import com.edgerush.lootman.application.guild.WarcraftLogsPerformanceSyncService
 import com.edgerush.lootman.application.guild.PerformanceSyncResult
 import com.edgerush.lootman.application.guild.WarcraftLogsRosterSyncService
 import com.edgerush.lootman.application.guild.WarcraftLogsSyncResult
+import com.edgerush.lootman.application.guild.WoWAuditApplicationsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditAttendanceSyncService
+import com.edgerush.lootman.application.guild.WoWAuditGuestsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditHistoricalDataSyncService
 import com.edgerush.lootman.application.guild.WoWAuditLootHistorySyncService
+import com.edgerush.lootman.application.guild.WoWAuditPeriodSyncService
+import com.edgerush.lootman.application.guild.WoWAuditRaidsSyncService
 import com.edgerush.lootman.application.guild.WoWAuditRosterSyncService
 import com.edgerush.lootman.application.guild.WoWAuditSyncResult
+import com.edgerush.lootman.application.guild.WoWAuditTeamSyncService
 import com.edgerush.lootman.application.guild.WoWAuditWishlistSyncService
 import com.edgerush.lootman.domain.guild.repository.GuildConfigurationRepository
 import io.kotest.matchers.shouldBe
@@ -38,6 +43,11 @@ class GuildSyncControllerTest : UnitTest() {
     private lateinit var wowAuditLootHistorySyncService: WoWAuditLootHistorySyncService
     private lateinit var wowAuditWishlistSyncService: WoWAuditWishlistSyncService
     private lateinit var wowAuditHistoricalDataSyncService: WoWAuditHistoricalDataSyncService
+    private lateinit var wowAuditPeriodSyncService: WoWAuditPeriodSyncService
+    private lateinit var wowAuditTeamSyncService: WoWAuditTeamSyncService
+    private lateinit var wowAuditRaidsSyncService: WoWAuditRaidsSyncService
+    private lateinit var wowAuditGuestsSyncService: WoWAuditGuestsSyncService
+    private lateinit var wowAuditApplicationsSyncService: WoWAuditApplicationsSyncService
     private lateinit var warcraftLogsRosterSyncService: WarcraftLogsRosterSyncService
     private lateinit var warcraftLogsPerformanceSyncService: WarcraftLogsPerformanceSyncService
     private lateinit var raiderIOPreparationSyncService: RaiderIOPreparationSyncService
@@ -55,6 +65,11 @@ class GuildSyncControllerTest : UnitTest() {
         wowAuditLootHistorySyncService = mockk()
         wowAuditWishlistSyncService = mockk()
         wowAuditHistoricalDataSyncService = mockk()
+        wowAuditPeriodSyncService = mockk()
+        wowAuditTeamSyncService = mockk()
+        wowAuditRaidsSyncService = mockk()
+        wowAuditGuestsSyncService = mockk()
+        wowAuditApplicationsSyncService = mockk()
         warcraftLogsRosterSyncService = mockk()
         warcraftLogsPerformanceSyncService = mockk()
         raiderIOPreparationSyncService = mockk()
@@ -69,6 +84,11 @@ class GuildSyncControllerTest : UnitTest() {
                 wowAuditLootHistorySyncService,
                 wowAuditWishlistSyncService,
                 wowAuditHistoricalDataSyncService,
+                wowAuditPeriodSyncService,
+                wowAuditTeamSyncService,
+                wowAuditRaidsSyncService,
+                wowAuditGuestsSyncService,
+                wowAuditApplicationsSyncService,
                 warcraftLogsRosterSyncService,
                 warcraftLogsPerformanceSyncService,
                 raiderIOPreparationSyncService,
